@@ -1,0 +1,4 @@
+# Exclude the legacy static frontend from GitHub's language statistics —
+# this repo's subject is the Kotlin backend port, not the pre-existing HTML.
+*.html linguist-vendored=true
+backend/src/main/resources/seed/seed-data.json linguist-generated=true
