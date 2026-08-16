@@ -120,25 +120,6 @@
   }
   .tabbar-logout:hover{ background:rgba(255,255,255,0.04); color:var(--ink); border-color:var(--gold); }
 
-  .java-placeholder{
-    display:none; position:fixed; inset:0; z-index:900;
-    align-items:center; justify-content:center; padding:20px;
-    background:var(--blueprint-deep);
-  }
-  .java-placeholder.show{ display:flex; }
-  .jp-card{ max-width:420px; text-align:center; }
-  .jp-eyebrow{
-    font-family:var(--mono); font-size:12px; letter-spacing:4px;
-    color:var(--gold); margin-bottom:12px;
-  }
-  .jp-card h2{ font-family:var(--sans); font-weight:700; color:var(--ink); margin:0 0 10px; }
-  .jp-card p{ color:var(--ink-soft); font-size:14px; line-height:1.6; margin:0 0 22px; }
-  .jp-back{
-    font-family:var(--mono); font-size:12.5px; background:transparent; color:var(--ink);
-    border:1px solid var(--grid-line-strong); border-radius:20px; padding:9px 18px; cursor:pointer;
-  }
-  .jp-back:hover{ background:rgba(255,255,255,0.04); border-color:var(--gold); }
-
   .python-app{
     display:none; position:fixed; inset:0; z-index:800; flex-direction:column;
     background:var(--blueprint-deep);
@@ -432,13 +413,9 @@
             <span class="lang-name">C++</span>
             <span class="lang-desc">Azercell Cup hazırlıq planı, test vərəqləri, alqoritm simulyasiyası</span>
           </button>
-          <button type="button" class="lang-btn lang-btn-java" onclick="chooseLanguage('java')">
-            <span class="lang-name">Java</span>
-            <span class="lang-desc">Tezliklə burada Java materialları olacaq</span>
-          </button>
           <button type="button" class="lang-btn lang-btn-python" onclick="chooseLanguage('python')">
-            <span class="lang-name">Python</span>
-            <span class="lang-desc">RFM analizi — pandas ilə müştəri seqmentləşdirməsi</span>
+            <span class="lang-name">Computer Science in DP (International Baccalaureate)</span>
+            <span class="lang-desc">Python ilə IB Diploma Programme Computer Science materialları</span>
           </button>
         </div>
       </div>
@@ -521,15 +498,6 @@
         <div class="loading-pct" id="loadingPct">0%</div>
       </div>
     </div>
-
-  <div class="java-placeholder" id="javaPlaceholder">
-    <div class="jp-card">
-      <div class="jp-eyebrow">JAVA</div>
-      <h2>Tezliklə burada olacaq</h2>
-      <p>Java hazırlıq materialları hazırlanır. Hazır olduqda bu bölmə aktiv olacaq.</p>
-      <button type="button" class="jp-back" onclick="backToLangSelect()">← Geri qayıt</button>
-    </div>
-  </div>
 
   <div class="python-app" id="pythonApp">
     <button type="button" class="py-back" onclick="backToLangSelect()">← Dil seçiminə qayıt</button>
@@ -775,7 +743,6 @@ function updateAuthUI(){
       langGate.style.display = 'none';
       document.getElementById('langSelect').classList.add('hide');
       document.getElementById('mainApp').classList.add('show');
-      document.getElementById('javaPlaceholder').classList.remove('show');
       document.getElementById('pythonApp').classList.remove('show');
       showTab('users');
     } else {
@@ -822,21 +789,14 @@ function chooseLanguage(lang){
   runLoadingThen(() => {
     if (lang === 'cpp'){
       document.getElementById('mainApp').classList.add('show');
-      document.getElementById('javaPlaceholder').classList.remove('show');
-      document.getElementById('pythonApp').classList.remove('show');
-    } else if (lang === 'java'){
-      document.getElementById('javaPlaceholder').classList.add('show');
-      document.getElementById('mainApp').classList.remove('show');
       document.getElementById('pythonApp').classList.remove('show');
     } else if (lang === 'python'){
       document.getElementById('pythonApp').classList.add('show');
       document.getElementById('mainApp').classList.remove('show');
-      document.getElementById('javaPlaceholder').classList.remove('show');
     }
   });
 }
 function backToLangSelect(){
-  document.getElementById('javaPlaceholder').classList.remove('show');
   document.getElementById('mainApp').classList.remove('show');
   document.getElementById('pythonApp').classList.remove('show');
   document.getElementById('langSelect').classList.remove('hide');
