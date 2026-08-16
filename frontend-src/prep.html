@@ -326,6 +326,15 @@
     color:var(--green-text); background:rgba(63,143,95,0.15); border:1px solid rgba(63,143,95,0.35);
     border-radius:20px; padding:4px 10px; flex-shrink:0;
   }
+  /* Müəllim tərəfindən hələ "açıq" elan olunmamış mövzu — şagirdə bağlı
+     görünür, kartın body-si klik ilə açılmır (bax: toggleWeek() / jumpToWeek()). */
+  .week.locked{ opacity:0.55; }
+  .week.locked .week-head{ cursor:not-allowed; }
+  .lock-badge{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.3px; white-space:nowrap;
+    color:var(--ink-soft); background:rgba(139,147,168,0.12); border:1px solid var(--grid-line-strong);
+    border-radius:20px; padding:4px 10px; flex-shrink:0;
+  }
   /* Sağ tərəfdəki ox (▶) işarəsi. .week.open klassı əlavə olunanda 90 dərəcə
      çevrilərək aşağı (▼) baxan vəziyyətə keçir — kartın açıq olduğunu bildirir. */
   .chevron{
@@ -2296,12 +2305,13 @@ weeks.forEach((w, i) => {
     ${w.hardStart ? `
     <div class="hard-start-banner">🔴 BURADAN ETİBARƏN ALQORİTMLƏR ÇƏTİNLƏŞİR — Backtracking ilə başlayır, DP (Mövzu 12) ən çətin mövzudur</div>
     ` : ''}
-    <div class="week-head" onclick="this.parentElement.classList.toggle('open')">
+    <div class="week-head" onclick="toggleWeek(this)">
       <div class="week-num">MÖVZU ${String(i+1).padStart(2,'0')}</div>
       <div class="week-title">
         <h3>${w.title}</h3>
         <p>${w.desc}</p>
       </div>
+      <span class="lock-badge" id="lock-${i}" style="display:none">🔒 Hələ açıq deyil</span>
       ${TEST_TABS[i] !== undefined ? `<div class="progress-badge" id="progress-${i}" style="display:none;"></div>` : ''}
       <div class="chevron">▶</div>
     </div>
@@ -2324,7 +2334,7 @@ weeks.forEach((w, i) => {
         <div class="tag-row"><span class="tag">${w.tag}</span>${w.hard ? `<span class="hard-badge">🔴 ÇƏTİN</span>` : ''}</div>
         <div class="topic-test-row">
           ${TEST_TABS[i] !== undefined
-            ? `<button type="button" class="test-btn" onclick="window.parent.showTab('${TEST_TABS[i]}')">📝 Test ${i+1}-i həll et</button>`
+            ? `<button type="button" class="test-btn" id="test-btn-${i}" onclick="window.parent.showTab('${TEST_TABS[i]}')">📝 Test ${i+1}-i həll et</button>`
             : `<button type="button" class="test-btn test-btn-disabled" disabled>📝 Test ${i+1} (tezliklə)</button>`}
         </div>
       </div>
@@ -2350,9 +2360,34 @@ async function loadProgress(){
         el.style.display = 'inline-block';
       }
     });
-  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+    // Backend /api/topics STUDENT üçün yalnız müəllimin "açıq" elan etdiyi
+    // mövzuları qaytarır (bax: TopicService.listTopics) — TEACHER/ADMIN üçün
+    // isə hamısını, ona görə slug-ın cavabda olub-olmaması "bu kart bu
+    // istifadəçiyə açıqdırmı" sualının düz cavabıdır.
+    weeks.forEach((w, i) => {
+      const slug = 'week' + (i + 1);
+      const isLocked = !bySlug[slug];
+      const weekEl = document.getElementById('week-' + i);
+      const lockBadge = document.getElementById('lock-' + i);
+      const testBtn = document.getElementById('test-btn-' + i);
+      if (weekEl) {
+        weekEl.classList.toggle('locked', isLocked);
+        if (isLocked) weekEl.classList.remove('open');
+      }
+      if (lockBadge) lockBadge.style.display = isLocked ? 'inline-block' : 'none';
+      if (testBtn) testBtn.disabled = isLocked;
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç, kartlar açıq qalır */ }
 }
 loadProgress();
+
+// Kart bağlıdırsa (hələ müəllim tərəfindən açıq elan olunmayıb) klik
+// heç nə etmir — açılıb-bağlanma yalnız açıq mövzular üçün işləyir.
+function toggleWeek(headEl){
+  const week = headEl.parentElement;
+  if (week.classList.contains('locked')) return;
+  week.classList.toggle('open');
+}
 
 weeks.forEach((w, i) => {
   const navBtn = document.createElement('button');
@@ -2367,7 +2402,7 @@ weeks.forEach((w, i) => {
 function jumpToWeek(i){
   const target = document.getElementById('week-' + i);
   if (!target) return;
-  target.classList.add('open');
+  if (!target.classList.contains('locked')) target.classList.add('open');
   target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   document.querySelectorAll('.roadmap-nav-item').forEach(el => el.classList.remove('current'));
   const navBtn = document.getElementById('nav-week-' + i);
