@@ -1,0 +1,2671 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 4 — Test: Riyazi əsaslar II (Rəqəmlər, modul aritmetika, dərəcə, kombinatorika, overflow, bölənlər)</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:16px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{ display:flex; align-items:flex-start; gap:14px; padding:16px 18px; }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; }
+  .problem-main h3{ margin:0 0 6px; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; margin-bottom:8px; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-body{ padding:0 18px 16px; }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-input{
+    width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px; resize:vertical; outline:none; box-sizing:border-box;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>04</span> — Test Vərəqi</h1>
+    <p>Mövzu: ədədin rəqəmlərinə ayrılması, modul aritmetika, sürətli qüvvətə yüksəltmə, faktorial və kombinatorika (C(n,k)), tam ədəd daşması (overflow), ədədin bölənlərinin tapılması. Aşağıdakı 100 məsələ yalnız Mövzu 4-ün mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 4 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "4827 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"4827", out:"21"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "999 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"999", out:"27"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "100 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"100", out:"1"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "12345 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"12345", out:"15"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "7 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"7", out:"7"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "88888 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"88888", out:"40"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "10203 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"10203", out:"6"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "55555 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"55555", out:"25"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1000000 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"1000000", out:"1"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "246810 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"246810", out:"21"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "13579 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"13579", out:"25"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "90909 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"90909", out:"27"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "123456789 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"123456789", out:"45"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "42 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"42", out:"6"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "8080 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"8080", out:"16"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "654321 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"654321", out:"21"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "99999 ədədinin rəqəmlərinin cəmi",
+    difficulty: "easy",
+    tags: ["rəqəmlərə ayırma", "%", "/", "while"],
+    statement: "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
+    output: "Rəqəmlərin cəmi.",
+    example: {in:"99999", out:"45"},
+    approach: "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long sum = 0;
+    while (n > 0){
+        sum += n % 10;
+        n /= 10;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "999999999 və 999999999 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"999999999 999999999 1000000007", out:"999999991 64"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "123456789 və 987654321 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"123456789 987654321 1000000007", out:"111111103 259106859"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "500000000 və 600000000 ədədlərinin mod 998244353 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"500000000 600000000 998244353", out:"101755647 414470140"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "17 və 5 ədədlərinin mod 12 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"17 5 12", out:"10 1"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "100 və 200 ədədlərinin mod 7 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"100 200 7", out:"6 1"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "999999999999 və 999999999999 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"999999999999 999999999999 1000000007", out:"999986005 49014001"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "7 və 8 ədədlərinin mod 5 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"7 8 5", out:"0 1"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "1000000000 və 1000000000 ədədlərinin mod 999999937 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"1000000000 1000000000 999999937", out:"126 3969"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "55 və 66 ədədlərinin mod 13 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"55 66 13", out:"4 3"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "2 və 3 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"2 3 1000000007", out:"5 6"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "999999999 və 1 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"999999999 1 1000000007", out:"1000000000 999999999"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "444444444 və 555555555 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"444444444 555555555 1000000007", out:"999999999 24691374"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "81 və 27 ədədlərinin mod 100 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"81 27 100", out:"8 87"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "9999999999 və 8888888888 ədədlərinin mod 998244353 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"9999999999 8888888888 998244353", out:"920490533 951972827"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "1 və 1 ədədlərinin mod 2 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"1 1 2", out:"0 1"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "777777777 və 333333333 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"777777777 333333333 1000000007", out:"111111103 925925949"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "999999999999999999 və 1 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+    difficulty: "mid",
+    tags: ["modul aritmetika", "%", "overflow"],
+    statement: "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
+    output: "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
+    example: {in:"999999999999999999 1 1000000007", out:"49 48"},
+    approach: "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b, m; cin >> a >> b >> m;
+    long long sum = (a % m + b % m) % m;
+    long long prod = (a % m) * (b % m) % m;
+    cout << sum << " " << prod << "\\n";
+}`},
+  {
+    title: "2 ədədinin 10-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"2 10 1000000007", out:"1024"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "3 ədədinin 20-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"3 20 1000000007", out:"486784380"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "5 ədədinin 100-ci dərəcəsi (mod 998244353)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"5 100 998244353", out:"993453594"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "7 ədədinin 13-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"7 13 1000000007", out:"889009735"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "2 ədədinin 30-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"2 30 1000000007", out:"73741817"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "10 ədədinin 9-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"10 9 1000000007", out:"1000000000"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "4 ədədinin 50-ci dərəcəsi (mod 998244353)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"4 50 998244353", out:"882499718"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "6 ədədinin 6-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"6 6 1000000007", out:"46656"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "2 ədədinin 1000000000-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"2 1000000000 1000000007", out:"140625001"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "9 ədədinin 9-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"9 9 1000000007", out:"387420489"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "11 ədədinin 11-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"11 11 1000000007", out:"311668616"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "13 ədədinin 13-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"13 13 1000000007", out:"104472128"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "3 ədədinin 100-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"3 100 1000000007", out:"886041711"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "2 ədədinin 63-ci dərəcəsi (mod 998244353)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"2 63 998244353", out:"466025955"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "5 ədədinin 5-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"5 5 1000000007", out:"3125"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "17 ədədinin 17-ci dərəcəsi (mod 1000000007)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"17 17 1000000007", out:"654971512"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "7 ədədinin 100-ci dərəcəsi (mod 998244353)",
+    difficulty: "mid",
+    tags: ["sürətli qüvvət", "modul aritmetika", "O(log n)"],
+    statement: "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
+    input: "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
+    output: "(base^exp) mod mod dəyəri.",
+    example: {in:"7 100 998244353", out:"680223855"},
+    approach: "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;
+    }
+    return result;
+}
+int main(){
+    long long base, exp, mod; cin >> base >> exp >> mod;
+    cout << power(base, exp, mod) << "\\n";
+}`},
+  {
+    title: "5! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"5", out:"120"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "10! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"10", out:"3628800"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "0! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"0", out:"1"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "1! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"1", out:"1"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "15! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"15", out:"1307674368000"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "12! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"12", out:"479001600"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "18! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"18", out:"6402373705728000"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "7! (faktorial) hesablanması",
+    difficulty: "easy",
+    tags: ["faktorial", "for", "long long"],
+    statement: "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 18).",
+    output: "N! dəyəri.",
+    example: {in:"7", out:"5040"},
+    approach: "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    cout << res << "\\n";
+}`},
+  {
+    title: "C(5,2) — 5 elementdən 2 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"5 2", out:"10"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(10,3) — 10 elementdən 3 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"10 3", out:"120"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(6,6) — 6 elementdən 6 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"6 6", out:"1"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(7,0) — 7 elementdən 0 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"7 0", out:"1"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(8,4) — 8 elementdən 4 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"8 4", out:"70"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(12,5) — 12 elementdən 5 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"12 5", out:"792"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(9,2) — 9 elementdən 2 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"9 2", out:"36"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "C(15,7) — 15 elementdən 7 seçmə",
+    difficulty: "mid",
+    tags: ["kombinatorika", "faktorial", "C(n,k)"],
+    statement: "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
+    input: "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
+    output: "C(n,k) dəyəri.",
+    example: {in:"15 7", out:"6435"},
+    approach: "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << fact(n) / (fact(k) * fact(n - k)) << "\\n";
+}`},
+  {
+    title: "2000000000 və 2000000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2000000000 2000000000", out:"4000000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1500000000 və 1800000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1500000000 1800000000", out:"3300000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "999999999 və 999999999 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"999999999 999999999", out:"1999999998"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "2100000000 və 2100000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2100000000 2100000000", out:"4200000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1234567890 və 1234567890 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1234567890 1234567890", out:"2469135780"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "2000000000 və 100000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2000000000 100000000", out:"2100000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1999999999 və 1999999999 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1999999999 1999999999", out:"3999999998"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1000000000 və 1000000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1000000000 1000000000", out:"2000000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1800000000 və 1900000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1800000000 1900000000", out:"3700000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "2147483000 və 2147483000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2147483000 2147483000", out:"4294966000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1500000001 və 1500000002 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1500000001 1500000002", out:"3000000003"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "2000000001 və 999999999 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2000000001 999999999", out:"3000000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1700000000 və 1700000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1700000000 1700000000", out:"3400000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1900000000 və 1900000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1900000000 1900000000", out:"3800000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "2050000000 və 2050000000 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"2050000000 2050000000", out:"4100000000"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "1234567891 və 987654321 ədədlərinin cəmi (overflow-suz)",
+    difficulty: "mid",
+    tags: ["overflow", "long long", "tam ədəd daşması"],
+    statement: "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
+    input: "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
+    output: "a + b cəmi.",
+    example: {in:"1234567891 987654321", out:"2222222212"},
+    approach: "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << a + b << "\\n";
+}`},
+  {
+    title: "36 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"36", out:"9"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "100 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"100", out:"9"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "17 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"17", out:"2"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "60 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"60", out:"12"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"1", out:"1"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "999 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"999", out:"8"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "720 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"720", out:"30"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1000000 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"1000000", out:"49"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "97 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"97", out:"2"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "144 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"144", out:"15"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "360 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"360", out:"24"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1024 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"1024", out:"11"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "210 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"210", out:"16"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "89 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"89", out:"2"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "500000 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"500000", out:"42"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "999983 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"999983", out:"2"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "720720 ədədinin bölənlərinin sayı",
+    difficulty: "mid",
+    tags: ["bölənlər", "√n", "for"],
+    statement: "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+    output: "Bölənlərin sayı.",
+    example: {in:"720720", out:"240"},
+    approach: "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n; cin >> n;
+    long long cnt = 0;
+    for (long long i = 1; i * i <= n; i++){
+        if (n % i == 0){
+            cnt++;
+            if (i != n / i) cnt++;
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/01_4827_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/02_999_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/03_100_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/04_12345_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/05_7_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/06_88888_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/07_10203_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/08_55555_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/09_1000000_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/10_246810_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/11_13579_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/12_90909_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/13_123456789_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/14_42_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/15_8080_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/16_654321_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/17_99999_ededinin_reqemlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/18_999999999_ve_999999999_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/19_123456789_ve_987654321_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/20_500000000_ve_600000000_ededlerinin_mod_998244353_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/21_17_ve_5_ededlerinin_mod_12_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/22_100_ve_200_ededlerinin_mod_7_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/23_999999999999_ve_999999999999_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/24_7_ve_8_ededlerinin_mod_5_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/25_1000000000_ve_1000000000_ededlerinin_mod_999999937_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/26_55_ve_66_ededlerinin_mod_13_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/27_2_ve_3_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/28_999999999_ve_1_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/29_444444444_ve_555555555_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/30_81_ve_27_ededlerinin_mod_100_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/31_9999999999_ve_8888888888_ededlerinin_mod_998244353_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/32_1_ve_1_ededlerinin_mod_2_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/33_777777777_ve_333333333_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/34_999999999999999999_ve_1_ededlerinin_mod_1000000007_uzre_cemi_ve_hasili.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/35_2_ededinin_10_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/36_3_ededinin_20_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/37_5_ededinin_100_ci_derecesi_mod_998244353.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/38_7_ededinin_13_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/39_2_ededinin_30_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/40_10_ededinin_9_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/41_4_ededinin_50_ci_derecesi_mod_998244353.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/42_6_ededinin_6_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/43_2_ededinin_1000000000_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/44_9_ededinin_9_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/45_11_ededinin_11_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/46_13_ededinin_13_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/47_3_ededinin_100_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/48_2_ededinin_63_ci_derecesi_mod_998244353.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/49_5_ededinin_5_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/50_17_ededinin_17_ci_derecesi_mod_1000000007.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/51_7_ededinin_100_ci_derecesi_mod_998244353.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/52_5_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/53_10_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/54_0_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/55_1_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/56_15_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/57_12_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/58_18_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/59_7_faktorial_hesablanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/60_c_5_2_5_elementden_2_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/61_c_10_3_10_elementden_3_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/62_c_6_6_6_elementden_6_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/63_c_7_0_7_elementden_0_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/64_c_8_4_8_elementden_4_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/65_c_12_5_12_elementden_5_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/66_c_9_2_9_elementden_2_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/67_c_15_7_15_elementden_7_secme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/68_2000000000_ve_2000000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/69_1500000000_ve_1800000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/70_999999999_ve_999999999_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/71_2100000000_ve_2100000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/72_1234567890_ve_1234567890_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/73_2000000000_ve_100000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/74_1999999999_ve_1999999999_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/75_1000000000_ve_1000000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/76_1800000000_ve_1900000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/77_2147483000_ve_2147483000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/78_1500000001_ve_1500000002_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/79_2000000001_ve_999999999_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/80_1700000000_ve_1700000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/81_1900000000_ve_1900000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/82_2050000000_ve_2050000000_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/83_1234567891_ve_987654321_ededlerinin_cemi_overflow_suz.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/84_36_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/85_100_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/86_17_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/87_60_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/88_1_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/89_999_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/90_720_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/91_1000000_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/92_97_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/93_144_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/94_360_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/95_1024_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/96_210_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/97_89_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/98_500000_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/99_999983_ededinin_bolenlerinin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu4/100_720720_ededinin_bolenlerinin_sayi.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.innerHTML = `
+    <div class="problem-head">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+        <div class="problem-body">
+          <p>${p.statement}</p>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+            <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+          </div>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+            <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+          </div>
+          <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="solution-inner approach-block">
+            <p class="sub-label">Yanaşma</p>
+            <p class="approach">${p.approach}</p>
+          </div>
+          <div class="submit-panel">
+            <p class="sub-label">Kodunu göndər</p>
+            <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
+            <div class="submit-row">
+              <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+              <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+              <span class="submit-hint" id="hint-${i}"></span>
+            </div>
+            <div class="history-list" id="history-${i}"></div>
+            <div class="verdict" id="verdict-${i}">
+              <span class="verdict-badge" id="badge-${i}"></span>
+              <div class="io-grid">
+                <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+                <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+            <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week4/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    badgeEl.textContent = VERDICT_LABELS[data.status] || data.status;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

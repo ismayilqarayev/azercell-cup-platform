@@ -1,0 +1,2404 @@
+<!--
+  ============================================================================
+  AZERCELL CUP — QIZIL MEDAL HAZIRLIQ PLANI
+  ----------------------------------------------------------------------------
+  Bu sənəd tək fayldan ibarət, statik (server tələb etməyən) bir veb səhifədir:
+    <head><style>  -> bütün vizual dizayn (rənglər, layout, animasiyalar)
+    <body>         -> statik HTML skelet (başlıq, metod qeydi, boş konteynerlər)
+    <script>       -> bütün MƏZMUN (weeks, resources massivləri)
+                      və bu məzmunu boş konteynerlərin içinə HTML olaraq
+                      "render" edən (yaradıb yerləşdirən) funksiyalar.
+  Səhifə açılan kimi script işə düşür, weeks/resources
+  massivlərini gəzib müvafiq HTML-i yaradır və #roadmap, #resources
+  konteynerlərinin içinə yerləşdirir. İstifadəçi qarşılıqlı
+  təsiri (klik və s.) tamamilə brauzerdə, əlavə şəbəkə sorğusu olmadan işləyir.
+  ============================================================================
+-->
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<title>Azercell Cup — Qızıl Medal Hazırlıq Planı</title>
+<style>
+  /* ==========================================================================
+     RƏNG VƏ FONT DƏYİŞƏNLƏRİ (CSS Custom Properties)
+     --------------------------------------------------------------------------
+     Bütün səhifə boyunca istifadə olunan rəng paletini və font ailələrini
+     burada mərkəzləşdiririk. Səbəb: dizaynı dəyişmək lazım olsa (məsələn,
+     qızıl rəngi daha tünd etmək), yalnız bu bir yerdə düzəliş etmək kifayətdir —
+     kodun hər yerində ayrı-ayrı rəng kodlarını axtarıb dəyişmək lazım deyil.
+     Ümumi tema: "mühəndislik çertyoju / blueprint" görünüşü — tünd mavi fon
+     üzərində qızıl/bürünc vurğular, planlaşdırma sənədi hissi yaratmaq üçün.
+     ========================================================================== */
+  :root{
+    --blueprint-deep:   #0B0F19; /* Ən tünd fon rəngi — səhifənin əsas arxa planı */
+    --blueprint-mid:    #EDEEF2; /* Bir az açıq tünd mavi (hazırda ehtiyat rəng) */
+    --grid-line:        rgba(255, 255, 255, 0.08); /* Blueprint effekti üçün incə xətlər — kiçik şəbəkə (16px) */
+    --grid-line-strong: rgba(255, 255, 255, 0.16); /* Eyni şəbəkənin qalın/görünən xətləri — böyük şəbəkə (96px) */
+    --paper:            #141824; /* "Kağız" rəngi — açıq fonlu kart/blok elementləri (məs. mövzu kartları) üçün */
+    --paper-warm:       #1B2030; /* Kağızın isti (yaşılımtıl) variantı — cədvəl başlıqları və s. üçün */
+    --well: #05070C;
+    --ink:              #F2F4F8; /* Açıq fon üzərində əsas mətn rəngi (tünd, oxunaqlı) */
+    --ink-soft:         #8B93A8; /* İkinci dərəcəli, az vurğulu mətn üçün yumşaq rəng */
+    --gold:             #00E5FF; /* Əsas vurğu rəngi — çərçivələr, xətlər, teqlər */
+    --gold-bright:      #4DFFFF; /* Qızılın parlaq forması — başlıqlar, önə çıxan mətnlər üçün */
+    --on-accent: #0B0F19;
+    --bronze:           #FF7A00; /* İkinci dərəcəli vurğu rəngi — kiçik başlıqlar (h4), teqlər */
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --alert:            #FF3B3B; /* Xəbərdarlıq/hover zamanı diqqət çəkən rəng */
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace; /* Kod və texniki yazılar üçün mono şrift */
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; /* Adi mətn üçün oxunaqlı şrift */
+  }
+
+  /* box-sizing:border-box — padding və border dəyərləri elementin ÜMUMİ enin/boyunun
+     içinə hesablanır, beləliklə layout hesablamaları asanlaşır və elementlər
+     gözlənilməz şəkildə böyümür. Bütün elementlərə (*) tətbiq olunur. */
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--blueprint-deep);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* "Blueprint kağızı" effekti: 4 ədəd təkrarlanan xətti qradient bir-birinin
+     üzərinə qoyulur ki, mühəndislik çertyojlarındakı milimetrli kağıza bənzəyən
+     iki qatlı (kiçik + böyük) tor (grid) şəbəkəsi yaransın:
+       1-ci və 2-ci qradient -> şaquli/üfüqi NAZİK xətlər, 16px aralıqla (xırda tor)
+       3-cü və 4-cü qradient -> şaquli/üfüqi QALIN xətlər, 96px aralıqla (əsas tor)
+     background-size hər qradientin təkrarlanma ölçüsünü təyin edir (sıra ilə
+     yuxarıdakı 4 qradientə uyğun). background-position xətlərin kənardan
+     kəsilməsinin qarşısını almaq üçün 1px sürüşdürür. */
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+
+  /* Bütün səhifə məzmununu ortalayan və maksimum eni 1000px-lə məhdudlaşdıran
+     əsas konteyner. Yuxarı/aşağı padding səhifənin kənarlarında boşluq yaradır. */
+  .wrap{ max-width:1000px; margin:0 auto; padding:36px 20px 100px; }
+
+  /* ==========================================================================
+     BAŞLIQ BLOKU (TITLE BLOCK) — mühəndislik çertyojlarının küncündəki
+     "sənəd kartı"na bənzəyir (adı, revizyası, təsviri olan kiçik cədvəl).
+     Burada şagirdin şəkli/adı və proqramın ümumi "spesifikasiyaları" göstərilir.
+     ========================================================================== */
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative; /* ::before elementini mütləq mövqedə yerləşdirmək üçün əsas nöqtə */
+    padding:28px 26px 20px;
+    margin-bottom:40px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  /* Çərçivənin yuxarı kənarında "kəsilmiş etiket" effekti: mütləq mövqeli,
+     yarı yuxarıda (top:-11px) yerləşən kiçik mətn qutusu, arxa fonla üst-üstə
+     düşərək çərçivə xəttini kəsib "AZ-CUP / TRAINING SCHEMATIC / REV. 2026"
+     yazısını göstərir — çertyoj sənədlərindəki başlıq ştampına bənzədilir. */
+  .titleblock::before{
+    content:"AZ-CUP / TRAINING SCHEMATIC / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  /* Foto + mətn sütununu yan-yana düzən flex konteyner. flex-wrap sayəsində
+     ekran daralanda foto mətnin altına düşür (mobil uyğunluq). */
+  .titleblock-inner{
+    display:flex;
+    align-items:flex-start;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+  /* Şagirdin profil şəklini və altındakı adı şaquli düzən sütun.
+     flex-shrink:0 — konteyner daralanda bu sütunun kiçilməsinin qarşısını alır. */
+  .profile-photo-col{
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:96px;
+  }
+  /* Dairəvi/yumşaq künclü şəkil çərçivəsi. overflow:hidden içindəki <img>-i
+     bu ölçüyə uyğun kəsir (object-fit:cover ilə birgə). */
+  .profile-photo{
+    width:96px; height:96px;
+    border-radius:6px;
+    overflow:hidden;
+    border:2px solid var(--gold);
+    box-shadow:0 2px 10px rgba(0,0,0,0.35);
+  }
+  /* object-fit:cover — şəklin en/uzun nisbəti konteynerdən fərqli olsa belə,
+     şəkil deformasiya olmadan konteyneri tam doldurur (kənarlar kəsilir). */
+  .profile-photo img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .profile-name{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.5px;
+    color:var(--gold-bright);
+    margin-top:8px;
+    text-align:center;
+  }
+  /* flex:1 — mətn bloku qalan bütün boş yeri tutur; min-width foto ilə mətnin
+     yan-yana sığmadığı halda düzgün sətirə keçməsini təmin edir. */
+  .titleblock-text{ flex:1; min-width:220px; }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(28px,5vw,44px);
+    line-height:1.15;
+    margin:10px 0 6px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p.sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:640px;
+    margin:0 0 22px;
+  }
+  .specs{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:0;
+    border-top:1px solid var(--grid-line-strong);
+  }
+  .specs div{
+    padding:12px 14px;
+    border-right:1px solid var(--grid-line-strong);
+  }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:1.5px;
+    color:var(--gold-bright);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .specs .v{ font-size:15px; font-weight:600; color:var(--ink); }
+
+  /* ==========================================================================
+     METOD QEYDİ (müəllimə yönəlik izahat bloku)
+     Açıq "kağız" fonlu, sadə mətn kartı — proqramın necə istifadə olunacağını
+     müəllimə izah edən paraqrafları saxlayır.
+     ========================================================================== */
+  .method-note{
+    background:var(--paper);
+    color:var(--ink);
+    padding:20px 22px;
+    border-left:3px solid var(--gold); /* Sol tərəfdə vurğu zolağı — diqqəti cəlb edir */
+    border-radius:2px;
+  }
+  .method-note p{
+    font-size:14.5px;
+    line-height:1.7; /* Uzun mətn paraqrafları üçün rahat oxunma araliği */
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+  .method-note p:last-child{ margin-bottom:0; } /* Son paraqrafın altında lazımsız boşluq olmasın */
+  .method-note b{ color:var(--bronze-text); } /* Qalın mətnlər (əsas terminlər) bürünc rənglə vurğulanır */
+
+  /* ==========================================================================
+     BÖLMƏ BAŞLIQLARI (Yol xəritəsi, Platformalar, ... )
+     Başlıq mətnindən sonra boş yer qalan hissəni nazik üfüqi xətlə (::after)
+     doldurur ki, başlıq "çertyoj cədvəli" kimi bölünmə xətti görünsün.
+     ========================================================================== */
+  .section-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--gold-bright);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:56px 0 18px;
+  }
+  .roadmap-layout{ display:flex; gap:22px; align-items:flex-start; }
+  .roadmap-nav{
+    width:220px; flex-shrink:0; position:sticky; top:20px;
+    display:flex; flex-direction:column; gap:4px;
+    max-height:calc(100vh - 40px); overflow-y:auto; padding-right:4px;
+  }
+  .roadmap-nav-item{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:0.2px;
+    color:var(--ink-soft); background:transparent; border:1px solid var(--grid-line-strong);
+    border-radius:5px; padding:9px 11px; text-align:left; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease; line-height:1.4;
+  }
+  .roadmap-nav-item .rn-num{ color:var(--gold-bright); font-weight:600; margin-right:4px; }
+  .roadmap-nav-item:hover{ background:rgba(255,255,255,0.04); color:var(--ink); }
+  .roadmap-nav-item.current{
+    background:var(--gold); color:var(--on-accent); font-weight:600; border-color:var(--bronze);
+  }
+  .roadmap-nav-item.current .rn-num{ color:var(--on-accent); }
+  .roadmap{ flex:1; min-width:0; }
+  @media (max-width:900px){
+    .roadmap-layout{ flex-direction:column; }
+    .roadmap-nav{
+      position:static; width:100%; flex-direction:row; flex-wrap:wrap;
+      max-height:none; overflow-y:visible;
+    }
+    .roadmap-nav-item{ flex:0 0 auto; }
+  }
+  .section-label::after{
+    content:"";
+    flex:1; /* Qalan bütün üfüqi yeri tutaraq başlıqdan sağa doğru xətt çəkir */
+    height:1px;
+    background:var(--grid-line-strong);
+  }
+
+  /* ==========================================================================
+     YOL XƏRİTƏSİ (ROADMAP) — açılıb-bağlanan (accordion) mövzu kartları siyahısı.
+     Soldakı nöqtəli şaquli xətt (.roadmap::before) və hər kartın kənarındakı
+     kiçik dairə (.week::before) "vaxt xətti" (timeline) hissi yaradır.
+     ========================================================================== */
+  .roadmap{ position:relative; padding-left:26px; } /* Sol boşluq — nöqtəli xətt və dairələr üçün yer açır */
+  .roadmap::before{
+    content:"";
+    position:absolute;
+    left:8px; top:6px; bottom:6px;
+    width:2px;
+    /* repeating-linear-gradient qısa-qısa qızıl parçalar və şəffaf boşluqlar
+       təkrarlayaraq nöqtəli (kəsik-kəsik) şaquli xətt effekti yaradır */
+    background:repeating-linear-gradient(180deg, var(--gold) 0 6px, transparent 6px 12px);
+  }
+  /* Hər bir mövzunu təmsil edən kart. overflow:hidden içərisindəki .week-body-nin
+     bağlı vəziyyətdə (max-height:0) daşan məzmununu gizlədir. */
+  .week{
+    position:relative;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:2px;
+    margin-bottom:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2);
+    overflow:hidden;
+  }
+  /* Kartın sol kənarında, vaxt xəttinin üzərində görünən kiçik dairəvi nöqtə
+     (timeline marker) — mütləq mövqedə, kartdan bayıra (-26px) çıxarılır. */
+  .week::before{
+    content:"";
+    position:absolute;
+    left:-26px; top:22px;
+    width:11px; height:11px;
+    border-radius:50%;
+    background:var(--blueprint-deep);
+    border:2px solid var(--gold-bright);
+  }
+  /* Kartın həmişə görünən yuxarı hissəsi (başlıq sətri) — klikləmə ilə
+     JS tərəfindən 'open' class-ı toggle edilərək kartın açılıb-bağlanmasını
+     idarə edir (bax: script hissəsindəki onclick). */
+  .week-head{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:16px 18px;
+    cursor:pointer;
+    user-select:none; /* Kliklərdə mətnin təsadüfən seçilməsinin qarşısını alır */
+  }
+  .week-num{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--on-accent);
+    background:var(--bronze);
+    padding:5px 9px;
+    border-radius:2px;
+    flex-shrink:0;
+    letter-spacing:1px;
+  }
+  .week.gold .week-num{ background:var(--gold); color:var(--on-accent); }
+  .week-title{ flex:1; }
+  .week-title h3{ margin:0 0 2px; font-size:16px; }
+  .week-title p{ margin:0; font-size:12.5px; color:var(--ink-soft); }
+  .progress-badge{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.3px; white-space:nowrap;
+    color:var(--green-text); background:rgba(63,143,95,0.15); border:1px solid rgba(63,143,95,0.35);
+    border-radius:20px; padding:4px 10px; flex-shrink:0;
+  }
+  /* Sağ tərəfdəki ox (▶) işarəsi. .week.open klassı əlavə olunanda 90 dərəcə
+     çevrilərək aşağı (▼) baxan vəziyyətə keçir — kartın açıq olduğunu bildirir. */
+  .chevron{
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--ink-soft);
+    transition:transform 0.25s ease;
+    flex-shrink:0;
+  }
+  .week.open .chevron{ transform:rotate(90deg); }
+
+  /* Accordion (akkordeon) effektinin əsası: max-height CSS keçidi (transition)
+     ilə animasiya olunur. Bağlı vəziyyətdə max-height:0 məzmunu tamamilə
+     gizlədir; .week.open əlavə olunanda max-height çox böyük bir dəyərə
+     (8000px) keçir ki, məzmunun həqiqi hündürlüyündən asılı olmayaraq
+     tam açılsın və animasiya hamar görünsün. */
+  .week-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.3s ease;
+    background:var(--paper-warm);
+    border-top:1px solid rgba(15,34,51,0.08);
+  }
+  .week.open .week-body{ max-height:8000px; }
+  .week-body-inner{ padding:16px 18px 20px; }
+  .week-body h4{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--bronze-text);
+    margin:14px 0 6px;
+  }
+  .week-body h4:first-child{ margin-top:0; }
+  .week-body p.why{ font-size:13.5px; line-height:1.6; color:var(--ink); margin:0 0 4px; }
+  .week-body ul{ margin:0; padding-left:18px; }
+
+  /* ==========================================================================
+     KOD BLOKU VƏ SƏTİR-BƏSƏTİR İZAH SİSTEMİ
+     --------------------------------------------------------------------------
+     Bu bölmə JS tərəfindən yaradılan (bax: renderCodeBlock funksiyası) C++
+     kod nümunələrinin görünüşünü təyin edir. Hər sətir kliklənə bilər və
+     klik olunanda altında həmin sətrin izahını göstərən panel açılır.
+     ========================================================================== */
+  .code-block{
+    background:var(--well);
+    font-family:var(--mono);
+    border-radius:3px;
+    overflow-x:auto; /* Uzun kod sətirləri konteynerdən çıxanda üfüqi scroll çıxarır */
+    margin:0;
+    padding:8px 0;
+    border-left:3px solid var(--bronze);
+  }
+  /* Hər bir kliklənə bilən kod sətri: sətir nömrəsi + ox işarəsi + kod mətni */
+  .code-line{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:2px 14px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:background 0.15s ease;
+    white-space:pre; /* Kodun boşluq/indent formatını olduğu kimi saxlayır */
+  }
+  .code-line:hover{ background:rgba(255,255,255,0.05); } /* Siçan üzərinə gələndə yüngül işıqlanma */
+  .code-line.active{ background:rgba(255,255,255,0.08); } /* İzah paneli açıq olan sətir daha güclü işıqlanır */
+  .code-line .line-no{
+    flex-shrink:0;
+    width:16px;
+    text-align:right;
+    font-size:11px;
+    color:#4d7188;
+    user-select:none;
+  }
+  /* Sətrin solundakı kiçik ox (▸) — izah paneli açıq olanda 90° çevrilir (▾) */
+  .code-line .line-caret{
+    flex-shrink:0;
+    width:10px;
+    font-size:10px;
+    color:#f2c14e;
+    opacity:0.5;
+    transition:transform 0.2s ease;
+  }
+  .code-line.active .line-caret{ transform:rotate(90deg); opacity:1; }
+  .code-line code{
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.6;
+    color:#cfe3ee;
+    white-space:pre;
+  }
+  /* Sintaksis vurğulama (syntax highlighting) rəngləri — JS-dəki
+     highlightCppLine funksiyası tərəfindən əlavə olunan <span> class-larına
+     uyğun gəlir: cmt=şərh, kw=açar söz, tp=tip, str=mətn sabiti, num=ədəd, pp=preprosessor */
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  /* Kod sətrinə klikləndikdə açılan "izah paneli". Qapalı vəziyyətdə
+     max-height:0 və opacity:0 ilə tam gizlədilir; JS tərəfindən 'open'
+     class-ı əlavə olunanda (openCodePanel funksiyası) hündürlüyü real
+     məzmuna uyğun hesablanıb (scrollHeight) animasiya ilə açılır. */
+  .code-explain{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    margin:0 14px;
+    transition:max-height 0.28s ease, opacity 0.28s ease, margin 0.28s ease;
+  }
+  .code-explain.open{
+    opacity:1;
+    margin:4px 14px 8px;
+  }
+  .code-explain-inner{
+    background:rgba(255,255,255,0.04);
+    border-left:2px solid var(--gold-bright);
+    border-radius:2px;
+    padding:8px 12px;
+    font-family:var(--sans);
+    font-size:12.5px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .topic-codes{ display:flex; flex-direction:column; gap:14px; margin-top:6px; }
+  .topic-code-item{ display:flex; flex-direction:column; gap:6px; }
+  .topic-code-title{
+    font-size:13px;
+    font-weight:600;
+    color:var(--bronze-text);
+    margin:0;
+    line-height:1.4;
+  }
+  .week-body li{ margin-bottom:4px; font-size:14px; line-height:1.5; }
+  /* Hər mövzu kartının sonunda görünən "Testi həll et" düyməsi — mövzu ilə
+     test vərəqi arasında körpü rolunu oynayır. Aktiv olanda kliklənəndə
+     valideyn pəncərədə (window.parent) uyğun test tabına keçid edir;
+     hazır olmayanlarda isə deaktiv/"tezliklə" görünüşü göstərir. */
+  .topic-test-row{ margin-top:14px; }
+  .test-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12px; letter-spacing:0.5px;
+    color:var(--on-accent); background:var(--gold-bright);
+    border:1px solid var(--gold); border-radius:4px;
+    padding:8px 14px; cursor:pointer;
+    transition:background 0.15s ease, transform 0.15s ease;
+  }
+  .test-btn:hover{ background:var(--bronze); transform:translateY(-1px); }
+  .test-btn.test-btn-disabled{
+    background:transparent; color:var(--ink-soft);
+    border:1px dashed rgba(15,34,51,0.3); cursor:not-allowed;
+  }
+  .test-btn.test-btn-disabled:hover{ transform:none; background:transparent; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .tag{
+    font-family:var(--mono);
+    font-size:10.5px;
+    background:rgba(15,34,51,0.08);
+    color:var(--ink);
+    padding:3px 8px;
+    border-radius:20px;
+    border:1px solid rgba(15,34,51,0.15);
+  }
+  /* Çətinlik səviyyəsi başlayan yerdə görünən qırmızı nişan.
+     .hard-badge — hər "çətin" mövzunun kartında (tag-row daxilində) görünür.
+     .hard-start-banner — çətinliyin başladığı ilk kartın ÜSTÜNDƏ, ayrıca zolaq kimi görünür. */
+  .hard-badge{
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:700;
+    background:rgba(255,59,59,0.15);
+    color:#FF6B6B;
+    padding:3px 8px;
+    border-radius:20px;
+    border:1px solid rgba(255,59,59,0.4);
+  }
+  .hard-start-banner{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 14px;
+    padding:10px 14px;
+    background:rgba(255,59,59,0.10);
+    border:1px solid rgba(255,59,59,0.35);
+    border-left:4px solid #FF3B3B;
+    border-radius:2px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#FF6B6B;
+    letter-spacing:0.3px;
+  }
+  /* Sırf dil/riyaziyyat əsaslarından sonra ƏSAS ALQORİTM MÖVZULARININ
+     başladığı ilk kartın ÜSTÜNDƏ görünən mavi zolaq. */
+  .algo-start-banner{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 14px;
+    padding:10px 14px;
+    background:rgba(77,159,255,0.10);
+    border:1px solid rgba(77,159,255,0.35);
+    border-left:4px solid #4D9FFF;
+    border-radius:2px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#7FB8FF;
+    letter-spacing:0.3px;
+  }
+
+  /* ==========================================================================
+     MƏNBƏLƏR (RESOURCES) — JS-dəki `resources` massivindən dinamik olaraq
+     doldurulan kart şəbəkəsi. auto-fit + minmax sayəsində ekran ölçüsünə görə
+     avtomatik olaraq sütun sayı dəyişir (responsive grid).
+     ========================================================================== */
+  .resources{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:12px;
+  }
+  .resource{
+    background:var(--paper);
+    color:var(--ink);
+    padding:16px 16px 14px;
+    border-left:3px solid var(--gold);
+    border-radius:2px;
+  }
+  .resource .name{ font-weight:700; font-size:15px; margin-bottom:4px; }
+  .resource .desc{ font-size:13px; color:var(--ink-soft); line-height:1.45; }
+  .resource a{
+    display:inline-block;
+    margin-top:8px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--bronze-text);
+    text-decoration:none;
+    border-bottom:1px dotted var(--bronze);
+  }
+  .resource a:hover{ color:var(--alert); border-color:var(--alert); }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    margin-top:60px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:var(--ink-soft);
+  }
+
+  /* Əlçatanlıq (accessibility): istifadəçi əməliyyat sistemində "hərəkəti azalt"
+     seçimini aktiv edibsə, bütün CSS transition-ları (accordion açılması,
+     hover effektləri və s.) tamamilə söndürülür ki, hərəkətə həssas
+     istifadəçilər üçün narahatlıq yaranmasın. */
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <div class="titleblock-inner">
+      <div class="profile-photo-col">
+        <div class="profile-photo"><img src="data:image/jpeg;base64,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" alt="Ismayil Garayev"></div>
+        <div class="profile-name">Ismayil<br>Garayev</div>
+      </div>
+      <div class="titleblock-text">
+        <h1>Azercell Cup <span>Qızıl Medal</span> Hazırlıq Sxemi</h1>
+        <p class="sub">6–7-ci sinif şagirdləri üçün Azercell Cup-un tələb etdiyi əsas mövzulara fokuslanmış, 8 aylıq (16 mövzulu) yığcam C++ hazırlıq planı.</p>
+      </div>
+    </div>
+    <div class="specs">
+      <div><div class="k">Müddət</div><div class="v">8 ay (16 mövzu)</div></div>
+      <div><div class="k">Format</div><div class="v">5 məsələ / 3 saat</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+      <div><div class="k">Hədəf</div><div class="v">Final + Medal</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Metodika izahı (müəllim üçün)</div>
+  <div class="method-note">
+    <p>Bu plan Azercell Cup-un tələb etdiyi bacarıqları — alqoritmik düşüncə, məlumat strukturları və vaxt məhdudiyyəti altında sürətli, düzgün kod yazma bacarığını — mərhələli şəkildə formalaşdırmaq üçün nəzərdə tutulub. Müsabiqənin hər turunda şagirdə 5 alqoritmik məsələ və 3 saat vaxt verildiyi üçün, hazırlıq da yalnız "nəzəriyyəni bilmək" deyil, məhz <b>real vaxt təzyiqi altında məsələ həll etmə vərdişini</b> qurmağa yönəlib.</p>
+    <p>Plan 8 aya (16 mövzuya) bölünüb və yalnız Azercell Cup-un formatı (5 məsələ, 3 saat, 6–7-ci sinif səviyyəsi) üçün həqiqətən vacib olan mövzuları əhatə edir: dilin özü (sintaksis, giriş-çıxış), riyazi əsaslar, sətir/massiv texnikaları, axtarış/çeşidləmə, rekursiya, backtracking, məlumat strukturları, greedy, dinamik proqramlaşdırmanın əsasları, qrafın əsasları və debaqinq. Artıq mürəkkəb və bu yaş qrupu üçün vacib olmayan mövzular (məs. qabaqcıl qraf alqoritmləri, seqment strukturları) proqramdan çıxarılıb ki, şagird məhz nüvə bacarıqlarına dərindən yiyələnsin.</p>
+    <p>Hər mövzunun iki komponenti var: <b>(1) mövzu</b> — həmin mövzu öyrənilməli nəzəri bilik və hər alt-mövzu üçün ayrıca C++ kod nümunəsi; <b>(2) məqsəd</b> — bu bilik nə üçün lazımdır və müsabiqədə hansı məsələ tipinə tətbiq olunur. Müəllim hər mövzunun sonunda şagirdin mövzunu mənimsədiyini yoxlaya bilər: nəzəriyyəni izah edə bilirmi və məsələləri müstəqil həll edə bilirmi.</p>
+    <p>Qiymətləndirmə üçün tövsiyə: hər mövzu sonu şagirdə 2-3 yeni məsələ verilib, onun izahı ilə birlikdə həll etməsi istənilə bilər (bu, sadəcə cavabı əzbərləmədiyini göstərir). 16 mövzunun bitməsindən sonra tam sınaq imtahanı formatında (3 saat, 5 məsələ, nəzarətli şərait) bir neçə məşq keçirilməlidir ki, şagird real müsabiqə gərginliyinə adaptasiya olsun.</p>
+  </div>
+
+  <div class="section-label">Yol xəritəsi</div>
+  <div class="roadmap-layout">
+    <div class="roadmap-nav" id="roadmapNav"></div>
+    <div class="roadmap" id="roadmap"></div>
+  </div>
+
+  <div class="section-label">Platformalar və mənbələr</div>
+  <div class="resources" id="resources"></div>
+
+  <div class="footer">AZ·CUP — HAZIRLIQ SXEMİ — ŞAGIRD ÜÇÜN FƏRDİ PLAN</div>
+</div>
+
+<script>
+/* ============================================================================
+   ƏSAS MƏLUMAT MASSİVİ: `weeks`
+   ----------------------------------------------------------------------------
+   Bütün 8 aylıq proqram bu massivdə saxlanılır. Massivin hər bir elementi
+   BİR MÖVZUNU təmsil edir və aşağıdakı sahələrdən (fields) ibarətdir:
+
+     gold        (bool)   — true olarsa, bu mövzu kartı xüsusi "qızıl" rənglə
+                            fərqləndirilir (məs. yekun sınaq mövzuları üçün).
+     tag         (string) — kiçik etiket mətni (məs. "Ay 1 · Təməl") —
+                            kartın sonunda .tag-row daxilində göstərilir.
+     title       (string) — mövzunun əsas başlığı (h3).
+     desc        (string) — başlığın altındakı qısa alt-təsvir.
+     why         (string) — "Məqsəd" bölməsində göstərilən, bu mövzunun
+                            NİYƏ vacib olduğunu izah edən paraqraf (müəllim üçün).
+     topics      (array)  — "Mövzular" bölməsində sadalanan nəzəri mövzular
+                            siyahısı (<li> elementlərinə çevrilir).
+     topicCodes  (array, seçimlik) — hər mövzu üçün ayrıca C++ kod nümunəsi.
+                            Hər element {topic, code} formatındadır: `topic`
+                            hansı mövzuya aid olduğunu, `code` isə template
+                            literal (backtick) daxilində yazılmış tam C++ kodunu
+                            saxlayır. Bu kodlar renderCodeBlock() funksiyası
+                            vasitəsilə sətir-sətir kliklənə bilən vurğulanmış
+                            koda çevrilir.
+     code        (string, seçimlik) — mövzunun ÜMUMİ/yekun nümunə proqramı
+                            (hazırda görünüşdə istifadə olunmasa da, gələcək
+                            genişləndirmə üçün məlumatda saxlanılır).
+
+   QEYD: Aşağıdakı massivin özü DATA-dır (dərs planının məzmunu) — hər bir
+   C++ kod nümunəsinin daxilində artıq öz Azərbaycanca izahedici şərhləri var
+   (// ilə başlayan sətirlər). Ona görə hər mövzu obyektini ayrıca şərhləmək
+   əvəzinə, struktur bir dəfə yuxarıda izah olunub; kod nümunələrinin öz
+   daxili şərhləri isə şagirdlər üçün artıq mövcuddur.
+   ============================================================================ */
+const weeks = [
+  {gold:false, tag:"Ay 1 · Təməl", title:"Sintaksis və I/O — I hissə", desc:"Dəyişənlər, operatorlar, şərtlər, dövrlər, tip çevrilmələri",
+    why:"Müsabiqədə şagird məsələni oxuyandan sonra dərhal kod yazmalıdır — sintaksisi düşünməyə vaxt yoxdur. 8 aylıq proqramda bu mövzuya 2 mövzu ayırırıq ki, əsaslar tam avtomatlaşsın və qalan mövzularda alqoritmə fokuslanmaq mümkün olsun. Sadə xəta kimi görünən şeylər (məsələn, int-in daşması və ya səhv tip çevrilməsi) yarışda düzgün alqoritmi belə səhv nəticəyə apara bilər — ona görə bu mövzu həm 'necə yazmalı', həm də 'niyə belə yazmalı' sualına cavab verir.",
+    topics:[
+      "Dəyişənlər və tiplər: int, long long, double, char, string, bool",
+      "Sabitlər (const) və avtomatik tip çıxarımı (auto)",
+      "Aritmetik, müqayisə və məntiq operatorları",
+      "Şərt operatorları: if / else if / else, switch-case",
+      "Dövrlər: for, while, do-while və onların fərqləri",
+      "break və continue ilə dövr axınına nəzarət",
+      "Tip çevrilmələri: implicit (avtomatik) və explicit (static_cast) çevrilmə",
+      "Şərti (ternary) operator: cond ? a : b",
+      "Dəyişənlərin əhatə dairəsi (scope): qlobal vs lokal dəyişənlər"
+    ],
+    topicCodes:[
+      {topic:"Dəyişənlər və tiplər: int, long long, double, char, string, bool",
+       code:
+`int a = 5;                 // adi tam ədəd (~2 milyarda qədər)
+long long big = 10000000000; // böyük ədədlər üçün (~9*10^18-ə qədər)
+double pi = 3.14159;        // kəsr ədəd
+char c = 'A';                // tək simvol
+string s = "salam";          // mətn
+bool isReady = true;         // doğru/yanlış`},
+      {topic:"Sabitlər (const) və avtomatik tip çıxarımı (auto)",
+       code:
+`const int MOD = 1000000007;   // dəyəri dəyişməyəcək sabit
+auto x = 5;                   // auto -> int kimi tanınır
+auto y = 3.14;                 // auto -> double kimi tanınır
+auto s = string("salam");      // auto -> string kimi tanınır`},
+      {topic:"Aritmetik, müqayisə və məntiq operatorları",
+       code:
+`int a = 7, b = 2;
+cout << a + b << " " << a - b << " " << a * b << "\\n";
+cout << a / b << " " << a % b << "\\n";   // bölmə və qalıq
+bool cond = (a > b) && (b != 0);           // müqayisə + məntiq`},
+      {topic:"Şərt operatorları: if / else if / else, switch-case",
+       code:
+`int score = 85;
+if (score >= 90) cout << "A\\n";
+else if (score >= 70) cout << "B\\n";
+else cout << "C\\n";
+
+int day = 2;
+switch (day)
+{
+    case 1: cout << "Bazar ertəsi\\n"; break;
+    case 2: cout << "Çərşənbə axşamı\\n"; break;
+    default: cout << "Digər gün\\n";
+}`},
+      {topic:"Dövrlər: for, while, do-while və onların fərqləri",
+       code:
+`for (int i = 0; i < 5; i++) cout << i << " ";
+cout << "\\n";
+
+int i = 0;
+while (i < 5)
+{
+    cout << i << " ";
+    i++;
+}
+cout << "\\n";
+
+int j = 0;
+do
+{
+    cout << j << " ";
+    j++;
+} while (j < 5); // ən azı 1 dəfə işləyir`},
+      {topic:"break və continue ilə dövr axınına nəzarət",
+       code:
+`for (int i = 1; i <= 10; i++)
+{
+    if (i == 5) continue;   // 5-i ötür, dövrü davam etdir
+    if (i == 8) break;      // 8-də dövrü tamamilə dayandır
+    cout << i << " ";
+}`},
+      {topic:"Tip çevrilmələri: implicit (avtomatik) və explicit (static_cast) çevrilmə",
+       code:
+`int a = 7, b = 2;
+double res1 = a / b;                  // 3  -> hələ int bölməsi, sonra double-a çevrilir
+double res2 = (double)a / b;          // 3.5 -> explicit çevrilmə düzgün nəticə verir
+double res3 = static_cast<double>(a) / b; // 3.5 -> müasir C++ üsulu (tövsiyə olunur)
+
+int truncated = (int)3.99;            // 3 -> kəsr hissə atılır, yuvarlaqlaşdırma YOXDUR`},
+      {topic:"Şərti (ternary) operator: cond ? a : b",
+       code:
+`int a = 7, b = 2;
+int maxVal = (a > b) ? a : b;         // if/else-in qısa forması
+cout << maxVal << "\\n";              // 7
+
+// cüt/tək yoxlamasını bir sətirdə yazmaq
+string parity = (a % 2 == 0) ? "cüt" : "tək";
+cout << parity << "\\n";`},
+      {topic:"Dəyişənlərin əhatə dairəsi (scope): qlobal vs lokal dəyişənlər",
+       code:
+`int globalCounter = 0;   // qlobal dəyişən — bütün funksiyalardan görünür
+
+void increment()
+{
+    int localVal = 1;    // lokal dəyişən — yalnız bu funksiya daxilində mövcuddur
+    globalCounter += localVal;
+}
+
+int main()
+{
+    increment();
+    increment();
+    cout << globalCounter << "\\n";  // 2
+    // cout << localVal;             // SƏHV: localVal burada görünmür
+}`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    int score = 85;
+    for (int i = 1; i <= 3; i++)
+    {
+        if (score >= 90) cout << "A\\n";
+        else if (score >= 70) cout << "B\\n";
+        else cout << "C\\n";
+        score -= 15;
+    }
+}`},
+  {gold:false, tag:"Ay 1 · Təməl", title:"Sintaksis və I/O — II hissə", desc:"Massiv/vector, funksiyalar, sürətli giriş-çıxış, struct, 2D massiv",
+    why:"İkinci mövzuda şagird məlumatı yığmaq (massiv/vector) və təkrar istifadə olunan kod (funksiyalar) yazmağı öyrənir. Sürətli I/O isə yarışda hər proqramın standart başlanğıcı olmalıdır. Bu mövzuda həmçinin çoxölçülü verilənlərlə (2D massiv, struct) ilk tanışlıq baş verir — bunlar sonrakı mövzularda (qraf, DP cədvəlləri) mütləq lazım olacaq.",
+    topics:[
+      "Massiv və vector konteyneri: elan etmək, ölçü vermək, elementlərə müraciət",
+      "Funksiyalar: parametr ötürmə (dəyər üzrə vs referans üzrə &)",
+      "Sürətli giriş-çıxış: ios::sync_with_stdio(false); cin.tie(nullptr)",
+      "cin/cout formatlaşdırma və çoxsətrli giriş oxumaq",
+      "İki ölçülü massiv/vector (matris): elan, giriş oxumaq, gəzmək",
+      "Öz məlumat tipini yaratmaq: struct və pair",
+      "String funksiyaları geniş: substr, find, append, ölçünü dəyişmək"
+    ],
+    topicCodes:[
+      {topic:"Massiv və vector konteyneri: elan etmək, ölçü vermək, elementlərə müraciət",
+       code:
+`int arr[5] = {1, 2, 3, 4, 5};      // statik massiv
+vector<int> v(5, 0);               // 5 elementli, hamısı 0
+v.push_back(10);                   // sona element əlavə et
+v[0] = 99;                          // indekslə müraciət
+cout << "Ölçü: " << v.size() << "\\n";`},
+      {topic:"Funksiyalar: parametr ötürmə (dəyər üzrə vs referans üzrə &)",
+       code:
+`// orijinalı dəyişmir
+void byValue(int x)
+{
+    x += 10;
+}
+
+// orijinalı dəyişir
+void byReference(int &x)
+{
+    x += 10;
+}
+
+int n = 5;
+byValue(n);      cout << n << "\\n";   // 5
+byReference(n);  cout << n << "\\n";   // 15`},
+      {topic:"Sürətli giriş-çıxış: ios::sync_with_stdio(false); cin.tie(nullptr)",
+       code:
+`int main()
+{
+    ios::sync_with_stdio(false);  // C və C++ I/O-nu ayırır, sürətlənir
+    cin.tie(nullptr);             // cin/cout-un avtomatik sinxronunu ləğv edir
+
+    int n; cin >> n;
+    cout << n << "\\n";
+}`},
+      {topic:"cin/cout formatlaşdırma və çoxsətrli giriş oxumaq",
+       code:
+`double x = 3.14159;
+cout << fixed << setprecision(2) << x << "\\n"; // 3.14
+
+int n;
+cin >> n;
+vector<int> a(n);
+for (int i = 0; i < n; i++) cin >> a[i];   // çoxsətrli/çoxsaylı giriş
+
+string line;
+getline(cin, line);   // bütün sətri (boşluqlarla birgə) oxumaq`},
+      {topic:"İki ölçülü massiv/vector (matris): elan, giriş oxumaq, gəzmək",
+       code:
+`int n = 3, m = 4;
+vector<vector<int>> grid(n, vector<int>(m, 0));  // n sətir, m sütun, hamısı 0
+
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+        cin >> grid[i][j];                        // matrisi oxumaq
+
+for (int i = 0; i < n; i++)
+{
+    for (int j = 0; j < m; j++)
+        cout << grid[i][j] << " ";
+    cout << "\\n";
+}`},
+      {topic:"Öz məlumat tipini yaratmaq: struct və pair",
+       code:
+`struct Student
+{
+    string name;
+    int score;
+};
+
+int main()
+{
+    Student s1 = {"Ayan", 92};
+    cout << s1.name << " " << s1.score << "\\n";
+
+    // pair — iki dəyəri birlikdə saxlamağın qısa yolu
+    pair<string,int> p = {"Kamran", 87};
+    cout << p.first << " " << p.second << "\\n";
+
+    vector<Student> students;
+    students.push_back({"Nərmin", 95});
+}`},
+      {topic:"String funksiyaları geniş: substr, find, append, ölçünü dəyişmək",
+       code:
+`string s = "Azercell Cup";
+
+cout << s.length() << "\\n";           // 12 -> uzunluq
+cout << s.substr(0, 8) << "\\n";       // "Azercell" -> 0-cı indeksdən 8 simvol
+cout << s.find("Cup") << "\\n";        // 9 -> "Cup" harada başlayır
+
+s += " 2026";                          // sona əlavə etmək (append)
+cout << s << "\\n";                    // "Azercell Cup 2026"
+
+s.resize(8);                           // ölçünü 8-ə endirir -> "Azercell"
+cout << s << "\\n";`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    // Sürətli I/O — yarışda hər proqramın başında bu 2 sətir olmalıdır
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    long long sum = 0;
+    for (int x : a) sum += x;
+
+    string parity = (sum % 2 == 0) ? "cüt" : "tək";
+    cout << "Cəm: " << sum << " (" << parity << ")\\n";
+}`},
+  {gold:false, tag:"Ay 2 · Riyaziyyat", title:"Riyazi əsaslar — I hissə", desc:"Bölünmə, ƏBOB/ƏKOB, sadə ədədlər, bit əməliyyatları, say sistemləri",
+    why:"Alqoritmik məsələlərin çoxu riyazi müşahidəyə əsaslanır. Bölünmə, ƏBOB/ƏKOB və sadə ədədlər bir çox 'sadə görünən' məsələnin açarıdır. Bit əməliyyatları isə ilk baxışda mücərrəd görünsə də, sonrakı ay­larda maska (bitmask) texnikaları və sürət tələb edən optimallaşdırmalar üçün baza rolunu oynayır.",
+    topics:[
+      "Bölünmə, qalıq (%) və onların praktik istifadəsi",
+      "ƏBOB (GCD) və ƏKOB (LCM) — Evklid alqoritmi",
+      "Sadə ədədlər: yoxlama üsulu və Eratosfen ələyi",
+      "Bit əməliyyatları əsasları: AND (&), OR (|), XOR (^), NOT (~), sürüşmə (<<, >>)",
+      "Say sistemləri: 10-luq, 2-lik və 16-lıq say sistemləri arasında çevrilmə"
+    ],
+    topicCodes:[
+      {topic:"Bölünmə, qalıq (%) və onların praktik istifadəsi",
+       code:
+`int a = 17, b = 5;
+cout << a / b << "\\n";   // 3  -> tam bölmə
+cout << a % b << "\\n";   // 2  -> qalıq
+
+// cüt/tək yoxlaması qalıqla aparılır
+if (a % 2 == 0) cout << "cütdür\\n";
+else cout << "tәkdir\\n";`},
+      {topic:"ƏBOB (GCD) və ƏKOB (LCM) — Evklid alqoritmi",
+       code:
+`long long gcd(long long a, long long b){
+    while (b){ a %= b; swap(a, b); }
+    return a;
+}
+
+long long lcm(long long a, long long b){
+    return a / gcd(a, b) * b;   // əvvəlcə bölmək daşmanın qarşısını alır
+}
+
+int main(){
+    cout << "gcd(24,36)=" << gcd(24, 36) << "\\n"; // 12
+    cout << "lcm(4,6)="   << lcm(4, 6)   << "\\n"; // 12
+}`},
+      {topic:"Sadə ədədlər: yoxlama üsulu və Eratosfen ələyi",
+       code:
+`bool isPrime(int n){
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+
+int main(){
+    const int N = 100;
+    vector<bool> isComposite(N + 1, false);
+    for (int i = 2; i * i <= N; i++)
+        if (!isComposite[i])
+            for (int j = i * i; j <= N; j += i)
+                isComposite[j] = true;
+    // isComposite[i] == false  ->  i sadə ədəddir
+}`},
+      {topic:"Bit əməliyyatları əsasları: AND (&), OR (|), XOR (^), NOT (~), sürüşmə (<<, >>)",
+       code:
+`int a = 6;   // ikilikdə: 110
+int b = 3;   // ikilikdə: 011
+
+cout << (a & b) << "\\n";   // 2  -> AND: 010
+cout << (a | b) << "\\n";   // 7  -> OR:  111
+cout << (a ^ b) << "\\n";   // 5  -> XOR: 101 (fərqli bitlər 1 olur)
+cout << (~a) << "\\n";      // -7 -> NOT: bütün bitləri tərsinə çevirir
+
+cout << (a << 1) << "\\n";  // 12 -> sola sürüşmə = 2-yə vurmaq
+cout << (a >> 1) << "\\n";  // 3  -> sağa sürüşmə = 2-yə bölmək`},
+      {topic:"Say sistemləri: 10-luq, 2-lik və 16-lıq say sistemləri arasında çevrilmə",
+       code:
+`int n = 42;
+
+// 10-luqdan 2-liyə: qalıqları yazıb tərsinə oxumaq
+string binary = "";
+int temp = n;
+while (temp > 0){
+    binary = char('0' + temp % 2) + binary;
+    temp /= 2;
+}
+cout << "2-lik: " << binary << "\\n";   // 101010
+
+// C++-da hazır alətlərlə çap etmək
+cout << hex << n << "\\n";              // 16-lıq: 2a
+cout << oct << n << "\\n";              // 8-lik: 52
+cout << dec << n << "\\n";              // geri 10-luğa qaytarır`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long gcd(long long a, long long b){
+    while (b) { a %= b; swap(a, b); }
+    return a;
+}
+
+int main(){
+    const int N = 100;
+    vector<bool> isComposite(N + 1, false);
+    for (int i = 2; i * i <= N; i++)
+        if (!isComposite[i])
+            for (int j = i * i; j <= N; j += i)
+                isComposite[j] = true;
+
+    cout << "gcd(24, 36) = " << gcd(24, 36) << "\\n";
+    cout << "36 mod 5 = " << 36 % 5 << "\\n";
+}`},
+  {gold:false, tag:"Ay 2 · Riyaziyyat", title:"Riyazi əsaslar — II hissə", desc:"Rəqəmlər, modul aritmetika, dərəcə, kombinatorika, overflow, bölənlər",
+    why:"Bu mövzuda əvvəlki riyazi əsasların üzərinə yeni alətlər (modul aritmetika, sürətli qüvvət, kombinatorika) əlavə olunur ki, riyazi bacarıqlar tam formalaşsın. Bölənlərin tapılması və faktorial əsasları isə DP və kombinatorika məsələlərində tez-tez qarşıya çıxan alt-tapşırıqlardır — bu mövzudan sonra şagird bu alətləri artıq düşünmədən tətbiq edə biləcək.",
+    topics:[
+      "Ədədin rəqəmlərinə ayrılması, rəqəmlər cəmi",
+      "Modul aritmetika: (a+b)%m, (a*b)%m qaydaları",
+      "Dərəcəyə yüksəltmə (sürətli qüvvət) məntiqi",
+      "Faktorial, kombinatorika əsasları (n!, C(n,k) fikri)",
+      "Tam ədəd daşması (overflow) və long long-un vacibliyi",
+      "Ədədin bütün bölənlərinin tapılması və sayının hesablanması"
+    ],
+    topicCodes:[
+      {topic:"Ədədin rəqəmlərinə ayrılması, rəqəmlər cəmi",
+       code:
+`int n = 4827;
+int sum = 0;
+while (n > 0){
+    int digit = n % 10;   // sonuncu rəqəmi ayır
+    sum += digit;
+    n /= 10;              // sonuncu rəqəmi at
+}
+cout << "Rəqəmlər cəmi: " << sum << "\\n"; // 21`},
+      {topic:"Modul aritmetika: (a+b)%m, (a*b)%m qaydaları",
+       code:
+`const int MOD = 1000000007;
+long long a = 999999999, b = 999999999;
+
+// toplama və vurmadan sonra dərhal mod almaq daşmanın qarşısını alır
+long long sum  = (a % MOD + b % MOD) % MOD;
+long long prod = (a % MOD) * (b % MOD) % MOD;
+
+cout << sum << " " << prod << "\\n";`},
+      {topic:"Dərəcəyə yüksəltmə (sürətli qüvvət) məntiqi",
+       code:
+`long long power(long long base, long long exp, long long mod){
+    long long result = 1;
+    base %= mod;
+    while (exp > 0){
+        if (exp % 2 == 1) result = result * base % mod;
+        base = base * base % mod;
+        exp /= 2;             // hər addımda qüvvəti yarıya bölür -> O(log exp)
+    }
+    return result;
+}
+
+int main(){
+    cout << power(2, 10, 1000000007) << "\\n"; // 1024
+}`},
+      {topic:"Faktorial, kombinatorika əsasları (n!, C(n,k) fikri)",
+       code:
+`long long fact(int n){
+    long long res = 1;
+    for (int i = 2; i <= n; i++) res *= i;
+    return res;
+}
+
+// C(n,k) = n! / (k! * (n-k)!)
+long long C(int n, int k){
+    return fact(n) / (fact(k) * fact(n - k));
+}
+
+int main(){
+    cout << fact(5) << "\\n";   // 120
+    cout << C(5, 2)  << "\\n";  // 10
+}`},
+      {topic:"Tam ədəd daşması (overflow) və long long-un vacibliyi",
+       code:
+`int a = 2000000000;
+int b = 2000000000;
+cout << a + b << "\\n";              // SƏHV: int daşır (overflow)
+
+long long la = a, lb = b;
+cout << la + lb << "\\n";            // DÜZGÜN: 4000000000
+
+// vurma zamanı daşma daha tez baş verir — diqqətli olun
+long long product = (long long)a * b;`},
+      {topic:"Ədədin bütün bölənlərinin tapılması və sayının hesablanması",
+       code:
+`int n = 36;
+vector<int> divisors;
+
+// yalnız √n-ə qədər gəzmək kifayətdir — hər cütü (i, n/i) bir dəfə tapırıq
+for (int i = 1; i * i <= n; i++)
+{
+    if (n % i == 0)
+    {
+        divisors.push_back(i);
+        if (i != n / i) divisors.push_back(n / i);  // iki fərqli bölən
+    }
+}
+
+cout << "Bölənlərin sayı: " << divisors.size() << "\\n";  // 9
+for (int d : divisors) cout << d << " ";                  // 1 2 3 4 6 9 12 18 36`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Riyazi əsasların yekunu: modul aritmetika + rəqəm əməliyyatları
+    long long a = 999999999, b = 999999999;
+    const long long MOD = 1000000007;
+
+    long long sum = (a % MOD + b % MOD) % MOD;
+    cout << "Mod ilə cəm: " << sum << "\\n";
+
+    int n = 4827, digitSum = 0;
+    while (n > 0){ digitSum += n % 10; n /= 10; }
+    cout << "Rəqəmlər cəmi: " << digitSum << "\\n";
+}`},
+  {gold:false, algoStart:true, tag:"Ay 3 · Sətir/Massiv", title:"Sətir texnikaları", desc:"String əməliyyatları, split, iki göstərici",
+    why:"Bir çox məsələ sətirlərin emalı ilə başlayır. İki göstərici metodu isə brute-force yanaşmadan qat-qat sürətli həll verir.",
+    topics:[
+      "Sətir emalı: substring, reverse, uzunluq, simvollara müraciət",
+      "Sətirlərin müqayisəsi və birləşdirilməsi (concatenation)",
+      "Sətri sözlərə bölmək (split məntiqi, stringstream)",
+      "İki göstərici (two pointers) metodu: eyni istiqamətdə və əks istiqamətdə"
+    ],
+    topicCodes:[
+      {topic:"Sətir emalı: substring, reverse, uzunluq, simvollara müraciət",
+       code:
+`string s = "salam dunya";
+
+cout << s.length() << "\\n";        // 11 -> uzunluq
+cout << s[0] << "\\n";               // 's' -> ilk simvol
+cout << s.substr(6, 5) << "\\n";     // "dunya" -> 6-dan 5 simvol
+
+reverse(s.begin(), s.end());        // sətri tərsinə çevirir
+cout << s << "\\n";`},
+      {topic:"Sətirlərin müqayisəsi və birləşdirilməsi (concatenation)",
+       code:
+`string a = "Baku", b = "Azercell";
+
+string full = a + " - " + b;        // birləşdirmə (+)
+cout << full << "\\n";
+
+if (a == "Baku") cout << "beraberdir\\n";
+if (a < b) cout << "a lugat sirasi ile b-den ondedir\\n"; // '<' əlifba sırası ilə müqayisə edir`},
+      {topic:"Sətri sözlərə bölmək (split məntiqi, stringstream)",
+       code:
+`#include <sstream>
+string line = "12 7 45 3";
+stringstream ss(line);
+
+int x;
+vector<int> nums;
+while (ss >> x)               // hər çağırışda növbəti ədədi oxuyur
+    nums.push_back(x);
+
+for (int v : nums) cout << v << " ";  // 12 7 45 3`},
+      {topic:"İki göstərici (two pointers) metodu: eyni istiqamətdə və əks istiqamətdə",
+       code:
+`// Əks istiqamətdə: massivin palindrom olub-olmadığını yoxlamaq
+bool isPalindrome(vector<int>& a){
+    int left = 0, right = a.size() - 1;
+    while (left < right){
+        if (a[left] != a[right]) return false;
+        left++; right--;      // bir-birinə tərəf yaxınlaşırlar
+    }
+    return true;
+}`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s = "salam dunya";
+    reverse(s.begin(), s.end());
+    cout << s << "\\n";
+
+    vector<int> a = {1, 2, 3, 2, 1};
+    int left = 0, right = a.size() - 1;
+    bool pal = true;
+    while (left < right){
+        if (a[left] != a[right]) { pal = false; break; }
+        left++; right--;
+    }
+    cout << (pal ? "Palindrom" : "Palindrom deyil") << "\\n";
+}`},
+  {gold:false, tag:"Ay 3 · Sətir/Massiv", title:"Massiv texnikaları", desc:"Prefiks cəmi, sürüşən pəncərə, Kadane",
+    why:"Bir çox məsələdə brute-force çox yavaş işləyir və vaxt limitini keçir. Prefiks cəmi və sürüşən pəncərə eyni məsələni qat-qat sürətli həll etməyə imkan verir.",
+    topics:[
+      "Prefiks cəmi (prefix sum) ilə aralıq sorğularını sürətləndirmək",
+      "Sürüşən pəncərə (sliding window) texnikasının əsasları",
+      "Massivdə maksimum/minimum alt-massiv axtarışı",
+      "Vaxt mürəkkəbliyini brute-force ilə optimallaşdırılmış həll arasında müqayisə etmək"
+    ],
+    topicCodes:[
+      {topic:"Prefiks cəmi (prefix sum) ilə aralıq sorğularını sürətləndirmək",
+       code:
+`vector<int> a = {2, 5, 1, 3, 4, 7};
+int n = a.size();
+
+vector<long long> prefix(n + 1, 0);
+for (int i = 0; i < n; i++)
+    prefix[i + 1] = prefix[i] + a[i];   // prefix[i] = a[0]+...+a[i-1]
+
+int l = 1, r = 4;
+cout << "Cəm: " << prefix[r] - prefix[l] << "\\n"; // O(1)-də aralıq cəmi`},
+      {topic:"Sürüşən pəncərə (sliding window) texnikasının əsasları",
+       code:
+`vector<int> a = {2, 1, 5, 1, 3, 2};
+int k = 3;   // pəncərə ölçüsü
+
+long long windowSum = 0;
+for (int i = 0; i < k; i++) windowSum += a[i];
+long long best = windowSum;
+
+for (int i = k; i < (int)a.size(); i++){
+    windowSum += a[i] - a[i - k];   // biri girir, biri çıxır -> O(1)
+    best = max(best, windowSum);
+}
+cout << "Maksimum " << k << " uzunluqlu pəncərə cəmi: " << best << "\\n";`},
+      {topic:"Massivdə maksimum/minimum alt-massiv axtarışı",
+       code:
+`// Kadane alqoritmi: maksimum cəmli ardıcıl alt-massiv
+vector<int> a = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+
+long long best = a[0], cur = a[0];
+for (int i = 1; i < (int)a.size(); i++){
+    cur = max((long long)a[i], cur + a[i]);  // ya yeni başla, ya davam et
+    best = max(best, cur);
+}
+cout << "Maksimum alt-massiv cəmi: " << best << "\\n"; // 6`},
+      {topic:"Vaxt mürəkkəbliyini brute-force ilə optimallaşdırılmış həll arasında müqayisə etmək",
+       code:
+`// Brute-force: bütün alt-massivləri yoxlamaq -> O(n^2)
+int bruteForce(vector<int>& a){
+    int n = a.size(), best = a[0];
+    for (int i = 0; i < n; i++){
+        int sum = 0;
+        for (int j = i; j < n; j++){ sum += a[j]; best = max(best, sum); }
+    }
+    return best;
+}
+// Prefiks cəmi / sliding window ilə eyni nəticə O(n)-də alınır
+// -> n böyük olduqda (məs. 10^5) O(n^2) vaxt limitini keçir, O(n) keçir`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {2, 5, 1, 3, 4, 7};
+    int n = a.size();
+
+    vector<long long> prefix(n + 1, 0);
+    for (int i = 0; i < n; i++)
+        prefix[i + 1] = prefix[i] + a[i];
+
+    int l = 1, r = 4;
+    cout << "Cəm: " << prefix[r] - prefix[l] << "\\n";
+
+    int target = 9, left = 0; long long curSum = 0;
+    for (int right = 0; right < n; right++){
+        curSum += a[right];
+        while (curSum > target) curSum -= a[left++];
+        if (curSum == target)
+            cout << "Tapıldı: [" << left << ", " << right << "]\\n";
+    }
+}`},
+  {gold:false, tag:"Ay 4 · Axtarış", title:"Axtarış və çeşidləmə", desc:"Sort, binar axtarış",
+    why:"Çeşidləmə çox məsələnin ilk addımıdır. Binar axtarış isə həm massivdə element tapmaq, həm də 'ən kiçik/böyük mümkün cavabı' tapmaq üçün universal alətdir.",
+    topics:[
+      "Standart sort() funksiyası: artan/azalan sıralama",
+      "Öz comparator-un yazılması (lambda ilə xüsusi sıralama qaydası)",
+      "Sabit-nöqtəli (stable) çeşidləmə anlayışı",
+      "Sıralı massivdə binar axtarış (binary_search)",
+      "lower_bound və upper_bound funksiyalarının işləmə məntiqi",
+      "'Cavab üzərində' binar axtarış: monoton şərt tapmaq",
+      "Sıralamanın həll strategiyasına necə təsir etdiyi (məs. greedy ilə əlaqə)"
+    ],
+    topicCodes:[
+      {topic:"Standart sort() funksiyası: artan/azalan sıralama",
+       code:
+`vector<int> a = {9, 2, 7, 4, 1, 5};
+sort(a.begin(), a.end());                  // artan: 1 2 4 5 7 9
+sort(a.begin(), a.end(), greater<int>());  // azalan: 9 7 5 4 2 1`},
+      {topic:"Öz comparator-un yazılması (lambda ilə xüsusi sıralama qaydası)",
+       code:
+`vector<pair<int,string>> people = {{25,"Ali"},{19,"Aygun"},{30,"Vusal"}};
+sort(people.begin(), people.end(),
+     [](auto &a, auto &b){ return a.first < b.first; }); // yaşa görə artan`},
+      {topic:"Sabit-nöqtəli (stable) çeşidləmə anlayışı",
+       code:
+`vector<pair<int,char>> a = {{2,'a'},{1,'b'},{2,'c'},{1,'d'}};
+stable_sort(a.begin(), a.end(),
+    [](auto &x, auto &y){ return x.first < y.first; });
+// bərabər açarlı elementlərin orijinal sırası qorunur: (1,b)(1,d)(2,a)(2,c)`},
+      {topic:"Sıralı massivdə binar axtarış (binary_search)",
+       code:
+`vector<int> a = {1, 2, 4, 5, 7, 9};
+bool found = binary_search(a.begin(), a.end(), 5); // true, O(log n)`},
+      {topic:"lower_bound və upper_bound funksiyalarının işləmə məntiqi",
+       code:
+`vector<int> a = {1, 2, 4, 4, 4, 7, 9};
+auto lo = lower_bound(a.begin(), a.end(), 4); // ilk 4-ün mövqeyi
+auto hi = upper_bound(a.begin(), a.end(), 4); // 4-dən böyük ilk elementin mövqeyi
+cout << "4-lər sayı: " << (hi - lo) << "\\n";  // 3`},
+      {topic:"'Cavab üzərində' binar axtarış: monoton şərt tapmaq",
+       code:
+`// Məs: "minimum sürəti tap ki, bütün tapşırıqlar T vaxtında bitsin"
+int lo = 1, hi = 1000000, ans = -1;
+while (lo <= hi){
+    int mid = lo + (hi - lo) / 2;
+    if (isEnough(mid)){ ans = mid; hi = mid - 1; } // şərt monoton olmalıdır
+    else lo = mid + 1;
+}`},
+      {topic:"Sıralamanın həll strategiyasına necə təsir etdiyi (məs. greedy ilə əlaqə)",
+       code:
+`// Fəaliyyət seçimi kimi çox greedy məsələ əvvəlcə sıralama tələb edir
+sort(intervals.begin(), intervals.end(),
+     [](auto &a, auto &b){ return a.second < b.second; }); // bitmə vaxtına görə`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {9, 2, 7, 4, 1, 5};
+
+    sort(a.begin(), a.end());          // artan sıra
+    // sort(a.begin(), a.end(), greater<int>()); // azalan sıra
+
+    int x = 7;
+    bool found = binary_search(a.begin(), a.end(), x);
+    cout << (found ? "Tapıldı" : "Tapılmadı") << "\\n";
+
+    int lo = 0, hi = a.size() - 1, ans = -1;
+    while (lo <= hi){
+        int mid = (lo + hi) / 2;
+        if (a[mid] >= x){ ans = mid; hi = mid - 1; }
+        else lo = mid + 1;
+    }
+    cout << "İlk mövqe: " << ans << "\\n";
+}`},
+  {gold:false, tag:"Ay 4 · Rekursiya", title:"Rekursiya əsasları", desc:"Baza şərti, rekursiv addım, stack məntiqi",
+    why:"Bəzi məsələlərdə bütün mümkün variantları sistemli yoxlamaq lazımdır. Rekursiya bu cür məsələləri qısa və başa düşülən kodla yazmağa imkan verir.",
+    topics:[
+      "Rekursiv funksiya anlayışı: baza şərti və rekursiv addım",
+      "Rekursiya zamanı stack-in necə işlədiyini başa düşmək",
+      "Faktorial, Fibonacci kimi klassik rekursiv nümunələr",
+      "Rekursiyanın effektivliyini qiymətləndirmək (nə vaxt yavaş işləyir)"
+    ],
+    topicCodes:[
+      {topic:"Rekursiv funksiya anlayışı: baza şərti və rekursiv addım",
+       code:
+`long long factorial(int n){
+    if (n <= 1) return 1;         // baza şərti
+    return n * factorial(n - 1);  // rekursiv addım
+}
+
+int main(){
+    cout << factorial(5) << "\\n"; // 120
+}`},
+      {topic:"Rekursiya zamanı stack-in necə işlədiyini başa düşmək",
+       code:
+`// factorial(3) çağırışının stack-də izi:
+// factorial(3) -> factorial(2) -> factorial(1) [baza, 1 qaytarır]
+// geri qayıdış: 2*1=2, sonra 3*2=6
+// Hər çağırış öz "stack frame"-ini yaradır, baza şərtinə çatanda geri sarınmağa başlayır.`},
+      {topic:"Faktorial, Fibonacci kimi klassik rekursiv nümunələr",
+       code:
+`long long fib(int n){
+    if (n <= 1) return n;              // baza şərti
+    return fib(n - 1) + fib(n - 2);    // rekursiv addım
+}
+
+int main(){
+    for (int i = 0; i < 8; i++) cout << fib(i) << " "; // 0 1 1 2 3 5 8 13
+    cout << "\\n";
+}`},
+      {topic:"Rekursiyanın effektivliyini qiymətləndirmək (nə vaxt yavaş işləyir)",
+       code:
+`// Sadə rekursiv fib(n) hər çağırışı 2 yeni çağırışa bölür -> O(2^n)
+// n=40 üçün belə praktik olaraq çox yavaş işləyir.
+// Həll: memoization (yadda saxlama) və ya tabulation istifadə etmək
+// (bu, Ay 4-də DP mövzusunda ətraflı öyrəniləcək)`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long factorial(int n){
+    if (n <= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int main(){
+    cout << "5! = " << factorial(5) << "\\n";
+}`},
+  {gold:false, hard:true, hardStart:true, tag:"Ay 5 · Backtracking", title:"Backtracking", desc:"Alt-çoxluqlar, permutasiyalar",
+    why:"Backtracking şagirdə seçim et → irəli get → geri qayıt məntiqini öyrədir və kombinatorik axtarış tələb edən məsələləri həll etməyə imkan verir.",
+    topics:[
+      "Backtracking məntiqi: seçim et → irəli get → geri qayıt",
+      "Bütün alt-çoxluqların (subset) generasiyası",
+      "Bütün permutasiyaların (sıralamaların) generasiyası",
+      "Kiçik ölçülü perebor (brute-force) məsələlərində backtracking-in tətbiqi"
+    ],
+    topicCodes:[
+      {topic:"Backtracking məntiqi: seçim et → irəli get → geri qayıt",
+       code:
+`void backtrack(int step){
+    if (/* baza şərti */ false){ /* nəticəni qeyd et */ return; }
+    for (int secim = 0; secim < 2; secim++){
+        // et(secim);        -> seçimi et
+        backtrack(step + 1); // irəli get
+        // geriQaytar(secim); -> geri qayıt (backtrack)
+    }
+}`},
+      {topic:"Bütün alt-çoxluqların (subset) generasiyası",
+       code:
+`vector<int> current;
+int n;
+
+void generate(int index){
+    if (index == n){
+        for (int v : current) cout << v << " ";
+        cout << "\\n";
+        return;
+    }
+    generate(index + 1);              // index-ci elementi daxil etmə
+    current.push_back(index + 1);
+    generate(index + 1);              // index-ci elementi daxil et
+    current.pop_back();               // backtrack: geri qaytar
+}`},
+      {topic:"Bütün permutasiyaların (sıralamaların) generasiyası",
+       code:
+`vector<int> a = {1, 2, 3};
+sort(a.begin(), a.end());
+do {
+    for (int v : a) cout << v << " ";
+    cout << "\\n";
+} while (next_permutation(a.begin(), a.end()));`},
+      {topic:"Kiçik ölçülü perebor (brute-force) məsələlərində backtracking-in tətbiqi",
+       code:
+`// n <= 10-12 olan tapşırıqlarda backtracking adətən kifayət edir.
+// n böyükdürsə (məs. 10^5), backtracking vaxt limitini keçəcək —
+// belə halda DP/greedy kimi alternativ axtarılmalıdır.`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> current;
+int n;
+
+// Bütün alt-çoxluqları tapan backtracking
+void generate(int index){
+    if (index == n){
+        for (int v : current) cout << v << " ";
+        cout << "\\n";
+        return;
+    }
+    // index-ci elementi daxil etmə
+    generate(index + 1);
+
+    // index-ci elementi daxil et
+    current.push_back(index + 1);
+    generate(index + 1);
+    current.pop_back();   // backtrack: geri qaytar
+}
+
+int main(){
+    n = 3;
+    generate(0);   // {}, {3}, {2}, {2,3}, {1}, {1,3}, {1,2}, {1,2,3}
+}`},
+  {gold:false, hard:true, tag:"Ay 5 · Struktur", title:"Data strukturları", desc:"Set, Map, Stack, Queue, priority_queue, deque",
+    why:"Düzgün data strukturu seçmək, alqoritmi dəyişdirmədən belə, məsələni saniyələr içində həll olunan hala gətirir.",
+    topics:[
+      "map/set: açar-dəyər saxlama, avtomatik sıralama, sürətli axtarış",
+      "unordered_map/unordered_set: orta halda daha sürətli axtarış",
+      "Stack (LIFO): mötərizə yoxlaması, geri qayıtma məntiqi",
+      "Queue (FIFO): BFS-də istifadə, sıra prinsipi",
+      "priority_queue (heap): ən böyük/ən kiçik elementi tez tapmaq",
+      "deque: hər iki tərəfdən əlavə/silmə əməliyyatları",
+      "Sadə linked-list məntiqi və massivdən fərqi",
+      "Hansı məsələdə hansı strukturun seçilməsi lazım olduğunu müəyyənləşdirmək"
+    ],
+    topicCodes:[
+      {topic:"map/set: açar-dəyər saxlama, avtomatik sıralama, sürətli axtarış",
+       code:
+`map<string, int> age;
+age["Tom"] = 12;
+age["Alice"] = 13;
+if (age.count("Tom")) cout << age["Tom"] << "\\n";
+
+set<int> s = {5, 3, 5, 1, 3};   // {1, 3, 5} -> avtomatik sıralı, unikal`},
+      {topic:"unordered_map/unordered_set: orta halda daha sürətli axtarış",
+       code:
+`unordered_map<string,int> fast;
+fast["Ali"] = 12;                 // orta halda O(1) axtarış (sıra qorunmur)
+
+unordered_set<int> us = {5, 3, 1}; // sıralama yoxdur, amma daha sürətlidir`},
+      {topic:"Stack (LIFO): mötərizə yoxlaması, geri qayıtma məntiqi",
+       code:
+`string s = "(()())";
+stack<char> st;
+bool ok = true;
+for (char c : s){
+    if (c == '(') st.push(c);
+    else { if (st.empty()) ok = false; else st.pop(); }
+}
+ok = ok && st.empty();
+cout << (ok ? "Düzgün" : "Səhv") << "\\n";`},
+      {topic:"Queue (FIFO): BFS-də istifadə, sıra prinsipi",
+       code:
+`queue<int> q;
+q.push(1); q.push(2); q.push(3);
+cout << q.front() << "\\n"; // 1 -> ilk giren ilk çıxır
+q.pop();`},
+      {topic:"priority_queue (heap): ən böyük/ən kiçik elementi tez tapmaq",
+       code:
+`priority_queue<int> pq;             // max-heap (default)
+pq.push(3); pq.push(1); pq.push(5);
+cout << pq.top() << "\\n";           // 5 -> ən böyük dərhal əldə olunur
+
+priority_queue<int, vector<int>, greater<int>> minPq; // min-heap`},
+      {topic:"deque: hər iki tərəfdən əlavə/silmə əməliyyatları",
+       code:
+`deque<int> dq;
+dq.push_back(1); dq.push_front(0);
+dq.push_back(2);
+cout << dq.front() << " " << dq.back() << "\\n"; // 0 2`},
+      {topic:"Sadə linked-list məntiqi və massivdən fərqi",
+       code:
+`struct Node{ int val; Node* next; };
+// massivdən fərqli olaraq elementlər ardıcıl yaddaşda deyil,
+// hər node növbətinin ünvanını saxlayır -> ortadan əlavə/silmə O(1)`},
+      {topic:"Hansı məsələdə hansı strukturun seçilməsi lazım olduğunu müəyyənləşdirmək",
+       code:
+`// Sürətli axtarış + sıralı saxlama lazımdır -> set/map
+// Sadəcə sürətli axtarış (sıra vacib deyil) -> unordered_map/set
+// LIFO lazımdır (son gələn ilk çıxsın) -> stack
+// FIFO lazımdır (BFS və s.) -> queue
+// Ən böyük/kiçiyi davamlı tez tapmaq lazımdır -> priority_queue`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    map<string, int> age;
+    age["Tom"] = 12;
+    age["Alice"] = 13;
+    if (age.count("Tom")) cout << age["Tom"] << "\\n";
+
+    set<int> s = {5, 3, 5, 1, 3};   // {1, 3, 5}
+
+    stack<int> st;
+    st.push(1); st.push(2);
+    cout << st.top() << "\\n";  // 2
+    st.pop();
+
+    queue<int> q;
+    q.push(1); q.push(2);
+    cout << q.front() << "\\n"; // 1
+    q.pop();
+}`},
+  {gold:false, hard:true, tag:"Ay 6 · Greedy", title:"Acgöz (Greedy) alqoritmlər", desc:"Optimal seçim strategiyası",
+    why:"Greedy alqoritmlər sadə görünür, amma nə vaxt işlədiyini sübut etmək çətindir. Bu mövzu şagirdə 'bu yanaşma niyə düzgündür' sualını verməyi öyrədir.",
+    topics:[
+      "Greedy (acgöz) yanaşmanın əsas fikri: hər addımda lokal optimal seçim",
+      "Greedy nə vaxt düzgün nəticə verir, nə vaxt yanlış ola bilər",
+      "Klassik nümunə: maksimum sayda kəsişməyən interval seçimi",
+      "Sikkə problemi və greedy-nin bütün sikkə sistemlərində işləməməsi",
+      "Fəaliyyət seçimi (activity selection) məsələləri",
+      "Greedy həllin düzgünlüyünü necə əsaslandırmaq (sadə sübut fikri)",
+      "Greedy ilə sıralamanın (sort) birgə istifadəsi"
+    ],
+    topicCodes:[
+      {topic:"Greedy (acgöz) yanaşmanın əsas fikri: hər addımda lokal optimal seçim",
+       code:
+`// Hər addımda "indiki ən yaxşı görünən" seçimi et, geri qayıtma (backtrack) yoxdur.
+// Bu yanaşma sürətlidir, amma hər məsələdə düzgün nəticə vermir.`},
+      {topic:"Greedy nə vaxt düzgün nəticə verir, nə vaxt yanlış ola bilər",
+       code:
+`// Sikkələr: {1, 3, 4}, məbləğ = 6
+// Greedy (ən böyükdən): 4 + 1 + 1 = 3 sikkə
+// Optimal: 3 + 3 = 2 sikkə  -> greedy bu sistemdə YANLIŞ nəticə verdi`},
+      {topic:"Klassik nümunə: maksimum sayda kəsişməyən interval seçimi",
+       code:
+`vector<pair<int,int>> intervals = {{1,3},{2,4},{3,5},{6,8}};
+
+sort(intervals.begin(), intervals.end(),
+     [](auto &a, auto &b){ return a.second < b.second; });
+
+int count = 0, lastEnd = INT_MIN;
+for (auto &[start, end] : intervals){
+    if (start >= lastEnd){ count++; lastEnd = end; }
+}
+cout << "Maksimum interval sayı: " << count << "\\n";`},
+      {topic:"Sikkə problemi və greedy-nin bütün sikkə sistemlərində işləməməsi",
+       code:
+`vector<int> coins = {1, 5, 10, 25};   // bu sistemdə greedy düzgün işləyir
+int amount = 63, count = 0;
+sort(coins.rbegin(), coins.rend());
+for (int c : coins){ count += amount / c; amount %= c; }
+cout << "Minimum sikkə: " << count << "\\n";`},
+      {topic:"Fəaliyyət seçimi (activity selection) məsələləri",
+       code:
+`// Fəaliyyət seçimi: bitmə vaxtına görə sırala, uyğun gələni seç
+// (yuxarıdakı interval seçimi kodu ilə eyni məntiq — fərq yalnız kontekstdədir)`},
+      {topic:"Greedy həllin düzgünlüyünü necə əsaslandırmaq (sadə sübut fikri)",
+       code:
+`// Sübut ideyası (exchange argument): fərz et optimal həll fərqli seçim edib.
+// Göstər ki, greedy seçimi ilə əvəz etsək, nəticə pisləşmir -> greedy optimaldır.`},
+      {topic:"Greedy ilə sıralamanın (sort) birgə istifadəsi",
+       code:
+`sort(items.begin(), items.end(),
+     [](auto &a, auto &b){ return a.value > b.value; }); // əvvəlcə ən dəyərlini sırala`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<pair<int,int>> intervals = {{1,3},{2,4},{3,5},{6,8}};
+
+    sort(intervals.begin(), intervals.end(),
+         [](auto &a, auto &b){ return a.second < b.second; });
+
+    int count = 0, lastEnd = INT_MIN;
+    for (auto &[start, end] : intervals){
+        if (start >= lastEnd){
+            count++;
+            lastEnd = end;
+        }
+    }
+    cout << "Maksimum interval sayı: " << count << "\\n";
+}`},
+  {gold:false, hard:true, tag:"Ay 6 · DP", title:"Dinamik proqramlaşdırma — I hissə", desc:"Əsas fikir, memoization və tabulation",
+    why:"Dinamik proqramlaşdırma yarışların ən çətin, amma ən çox bal verən mövzularından biridir. Məqsəd 'təkrarlanan alt-məsələ' anlayışını möhkəm mənimsətməkdir.",
+    topics:[
+      "Dinamik proqramlaşdırmanın əsas fikri: təkrarlanan alt-məsələlər",
+      "Fibonacci və pilləkən (staircase) problemi ilə giriş",
+      "Memoization (yuxarıdan-aşağı) yanaşması",
+      "Tabulation (aşağıdan-yuxarı) yanaşması",
+      "Memoization və tabulation arasındakı fərq və nə vaxt hansını seçmək"
+    ],
+    topicCodes:[
+      {topic:"Dinamik proqramlaşdırmanın əsas fikri: təkrarlanan alt-məsələlər",
+       code:
+`// Eyni alt-məsələ dəfələrlə hesablanırsa (fib(5) fib(4)-ü, fib(3)-ü bir neçə dəfə çağırır),
+// nəticəni bir dəfə hesablayıb yadda saxlamaq DP-nin əsasıdır.`},
+      {topic:"Fibonacci və pilləkən (staircase) problemi ilə giriş",
+       code:
+`vector<long long> ways(n + 1);
+ways[0] = 1; ways[1] = 1;
+for (int i = 2; i <= n; i++)
+    ways[i] = ways[i - 1] + ways[i - 2]; // 1 və ya 2 pillə atmaqla çatma üsulları`},
+      {topic:"Memoization (yuxarıdan-aşağı) yanaşması",
+       code:
+`vector<long long> memo(50, -1);
+long long fib(int n){
+    if (n <= 1) return n;
+    if (memo[n] != -1) return memo[n];       // artıq hesablanıb
+    return memo[n] = fib(n - 1) + fib(n - 2); // hesabla və yadda saxla
+}`},
+      {topic:"Tabulation (aşağıdan-yuxarı) yanaşması",
+       code:
+`vector<long long> dp(n + 1);
+dp[0] = 0; dp[1] = 1;
+for (int i = 2; i <= n; i++)
+    dp[i] = dp[i - 1] + dp[i - 2];   // cədvəl aşağıdan yuxarı ardıcıl doldurulur`},
+      {topic:"Memoization və tabulation arasındakı fərq və nə vaxt hansını seçmək",
+       code:
+`// Memoization: rekursiv, yalnız lazım olan alt-hallar hesablanır
+// Tabulation: dövrlə, bütün cədvəl ardıcıl doldurulur, adətən daha sürətli
+// (rekursiya çağırış xərci yoxdur, stack daşma riski yoxdur)`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 10;
+
+    vector<long long> dp(n + 1);
+    dp[0] = 0; dp[1] = 1;
+    for (int i = 2; i <= n; i++)
+        dp[i] = dp[i - 1] + dp[i - 2];
+
+    cout << "Fib(" << n << ") = " << dp[n] << "\\n";
+
+    vector<long long> ways(n + 1);
+    ways[0] = 1; ways[1] = 1;
+    for (int i = 2; i <= n; i++)
+        ways[i] = ways[i - 1] + ways[i - 2];
+
+    cout << "Üsul sayı: " << ways[n] << "\\n";
+}`},
+  {gold:false, hard:true, tag:"Ay 7 · DP", title:"Dinamik proqramlaşdırma — II hissə", desc:"0/1 çanta, DP cədvəli, keçid düsturu",
+    why:"0/1 çanta (knapsack) DP-nin klassik nümunəsidir və 'DP cədvəlinin mənası nədir' sualına cavab verməyi öyrədir.",
+    topics:[
+      "Sadə çanta (0/1 knapsack) məsələsinin DP ilə həlli",
+      "DP cədvəlinin (dp massivinin) mənasını düzgün müəyyən etmək",
+      "DP-də keçid (transition) düsturunu tapmaq vərdişi"
+    ],
+    topicCodes:[
+      {topic:"Sadə çanta (0/1 knapsack) məsələsinin DP ilə həlli",
+       code:
+`int n = 3, capacity = 5;
+vector<int> weight = {2, 3, 4};
+vector<int> value  = {3, 4, 5};
+
+// dp[w] = capacity w ilə əldə edilə bilən maksimum dəyər
+vector<int> dp(capacity + 1, 0);
+for (int i = 0; i < n; i++)
+    for (int w = capacity; w >= weight[i]; w--)   // geriyə doğru -> hər əşya 1 dəfə
+        dp[w] = max(dp[w], dp[w - weight[i]] + value[i]);
+
+cout << "Maksimum dəyər: " << dp[capacity] << "\\n";`},
+      {topic:"DP cədvəlinin (dp massivinin) mənasını düzgün müəyyən etmək",
+       code:
+`// dp[w] = "tutum tam olaraq w olduqda əldə edilə bilən maksimum dəyər"
+// Bu mənanı əvvəlcədən yazmaq, keçid düsturunu tapmağı asanlaşdırır.`},
+      {topic:"DP-də keçid (transition) düsturunu tapmaq vərdişi",
+       code:
+`// Sual: i-ci əşyanı götürməklə/götürməməklə dp necə dəyişir?
+// dp[w] = max( dp[w]                         /* götürmə */,
+//              dp[w - weight[i]] + value[i]  /* götür   */ );`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 3, capacity = 5;
+    vector<int> weight = {2, 3, 4};
+    vector<int> value  = {3, 4, 5};
+
+    vector<int> dp(capacity + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int w = capacity; w >= weight[i]; w--)
+            dp[w] = max(dp[w], dp[w - weight[i]] + value[i]);
+
+    cout << "Maksimum dəyər: " << dp[capacity] << "\\n";
+}`},
+  {gold:false, hard:true, tag:"Ay 7 · Qraf", title:"Qraf əsasları — I hissə", desc:"Adjacency list, BFS",
+    why:"Azercell Cup-un əsas proqramında qraf mövzusu mütləq deyil, amma final mərhələdə üstünlük verə bilər.",
+    topics:[
+      "Qrafın təsviri: qonşuluq siyahısı (adjacency list)",
+      "Sadə qraf gəzintisi: BFS (enlik üzrə axtarış)",
+      "BFS ilə minimum məsafə (kənar sayı) hesablamaq"
+    ],
+    topicCodes:[
+      {topic:"Qrafın təsviri: qonşuluq siyahısı (adjacency list)",
+       code:
+`int n = 4;
+vector<vector<int>> adj(n);
+adj[0].push_back(1); adj[1].push_back(0); // 0-1 kənarı (yönəlməmiş)
+adj[1].push_back(2); adj[2].push_back(1);`},
+      {topic:"Sadə qraf gəzintisi: BFS (enlik üzrə axtarış)",
+       code:
+`vector<bool> visited(n, false);
+queue<int> q;
+q.push(0); visited[0] = true;
+
+while (!q.empty()){
+    int cur = q.front(); q.pop();
+    cout << cur << " ";
+    for (int next : adj[cur])
+        if (!visited[next]){ visited[next] = true; q.push(next); }
+}`},
+      {topic:"BFS ilə minimum məsafə (kənar sayı) hesablamaq",
+       code:
+`vector<int> dist(n, -1);
+dist[0] = 0;
+queue<int> q; q.push(0);
+while (!q.empty()){
+    int cur = q.front(); q.pop();
+    for (int next : adj[cur])
+        if (dist[next] == -1){ dist[next] = dist[cur] + 1; q.push(next); }
+}`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 5; // təpə sayı
+    vector<vector<int>> adj(n);
+    adj[0] = {1, 2};
+    adj[1] = {0, 3};
+    adj[2] = {0};
+    adj[3] = {1, 4};
+    adj[4] = {3};
+
+    vector<bool> visited(n, false);
+    queue<int> q;
+    q.push(0); visited[0] = true;
+
+    while (!q.empty()){
+        int cur = q.front(); q.pop();
+        cout << cur << " ";
+        for (int next : adj[cur]){
+            if (!visited[next]){
+                visited[next] = true;
+                q.push(next);
+            }
+        }
+    }
+    cout << "\\n";
+}`},
+  {gold:false, hard:true, tag:"Ay 8 · Qraf", title:"Qraf əsasları — II hissə", desc:"DFS, bağlantı komponentləri",
+    why:"DFS BFS-ə alternativ gəzinti üsuludur və bağlantı komponentlərini tapmaq üçün əsas alətdir.",
+    topics:[
+      "Sadə qraf gəzintisi: DFS (dərinlik üzrə axtarış)",
+      "Bağlantı komponentlərinin tapılması",
+      "Ziyarət olunmuş təpələri qeyd etmək (visited massivi)",
+      "Yönəlmiş və yönəlməmiş qraf anlayışı arasındakı fərq"
+    ],
+    topicCodes:[
+      {topic:"Sadə qraf gəzintisi: DFS (dərinlik üzrə axtarış)",
+       code:
+`vector<vector<int>> adj;
+vector<bool> visited;
+
+void dfs(int cur){
+    visited[cur] = true;
+    cout << cur << " ";
+    for (int next : adj[cur])
+        if (!visited[next])
+            dfs(next);   // əvvəlcə sona qədər dərinliyə gedir
+}`},
+      {topic:"Bağlantı komponentlərinin tapılması",
+       code:
+`int n = 6;
+vector<vector<int>> adj(n);
+adj[0] = {1}; adj[1] = {0};
+adj[2] = {3}; adj[3] = {2};
+// 4 və 5 heç kimlə bağlı deyil
+
+vector<bool> visited(n, false);
+int components = 0;
+for (int i = 0; i < n; i++){
+    if (!visited[i]){
+        components++;
+        // burada dfs(i) və ya bfs(i) çağırılır
+        visited[i] = true;
+    }
+}
+cout << "Komponent sayı: " << components << "\\n";`},
+      {topic:"Ziyarət olunmuş təpələri qeyd etmək (visited massivi)",
+       code:
+`// visited[i] = true olduqda təpə artıq gəzilib, təkrar əlavə edilmir.
+// Unudulsa -> sonsuz dövr və ya eyni təpənin dəfələrlə hesablanması riski yaranır.`},
+      {topic:"Yönəlmiş və yönəlməmiş qraf anlayışı arasındakı fərq",
+       code:
+`// Yönəlməmiş: adj[a].push_back(b); adj[b].push_back(a);  (iki tərəfli əlaqə)
+// Yönəlmiş:   adj[a].push_back(b);                         (yalnız a -> b istiqaməti)`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+vector<vector<int>> adj;
+vector<bool> visited;
+
+void dfs(int cur){
+    visited[cur] = true;
+    cout << cur << " ";
+    for (int next : adj[cur])
+        if (!visited[next])
+            dfs(next);
+}
+
+int main(){
+    int n = 5;
+    adj.assign(n, {});
+    adj[0] = {1, 2};
+    adj[1] = {0, 3};
+    adj[2] = {0};
+    adj[3] = {1, 4};
+    adj[4] = {3};
+
+    visited.assign(n, false);
+    dfs(0);
+    cout << "\\n";
+}`},
+  {gold:false, tag:"Ay 8 · Debug", title:"Debug və sərhəd halları", desc:"Kodun düzgünlüyünü təmin etmək",
+    why:"Yarışlarda ən çox bal itkisi düzgün alqoritmə deyil, unudulmuş sərhəd hala görə olur. Bu mövzu şagirddə 'öz kodunu sındırmaq' vərdişini formalaşdırır.",
+    topics:[
+      "Sərhəd halları (edge cases): boş giriş, tək elementli massiv",
+      "Mənfi ədədlər və sıfırla bağlı xüsusi hallar",
+      "Təkrarlanan dəyərlər olan giriş məlumatları",
+      "Öz testini yazmaq və gözlənilən nəticə ilə müqayisə etmək vərdişi",
+      "Vaxt limitini keçməmək üçün mürəkkəbliyi (Big-O) qiymətləndirmək",
+      "int daşması (overflow) və onun qarşısını almaq",
+      "Kodun addım-addım əl ilə izlənməsi (debug məntiqi)",
+      "Səhv çıxışları tapmaq üçün kiçik test nümunələri qurmaq"
+    ],
+    topicCodes:[
+      {topic:"Sərhəd halları (edge cases): boş giriş, tək elementli massiv",
+       code:
+`vector<int> a = {};
+if (a.empty()) cout << "Diqqət: massiv boşdur\\n";
+
+vector<int> b = {5};
+cout << "Tək elementdə maksimum: " << b[0] << "\\n";`},
+      {topic:"Mənfi ədədlər və sıfırla bağlı xüsusi hallar",
+       code:
+`int x = -5;
+cout << x % 3 << "\\n"; // C++-da mənfi ədədin qalığı da mənfi ola bilər! (-2)
+// düzgün qeyri-mənfi qalıq üçün: ((x % 3) + 3) % 3`},
+      {topic:"Təkrarlanan dəyərlər olan giriş məlumatları",
+       code:
+`vector<int> a = {2, 2, 3, 2};
+set<int> unique(a.begin(), a.end()); // təkrarları avtomatik silir: {2, 3}
+cout << "Unikal say: " << unique.size() << "\\n";`},
+      {topic:"Öz testini yazmaq və gözlənilən nəticə ilə müqayisə etmək vərdişi",
+       code:
+`// Kiçik, əl ilə hesabladığın nümunə üzərində kodu işə sal,
+// nəticəni gözlədiyinlə müqayisə et — məs. n=1, n=0 kimi sadə hallar.`},
+      {topic:"Vaxt limitini keçməmək üçün mürəkkəbliyi (Big-O) qiymətləndirmək",
+       code:
+`// n <= 10^5 -> O(n log n) təhlükəsizdir
+// n <= 10^3 -> O(n^2) təhlükəsizdir
+// n <= 20   -> O(2^n) (backtracking) təhlükəsizdir`},
+      {topic:"int daşması (overflow) və onun qarşısını almaq",
+       code:
+`int a = 100000, b = 100000;
+cout << a * b << "\\n";              // SƏHV: int-də daşır
+cout << (long long)a * b << "\\n";   // DÜZGÜN`},
+      {topic:"Kodun addım-addım əl ilə izlənməsi (debug məntiqi)",
+       code:
+`// Hər dəyişənin dəyərini kağız üzərində sətir-sətir izlə,
+// xüsusilə dövr və şərtlərdə "indi bura neçə dəfə gəlir?" sualını ver.`},
+      {topic:"Səhv çıxışları tapmaq üçün kiçik test nümunələri qurmaq",
+       code:
+`// n=0, n=1, bütün elementlər eyni, artan/azalan sıralı massiv
+// kimi kiçik "xarakterik" testlər qurmaq səhvləri tez üzə çıxarır.`},
+    ],
+    code:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int findMax(vector<int> &a){
+    if (a.empty()){
+        cout << "Xəbərdarlıq: massiv boşdur\\n";
+        return INT_MIN;
+    }
+
+    int mx = a[0];
+    for (int i = 1; i < (int)a.size(); i++)
+        mx = max(mx, a[i]);
+    return mx;
+}
+
+int main(){
+    vector<int> a1 = {3, -5, 7, 2};
+    vector<int> a2 = {};          // boş massiv — unudulan sərhəd hal!
+
+    cout << findMax(a1) << "\\n";  // 7
+    cout << findMax(a2) << "\\n";  // xəbərdarlıq göstərilir
+}`},
+];
+
+
+
+/* ============================================================================
+   escapeHtml(str)
+   ----------------------------------------------------------------------------
+   Verilmiş mətndəki HTML üçün "təhlükəli" simvolları (&, <, >) onların
+   HTML-entity qarşılıqları ilə əvəz edir. Bu, C++ kodunu (məsələn "a < b"
+   kimi ifadələri) səhifəyə çıxaranda brauzerin onu HTML tag-ı kimi
+   yozmasının qarşısını alır. Əməliyyat sırası vacibdir: əvvəlcə "&" əvəz
+   olunur (çünki digər əvəzləmələr özləri "&" yaradır), sonra "<" və ">".
+   ============================================================================ */
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ============================================================================
+   CPP_TOKEN_PATTERNS
+   ----------------------------------------------------------------------------
+   Sadə C++ sintaksis-vurğulama (syntax highlighting) üçün istifadə olunan
+   token növləri və onlara uyğun regex şablonları. Hər element [class, regex]
+   cütüdür: `class` CSS-dəki .cmt/.kw/.tp/.str/.num/.pp klasslarından birinə
+   uyğun gəlir (bax: <style> bölməsindəki .code-block rəng qaydaları).
+   Sıra ƏHƏMİYYƏTLİDİR: highlightCppLine funksiyası bu şablonları BİRLƏŞDİRİB
+   tək bir böyük regex yaradır, ona görə əvvəl gələn şablon (məs. şərh "cmt")
+   sonrakılardan (məs. açar sözlər) üstün olur, uyğunluq üst-üstə düşəndə.
+     cmt (şərh)         -> // ilə başlayıb sətir sonuna qədər
+     str (mətn sabiti)  -> "..." və ya '...' daxilindəki mətn (escape-ləri nəzərə alır)
+     pp  (preprosessor) -> #include <...> və ya #include "..."
+     num (ədəd)         -> tam və ya kəsr ədədlər
+     kw  (açar söz)      -> dil strukturları: for, if, return, cin, cout və s.
+     tp  (tip)           -> data tipləri: int, double, vector, map və s.
+   ============================================================================ */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|template|typename|typedef|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|unordered_map|unordered_set|set|queue|stack|pair|size_t|short|unsigned)\b/],
+];
+
+/* ============================================================================
+   highlightCppLine(rawLine)
+   ----------------------------------------------------------------------------
+   Bir sətir xam (raw) C++ kodunu qəbul edir və rəngli <span> teqləri ilə
+   işarələnmiş HTML mətni qaytarır. Alqoritm:
+     1. Əvvəlcə sətir escapeHtml() ilə HTML-təhlükəsiz hala salınır.
+     2. Bütün CPP_TOKEN_PATTERNS şablonları TƏK bir böyük regex-də
+        "capture group"lar (mötərizəli hissələr) şəklində birləşdirilir —
+        məsələn (cmt-regex)|(str-regex)|(pp-regex)|...
+     3. Bu birləşmiş regex bütün sətir üzrə təkrar-təkrar axtarılır (/g bayrağı).
+     4. Hər uyğunluq tapılanda, hansı capture group-un (m[i+1]) doldurulduğuna
+        baxılır — bu, hansı token növünün uyğun gəldiyini göstərir — və
+        müvafiq CSS class-ı ilə <span> daxilinə alınır.
+     5. Uyğunluqlar arasındakı adi mətn (kodun vurğulanmamış hissəsi) olduğu
+        kimi saxlanılır.
+     6. Sonsuz dövrün qarşısını almaq üçün: əgər uyğunluq sıfır uzunluqdadırsa
+        (m.index === lastIndex), lastIndex əl ilə 1 artırılır.
+   Sətir tamamilə boşdursa, '&nbsp;' qaytarılır ki, boş sətir CSS-də
+   sıxılıb yox olmasın (hündürlüyünü saxlasın).
+   ============================================================================ */
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  // Bütün fərdi şablonları "(şablon1)|(şablon2)|..." formatında tək regexə birləşdiririk
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    // Əvvəlki uyğunluqdan bu uyğunluğa qədər olan "sadə" mətni əlavə et
+    out += escaped.slice(last, m.index);
+    // Hansı capture group-un dolu olduğunu tapıb ona uyğun rəng class-ı ver
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    // Sıfır-uzunluqlu uyğunluqda sonsuz dövrün qarşısını al
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  // Son uyğunluqdan sətrin sonuna qədər qalan mətni əlavə et
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+
+/* ============================================================================
+   EXPLAIN_PATTERNS
+   ----------------------------------------------------------------------------
+   Kod sətrinə klikləndikdə göstərilən "izah paneli"nin mətnini müəyyən edən
+   qayda cədvəli. Hər element [regex, izahMətni] cütüdür: sətir bu regex-ə
+   uyğun gələrsə, uyğun izah mətni namizəd siyahısına əlavə olunur.
+   Sıra prioritet təşkil edir — daha əvvəl duran, daha spesifik qaydalar
+   önce yoxlanılır (bax: explainLine funksiyası, ən çoxu 2 uyğunluq götürür).
+   ============================================================================ */
+const EXPLAIN_PATTERNS = [
+  [/#\s*include/, "Kitabxananı proqrama qoşur — kod bu kitabxanadakı hazır funksiyalardan istifadə edə bilir."],
+  [/using namespace std/, "std kitabxanasının funksiyalarını (cout, cin və s.) prefikssiz istifadə etməyə imkan verir."],
+  [/int main\s*\(/, "Proqramın işə düşdüyü əsas funksiya — icra buradan başlayır."],
+  [/cin\s*>>/, "Klaviaturadan (giriş məlumatından) dəyər oxuyur."],
+  [/cout\s*<</, "Ekrana nəticəni çıxarır."],
+  [/for\s*\(/, "Dövr: mötərizədəki şərt doğru olduqca kod təkrarlanır."],
+  [/while\s*\(/, "Dövr: şərt doğru olduqca təkrarlanır, təkrar sayı əvvəlcədən bilinmir."],
+  [/do\s*\{/, "Dövr ən azı bir dəfə işləyir, sonra şərt yoxlanılır."],
+  [/if\s*\(/, "Şərti yoxlayır: doğrudursa, daxilindəki kod işə düşür."],
+  [/\belse\b/, "Əvvəlki şərt yalan olduqda işə düşür."],
+  [/switch\s*\(/, "Dəyişənin dəyərinə görə müxtəlif halları (case) yoxlayır."],
+  [/\bcase\b/, "switch daxilində konkret bir dəyər üçün hal."],
+  [/\bbreak\b/, "Dövrü və ya switch-i dərhal dayandırır."],
+  [/\bcontinue\b/, "Cari təkrarı ötürüb dövrün növbəti addımına keçir."],
+  [/\breturn\b/, "Funksiyanı bitirir və (varsa) nəticəni qaytarır."],
+  [/vector\s*</, "Ölçüsü avtomatik dəyişə bilən dinamik massiv (vector) elan edir."],
+  [/\.push_back\s*\(/, "Konteynerin sonuna yeni element əlavə edir."],
+  [/\.size\s*\(/, "Konteynerdəki element sayını qaytarır."],
+  [/\.empty\s*\(/, "Konteynerin boş olub-olmadığını yoxlayır."],
+  [/map\s*</, "Açar–dəyər cütlərini saxlayan konteyner."],
+  [/queue\s*</, "FIFO (əvvəl gələn əvvəl çıxar) prinsipi ilə işləyən növbə."],
+  [/stack\s*</, "LIFO (sonuncu gələn birinci çıxar) prinsipi ilə işləyən yığın."],
+  [/adj\s*\[/, "Qraf üçün qonşuluq siyahısına müraciət edir."],
+  [/visited/, "Hansı elementin artıq gəzildiyini qeyd edən massiv/dəyişən."],
+  [/long long/, "Çox böyük ədədləri saxlaya bilən tip (~9×10^18-ə qədər)."],
+  [/\bconst\b/, "Bu dəyərin sonradan dəyişdirilməyəcəyini bildirir."],
+  [/\bauto\b/, "Dəyişənin tipini kompilyator özü avtomatik təyin edir."],
+  [/sort\s*\(/, "Massiv və ya vektoru artan sırayla düzür."],
+  [/INT_MIN|INT_MAX/, "int tipinin ala biləcəyi minimum/maksimum dəyər."],
+  [/dp\s*\[/, "Dinamik proqramlaşdırma massivi — əvvəlki hesablanmış nəticələri saxlayır."],
+  [/%/, "Bölmədən qalan hissəni (qalıq) hesablayır."],
+  [/\+\+|--/, "Dəyəri 1 vahid artırır və ya azaldır."],
+  [/^\s*\{\s*$/, "Blokun (kod hissəsinin) başlanğıcı."],
+  [/^\s*\}/, "Blokun (kod hissəsinin) sonu."],
+];
+
+/* ============================================================================
+   explainLine(rawLine)
+   ----------------------------------------------------------------------------
+   Verilmiş xam kod sətri üçün insan-dilində (Azərbaycanca) izah mətni yaradır.
+   Məntiq:
+     1. Sətir tamamilə boşdursa (yalnız boşluqdan ibarətdirsə), ümumi
+        "boş sətir" izahı qaytarılır.
+     2. Əks halda EXPLAIN_PATTERNS siyahısı sıra ilə yoxlanılır; uyğun gələn
+        (və təkrarlanmayan) izahlar `matches` massivinə toplanır.
+     3. Ən çoxu 2 izah götürülür (matches.length >= 2 olanda dövr dayanır) ki,
+        panel həddindən artıq uzun olmasın və ən vacib 1-2 fikir önə çıxsın.
+     4. Heç bir qayda uyğun gəlmirsə, ümumi bir defolt izah (dəyişənə
+        mənimsətmə/funksiya çağırışı) qaytarılır ki, panel heç vaxt boş qalmasın.
+     5. Tapılan izahlar boşluqla birləşdirilib tək mətn kimi qaytarılır.
+   ============================================================================ */
+function explainLine(rawLine){
+  const trimmed = rawLine.trim();
+  if (!trimmed) return "Boş sətir — kodu oxunaqlı etmək üçün istifadə olunur.";
+  const matches = [];
+  for (const [re, text] of EXPLAIN_PATTERNS){
+    if (re.test(rawLine) && !matches.includes(text)){
+      matches.push(text);
+      if (matches.length >= 2) break; // Panel üçün ən çoxu 2 izah kifayətdir
+    }
+  }
+  if (matches.length === 0){
+    return "Bu sətir dəyişənə dəyər mənimsədir və ya bir əməliyyat/funksiya çağırışı edir.";
+  }
+  return matches.join(' ');
+}
+
+// Bütün kod bloklarında yaradılan izah panellərinin unikal id-lərini təmin
+// etmək üçün qlobal sayğac. Hər çağırışda 1 artır, heç vaxt sıfırlanmır —
+// beləliklə fərqli topic-code blokları arasında id toqquşması olmur.
+let codeLineUid = 0;
+
+/* ============================================================================
+   renderCodeBlock(code)
+   ----------------------------------------------------------------------------
+   Tam bir C++ kod parçasını (çoxsətirli string) qəbul edib, hər sətri ayrıca
+   kliklənə bilən elementə çevirən HTML mətni qaytarır. Hər sətir üçün:
+     - Sətir nömrəsi göstərilir.
+     - Ox işarəsi (▸) — hansı sətrin izahı açıqdırsa, CSS ilə çevrilir.
+     - Sətrin özü highlightCppLine() ilə rəngli HTML-ə çevrilir.
+     - Sətrin altında, əvvəlcə boş olan (JS ilə sonradan doldurulan) bir
+       "izah paneli" (.code-explain) yaradılır. Xam (escape olunmamış) sətir
+       mətni encodeURIComponent() ilə data-raw atributunda saxlanılır ki,
+       daha sonra klik olunanda explainLine() funksiyasına ötürülsün.
+   Nəticədə bütün sətirlər .code-block konteynerinə yığılıb qaytarılır.
+   ============================================================================ */
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => {
+    const id = 'cl' + (codeLineUid++); // Bu sətrin izah paneli üçün unikal id
+    const highlighted = highlightCppLine(line);
+    // Xam sətri (HTML atributunda təhlükəsiz saxlamaq üçün) URI-encode edirik —
+    // sonra klik zamanı decodeURIComponent ilə geri açılacaq (bax: openCodePanel)
+    const rawAttr = encodeURIComponent(line);
+    return `<div class="code-line-group">
+      <div class="code-line" data-raw="${rawAttr}" data-target="${id}">
+        <span class="line-no">${idx + 1}</span><span class="line-caret">▸</span><code>${highlighted}</code>
+      </div>
+      <div class="code-explain" id="${id}"><div class="code-explain-inner"></div></div>
+    </div>`;
+  }).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+/* ============================================================================
+   closeCodePanel(panel, line) / openCodePanel(panel, line)
+   ----------------------------------------------------------------------------
+   Bu iki funksiya bir kod sətrinin izah panelini bağlayır/açır.
+
+   closeCodePanel: panelin max-height-ini 0-a qaytarır (CSS transition
+   sayəsində yığılıb bağlanır), 'open' class-ını götürür və (varsa) müvafiq
+   sətirdən 'active' vurğusunu silir.
+
+   openCodePanel:
+     1. "Tənbəl doldurma" (lazy render) texnikası: panel.dataset.filled
+        yoxlanılır — əgər bu panel əvvəllər heç açılmayıbsa (filled yoxdursa),
+        yalnız O ZAMAN explainLine() çağırılıb mətn yaradılır və
+        panel.dataset.filled='1' qoyulur. Bu sayədə eyni panel təkrar-təkrar
+        açılıb-bağlanarkən izah mətni hər dəfə yenidən hesablanmır.
+     2. 'open' və 'active' class-ları əlavə olunur (CSS görünüşü dəyişir).
+     3. requestAnimationFrame ilə brauzerin növbəti "boyama" (paint) dövründə
+        panel.scrollHeight (məzmunun HƏQİQİ hündürlüyü) oxunub max-height-ə
+        yazılır — bu, "max-height: auto" CSS-də animasiya olunmadığı üçün
+        lazım olan ümumi bir hiylədir (JS ilə real hündürlüyü ölçüb təyin etmək).
+   ============================================================================ */
+function closeCodePanel(panel, line){
+  panel.style.maxHeight = '0px';
+  panel.classList.remove('open');
+  if (line) line.classList.remove('active');
+}
+function openCodePanel(panel, line){
+  if (!panel.dataset.filled){
+    panel.querySelector('.code-explain-inner').textContent = explainLine(decodeURIComponent(line.dataset.raw));
+    panel.dataset.filled = '1';
+  }
+  panel.classList.add('open');
+  line.classList.add('active');
+  requestAnimationFrame(() => {
+    panel.style.maxHeight = panel.scrollHeight + 'px';
+  });
+}
+
+/* ============================================================================
+   Qlobal klik dinləyicisi (event delegation)
+   ----------------------------------------------------------------------------
+   Hər kod sətrinə ayrı-ayrı event listener bağlamaq əvəzinə (bu, çoxlu kod
+   sətri olduğu üçün performansa mənfi təsir edərdi), TƏK bir listener bütün
+   sənədə (document) bağlanır və klik hər dəfə e.target.closest('.code-line')
+   ilə "hansı sətrə düşdüyü" müəyyən edilir. Bu texnika "event delegation"
+   adlanır və dinamik yaradılan elementlər üçün effektivdir.
+
+   Məntiq:
+     1. Klik bir .code-line üzərində deyilsə (line == null), heç nə etmə.
+     2. Klik olunan sətrin daxil olduğu .code-block tapılır (block).
+     3. Bu sətrin uyğun izah paneli tapılır (panel) və onun hazırda açıq
+        olub-olmadığı yoxlanılır (wasOpen).
+     4. EYNİ blok daxilindəki BÜTÜN digər panellər bağlanır (accordion effekti —
+        eyni anda yalnız bir sətrin izahı açıq qala bilər). Diqqət: əgər klik
+        olunan panel artıq açıqdırsa (wasOpen), o da bağlanır (yəni "toggle" —
+        eyni sətrə iki dəfə kliklədikdə bağlanır).
+     5. Əgər panel əvvəllər açıq DEYİLDİSƏ, indi açılır (openCodePanel).
+   ============================================================================ */
+document.addEventListener('click', (e) => {
+  const line = e.target.closest('.code-line');
+  if (!line) return;
+  const block = line.closest('.code-block');
+  const panel = document.getElementById(line.dataset.target);
+  const wasOpen = panel.classList.contains('open');
+  // Bu bloka aid bütün sətir-panel cütlərini gəzib, klik olunan paneldən
+  // başqa hamısını bağla (və ya wasOpen true-dursa, hamısını bağla)
+  block.querySelectorAll('.code-line-group').forEach(g => {
+    const p = g.querySelector('.code-explain');
+    const l = g.querySelector('.code-line');
+    if (p !== panel || wasOpen) closeCodePanel(p, l);
+  });
+  if (!wasOpen) openCodePanel(panel, line);
+});
+
+/* ============================================================================
+   YOL XƏRİTƏSİNİN (ROADMAP) DİNAMİK OLARAQ QURULMASI
+   ----------------------------------------------------------------------------
+   `weeks` massivindəki hər obyekt üçün bir "kart" (div.week) yaradılır və
+   #roadmap konteynerinə əlavə olunur. Prosesin addımları:
+     1. Kartın əsas className-i təyin olunur; `w.gold` true olarsa əlavə
+        'gold' class-ı verilir (xüsusi qızıl rəngli görünüş üçün).
+     2. innerHTML vasitəsilə bütün daxili HTML struktur (başlıq, açılan
+        bədən hissəsi) template literal ilə bir dəfəyə yazılır:
+          - week-head hissəsində MÖVZU nömrəsi (2 rəqəmli, padStart ilə,
+            məs. "01", "02"...), başlıq (h3), alt-təsvir (p) və ox (chevron) var.
+          - week-head üzərində olan inline onclick, bu kartın valideynini
+            (`.week` divini) tapıb 'open' class-ını toggle edir — bu, CSS-dəki
+            .week.open .week-body qaydasını aktivləşdirərək accordion-u açır/bağlayır.
+          - week-body hissəsində "Məqsəd" (why) və "Mövzular" (topics siyahısı)
+            göstərilir.
+          - Əgər w.topicCodes mövcuddursa (bəzi mövzularda olmaya bilər),
+            hər mövzu üçün renderCodeBlock() çağırılıb kliklənə bilən kod
+            nümunəsi əlavə olunur; əks halda bu hissə tamamilə keçilir (boş sətir).
+          - Sonda kartın "tag" etiketi (məs. "Ay 1 · Təməl") göstərilir.
+     3. Hazır kart elementi #roadmap konteynerinə əlavə olunur.
+   Nəticədə bütün 8 aylıq proqram avtomatik, təkrarlanan HTML yazmadan,
+   TƏK BİR data massivindən (weeks) qurulur.
+   ============================================================================ */
+/* ============================================================================
+   TEST_TABS — hər mövzunun (0-əsaslı indeks) hansı test tabına aid olduğunu
+   göstərir. Yalnız artıq hazırlanmış test vərəqləri (valideyn səhifədəki
+   tabbar-da mövcud olan) burada qeyd olunur — məs. Mövzu 1 üçün 'week1' tabı.
+   Yeni test vərəqi hazırlandıqca (valideyn HTML-də yeni tab + iframe əlavə
+   edilərək) bu obyektə {mövzuİndeksi: 'tabId'} əlavə etmək kifayətdir.
+   ============================================================================ */
+const TEST_TABS = { 0: 'week1', 1: 'week2', 2: 'week3', 3: 'week4', 4: 'week5' };
+
+const roadmapEl = document.getElementById('roadmap');
+const roadmapNavEl = document.getElementById('roadmapNav');
+weeks.forEach((w, i) => {
+  const el = document.createElement('div');
+  el.className = 'week' + (w.gold ? ' gold' : '');
+  el.id = 'week-' + i;
+  el.innerHTML = `
+    ${w.algoStart ? `
+    <div class="algo-start-banner">🔵 BURADAN ETİBARƏN ƏSAS ALQORİTM MÖVZULARI BAŞLAYIR — əvvəlki mövzular dil (sintaksis) və riyazi əsaslar idi</div>
+    ` : ''}
+    ${w.hardStart ? `
+    <div class="hard-start-banner">🔴 BURADAN ETİBARƏN ALQORİTMLƏR ÇƏTİNLƏŞİR — Backtracking ilə başlayır, DP (Mövzu 12) ən çətin mövzudur</div>
+    ` : ''}
+    <div class="week-head" onclick="this.parentElement.classList.toggle('open')">
+      <div class="week-num">MÖVZU ${String(i+1).padStart(2,'0')}</div>
+      <div class="week-title">
+        <h3>${w.title}</h3>
+        <p>${w.desc}</p>
+      </div>
+      ${TEST_TABS[i] !== undefined ? `<div class="progress-badge" id="progress-${i}" style="display:none;"></div>` : ''}
+      <div class="chevron">▶</div>
+    </div>
+    <div class="week-body">
+      <div class="week-body-inner">
+        <h4>Məqsəd</h4>
+        <p class="why">${w.why}</p>
+        <h4>Mövzular</h4>
+        <ul>${w.topics.map(t => `<li>${t}</li>`).join('')}</ul>
+        ${w.topicCodes ? `
+        <h4>Mövzu üzrə kod nümunələri (C++)</h4>
+        <div class="topic-codes">
+          ${w.topicCodes.map(tc => `
+            <div class="topic-code-item">
+              <p class="topic-code-title">${tc.topic}</p>
+              ${renderCodeBlock(tc.code)}
+            </div>
+          `).join('')}
+        </div>` : ''}
+        <div class="tag-row"><span class="tag">${w.tag}</span>${w.hard ? `<span class="hard-badge">🔴 ÇƏTİN</span>` : ''}</div>
+        <div class="topic-test-row">
+          ${TEST_TABS[i] !== undefined
+            ? `<button type="button" class="test-btn" onclick="window.parent.showTab('${TEST_TABS[i]}')">📝 Test ${i+1}-i həll et</button>`
+            : `<button type="button" class="test-btn test-btn-disabled" disabled>📝 Test ${i+1} (tezliklə)</button>`}
+        </div>
+      </div>
+    </div>
+  `;
+  roadmapEl.appendChild(el);
+});
+
+/* ---------- Backend inteqrasiyası: mövzu üzrə irəliləyiş nişanları ---------- */
+async function loadProgress(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics');
+    if (!res.ok) return;
+    const topics = await res.json();
+    const bySlug = {};
+    topics.forEach(t => { bySlug[t.slug] = t; });
+    Object.keys(TEST_TABS).forEach(idxStr => {
+      const idx = Number(idxStr);
+      const t = bySlug[TEST_TABS[idx]];
+      const el = document.getElementById('progress-' + idx);
+      if (t && el) {
+        el.textContent = t.solvedCount + ' / ' + t.problemCount + ' həll edilib';
+        el.style.display = 'inline-block';
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProgress();
+
+weeks.forEach((w, i) => {
+  const navBtn = document.createElement('button');
+  navBtn.type = 'button';
+  navBtn.className = 'roadmap-nav-item';
+  navBtn.id = 'nav-week-' + i;
+  navBtn.innerHTML = `<span class="rn-num">${String(i+1).padStart(2,'0')}</span>${w.title}`;
+  navBtn.addEventListener('click', () => jumpToWeek(i));
+  roadmapNavEl.appendChild(navBtn);
+});
+
+function jumpToWeek(i){
+  const target = document.getElementById('week-' + i);
+  if (!target) return;
+  target.classList.add('open');
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.roadmap-nav-item').forEach(el => el.classList.remove('current'));
+  const navBtn = document.getElementById('nav-week-' + i);
+  if (navBtn) navBtn.classList.add('current');
+}
+
+/* ============================================================================
+   MƏNBƏLƏR (resources) — dərs platformalarının statik siyahısı.
+   Hər element {name, desc, url} formatındadır və aşağıdakı forEach dövründə
+   #resources konteynerinə kart şəklində əlavə olunur. rel="noopener" xarici
+   linkə keçəndə yeni pəncərənin əsas səhifəyə (window.opener vasitəsilə)
+   girişini bloklayır — bu, təhlükəsizlik üçün standart bir təcrübədir.
+   ============================================================================ */
+const resources = [
+  {name:"CodeAny", desc:"Azercell Cup-un öz yarış platforması — keçmiş illərin suallarını tapmaq üçün ideal.", url:"https://azercellcup.org"},
+  {name:"Codeforces", desc:"Div 3/4 turları və 'Problemset' bölməsi (reytinq 800–1200 aralığı yeni başlayanlar üçün uyğundur).", url:"https://codeforces.com"},
+  {name:"CSES Problem Set", desc:"Mövzu üzrə təşkil olunmuş, alqoritmik düşüncəni inkişaf etdirən klassik məsələlər toplusu.", url:"https://cses.fi/problemset/"},
+  {name:"AtCoder Beginner Contest", desc:"Yeni başlayanlar üçün strukturlaşdırılmış, aydın izahlı yarış arxivi.", url:"https://atcoder.jp"},
+  {name:"HackerRank", desc:"Mövzu bölmələrinə görə (massiv, sətir, DP və s.) sıralanmış təcrübə bankı.", url:"https://www.hackerrank.com"},
+  {name:"LeetCode (Easy)", desc:"Massiv, sətir və hash-map mövzularında əlavə praktika üçün.", url:"https://leetcode.com"},
+];
+const resEl = document.getElementById('resources');
+resources.forEach(r => {
+  const el = document.createElement('div');
+  el.className = 'resource';
+  // url.replace('https://','') — linkin görünən mətnində "https://" hissəsini
+  // gizlədir ki, daha qısa/təmiz görünsün (məs. "codeforces.com")
+  el.innerHTML = `<div class="name">${r.name}</div><div class="desc">${r.desc}</div><a href="${r.url}" target="_blank" rel="noopener">${r.url.replace('https://','')}</a>`;
+  resEl.appendChild(el);
+});
+
+</script>
+</body>
+</html>

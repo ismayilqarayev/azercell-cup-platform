@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alqoritmlərin İşləmə Prinsipi — Vizual Simulyasiya</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --alert:            #FF3B3B;
+    --blue:             #2e6ea1;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold); position:relative;
+    padding:26px 24px 20px; margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / ALQORİTM SİMULYASİYASI / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep); padding:0 10px;
+    font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono); font-size:clamp(24px,4.5vw,36px); line-height:1.2;
+    margin:8px 0 8px; color:var(--ink); letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  /* --------- Algoritm seçici tab-lar --------- */
+  .algo-tabs{ display:flex; flex-wrap:wrap; gap:8px; }
+  .algo-tab{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:0.3px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:3px; padding:9px 14px; cursor:pointer; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .algo-tab:hover{ background:rgba(255,255,255,0.08); }
+  .algo-tab.active{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+
+  /* --------- Vizual panel --------- */
+  .visual-card{
+    background:var(--paper); color:var(--ink); border-radius:3px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); padding:20px 20px 22px; margin-top:6px;
+  }
+  .visual-card h3{ margin:0 0 4px; font-size:17px; }
+  .visual-card p.why{ margin:0 0 14px; font-size:13.5px; color:var(--ink-soft); line-height:1.55; }
+
+  .stage{
+    background:var(--well); border-radius:3px; padding:18px 10px;
+    display:flex; align-items:center; justify-content:center; overflow-x:auto;
+    min-height:170px;
+  }
+  .stage svg{ display:block; }
+
+  .step-text{
+    margin-top:14px; padding:12px 14px; background:var(--paper-warm);
+    border-left:3px solid var(--gold); border-radius:2px;
+    font-size:13.5px; line-height:1.55; color:var(--ink); min-height:20px;
+  }
+  .step-text b{ color:var(--bronze-text); }
+
+  .controls{ display:flex; align-items:center; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .ctrl-btn{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.3px;
+    background:var(--paper-warm); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:3px; padding:8px 13px; cursor:pointer; transition:background 0.15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--grid-line-strong); }
+  .ctrl-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .ctrl-btn.primary{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+  .ctrl-btn.primary:hover{ background:var(--bronze); }
+  .step-counter{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-left:auto; }
+
+  .custom-input{
+    margin-top:16px; padding-top:14px; border-top:1px dashed var(--grid-line-strong);
+    display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;
+  }
+  .field{ display:flex; flex-direction:column; gap:4px; }
+  .field label{ font-family:var(--mono); font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); }
+  .field input{
+    font-family:var(--mono); font-size:13px; padding:7px 9px; border:1px solid var(--grid-line-strong);
+    border-radius:3px; background:var(--well); color:var(--ink); width:170px;
+  }
+  .field.wide input{ width:280px; }
+
+  /* --------- Praktika (quiz) --------- */
+  .quiz-card{
+    background:var(--paper); color:var(--ink); border-radius:3px;
+    padding:20px 20px 20px; box-shadow:0 1px 0 rgba(0,0,0,0.2);
+  }
+  .quiz-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .quiz-score{ font-family:var(--mono); font-size:12px; color:var(--bronze-text); }
+  .quiz-question{ font-size:14.5px; line-height:1.6; margin:0 0 14px; }
+  .quiz-options{ display:grid; gap:8px; }
+  .quiz-opt{
+    text-align:left; font-family:var(--sans); font-size:13.5px; padding:10px 12px;
+    background:var(--paper-warm); color:var(--ink); border:1px solid var(--grid-line-strong); border-radius:3px;
+    cursor:pointer; transition:background 0.15s ease;
+  }
+  .quiz-opt:hover{ background:rgba(255,255,255,0.08); }
+  .quiz-opt.correct{ background:rgba(63,143,95,0.18); border-color:var(--green); }
+  .quiz-opt.wrong{ background:rgba(193,85,63,0.15); border-color:var(--alert); }
+  .quiz-feedback{ margin-top:12px; font-size:13px; line-height:1.5; min-height:18px; }
+  .quiz-feedback.correct{ color:var(--green-text); }
+  .quiz-feedback.wrong{ color:var(--alert); }
+  .quiz-next{ margin-top:14px; }
+
+  .footer{
+    margin-top:60px; text-align:center; font-family:var(--mono); font-size:11px;
+    letter-spacing:1.5px; color:var(--ink-soft);
+  }
+
+  @media (max-width:560px){
+    .stage{ min-height:140px; }
+    .field input{ width:130px; }
+    .field.wide input{ width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Alqoritmlərin <span>İşləmə Prinsipi</span></h1>
+    <p>Kod sətirlərini oxumaqla alqoritmin "başında" nə baş verdiyini görmək çətindir. Bu səhifə hər addımı vizual olaraq göstərir — massivdə hansı elementlərə baxılır, göstəricilər hara hərəkət edir, qraf necə gəzilir. Aşağıda öz məlumatınla sınayıb, sonda kiçik sual-cavabla anlayışını yoxlaya bilərsən.</p>
+    <div class="specs">
+      <div><div class="k">Alqoritm sayı</div><div class="v">6</div></div>
+      <div><div class="k">Rejim</div><div class="v">Addım-addım / Avtomatik</div></div>
+      <div><div class="k">Format</div><div class="v">Diaqram + Praktika</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Alqoritm seç</div>
+  <div class="algo-tabs" id="algoTabs"></div>
+
+  <div class="section-label">Vizual İzləmə</div>
+  <div class="visual-card">
+    <h3 id="algoTitle"></h3>
+    <p class="why" id="algoWhy"></p>
+    <div class="stage" id="stage"></div>
+    <div class="step-text" id="stepText">Başlamaq üçün "▶ Növbəti addım" düyməsinə basın.</div>
+    <div class="controls">
+      <button class="ctrl-btn" id="btnReset">⟲ Sıfırla</button>
+      <button class="ctrl-btn" id="btnPrev">◀ Geri</button>
+      <button class="ctrl-btn primary" id="btnNext">▶ Növbəti addım</button>
+      <button class="ctrl-btn" id="btnPlay">⏵ Avtomatik oynat</button>
+      <span class="step-counter" id="stepCounter">0 / 0</span>
+    </div>
+    <div class="custom-input" id="customInput"></div>
+  </div>
+
+  <div class="section-label">Praktika sahəsi</div>
+  <div class="quiz-card">
+    <div class="quiz-top">
+      <div class="section-label" style="margin:0; font-size:11px;">Bilirsənmi?</div>
+      <div class="quiz-score" id="quizScore">Nəticə: 0 / 0</div>
+    </div>
+    <p class="quiz-question" id="quizQuestion"></p>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="ctrl-btn primary quiz-next" id="btnNextQuiz">Növbəti sual →</button>
+  </div>
+
+  <div class="footer">AZ·CUP — ALQORİTM SİMULYASİYASI — ADDIM-ADDIM ANLA</div>
+</div>
+
+<script>
+/* ============================================================
+   QRAF (BFS/DFS üçün) — sabit kiçik qraf
+   ============================================================ */
+const graphNodes = [
+  {id:0, x:50,  y:80},
+  {id:1, x:160, y:30},
+  {id:2, x:160, y:130},
+  {id:3, x:280, y:80},
+  {id:4, x:400, y:30},
+  {id:5, x:400, y:130},
+];
+const graphEdges = [[0,1],[0,2],[1,3],[2,3],[3,4],[3,5]];
+function buildAdj(){
+  const adj = {};
+  graphNodes.forEach(n => adj[n.id] = []);
+  graphEdges.forEach(([a,b]) => { adj[a].push(b); adj[b].push(a); });
+  Object.values(adj).forEach(l => l.sort((x,y)=>x-y));
+  return adj;
+}
+
+/* ============================================================
+   ADDIM GENERATORLARI — hər alqoritm üçün addım-addım vəziyyət
+   ============================================================ */
+function binarySearchSteps(arr, target){
+  const a = arr.slice().sort((x,y)=>x-y);
+  const steps = [];
+  let lo=0, hi=a.length-1;
+  while(lo<=hi){
+    const mid = Math.floor((lo+hi)/2);
+    if (a[mid]===target){
+      steps.push({arr:a, lo, hi, mid, state:'found', text:`orta=${mid} (dəyər <b>${a[mid]}</b>) == hədəf <b>${target}</b> → TAPILDI!`});
+      return steps;
+    } else if (a[mid] < target){
+      steps.push({arr:a, lo, hi, mid, state:'right', text:`orta=${mid} (dəyər <b>${a[mid]}</b>) &lt; hədəf <b>${target}</b> → sağ yarıya keç`});
+      lo = mid+1;
+    } else {
+      steps.push({arr:a, lo, hi, mid, state:'left', text:`orta=${mid} (dəyər <b>${a[mid]}</b>) &gt; hədəf <b>${target}</b> → sol yarıya keç`});
+      hi = mid-1;
+    }
+  }
+  steps.push({arr:a, lo, hi, mid:-1, state:'notfound', text:`lo (${lo}) &gt; hi (${hi}) oldu → <b>${target}</b> massivdə yoxdur`});
+  return steps;
+}
+
+function bubbleSortSteps(arr){
+  const a = arr.slice();
+  const n = a.length;
+  const steps = [{arr:a.slice(), i:-1, j:-1, swapped:false, text:'Sıralamaya başlayırıq — hələ heç nə müqayisə olunmayıb.'}];
+  for (let i=0; i<n-1; i++){
+    for (let j=0; j<n-1-i; j++){
+      steps.push({arr:a.slice(), i:j, j:j+1, swapped:false, text:`<b>${a[j]}</b> və <b>${a[j+1]}</b> müqayisə olunur`});
+      if (a[j] > a[j+1]){
+        [a[j], a[j+1]] = [a[j+1], a[j]];
+        steps.push({arr:a.slice(), i:j, j:j+1, swapped:true, text:`<b>${a[j+1]}</b> &gt; <b>${a[j]}</b> idi → yerləri dəyişdirildi`});
+      }
+    }
+  }
+  steps.push({arr:a.slice(), i:-1, j:-1, swapped:false, text:'Massiv tam sıralandı! ✓'});
+  return steps;
+}
+
+function twoPointersSteps(arr, target){
+  const a = arr.slice().sort((x,y)=>x-y);
+  const steps = [];
+  let l=0, r=a.length-1;
+  steps.push({arr:a, left:l, right:r, sum:a[l]+a[r], text:`Başlanğıc: sol=${l} (${a[l]}), sağ=${r} (${a[r]})`});
+  while (l < r){
+    const sum = a[l]+a[r];
+    if (sum === target){
+      steps.push({arr:a, left:l, right:r, sum, state:'found', text:`${a[l]}+${a[r]}=<b>${sum}</b> == hədəf <b>${target}</b> → TAPILDI!`});
+      return steps;
+    } else if (sum < target){
+      l++;
+      steps.push({arr:a, left:l, right:r, sum, text:`cəm ${sum} &lt; hədəf ${target} → sol göstəricini irəli apar`});
+    } else {
+      r--;
+      steps.push({arr:a, left:l, right:r, sum, text:`cəm ${sum} &gt; hədəf ${target} → sağ göstəricini geri apar`});
+    }
+  }
+  steps.push({arr:a, left:l, right:r, sum:null, state:'notfound', text:'Göstəricilər üst-üstə düşdü → uyğun cüt tapılmadı'});
+  return steps;
+}
+
+function slidingWindowSteps(arr, k){
+  const a = arr.slice();
+  const steps = [];
+  if (k > a.length) k = a.length;
+  let sum = 0;
+  for (let i=0;i<k;i++) sum += a[i];
+  let max = sum;
+  steps.push({arr:a, start:0, end:k-1, sum, max, text:`İlk pəncərə [0,${k-1}]: cəm=<b>${sum}</b>`});
+  for (let end=k; end<a.length; end++){
+    const start = end-k+1;
+    sum += a[end] - a[end-k];
+    if (sum > max) max = sum;
+    steps.push({arr:a, start, end, sum, max, text:`Pəncərə [${start},${end}]: <b>${a[end]}</b> daxil oldu, <b>${a[end-k]}</b> çıxdı → cəm=<b>${sum}</b>`});
+  }
+  steps.push({arr:a, start:a.length-k, end:a.length-1, sum, max, text:`Bitdi. Maksimum pəncərə cəmi: <b>${max}</b>`});
+  return steps;
+}
+
+function bfsSteps(start){
+  const adj = buildAdj();
+  const visited = new Set([start]);
+  const queue = [start];
+  const steps = [{queue:[...queue], visited:[...visited], current:null, text:`Başlanğıc düyün <b>${start}</b> növbəyə əlavə olunur`}];
+  while (queue.length){
+    const cur = queue.shift();
+    steps.push({queue:[...queue], visited:[...visited], current:cur, text:`Düyün <b>${cur}</b> növbədən çıxarılır və emal olunur`});
+    for (const nb of adj[cur]){
+      if (!visited.has(nb)){
+        visited.add(nb); queue.push(nb);
+        steps.push({queue:[...queue], visited:[...visited], current:cur, text:`Qonşu <b>${nb}</b> hələ ziyarət olunmayıb → növbəyə əlavə olunur`});
+      }
+    }
+  }
+  steps.push({queue:[], visited:[...visited], current:null, text:'BFS tamamlandı — bütün əlçatan düyünlər gəzildi (səviyyə-səviyyə)'});
+  return steps;
+}
+
+function dfsSteps(start){
+  const adj = buildAdj();
+  const visited = new Set();
+  const steps = [];
+  function dfs(node, parent){
+    visited.add(node);
+    steps.push({visited:[...visited], current:node, text: parent===null ? `Başlanğıc düyün <b>${node}</b> ziyarət olunur` : `<b>${parent}</b>-dən <b>${node}</b>-ə keçilir (dərinliyə doğru)`});
+    for (const nb of adj[node]){
+      if (!visited.has(nb)) dfs(nb, node);
+    }
+  }
+  dfs(start, null);
+  steps.push({visited:[...visited], current:null, text:'DFS tamamlandı — hər budaq sonuna qədər gəzildikdən sonra geri qayıdıldı'});
+  return steps;
+}
+
+/* ============================================================
+   RENDER FUNKSİYALARI — vəziyyəti SVG-yə çevirir
+   ============================================================ */
+function renderArray(arr, highlightFn){
+  const w = 56, h = 46, gap = 8, startX = 10, y = 30;
+  const totalW = arr.length * (w+gap) - gap + 20;
+  let svg = `<svg viewBox="0 0 ${Math.max(totalW,300)} 110" width="${Math.max(totalW,300)}" height="110">`;
+  arr.forEach((val, idx) => {
+    const x = startX + idx*(w+gap);
+    const hl = highlightFn(idx) || {};
+    const fill = hl.fill || '#1a2036';
+    const stroke = hl.stroke || '#2a3252';
+    svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/>`;
+    svg += `<text x="${x+w/2}" y="${y+h/2+6}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="16" fill="#eef3f6">${val}</text>`;
+    svg += `<text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8c93b0">${idx}</text>`;
+    if (hl.label){
+      svg += `<text x="${x+w/2}" y="${y+h+16}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="${hl.labelColor||'#FFC947'}">${hl.label}</text>`;
+    }
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+function renderGraph(state){
+  let svg = `<svg viewBox="0 0 460 170" width="460" height="170">`;
+  graphEdges.forEach(([a,b]) => {
+    const na = graphNodes[a], nb = graphNodes[b];
+    svg += `<line x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}" stroke="#2a3252" stroke-width="2.5"/>`;
+  });
+  graphNodes.forEach(n => {
+    let fill = '#1a2036', stroke = '#2a3252';
+    if (state.visited && state.visited.includes(n.id)) { fill = '#3f8f5f'; stroke = '#3f8f5f'; }
+    if (state.queue && state.queue.includes(n.id)) { fill = '#FFA116'; stroke = '#FFC947'; }
+    if (state.current === n.id) { stroke = '#FFC947'; }
+    svg += `<circle cx="${n.x}" cy="${n.y}" r="22" fill="${fill}" stroke="${stroke}" stroke-width="${state.current===n.id?4:2.5}"/>`;
+    svg += `<text x="${n.x}" y="${n.y+6}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="16" fill="#eef3f6">${n.id}</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ============================================================
+   ALQORİTM TƏRİFLƏRİ — hər biri: ad, izah, custom input sahələri,
+   step generasiya funksiyası, render funksiyası
+   ============================================================ */
+const algorithms = {
+  binarySearch: {
+    name: "İkili Axtarış",
+    why: "Sıralanmış massivdə hər addımda axtarış sahəsini yarıya bölür — n elementdə cəmi O(log n) addımda nəticə tapılır.",
+    defaults: { arr: [3,7,12,18,25,31,42,50,61,77], target: 42 },
+    fields: [
+      {key:'arr', label:'Massiv (vergüllə)', type:'array', default:[3,7,12,18,25,31,42,50,61,77]},
+      {key:'target', label:'Hədəf ədəd', type:'number', default:42},
+    ],
+    genSteps: (v) => binarySearchSteps(v.arr, v.target),
+    render: (step) => renderArray(step.arr, (idx) => {
+      if (idx === step.mid) return { fill: step.state==='found' ? '#3f8f5f' : '#FFA116', stroke:'#FFC947', label:'orta' };
+      if (idx === step.lo) return { stroke:'#2e6ea1', label: idx===step.hi ? 'lo=hi' : 'lo' };
+      if (idx === step.hi) return { stroke:'#c1553f', label:'hi' };
+      if (idx < step.lo || idx > step.hi) return { fill:'#141a2e', stroke:'#1e2740' };
+      return {};
+    }),
+  },
+  bubbleSort: {
+    name: "Bubble Sort",
+    why: "Qonşu elementləri müqayisə edib lazım gələndə yerlərini dəyişir — hər tam gəzintidən sonra ən böyük element sona 'üzür'.",
+    fields: [
+      {key:'arr', label:'Massiv (vergüllə)', type:'array', default:[5,2,9,1,7,3]},
+    ],
+    genSteps: (v) => bubbleSortSteps(v.arr),
+    render: (step) => renderArray(step.arr, (idx) => {
+      if (idx === step.i || idx === step.j) return { fill: step.swapped ? '#3f8f5f' : '#FFA116', stroke:'#FFC947' };
+      return {};
+    }),
+  },
+  twoPointers: {
+    name: "İki Göstərici",
+    why: "Sıralanmış massivdə iki ucdan bir-birinə tərəf yaxınlaşan göstəricilərlə hədəf cəmə uyğun cütü O(n) vaxtda tapır.",
+    fields: [
+      {key:'arr', label:'Massiv (vergüllə)', type:'array', default:[2,7,11,15,20,26]},
+      {key:'target', label:'Hədəf cəm', type:'number', default:26},
+    ],
+    genSteps: (v) => twoPointersSteps(v.arr, v.target),
+    render: (step) => renderArray(step.arr, (idx) => {
+      if (idx === step.left && idx === step.right) return { fill:'#FFA116', stroke:'#FFC947', label:'sol=sağ' };
+      if (idx === step.left) return { stroke:'#2e6ea1', label:'sol' };
+      if (idx === step.right) return { stroke:'#c1553f', label:'sağ' };
+      return {};
+    }),
+  },
+  slidingWindow: {
+    name: "Sürüşən Pəncərə",
+    why: "Sabit ölçülü pəncərəni massiv üzərində sürüşdürərək hər addımda yalnız girən/çıxan elementi hesaba qatır — hər dəfə sıfırdan cəmləmək lazım gəlmir.",
+    fields: [
+      {key:'arr', label:'Massiv (vergüllə)', type:'array', default:[2,1,5,1,3,2,7,4]},
+      {key:'k', label:'Pəncərə ölçüsü (k)', type:'number', default:3},
+    ],
+    genSteps: (v) => slidingWindowSteps(v.arr, v.k),
+    render: (step) => renderArray(step.arr, (idx) => {
+      if (idx >= step.start && idx <= step.end) return { fill:'rgba(0,0,0,0.12)', stroke:'#FFC947' };
+      return {};
+    }),
+  },
+  bfs: {
+    name: "BFS (Enlik üzrə axtarış)",
+    why: "Növbə (queue) istifadə edərək qrafı səviyyə-səviyyə gəzir — çəkisiz qrafda ən qısa yolu tapmaq üçün istifadə olunur.",
+    fields: [
+      {key:'start', label:'Başlanğıc düyün (0-5)', type:'number', default:0},
+    ],
+    genSteps: (v) => bfsSteps(v.start),
+    render: (step) => renderGraph(step),
+  },
+  dfs: {
+    name: "DFS (Dərinlik üzrə axtarış)",
+    why: "Rekursiya (və ya stack) ilə bir budağın sonuna qədər gedir, sonra geri qayıdıb növbəti budağı yoxlayır.",
+    fields: [
+      {key:'start', label:'Başlanğıc düyün (0-5)', type:'number', default:0},
+    ],
+    genSteps: (v) => dfsSteps(v.start),
+    render: (step) => renderGraph(step),
+  },
+};
+
+/* ============================================================
+   KONTROLLER
+   ============================================================ */
+let currentAlgoKey = 'binarySearch';
+let currentSteps = [];
+let currentStepIdx = -1;
+let playTimer = null;
+
+function parseArrField(str){
+  return str.split(',').map(s => parseInt(s.trim(),10)).filter(n => !isNaN(n));
+}
+
+function getFieldValues(algo){
+  const values = {};
+  algo.fields.forEach(f => {
+    const el = document.getElementById('field_' + f.key);
+    if (f.type === 'array'){
+      values[f.key] = parseArrField(el.value);
+    } else {
+      values[f.key] = parseInt(el.value, 10);
+    }
+  });
+  return values;
+}
+
+function renderCustomInputs(algo){
+  const container = document.getElementById('customInput');
+  container.innerHTML = '';
+  algo.fields.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'field' + (f.type === 'array' ? ' wide' : '');
+    const defaultVal = f.type === 'array' ? f.default.join(', ') : f.default;
+    div.innerHTML = `<label>${f.label}</label><input id="field_${f.key}" value="${defaultVal}">`;
+    container.appendChild(div);
+  });
+  const btnDiv = document.createElement('div');
+  btnDiv.className = 'field';
+  btnDiv.innerHTML = `<label>&nbsp;</label><button class="ctrl-btn primary" id="btnRegen">↻ Öz məlumatınla sına</button>`;
+  container.appendChild(btnDiv);
+  document.getElementById('btnRegen').addEventListener('click', () => loadAlgo(currentAlgoKey, true));
+}
+
+function loadAlgo(key, keepInputs){
+  currentAlgoKey = key;
+  const algo = algorithms[key];
+  document.getElementById('algoTitle').textContent = algo.name;
+  document.getElementById('algoWhy').textContent = algo.why;
+  if (!keepInputs) renderCustomInputs(algo);
+  const values = getFieldValues(algo);
+  try {
+    currentSteps = algo.genSteps(values);
+  } catch(e) {
+    currentSteps = [];
+  }
+  currentStepIdx = -1;
+  stopPlay();
+  renderStep();
+  document.querySelectorAll('.algo-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.key === key);
+  });
+}
+
+function renderStep(){
+  const stage = document.getElementById('stage');
+  const stepText = document.getElementById('stepText');
+  const counter = document.getElementById('stepCounter');
+  const algo = algorithms[currentAlgoKey];
+  if (currentStepIdx < 0){
+    const values = getFieldValues(algo);
+    const initial = (currentAlgoKey === 'bfs' || currentAlgoKey === 'dfs')
+      ? { visited:[], queue:[], current:null }
+      : { arr: values.arr || [], lo:-1, hi:-1, mid:-1, left:-1, right:-1, start:-1, end:-1 };
+    stage.innerHTML = algo.render(initial);
+    stepText.innerHTML = 'Başlamaq üçün "▶ Növbəti addım" düyməsinə basın.';
+  } else {
+    const step = currentSteps[currentStepIdx];
+    stage.innerHTML = algo.render(step);
+    stepText.innerHTML = step.text;
+  }
+  counter.textContent = `${Math.max(currentStepIdx+1,0)} / ${currentSteps.length}`;
+  document.getElementById('btnPrev').disabled = currentStepIdx <= 0;
+  document.getElementById('btnNext').disabled = currentStepIdx >= currentSteps.length-1;
+}
+
+function stopPlay(){
+  if (playTimer){ clearInterval(playTimer); playTimer = null; }
+  document.getElementById('btnPlay').textContent = '⏵ Avtomatik oynat';
+}
+
+document.getElementById('btnNext').addEventListener('click', () => {
+  if (currentStepIdx < currentSteps.length-1){ currentStepIdx++; renderStep(); }
+});
+document.getElementById('btnPrev').addEventListener('click', () => {
+  if (currentStepIdx > 0){ currentStepIdx--; renderStep(); }
+  else if (currentStepIdx === 0){ currentStepIdx = -1; renderStep(); }
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+  stopPlay();
+  currentStepIdx = -1;
+  renderStep();
+});
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (playTimer){ stopPlay(); return; }
+  document.getElementById('btnPlay').textContent = '⏸ Dayandır';
+  playTimer = setInterval(() => {
+    if (currentStepIdx < currentSteps.length-1){
+      currentStepIdx++; renderStep();
+    } else {
+      stopPlay();
+    }
+  }, 1100);
+});
+
+/* Tab-ları qur */
+const tabsEl = document.getElementById('algoTabs');
+Object.keys(algorithms).forEach(key => {
+  const btn = document.createElement('button');
+  btn.className = 'algo-tab';
+  btn.dataset.key = key;
+  btn.textContent = algorithms[key].name;
+  btn.addEventListener('click', () => loadAlgo(key));
+  tabsEl.appendChild(btn);
+});
+loadAlgo('binarySearch');
+
+/* ============================================================
+   PRAKTİKA SAHƏSİ — anlayış sualları
+   ============================================================ */
+const quizBank = [
+  { q:"İkili axtarış işləmək üçün massiv haqqında hansı şərt vacibdir?",
+    opts:["Massiv sıralanmış olmalıdır","Massivdə mənfi ədəd olmamalıdır","Massivin uzunluğu cüt olmalıdır","Massivdə təkrar element olmamalıdır"],
+    correct:0,
+    explain:"İkili axtarış hər addımda 'sol yarımı, yoxsa sağ yarımı axtarım?' qərarını sıralı olduğuna güvənərək verir — sıralanmamış massivdə bu məntiq işləmir." },
+  { q:"N elementlik sıralanmış massivdə ikili axtarışın vaxt mürəkkəbliyi nədir?",
+    opts:["O(n)","O(n²)","O(log n)","O(1)"],
+    correct:2,
+    explain:"Hər addımda axtarış sahəsi yarıya bölündüyü üçün ən çox log₂(n) addımdan sonra cavab tapılır." },
+  { q:"Bubble Sort-da bir tam gəzintidən (pass) sonra nə baş verir?",
+    opts:["Massiv tam sıralanır","Ən kiçik element əvvələ keçir","Ən böyük (qalan) element öz yerinə — sona doğru — çatır","Heç nə dəyişmir"],
+    correct:2,
+    explain:"Hər pass-da qonşu elementlər müqayisə edilib lazım gələndə dəyişdirilir, nəticədə həmin pass-ın ən böyük elementi 'sona doğru üzür'." },
+  { q:"İki göstərici (two pointers) metodu üçün massiv necə olmalıdır ki, cüt axtarışı düzgün işləsin?",
+    opts:["Sıralanmış olmalıdır","Yalnız müsbət ədədlərdən ibarət olmalıdır","Uzunluğu 10-dan az olmalıdır","Fərq etməz"],
+    correct:0,
+    explain:"Sol/sağ göstəricilərin 'irəli' və ya 'geri' hərəkəti yalnız massiv sıralı olduqda düzgün nəticə verir." },
+  { q:"Sürüşən pəncərə (sliding window) metodunun əsas üstünlüyü nədir?",
+    opts:["Massivi sıralayır","Hər pəncərədə cəmi sıfırdan hesablamaq lazım qalmır","Yalnız cüt ölçülü pəncərələrdə işləyir","Yaddaş sərf etmir"],
+    correct:1,
+    explain:"Pəncərə sürüşəndə yalnız 'giriş' və 'çıxış' elementi nəzərə alınır — bütün pəncərəni yenidən cəmləməyə ehtiyac yoxdur, bu da vaxta böyük qənaətdir." },
+  { q:"BFS hansı məlumat strukturunu əsas alır?",
+    opts:["Stack (LIFO)","Queue (FIFO)","Heap","Hash cədvəli"],
+    correct:1,
+    explain:"BFS düyünləri 'ilk daxil olan ilk çıxır' prinsipi ilə emal edir ki, qrafı səviyyə-səviyyə (yaxından uzağa) gəzsin." },
+  { q:"DFS-in rekursiv versiyasında 'geri qayıtma' nə vaxt baş verir?",
+    opts:["Heç vaxt","Cari düyünün bütün qonşuları ziyarət olunduqdan sonra","Qraf dövr (cycle) olduqda","Yalnız BFS-də olur"],
+    correct:1,
+    explain:"DFS bir budağın lap sonuna qədər gedir; artıq gedəcək yer qalmadıqda funksiya geri qayıdır və növbəti ziyarət olunmamış qonşunu yoxlayır." },
+  { q:"Hansı alqoritm 'hər addımda axtarış sahəsini yarıya bölmək' prinsipinə əsaslanır?",
+    opts:["Bubble Sort","BFS","İkili axtarış","DFS"],
+    correct:2,
+    explain:"İkili axtarışın əsas ideyası budur — buna görə də sıralanmış massivdə çox sürətli işləyir." },
+];
+let quizIdx = -1;
+let quizCorrect = 0;
+let quizTotal = 0;
+let usedQuizIdx = [];
+
+function pickNextQuiz(){
+  if (usedQuizIdx.length === quizBank.length) usedQuizIdx = [];
+  let idx;
+  do { idx = Math.floor(Math.random()*quizBank.length); } while (usedQuizIdx.includes(idx));
+  usedQuizIdx.push(idx);
+  return idx;
+}
+
+function renderQuiz(){
+  quizIdx = pickNextQuiz();
+  const item = quizBank[quizIdx];
+  document.getElementById('quizQuestion').textContent = item.q;
+  const optsEl = document.getElementById('quizOptions');
+  optsEl.innerHTML = '';
+  item.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => answerQuiz(i));
+    optsEl.appendChild(btn);
+  });
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+}
+
+function answerQuiz(choiceIdx){
+  const item = quizBank[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((btn, i) => {
+    btn.style.pointerEvents = 'none';
+    if (i === item.correct) btn.classList.add('correct');
+    else if (i === choiceIdx) btn.classList.add('wrong');
+  });
+  quizTotal++;
+  const feedback = document.getElementById('quizFeedback');
+  if (choiceIdx === item.correct){
+    quizCorrect++;
+    feedback.textContent = '✓ Doğrudur! ' + item.explain;
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    feedback.textContent = '✗ Yanlışdır. ' + item.explain;
+    feedback.className = 'quiz-feedback wrong';
+  }
+  document.getElementById('quizScore').textContent = `Nəticə: ${quizCorrect} / ${quizTotal}`;
+}
+
+document.getElementById('btnNextQuiz').addEventListener('click', renderQuiz);
+renderQuiz();
+</script>
+</body>
+</html>

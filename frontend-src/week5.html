@@ -1,0 +1,2537 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 5 — Test: Sətir texnikaları (substring, müqayisə, split, iki göstərici)</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:16px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{ display:flex; align-items:flex-start; gap:14px; padding:16px 18px; }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; }
+  .problem-main h3{ margin:0 0 6px; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; margin-bottom:8px; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-body{ padding:0 18px 16px; }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-input{
+    width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px; resize:vertical; outline:none; box-sizing:border-box;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>05</span> — Test Vərəqi</h1>
+    <p>Mövzu: sətir emalı (substring, reverse, uzunluq, simvollara müraciət), sətirlərin müqayisəsi və birləşdirilməsi, sətri sözlərə/ədədlərə bölmək (split, stringstream), iki göstərici (two pointers) metodu. Aşağıdakı 100 məsələ yalnız Mövzu 5-in mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 05 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 5 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "\"salam\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"salam", out:"5"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"azercell\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"azercell", out:"8"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"programming\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"programming", out:"11"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"a\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"a", out:"1"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"greetings\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"greetings", out:"9"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"competitive\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"competitive", out:"11"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"xyz123\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"xyz123", out:"6"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"informatika\" sətrinin uzunluğu",
+    difficulty: "easy",
+    tags: ["string", "length()"],
+    statement: "Bir sətir verilib. Onun uzunluğunu (simvol sayını) tapın.",
+    input: "Bir sətir S (boşluqsuz, 1 ≤ |S| ≤ 100).",
+    output: "S-in uzunluğu.",
+    example: {in:"informatika", out:"11"},
+    approach: "C++-da <b>string</b> tipinin <b>.length()</b> (və ya .size()) metodu sətirdəki simvol sayını birbaşa qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+}`},
+  {
+    title: "\"salam\" sətrinin 0-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"salam\n0", out:"s"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"azercell\" sətrinin 3-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"azercell\n3", out:"r"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"programming\" sətrinin 5-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"programming\n5", out:"a"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"hello\" sətrinin 4-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"hello\n4", out:"o"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"competitive\" sətrinin 0-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"competitive\n0", out:"c"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"informatika\" sətrinin 10-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"informatika\n10", out:"a"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"xyz\" sətrinin 2-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"xyz\n2", out:"z"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"cup2026\" sətrinin 6-ci simvolu",
+    difficulty: "easy",
+    tags: ["string", "indeksləmə"],
+    statement: "Bir sətir S və indeks i verilib (0-indeksli). S-in i-ci simvolunu tapın.",
+    input: "Birinci sətirdə S, ikinci sətirdə tam ədəd i (0 ≤ i < |S|).",
+    output: "S[i] simvolu.",
+    example: {in:"cup2026\n6", out:"6"},
+    approach: "C++-da sətirlərə massiv kimi <b>indekslə</b> müraciət olunur: <b>s[i]</b> ifadəsi sətirin i-ci (0-dan başlayan) simvolunu qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int i; cin >> i;
+    cout << s[i] << "\\n";
+}`},
+  {
+    title: "\"azercellcup\" sətrindən substr(0,8)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"azercellcup\n0 8", out:"azercell"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"informatika\" sətrindən substr(2,5)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"informatika\n2 5", out:"forma"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"competitive\" sətrindən substr(4,4)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"competitive\n4 4", out:"etit"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"salamdunya\" sətrindən substr(6,4)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"salamdunya\n6 4", out:"unya"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"programming\" sətrindən substr(0,7)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"programming\n0 7", out:"program"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"xyzabcdef\" sətrindən substr(3,3)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"xyzabcdef\n3 3", out:"abc"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"helloworld\" sətrindən substr(5,5)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"helloworld\n5 5", out:"world"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"olympiadaz\" sətrindən substr(0,4)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"olympiadaz\n0 4", out:"olym"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"bakuazerbaijan\" sətrindən substr(4,10)",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir S və iki tam ədəd a, b verilib. S.substr(a,b) nəticəsini tapın (a-dan başlayaraq b simvol).",
+    input: "Birinci sətirdə S, ikinci sətirdə iki tam ədəd a və b.",
+    output: "Alt-sətir.",
+    example: {in:"bakuazerbaijan\n4 10", out:"azerbaijan"},
+    approach: "<b>.substr(a, b)</b> metodu S-in a-cı indeksindən başlayaraq b simvoldan ibarət alt-sətrini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int a, b; cin >> a >> b;
+    cout << s.substr(a, b) << "\\n";
+}`},
+  {
+    title: "\"Baku\" və \"Azercell\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Baku Azercell", out:"Baku - Azercell"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Azerbaijan\" və \"Cup\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Azerbaijan Cup", out:"Azerbaijan - Cup"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"salam\" və \"dunya\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"salam dunya", out:"salam - dunya"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Ismayil\" və \"Garayev\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Ismayil Garayev", out:"Ismayil - Garayev"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Riyazi\" və \"Esaslar\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Riyazi Esaslar", out:"Riyazi - Esaslar"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Data\" və \"Structure\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Data Structure", out:"Data - Structure"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Kod\" və \"Yazma\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Kod Yazma", out:"Kod - Yazma"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Test\" və \"Veregi\" sətirlərini birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "concatenation", "+"],
+    statement: "İki sətir a və b verilib. Onları \"a - b\" formatında birləşdirib çap edin.",
+    input: "Bir sətirdə iki söz a və b (boşluqla ayrılmış).",
+    output: "\"a - b\" formatında birləşdirilmiş sətir.",
+    example: {in:"Test Veregi", out:"Test - Veregi"},
+    approach: "C++-da sətirlər <b>+</b> operatoru ilə birləşdirilir (concatenation) — bu, yeni bir sətir yaradır, orijinal sətirləri dəyişmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    string full = a + " - " + b;
+    cout << full << "\\n";
+}`},
+  {
+    title: "\"Baku\" və \"Baku\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"Baku Baku", out:"BƏRABƏRDİR"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"salam\" və \"dunya\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"salam dunya", out:"BƏRABƏR DEYİL"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"Azercell\" və \"Azercell\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"Azercell Azercell", out:"BƏRABƏRDİR"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"Cup\" və \"cup\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"Cup cup", out:"BƏRABƏR DEYİL"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"test\" və \"test\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"test test", out:"BƏRABƏRDİR"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"kod\" və \"kodu\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"kod kodu", out:"BƏRABƏR DEYİL"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"informatika\" və \"informatika\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"informatika informatika", out:"BƏRABƏRDİR"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"evklid\" və \"evklit\" sətirlərinin bərabərliyi",
+    difficulty: "easy",
+    tags: ["string", "=="],
+    statement: "İki sətir a və b verilib. Onların tam bərabər olub-olmadığını yoxlayın.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"BƏRABƏRDİR\" və ya \"BƏRABƏR DEYİL\".",
+    example: {in:"evklid evklit", out:"BƏRABƏR DEYİL"},
+    approach: "C++-da <b>==</b> operatoru iki sətiri simvol-simvol müqayisə edir; həm uzunluq, həm də bütün simvollar eyni olmalıdır ki, nəticə true olsun.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    cout << (a == b ? "B\\u018fRAB\\u018fRD\\u0130R" : "B\\u018fRAB\\u018fR DEY\\u0130L") << "\\n";
+}`},
+  {
+    title: "\"apple\" və \"banana\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"apple banana", out:"A"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"zebra\" və \"apple\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"zebra apple", out:"B"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"baku\" və \"baku\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"baku baku", out:"E"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"cat\" və \"car\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"cat car", out:"B"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"code\" və \"coder\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"code coder", out:"A"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"dog\" və \"cat\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"dog cat", out:"B"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"test\" və \"testing\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"test testing", out:"A"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"azercell\" və \"azerbaijan\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"azercell azerbaijan", out:"B"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"kitab\" və \"kitabxana\" sözlərinin əlifba sırası",
+    difficulty: "mid",
+    tags: ["string", "<", "əlifba sırası"],
+    statement: "İki sətir a və b verilib. Hansının əlifba (leksikoqrafik) sırasına görə əvvəl gəldiyini müəyyən edin: a-nın əvvəl gəlməsi \"A\", b-nin əvvəl gəlməsi \"B\", bərabərlik \"E\" kimi çap olunsun.",
+    input: "Bir sətirdə iki söz a və b.",
+    output: "\"A\", \"B\" və ya \"E\" (bərabər olarsa).",
+    example: {in:"kitab kitabxana", out:"A"},
+    approach: "C++-da <b>&lt;</b> operatoru sətirləri simvol-simvol (ASCII kodlarına görə) müqayisə edir — bu, sözlük (lüğət) sırasına uyğundur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    if (a < b) cout << "A\\n";
+    else if (a > b) cout << "B\\n";
+    else cout << "E\\n";
+}`},
+  {
+    title: "\"Azercell Cup ucun hazirliq\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"Azercell Cup ucun hazirliq", out:"4"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"salam dunya\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"salam dunya", out:"2"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"bir iki uc dord bes\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"bir iki uc dord bes", out:"5"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"informatika\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"informatika", out:"1"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"C++ ile alqoritmik dusunce inkishaf edir\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"C++ ile alqoritmik dusunce inkishaf edir", out:"6"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"test\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"test", out:"1"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"hazirliq plani hazirdir\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"hazirliq plani hazirdir", out:"3"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"riyazi esaslar cox vacibdir\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"riyazi esaslar cox vacibdir", out:"4"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"a b c d e f g\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"a b c d e f g", out:"7"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"sozlerin sayini tapmaq lazimdir\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"sozlerin sayini tapmaq lazimdir", out:"4"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"tek soz\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"tek soz", out:"2"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"bu bir test cumlesidir\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"bu bir test cumlesidir", out:"4"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"kod yazmaq ve alqoritm qurmaq\" cümləsindəki söz sayı",
+    difficulty: "easy",
+    tags: ["stringstream", "split", "söz sayı"],
+    statement: "Bir sətir (bir neçə sözdən ibarət, boşluqla ayrılmış) verilib. Ondakı sözlərin sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"kod yazmaq ve alqoritm qurmaq", out:"5"},
+    approach: "<b>getline</b> ilə bütün sətir oxunur, sonra <b>stringstream</b>-ə yüklənib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər çağırışda növbəti söz ayrılıb sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"12 7 45 3\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"12 7 45 3", out:"67"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"1 2 3 4 5\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"1 2 3 4 5", out:"15"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"100 200 300\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"100 200 300", out:"600"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"5\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"5", out:"5"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"10 -5 3\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"10 -5 3", out:"8"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"7 7 7 7 7\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"7 7 7 7 7", out:"35"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"1000000 2000000\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"1000000 2000000", out:"3000000"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"0 0 0\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"0 0 0", out:"0"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"9 8 7 6 5 4\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"9 8 7 6 5 4", out:"39"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"-1 -2 -3\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"-1 -2 -3", out:"-6"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"50 25 25\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"50 25 25", out:"100"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"3 6 9 12 15\" sətrindəki ədədlərin cəmi",
+    difficulty: "mid",
+    tags: ["stringstream", "split", "cəm"],
+    statement: "Bir sətirdə boşluqla ayrılmış tam ədədlər verilib (say əvvəlcədən bilinmir). Onların cəmini tapın.",
+    input: "Bir sətirdə naməlum sayda tam ədəd (boşluqla ayrılmış).",
+    output: "Bütün ədədlərin cəmi.",
+    example: {in:"3 6 9 12 15", out:"45"},
+    approach: "Say əvvəlcədən bilinmədiyi üçün <b>stringstream</b>-ə sətir yüklənir və <b>while (ss &gt;&gt; x)</b> dövrü ilə hər ədəd növbə ilə oxunub cəmə əlavə olunur — dövr sətir bitəndə avtomatik dayanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    long long x, sum = 0;
+    while (ss >> x) sum += x;
+    cout << sum << "\\n";
+}`},
+  {
+    title: "\"ana\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"ana", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"salam\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"salam", out:"PALINDROM DEYIL"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"abcba\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"abcba", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"azercell\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"azercell", out:"PALINDROM DEYIL"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"wow\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"wow", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"otto\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"otto", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"informatika\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"informatika", out:"PALINDROM DEYIL"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"level\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"level", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"test\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"test", out:"PALINDROM DEYIL"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"abccba\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"abccba", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"xyzzyx\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"xyzzyx", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"qoqo\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"qoqo", out:"PALINDROM DEYIL"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "\"racecar\" sətrinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "string"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Bir sətir S (yalnız kiçik hərflər, 1 ≤ |S| ≤ 100).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"racecar", out:"PALINDROM"},
+    approach: "<b>İki göstərici</b> (two pointers) metodu: bir göstərici əvvəldən (<b>left</b>), digəri sondan (<b>right</b>) başlayır və bir-birinə tərəf yaxınlaşır; hər addımda uyğun simvollar müqayisə olunur — hamısı uyğun gəlirsə, sətir palindromdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int left = 0, right = (int)s.size() - 1;
+    bool isPal = true;
+    while (left < right){
+        if (s[left] != s[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{1, 2, 3, 2, 1} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"5\n1 2 3 2 1", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{1, 2, 3, 4, 5} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"5\n1 2 3 4 5", out:"PALINDROM DEYIL"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{7, 7, 7} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"3\n7 7 7", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{1, 2, 2, 1} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"4\n1 2 2 1", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{5} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"1\n5", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{1, 2, 3, 4, 3, 2, 1} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"7\n1 2 3 4 3 2 1", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{4, 5, 6, 7} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"4\n4 5 6 7", out:"PALINDROM DEYIL"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{9, 1, 9} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"3\n9 1 9", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{3, 3, 3, 3} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"4\n3 3 3 3", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{10, 20, 30, 20, 10} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"5\n10 20 30 20 10", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{1, 2, 3, 3, 2, 1} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"6\n1 2 3 3 2 1", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+  {
+    title: "{8, 4, 8} massivinin palindrom olub-olmadığı",
+    difficulty: "mid",
+    tags: ["two pointers", "palindrom", "massiv"],
+    statement: "N elementdən ibarət massiv verilib. Onun palindrom (əvvəldən və sondan eyni oxunan) olub-olmadığını müəyyən edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYIL\".",
+    example: {in:"3\n8 4 8", out:"PALINDROM"},
+    approach: "Sətirlərdə olduğu kimi, massivdə də <b>iki göstərici</b> (left/right) bir-birinə tərəf yaxınlaşdırılır və uyğun elementlər müqayisə olunur — bu, O(n) vaxtda işləyən sadə və effektiv üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int left = 0, right = n - 1;
+    bool isPal = true;
+    while (left < right){
+        if (a[left] != a[right]) { isPal = false; break; }
+        left++; right--;
+    }
+    cout << (isPal ? "PALINDROM" : "PALINDROM DEYIL") << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/01_salam_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/02_azercell_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/03_programming_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/04_a_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/05_greetings_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/06_competitive_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/07_xyz123_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/08_informatika_setrinin_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/09_salam_setrinin_0_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/10_azercell_setrinin_3_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/11_programming_setrinin_5_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/12_hello_setrinin_4_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/13_competitive_setrinin_0_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/14_informatika_setrinin_10_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/15_xyz_setrinin_2_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/16_cup2026_setrinin_6_ci_simvolu.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/17_azercellcup_setrinden_substr_0_8.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/18_informatika_setrinden_substr_2_5.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/19_competitive_setrinden_substr_4_4.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/20_salamdunya_setrinden_substr_6_4.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/21_programming_setrinden_substr_0_7.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/22_xyzabcdef_setrinden_substr_3_3.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/23_helloworld_setrinden_substr_5_5.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/24_olympiadaz_setrinden_substr_0_4.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/25_bakuazerbaijan_setrinden_substr_4_10.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/26_baku_ve_azercell_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/27_azerbaijan_ve_cup_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/28_salam_ve_dunya_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/29_ismayil_ve_garayev_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/30_riyazi_ve_esaslar_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/31_data_ve_structure_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/32_kod_ve_yazma_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/33_test_ve_veregi_setirlerini_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/34_baku_ve_baku_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/35_salam_ve_dunya_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/36_azercell_ve_azercell_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/37_cup_ve_cup_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/38_test_ve_test_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/39_kod_ve_kodu_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/40_informatika_ve_informatika_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/41_evklid_ve_evklit_setirlerinin_beraberliyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/42_apple_ve_banana_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/43_zebra_ve_apple_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/44_baku_ve_baku_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/45_cat_ve_car_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/46_code_ve_coder_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/47_dog_ve_cat_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/48_test_ve_testing_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/49_azercell_ve_azerbaijan_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/50_kitab_ve_kitabxana_sozlerinin_elifba_sirasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/51_azercell_cup_ucun_hazirliq_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/52_salam_dunya_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/53_bir_iki_uc_dord_bes_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/54_informatika_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/55_c_ile_alqoritmik_dusunce_inkishaf_edir_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/56_test_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/57_hazirliq_plani_hazirdir_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/58_riyazi_esaslar_cox_vacibdir_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/59_a_b_c_d_e_f_g_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/60_sozlerin_sayini_tapmaq_lazimdir_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/61_tek_soz_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/62_bu_bir_test_cumlesidir_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/63_kod_yazmaq_ve_alqoritm_qurmaq_cumlesindeki_soz_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/64_12_7_45_3_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/65_1_2_3_4_5_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/66_100_200_300_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/67_5_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/68_10_5_3_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/69_7_7_7_7_7_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/70_1000000_2000000_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/71_0_0_0_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/72_9_8_7_6_5_4_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/73_1_2_3_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/74_50_25_25_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/75_3_6_9_12_15_setrindeki_ededlerin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/76_ana_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/77_salam_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/78_abcba_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/79_azercell_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/80_wow_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/81_otto_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/82_informatika_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/83_level_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/84_test_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/85_abccba_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/86_xyzzyx_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/87_qoqo_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/88_racecar_setrinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/89_1_2_3_2_1_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/90_1_2_3_4_5_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/91_7_7_7_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/92_1_2_2_1_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/93_5_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/94_1_2_3_4_3_2_1_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/95_4_5_6_7_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/96_9_1_9_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/97_3_3_3_3_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/98_10_20_30_20_10_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/99_1_2_3_3_2_1_massivinin_palindrom_olub_olmadigi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu5/100_8_4_8_massivinin_palindrom_olub_olmadigi.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.innerHTML = `
+    <div class="problem-head">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+        <div class="problem-body">
+          <p>${p.statement}</p>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+            <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+          </div>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+            <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+          </div>
+          <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="solution-inner approach-block">
+            <p class="sub-label">Yanaşma</p>
+            <p class="approach">${p.approach}</p>
+          </div>
+          <div class="submit-panel">
+            <p class="sub-label">Kodunu göndər</p>
+            <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
+            <div class="submit-row">
+              <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+              <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+              <span class="submit-hint" id="hint-${i}"></span>
+            </div>
+            <div class="history-list" id="history-${i}"></div>
+            <div class="verdict" id="verdict-${i}">
+              <span class="verdict-badge" id="badge-${i}"></span>
+              <div class="io-grid">
+                <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+                <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+            <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week5/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    badgeEl.textContent = VERDICT_LABELS[data.status] || data.status;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

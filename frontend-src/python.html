@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python ilə RFM Analizi</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --py-blue:          #6fb1e0;
+    --py-blue-bright:   #8FCBEF;
+    --py-blue-text:     #8FCBEF;
+    --py-yellow:        #ffd43b;
+    --py-yellow-text:   #FFE066;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--py-blue-bright); position:relative;
+    padding:26px 24px 20px; margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(75,139,190,0.08), transparent 60%);
+  }
+  .titleblock::before{
+    content:"ORİJİNAL MƏZMUN / PYTHON / DATA ANALİTİKASI";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep); padding:0 10px;
+    font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--py-yellow-text);
+  }
+  .titleblock h1{
+    font-family:var(--mono); font-size:clamp(24px,4.5vw,34px); line-height:1.2;
+    margin:8px 0 8px; color:var(--ink); letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--py-blue); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:660px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--py-yellow-text); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--py-yellow-text);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .rfm-explain{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-bottom:8px;
+  }
+  .rfm-card{
+    background:var(--paper); color:var(--ink); border-radius:6px; padding:16px;
+    border-top:3px solid var(--py-blue-bright);
+  }
+  .rfm-card .letter{ font-family:var(--mono); font-size:22px; font-weight:700; color:var(--py-blue); }
+  .rfm-card h4{ margin:6px 0 4px; font-size:14px; }
+  .rfm-card p{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+
+  .step-card{
+    background:var(--paper); color:var(--ink); border-radius:3px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); padding:20px 20px 22px; margin-bottom:18px;
+  }
+  .step-card .tag{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:1px;
+    background:rgba(75,139,190,0.15); color:var(--py-blue-text); padding:3px 9px; border-radius:3px; margin-bottom:10px;
+  }
+  .step-card h3{ margin:0 0 6px; font-size:17px; }
+  .step-card .desc{ font-size:13.5px; color:var(--ink-soft); margin:0 0 14px; line-height:1.55; }
+  .why-box{
+    background:var(--paper-warm); border-left:3px solid var(--py-blue); border-radius:2px;
+    padding:10px 14px; margin-bottom:14px; font-size:13px; line-height:1.55;
+  }
+  .why-box b{ color:var(--bronze-text); }
+  .out-box{
+    background:#0a1c2c; border-radius:4px; padding:10px 12px; margin-top:10px;
+    font-family:var(--mono); font-size:11.5px; color:#a8d8c0; overflow-x:auto; white-space:pre;
+  }
+  .out-label{ font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--ink-soft); margin:10px 0 4px; text-transform:uppercase; }
+
+  .code-block{
+    background:var(--well); font-family:var(--mono); border-radius:4px;
+    overflow-x:auto; margin:0; padding:10px 8px;
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:18px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:var(--py-blue-bright); font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .fn{ color:var(--py-yellow); }
+
+  .footer{
+    margin-top:60px; text-align:center; font-family:var(--mono); font-size:11px;
+    letter-spacing:1.5px; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Python ilə <span>RFM Analizi</span></h1>
+    <p>RFM (Recency, Frequency, Monetary) — müştəriləri alış davranışına görə seqmentləşdirmək üçün istifadə olunan analitik metoddur. Bu səhifə addım-addım, real pandas kodu ilə RFM analizini necə qurmağı göstərir — hər kod nümunəsi faktiki işə salınıb yoxlanılıb.</p>
+    <div class="specs">
+      <div><div class="k">Metod</div><div class="v">RFM Analizi</div></div>
+      <div><div class="k">Kitabxana</div><div class="v">pandas</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Orta (data analitika)</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">RFM Nədir?</div>
+  <div class="rfm-explain">
+    <div class="rfm-card">
+      <div class="letter">R</div>
+      <h4>Recency (Yenilik)</h4>
+      <p>Müştəri ən son nə vaxt alış edib? Nə qədər yaxın zamanda alış edibsə, bir o qədər dəyərlidir.</p>
+    </div>
+    <div class="rfm-card">
+      <div class="letter">F</div>
+      <h4>Frequency (Tezlik)</h4>
+      <p>Müştəri nə qədər tez-tez alış edib? Çox alış edən müştərilər daha sadiqdir.</p>
+    </div>
+    <div class="rfm-card">
+      <div class="letter">M</div>
+      <h4>Monetary (Pul Dəyəri)</h4>
+      <p>Müştəri ümumilikdə nə qədər pul xərcləyib? Yüksək xərcləyən müştərilər prioritetlidir.</p>
+    </div>
+  </div>
+
+  <div class="section-label">Addım-Addım Tətbiq</div>
+
+  <div class="step-card">
+    <span class="tag">Addım 1</span>
+    <h3>Nümunə Məlumatların Hazırlanması</h3>
+    <p class="desc">RFM analizi üçün minimum lazım olan sütunlar: müştəri ID-si, alış tarixi və alış məbləği.</p>
+    <div class="why-box"><b>Niyə vacibdir:</b> Real layihələrdə bu məlumat adətən satış/sifariş cədvəlindən gəlir — burada sadə nümunə ilə metodu izah edirik.</div>
+    <div class="code-block" id="s1"></div>
+  </div>
+
+  <div class="step-card">
+    <span class="tag">Addım 2</span>
+    <h3>R, F, M Dəyərlərinin Hesablanması</h3>
+    <p class="desc"><code>groupby</code> ilə hər müştəri üçün Recency (son alışdan neçə gün keçib), Frequency (neçə alış edib) və Monetary (ümumi xərclədiyi məbləğ) hesablanır.</p>
+    <div class="why-box"><b>Niyə vacibdir:</b> <code>snapshot_date</code> — analizi apardığımız "bugünkü" tarixdir. Recency bu tarixdən son alışa qədər olan gün fərqidir.</div>
+    <div class="code-block" id="s2"></div>
+    <div class="out-label">Nəticə (konsol çıxışı)</div>
+    <div class="out-box" id="s2out"></div>
+  </div>
+
+  <div class="step-card">
+    <span class="tag">Addım 3</span>
+    <h3>Xallandırma (Scoring) — 1-4 Şkalası</h3>
+    <p class="desc">Hər R, F, M dəyəri 4 bərabər hissəyə (kvartilə) bölünərək 1-4 arası xal verilir. Ən yaxşı Recency ən yüksək xalı alır (yəni son alış nə qədər yaxındırsa, bir o qədər yüksək).</p>
+    <div class="why-box"><b>Diqqət:</b> <code>pd.qcut</code> təkrarlanan dəyərlərdə xəta verə bilər ("Bin edges must be unique"). Bunu <code>rank(method='first')</code> ilə həll edirik — hər dəyərə unikal sıra nömrəsi verilir, sonra həmin sıra kvartillərə bölünür.</div>
+    <div class="code-block" id="s3"></div>
+  </div>
+
+  <div class="step-card">
+    <span class="tag">Addım 4</span>
+    <h3>Müştəri Seqmentləşdirməsi</h3>
+    <p class="desc">R, F, M xallarının kombinasiyasına əsasən müştərilər mənalı qruplara bölünür: "Champions" (ən yaxşı müştərilər), "At Risk" (itirmə riski olanlar) və s.</p>
+    <div class="why-box"><b>Niyə vacibdir:</b> Bu seqmentləşdirmə marketinq qərarlarına birbaşa təsir edir — "Champions"-a mükafat, "At Risk"-ə xüsusi endirim təklif etmək kimi.</div>
+    <div class="code-block" id="s4"></div>
+    <div class="out-label">Yekun nəticə (konsol çıxışı)</div>
+    <div class="out-box" id="s4out"></div>
+  </div>
+
+  <div class="step-card">
+    <span class="tag">Addım 5</span>
+    <h3>Seqmentlərin Ümumi Sayı</h3>
+    <p class="desc">Hər seqmentdə neçə müştəri olduğunu tez baxmaq üçün <code>value_counts()</code> istifadə olunur.</p>
+    <div class="why-box"><b>Niyə vacibdir:</b> Bu, RFM analizinin son addımıdır — nəticəni raport və ya dashboard üçün ümumiləşdirir.</div>
+    <div class="code-block" id="s5"></div>
+    <div class="out-label">Nəticə (konsol çıxışı)</div>
+    <div class="out-box" id="s5out"></div>
+  </div>
+
+  <div class="footer">PYTHON + RFM ANALİZİ — ORİJİNAL MƏZMUN — BÜTÜN KODLAR PANDAS İLƏ İCRA EDİLİB YOXLANILIB</div>
+</div>
+
+<script>
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+const PY_TOKEN_PATTERNS = [
+  ['cmt', /#.*$/],
+  ['str', /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['fn', /\b(?:pd|groupby|agg|qcut|rank|apply|reset_index|value_counts|astype|to_datetime|Timestamp)\b(?=\()/],
+  ['kw', /\b(?:import|as|def|return|if|elif|else|for|in|lambda|True|False|None|and|or|not)\b/],
+  ['tp', /\b(?:DataFrame|Series|int|str|float)\b/],
+];
+function highlightPyLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(PY_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < PY_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${PY_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightPyLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+function fillCode(id, code){
+  document.getElementById(id).outerHTML = renderCodeBlock(code).replace('<div class="code-block">', `<div class="code-block" id="${id}">`);
+}
+function fillOut(id, text){
+  document.getElementById(id).textContent = text;
+}
+
+fillCode('s1', `import pandas as pd
+
+data = {
+    'CustomerID': [101, 101, 102, 103, 103, 103, 104, 105, 105, 106],
+    'InvoiceDate': ['2024-01-05', '2024-03-10', '2024-02-15', '2024-01-20',
+                     '2024-02-25', '2024-03-28', '2023-12-01', '2024-03-01',
+                     '2024-03-15', '2023-11-10'],
+    'Amount': [120, 80, 200, 50, 60, 90, 300, 150, 170, 40],
+}
+df = pd.DataFrame(data)
+df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])`);
+
+fillCode('s2', `snapshot_date = pd.Timestamp('2024-04-01')
+
+rfm = df.groupby('CustomerID').agg(
+    Recency=('InvoiceDate', lambda x: (snapshot_date - x.max()).days),
+    Frequency=('InvoiceDate', 'count'),
+    Monetary=('Amount', 'sum')
+).reset_index()
+
+print(rfm)`);
+
+fillOut('s2out', `   CustomerID  Recency  Frequency  Monetary
+0         101       22          2       200
+1         102       46          1       200
+2         103        4          3       200
+3         104      122          1       300
+4         105       17          2       320
+5         106      143          1        40`);
+
+fillCode('s3', `rfm['R_Score'] = pd.qcut(rfm['Recency'].rank(method='first'), 4, labels=[4,3,2,1]).astype(int)
+rfm['F_Score'] = pd.qcut(rfm['Frequency'].rank(method='first'), 4, labels=[1,2,3,4]).astype(int)
+rfm['M_Score'] = pd.qcut(rfm['Monetary'].rank(method='first'), 4, labels=[1,2,3,4]).astype(int)
+
+rfm['RFM_Score'] = (
+    rfm['R_Score'].astype(str) +
+    rfm['F_Score'].astype(str) +
+    rfm['M_Score'].astype(str)
+)`);
+
+fillCode('s4', `def segment(row):
+    if row['R_Score'] >= 3 and row['F_Score'] >= 3 and row['M_Score'] >= 3:
+        return 'Champions'
+    elif row['R_Score'] <= 2 and row['F_Score'] <= 2:
+        return 'At Risk'
+    else:
+        return 'Regular'
+
+rfm['Segment'] = rfm.apply(segment, axis=1)
+print(rfm[['CustomerID', 'RFM_Score', 'Segment']])`);
+
+fillOut('s4out', `   CustomerID RFM_Score    Segment
+0         101       331    Regular
+1         102       212    At Risk
+2         103       443  Champions
+3         104       114    At Risk
+4         105       444  Champions
+5         106       121    At Risk`);
+
+fillCode('s5', `print(rfm['Segment'].value_counts())`);
+
+fillOut('s5out', `Segment
+At Risk      3
+Champions    2
+Regular      1
+Name: count, dtype: int64`);
+</script>
+</body>
+</html>

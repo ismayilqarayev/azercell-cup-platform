@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 2 — Test: Massiv, Funksiya, I/O, Struct</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:16px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{ display:flex; align-items:flex-start; gap:14px; padding:16px 18px; }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; }
+  .problem-main h3{ margin:0 0 6px; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; margin-bottom:8px; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-body{ padding:0 18px 16px; }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-input{
+    width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px; resize:vertical; outline:none; box-sizing:border-box;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>02</span> — Test Vərəqi</h1>
+    <p>Mövzu: massiv/vector, funksiyalar (dəyərlə/referansla ötürmə), sürətli giriş-çıxış, 2D massiv, struct/pair, sətir (string) funksiyaları. Aşağıdakı 50 məsələ yalnız Mövzu 2-nin mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">50</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">240–300 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc–Aralıq (CF ~800–1000)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 02 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 2 mövzularına uyğun 50 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "1. Vektorun elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["vector", "for"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb cəmini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"5\n1 2 3 4 5", out:"15"},
+    approach: "N ölçüsündə <b>vector&lt;int&gt;</b> elan olunur, <b>cin &gt;&gt;</b> ilə hər elementi oxuyaraq vektora yazırıq (indekslə və ya <b>push_back</b> ilə), sonra dövrlə hamısını toplayırıq. Cəm böyük ola biləcəyi üçün <b>long long</b> istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long sum = 0;
+    for (int x : a) sum += x;
+    cout << sum << "\\n";
+}`
+  },
+  {
+    title: "2. Vektorda maksimum və minimum",
+    difficulty: "easy",
+    tags: ["vector", "max", "min"],
+    statement: "N ədəd tam ədəd verilib. Onların içindən ən böyük və ən kiçik dəyəri tapıb çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "İki ədəd: maksimum və minimum (bir sətirdə, boşluqla).",
+    example: {in:"6\n3 7 1 9 4 2", out:"9 1"},
+    approach: "Vektor <b>*max_element(a.begin(), a.end())</b> və <b>*min_element(a.begin(), a.end())</b> funksiyaları ilə birbaşa maksimum/minimum tapılır — massivi əl ilə gəzməyə ehtiyac qalmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << *max_element(a.begin(), a.end()) << " "
+         << *min_element(a.begin(), a.end()) << "\\n";
+}`
+  },
+  {
+    title: "3. Vektoru tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["vector", "for"],
+    statement: "N ədəd tam ədəd verilib. Onları TƏRS sırada (sonuncudan birinciyə doğru) çap edin. STL-in <b>reverse()</b> funksiyasından istifadə etməyin — özünüz dövrlə çevirin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Elementlər tərs sırada, boşluqla ayrılmış.",
+    example: {in:"4\n10 20 30 40", out:"40 30 20 10"},
+    approach: "Vektor <b>a</b>-nın son indeksindən (<b>n-1</b>) başlayaraq geriyə doğru (<b>i--</b>) dövr edilir və hər addımda elementi çap edirik — bu, massivi manual şəkildə tərsinə 'oxumaq' üsuludur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = n - 1; i >= 0; i--) cout << a[i] << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "4. Vektorda cüt ədədlərin sayı",
+    difficulty: "easy",
+    tags: ["vector", "if", "%"],
+    statement: "N ədəd tam ədəd verilib. Onların arasında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"5\n1 2 3 4 5", out:"2"},
+    approach: "Vektor elementlərini bir-bir gəzərək hər biri üçün <b>x % 2 == 0</b> şərtini yoxlayırıq; doğrudursa, sayğacı artırırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int cnt = 0;
+    for (int x : a) if (x % 2 == 0) cnt++;
+    cout << cnt << "\\n";
+}`
+  },
+  {
+    title: "5. Vektorda unikal elementlərin sayı",
+    difficulty: "mid",
+    tags: ["vector", "set"],
+    statement: "N ədəd tam ədəd verilib. Onların arasında neçə fərqli (unikal) dəyər olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Unikal dəyərlərin sayı.",
+    example: {in:"6\n1 2 2 3 3 3", out:"3"},
+    approach: "Bütün elementlər <b>set&lt;int&gt;</b>-ə əlavə olunur — set avtomatik olaraq təkrarları silir və elementləri saxlayır. Sonda <b>set.size()</b> unikal say verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        s.insert(x);
+    }
+    cout << s.size() << "\\n";
+}`
+  },
+  {
+    title: "6. Vektoru push_back ilə qurmaq",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları <b>push_back</b> ilə boş vektora əlavə edərək, sonra bütün elementləri çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlər bir sətirdə, boşluqla ayrılmış.",
+    example: {in:"3\n5 6 7", out:"5 6 7"},
+    approach: "Əvvəlcə <b>vector&lt;int&gt; a;</b> boş elan olunur (ölçü göstərilmir), sonra hər oxunan ədəd <b>a.push_back(x)</b> ilə sona əlavə olunur. Bu, ölçüsü əvvəlcədən bilinməyən girişlər üçün standart üsuldur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        a.push_back(x);
+    }
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "7. Vektorda ən çox təkrarlanan ədəd",
+    difficulty: "mid",
+    tags: ["vector", "map", "tezlik"],
+    statement: "N ədəd tam ədəd verilib. Ən çox təkrarlanan (tezliyi ən yüksək olan) ədədi tapın. Bir neçə variant varsa, ən kiçiyini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd (0 ≤ hər biri ≤ 10^6).",
+    output: "Ən çox təkrarlanan ədəd.",
+    example: {in:"7\n4 2 4 3 2 4 1", out:"4"},
+    approach: "<b>map&lt;int,int&gt;</b> ilə hər ədədin neçə dəfə göründüyü sayılır (tezlik cədvəli). Sonra map üzərində gəzərək tezliyi ən böyük olan açarı (ədədi) seçirik; map açarları artan sırada saxladığı üçün bərabərlikdə avtomatik ən kiçik ədəd seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        freq[x]++;
+    }
+    int best = freq.begin()->first, bestCnt = 0;
+    for (auto &[val, cnt] : freq){
+        if (cnt > bestCnt){ bestCnt = cnt; best = val; }
+    }
+    cout << best << "\\n";
+}`
+  },
+  {
+    title: "8. İki vektoru birləşdirmək",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "İki ayrı vektor verilib. Onları birləşdirib (birincinin ardınca ikincini) çap edin.",
+    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 1000), ikinci sətirdə N ədəd, üçüncü sətirdə M ədəd.",
+    output: "Birləşmiş vektorun bütün elementləri, boşluqla ayrılmış.",
+    example: {in:"3 2\n1 2 3\n4 5", out:"1 2 3 4 5"},
+    approach: "Birinci vektor <b>a</b> oxunur, sonra ikinci vektorun hər elementi birbaşa <b>a.push_back(x)</b> ilə <b>a</b>-nın sonuna əlavə olunur — nəticədə <b>a</b> hər iki vektorun elementlərini ardıcıl saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = 0; i < m; i++){
+        int x; cin >> x;
+        a.push_back(x);
+    }
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "9. Vektorda ikinci ən böyük ədəd",
+    difficulty: "mid",
+    tags: ["vector", "sort"],
+    statement: "N ədəd tam ədəd verilib (N ≥ 2). Ən böyük ikinci fərqli (təkrarlanmayan) dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli dəyər.",
+    example: {in:"5\n4 4 6 2 6", out:"4"},
+    approach: "Vektor <b>sort()</b> ilə sıralanır, sonra <b>set&lt;int&gt;</b>-ə köçürülərək təkrarlar silinir (yaxud <b>unique()</b> istifadə oluna bilər). Sıralı unikal siyahının sondan ikinci elementi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    set<int> uniq(a.begin(), a.end());   // avtomatik sıralı, unikal
+    auto it = uniq.end();
+    --it; --it;                          // sondan ikinci elementə keç
+    cout << *it << "\\n";
+}`
+  },
+  {
+    title: "10. Vektoru sola sürüşdürmək",
+    difficulty: "mid",
+    tags: ["vector", "rotate"],
+    statement: "N ədəd tam ədəd verilib. Vektoru sola doğru 1 addım dövri sürüşdürün (ilk element sona keçir).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Sürüşdürülmüş vektorun elementləri.",
+    example: {in:"5\n1 2 3 4 5", out:"2 3 4 5 1"},
+    approach: "İlk element <b>a[0]</b> müvəqqəti dəyişəndə saxlanılır, sonra bütün elementlər bir mövqe sola köçürülür (<b>a[i] = a[i+1]</b>), son mövqeyə isə saxlanılan ilk element yazılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    if (n > 1){
+        int first = a[0];
+        for (int i = 0; i < n - 1; i++) a[i] = a[i + 1];
+        a[n - 1] = first;
+    }
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "11. Dəyərlə və referansla ötürmə",
+    difficulty: "easy",
+    tags: ["funksiya", "referans"],
+    statement: "İki tam ədəd verilib. Onları yerlərini dəyişən <b>swap</b> funksiyası yazın (referans ilə parametr ötürərək) və nəticəni çap edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "Yerdəyişmiş a və b (bir sətirdə, boşluqla).",
+    example: {in:"3 7", out:"7 3"},
+    approach: "Funksiya parametrləri <b>int &a, int &b</b> kimi <b>referans</b> ilə götürülür ki, funksiya daxilində edilən dəyişiklik funksiyadan kənarda da (çağıran yerdə) görünsün. Funksiya daxilində üçüncü müvəqqəti dəyişənlə klassik yerdəyişmə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void mySwap(int &a, int &b){
+    int t = a;
+    a = b;
+    b = t;
+}
+int main(){
+    int a, b; cin >> a >> b;
+    mySwap(a, b);
+    cout << a << " " << b << "\\n";
+}`
+  },
+  {
+    title: "12. Funksiyaya vektor ötürüb cəmini tapmaq",
+    difficulty: "easy",
+    tags: ["funksiya", "vector", "referans"],
+    statement: "N ədəd tam ədəd verilib. Vektoru bir funksiyaya (referans ilə) ötürüb, həmin funksiyada elementlərin cəmini hesablayıb qaytarın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Elementlərin cəmi.",
+    example: {in:"4\n1 2 3 4", out:"10"},
+    approach: "Vektor böyük ola biləcəyi üçün funksiyaya <b>const vector&lt;int&gt; &a</b> kimi referans ilə ötürülür ki, kopyalanmasın (performans üçün vacibdir). Funksiya <b>long long</b> nəticə qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumVector(const vector<int> &a){
+    long long s = 0;
+    for (int x : a) s += x;
+    return s;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumVector(a) << "\\n";
+}`
+  },
+  {
+    title: "13. Funksiya ilə ən böyük ədədi tapmaq",
+    difficulty: "easy",
+    tags: ["funksiya", "return"],
+    statement: "Üç tam ədəd verilib. İki ədəd arasında böyüyünü qaytaran <b>maxOf2</b> funksiyası yazın və onu iki dəfə çağıraraq üçünün maksimumunu tapın.",
+    input: "Bir sətirdə üç tam ədəd a, b, c.",
+    output: "Üç ədədin maksimumu.",
+    example: {in:"4 9 7", out:"9"},
+    approach: "<b>maxOf2(int a, int b)</b> funksiyası sadəcə iki ədədi müqayisə edib böyüyünü <b>return</b> edir. Üç ədədin maksimumunu tapmaq üçün bu funksiya əvvəlcə a və b üçün, sonra nəticə ilə c üçün çağırılır — kiçik funksiyalardan böyük məntiq qurmaq nümunəsidir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxOf2(int a, int b){
+    if (a > b) return a;
+    return b;
+}
+int main(){
+    int a, b, c; cin >> a >> b >> c;
+    cout << maxOf2(maxOf2(a, b), c) << "\\n";
+}`
+  },
+  {
+    title: "14. Sadə ədəd yoxlayan funksiya",
+    difficulty: "easy",
+    tags: ["funksiya", "bool", "sadə ədəd"],
+    statement: "N ədəd tam ədəd verilib. Hər biri üçün sadə ədəd olub-olmadığını yoxlayan <b>bool isPrime(int)</b> funksiyasından istifadə edərək nəticələri çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N tam ədəd (2 ≤ hər biri ≤ 10^6).",
+    output: "Hər ədəd üçün ayrı sətirdə \"SADƏ\" və ya \"SADƏ DEYİL\".",
+    example: {in:"3\n7 8 13", out:"SADƏ\nSADƏ DEYİL\nSADƏ"},
+    approach: "<b>bool isPrime(int n)</b> funksiyası <b>2-dən √n-ə qədər</b> bölünmə yoxlayır və nəticəni <b>true/false</b> olaraq qaytarır. Bu funksiya <b>main()</b> daxilində hər ədəd üçün çağırılıb nəticəyə görə uyğun mətn çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPrime(int n){
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+int main(){
+    int n; cin >> n;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        cout << (isPrime(x) ? "SADƏ" : "SADƏ DEYİL") << "\\n";
+    }
+}`
+  },
+  {
+    title: "15. Defolt parametrli funksiya",
+    difficulty: "mid",
+    tags: ["funksiya", "default arqument"],
+    statement: "İki ədədin vurma cədvəlini çap edən funksiya yazın; funksiya defolt olaraq 1-dən 10-a qədər cədvəl çap etsin, amma ikinci arqument verilsə, o qədərə qədər çap etsin.",
+    input: "Bir sətirdə əsas ədəd n. İkinci sətirdə isə cədvəlin neçəyə qədər çap olunacağını göstərən k (əgər k = 0 verilibsə, defolt 10 istifadə olunmalıdır).",
+    output: "1-dən k-ya (və ya defolt 10-a) qədər 'n x i = nəticə' formatında sətirlər.",
+    example: {in:"3\n0", out:"3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30"},
+    approach: "Funksiya <b>void printTable(int n, int upTo = 10)</b> şəklində elan olunur — <b>upTo</b> parametrinin defolt dəyəri 10-dur. k = 0 gələndə funksiya defolt arqumentlə (yəni yalnız <b>n</b> ilə) çağırılır, əks halda hər iki arqumentlə çağırılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printTable(int n, int upTo = 10){
+    for (int i = 1; i <= upTo; i++)
+        cout << n << " x " << i << " = " << n * i << "\\n";
+}
+int main(){
+    int n, k; cin >> n >> k;
+    if (k == 0) printTable(n);       // defolt arqumentlə çağırış
+    else printTable(n, k);
+}`
+  },
+  {
+    title: "16. Eyni adlı funksiyaların yüklənməsi (overload)",
+    difficulty: "mid",
+    tags: ["funksiya", "overload"],
+    statement: "İki tam ədədin, yoxsa iki real ədədin cəmini tapan <b>eyni adlı</b> (<b>sum</b>) funksiyalar yazın — parametr tiplərinə görə C++ düzgün variantı özü seçsin.",
+    input: "Bir sətirdə iki tam ədəd a, b. İkinci sətirdə iki real ədəd x, y.",
+    output: "Birinci sətirdə tam ədədlərin cəmi, ikinci sətirdə real ədədlərin cəmi (2 ondalıq dəqiqliklə).",
+    example: {in:"3 4\n1.5 2.25", out:"7\n3.75"},
+    approach: "C++ eyni adlı, amma <b>fərqli parametr tipli</b> iki funksiyanı ayrı-ayrı saxlaya bilir (<b>function overloading</b>) — <b>sum(int,int)</b> və <b>sum(double,double)</b>. Çağırış zamanı arqumentlərin tipinə görə kompilyator düzgün variantı avtomatik seçir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int sum(int a, int b){
+    return a + b;
+}
+double sum(double a, double b){
+    return a + b;
+}
+int main(){
+    int a, b; cin >> a >> b;
+    double x, y; cin >> x >> y;
+    cout << sum(a, b) << "\\n";
+    cout << fixed << setprecision(2) << sum(x, y) << "\\n";
+}`
+  },
+  {
+    title: "17. Funksiya ilə vektoru dəyişdirmək",
+    difficulty: "easy",
+    tags: ["funksiya", "vector", "referans"],
+    statement: "N ədəd tam ədəd verilib. Vektoru referans ilə funksiyaya ötürüb, funksiya daxilində bütün elementləri 2 dəfə artırın (vektoru birbaşa dəyişdirin), sonra nəticəni çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkiqat artırılmış elementlər, boşluqla ayrılmış.",
+    example: {in:"4\n1 2 3 4", out:"2 4 6 8"},
+    approach: "Funksiya <b>void doubleAll(vector&lt;int&gt; &a)</b> vektoru referans ilə götürür, ona görə funksiya daxilində <b>a[i] *= 2</b> etdikdə dəyişiklik <b>main()</b>-dəki əsl vektorda da baş verir (kopya deyil, orijinal üzərində işlənir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void doubleAll(vector<int> &a){
+    for (int i = 0; i < (int)a.size(); i++)
+        a[i] *= 2;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    doubleAll(a);
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "18. Funksiyadan bir neçə dəyər qaytarmaq",
+    difficulty: "mid",
+    tags: ["funksiya", "pair"],
+    statement: "N ədəd tam ədəd verilib. Bir funksiya yazın ki, eyni zamanda həm minimum, həm maksimum dəyəri <b>pair</b> şəklində qaytarsın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Minimum və maksimum (bir sətirdə, boşluqla).",
+    example: {in:"5\n3 8 1 9 4", out:"1 9"},
+    approach: "Funksiya <b>pair&lt;int,int&gt; minMax(vector&lt;int&gt; &a)</b> vektoru gəzərək minimum və maksimumu tapır və onları <b>{mn, mx}</b> şəklində tək bir <b>pair</b> obyektində qaytarır — bu, C++-da funksiyadan 'iki dəyər' qaytarmağın standart üsuludur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+pair<int,int> minMax(vector<int> &a){
+    int mn = a[0], mx = a[0];
+    for (int x : a){
+        mn = min(mn, x);
+        mx = max(mx, x);
+    }
+    return {mn, mx};
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    auto [mn, mx] = minMax(a);
+    cout << mn << " " << mx << "\\n";
+}`
+  },
+  {
+    title: "19. Sürətli daxil olma ilə böyük cəm",
+    difficulty: "easy",
+    tags: ["sürətli I/O", "for"],
+    statement: "N ədəd tam ədəd verilib (N böyük ola bilər). Sürətli giriş-çıxışdan istifadə edərək cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 2×10^5), ikinci sətirdə N tam ədəd.",
+    output: "Cəm.",
+    example: {in:"5\n1 2 3 4 5", out:"15"},
+    approach: "<b>ios::sync_with_stdio(false); cin.tie(nullptr);</b> sətirləri C və C++ giriş-çıxış axınlarını ayırır və <b>cin/cout</b>-un avtomatik sinxronunu ləğv edir — nəticədə böyük N üçün oxuma/yazma xeyli sürətlənir. Bu, hər proqramın başında yazılmalı standart 'ilk iki sətir'dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`
+  },
+  {
+    title: "20. getline ilə söz sayını tapmaq",
+    difficulty: "mid",
+    tags: ["getline", "string", "split"],
+    statement: "Bir sətir mətn verilib. Ondakı sözlərin (boşluqla ayrılmış ardıcıllıqların) sayını tapın.",
+    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı.",
+    example: {in:"Azercell Cup ucun hazirliq", out:"4"},
+    approach: "<b>getline(cin, line)</b> bütün sətri (boşluqları ilə birlikdə) oxuyur. Sonra <b>stringstream</b>-ə yükləyib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər sözü ayrıca oxuyub sayğacı artırırıq — bu, sətri boşluqlara görə 'bölmək'in ən sadə yoludur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) cnt++;
+    cout << cnt << "\\n";
+}`
+  },
+  {
+    title: "21. Çoxsaylı test halları",
+    difficulty: "easy",
+    tags: ["sürətli I/O", "for", "T test"],
+    statement: "Əvvəlcə T (test sayı) verilir. Sonra T sətirdə hər dəfə iki tam ədəd a, b verilir. Hər test üçün a+b-ni çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 10^5). Sonrakı T sətirdə hər birində iki tam ədəd a, b.",
+    output: "Hər test üçün a+b, ayrı sətirdə.",
+    example: {in:"3\n1 2\n5 5\n10 20", out:"3\n10\n30"},
+    approach: "Yarışlarda çox rast gəlinən 'çoxsaylı test halı' formatıdır: əvvəlcə T oxunur, sonra <b>for (int t = 0; t &lt; T; t++)</b> dövründə hər test ayrıca oxunub həll olunur. Sürətli I/O (sync_with_stdio(false)) böyük T üçün vacibdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int t; cin >> t;
+    while (t--){
+        long long a, b; cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`
+  },
+  {
+    title: "22. \"\\n\" ilə çıxışın sürətləndirilməsi",
+    difficulty: "easy",
+    tags: ["cout", "format"],
+    statement: "N ədəd tam ədəd verilib. Onları ayrı-ayrı sətirlərdə çap edin — çıxışda <b>endl</b> əvəzinə <b>\"\\n\"</b> istifadə edin (endl əlavə olaraq bufferi 'flush' etdiyi üçün böyük çıxışlarda yavaşlığa səbəb olur).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Hər ədəd ayrı sətirdə.",
+    example: {in:"3\n7 8 9", out:"7\n8\n9"},
+    approach: "<b>cout &lt;&lt; endl</b> hər dəfə çıxış bufferini məcburi boşaldır (flush edir), bu da çoxsaylı çıxışlarda proqramı yavaşlada bilər. Onun yerinə <b>\"\\n\"</b> istifadə etmək eyni nəticəni verir, amma proqram avtomatik olaraq sonda (və ya bufferin dolduğu vaxt) flush edir — daha sürətlidir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n; cin >> n;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        cout << x << "\\n";   // endl yox, "\\n"
+    }
+}`
+  },
+  {
+    title: "23. Sonsuz oxuma ilə cəm (EOF-a qədər)",
+    difficulty: "mid",
+    tags: ["cin", "while", "EOF"],
+    statement: "Girişdə neçə ədəd olacağı verilmir — ədədlər fayl/giriş sonuna (EOF) qədər davam edir. Bütün ədədlərin cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə tam ədədlər (giriş sonuna qədər, ümumi say əvvəlcədən bilinmir).",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"1 2 3\n4 5", out:"15"},
+    approach: "<b>while (cin &gt;&gt; x)</b> konstruksiyası — <b>cin &gt;&gt; x</b> uğurlu oxunanda <b>true</b>, giriş bitəndə (EOF) isə <b>false</b> qaytarır. Bu üsul say əvvəlcədən verilmədiyi giriş formatlarında istifadə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long sum = 0, x;
+    while (cin >> x) sum += x;
+    cout << sum << "\\n";
+}`
+  },
+  {
+    title: "24. Qarışıq tipli giriş oxumaq",
+    difficulty: "easy",
+    tags: ["cin", "string", "double"],
+    statement: "Bir sətirdə tələbənin adı (boşluqsuz), yaşı (tam ədəd) və qiyməti (real ədəd) verilir. Onları oxuyub formatlı şəkildə çap edin.",
+    input: "Bir sətirdə: ad (string), yaş (int), qiymət (double) — boşluqla ayrılmış.",
+    output: "\"Ad: X, Yaş: Y, Qiymət: Z\" formatında (qiymət 1 ondalıq dəqiqliklə).",
+    example: {in:"Ayan 13 8.5", out:"Ad: Ayan, Yaş: 13, Qiymət: 8.5"},
+    approach: "<b>cin</b> eyni sətirdə fərqli tipli dəyərləri ardıcıl oxuya bilir — <b>cin &gt;&gt; name &gt;&gt; age &gt;&gt; grade</b> boşluqlara görə avtomatik ayırır, tipinə uyğun (string/int/double) çevirir. Çıxışda <b>fixed &lt;&lt; setprecision(1)</b> ilə dəqiq format verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string name;
+    int age;
+    double grade;
+    cin >> name >> age >> grade;
+    cout << "Ad: " << name << ", Yaş: " << age
+         << ", Qiymət: " << fixed << setprecision(1) << grade << "\\n";
+}`
+  },
+  {
+    title: "25. Matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "for"],
+    statement: "N×M ölçülü matris verilib. Bütün elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"21"},
+    approach: "<b>vector&lt;vector&lt;int&gt;&gt;</b> ilə N×M matris elan olunur (iç-içə iki dövrlə oxunur), sonra yenə iç-içə iki dövrlə hər elementi cəmə əlavə edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            sum += a[i][j];
+
+    cout << sum << "\\n";
+}`
+  },
+  {
+    title: "26. Matrisin əsas diaqonalının cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N×N ölçülü kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"3\n1 2 3\n4 5 6\n7 8 9", out:"15"},
+    approach: "Əsas diaqonalın elementləri həmişə <b>a[i][i]</b> şəklindədir (sətir və sütun indeksi bərabərdir). Tək bir dövrlə <b>i = 0..n-1</b> gəzərək bu elementləri toplayırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<vector<int>> a(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) sum += a[i][i];
+    cout << sum << "\\n";
+}`
+  },
+  {
+    title: "27. Matrisi transponirə etmək",
+    difficulty: "mid",
+    tags: ["2D massiv", "transpon"],
+    statement: "N×M ölçülü matris verilib. Onun transponirəsini (sətirlərlə sütunları yerini dəyişmiş formasını, M×N ölçüsündə) çap edin.",
+    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
+    output: "M sətir, hər birində N tam ədəd — transponirə olunmuş matris.",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"1 4\n2 5\n3 6"},
+    approach: "Transponirədə köhnə matrisin <b>a[i][j]</b> elementi yeni matrisdə <b>b[j][i]</b> mövqeyinə keçir — yəni sətir və sütun indeksləri yerini dəyişir. Yeni matris M×N ölçüsündə qurulur və köhnə matrisdən bu düsturla doldurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    vector<vector<int>> b(m, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            b[j][i] = a[i][j];
+
+    for (int i = 0; i < m; i++){
+        for (int j = 0; j < n; j++) cout << b[i][j] << " ";
+        cout << "\\n";
+    }
+}`
+  },
+  {
+    title: "28. Matrisdə sətir və sütun cəmləri",
+    difficulty: "mid",
+    tags: ["2D massiv", "for"],
+    statement: "N×M ölçülü matris verilib. Hər sətrin cəmini, sonra hər sütunun cəmini çap edin.",
+    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
+    output: "Əvvəlcə N ədəd sətir cəmi (bir sətirdə), sonra M ədəd sütun cəmi (bir sətirdə).",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"6 15\n5 7 9"},
+    approach: "Sətir cəmləri üçün hər sətir daxilində (<b>j</b> üzrə) gəzib toplayırıq. Sütun cəmləri üçün isə hər sütun <b>j</b> sabit saxlanaraq bütün sətirlər (<b>i</b>) üzrə toplanır — iki fərqli 'gəzmə istiqaməti' tələb olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    for (int i = 0; i < n; i++){
+        int rowSum = 0;
+        for (int j = 0; j < m; j++) rowSum += a[i][j];
+        cout << rowSum << (i + 1 < n ? " " : "\\n");
+    }
+    for (int j = 0; j < m; j++){
+        int colSum = 0;
+        for (int i = 0; i < n; i++) colSum += a[i][j];
+        cout << colSum << (j + 1 < m ? " " : "\\n");
+    }
+}`
+  },
+  {
+    title: "29. İki matrisin toplanması",
+    difficulty: "easy",
+    tags: ["2D massiv", "for"],
+    statement: "Eyni ölçülü (N×M) iki matris verilib. Onları elementbəelement toplayıb nəticəni çap edin.",
+    input: "Birinci sətirdə N və M, sonra N sətirdə birinci matris, daha sonra N sətirdə ikinci matris.",
+    output: "Toplanmış N×M matris.",
+    example: {in:"2 2\n1 2\n3 4\n5 6\n7 8", out:"6 8\n10 12"},
+    approach: "İki matris ayrı-ayrı oxunur, sonra hər <b>(i,j)</b> mövqeyi üçün <b>c[i][j] = a[i][j] + b[i][j]</b> düsturu ilə iç-içə dövrdə nəticə matrisi qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m)), b(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> a[i][j];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> b[i][j];
+
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < m; j++) cout << a[i][j] + b[i][j] << " ";
+        cout << "\\n";
+    }
+}`
+  },
+  {
+    title: "30. Matrisdə maksimum element və mövqeyi",
+    difficulty: "mid",
+    tags: ["2D massiv", "max"],
+    statement: "N×M ölçülü matris verilib. Ən böyük elementi və onun (sətir, sütun) mövqeyini (0-əsaslı) tapın.",
+    input: "Birinci sətirdə N və M, sonra N sətirdə hər birində M tam ədəd.",
+    output: "Üç ədəd: maksimum dəyər, sətir indeksi, sütun indeksi.",
+    example: {in:"2 3\n1 9 3\n4 5 6", out:"9 0 1"},
+    approach: "İç-içə dövrlə bütün elementlər gəzilir; hər elementin cari maksimumdan böyük olub-olmadığı yoxlanılır, doğrudursa, həm maksimum dəyər, həm də uyğun <b>i, j</b> indeksləri yenilənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> a[i][j];
+
+    int best = a[0][0], bi = 0, bj = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            if (a[i][j] > best){ best = a[i][j]; bi = i; bj = j; }
+
+    cout << best << " " << bi << " " << bj << "\\n";
+}`
+  },
+  {
+    title: "31. Matrisi spiral formada çap etmək",
+    difficulty: "mid",
+    tags: ["2D massiv", "spiral"],
+    statement: "N×M ölçülü matris verilib. Elementləri xaricdən mərkəzə doğru spiral (saat əqrəbi istiqamətində) sırada çap edin.",
+    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 50), sonra N sətirdə hər birində M tam ədəd.",
+    output: "Bütün elementlər spiral sırada, boşluqla ayrılmış.",
+    example: {in:"3 3\n1 2 3\n4 5 6\n7 8 9", out:"1 2 3 6 9 8 7 4 5"},
+    approach: "Dörd sərhəd dəyişəni (<b>top, bottom, left, right</b>) saxlanılır. Növbə ilə üst sətir soldan-sağa, sağ sütun yuxarıdan-aşağı, alt sətir sağdan-sola, sol sütun aşağıdan-yuxarı gəzilir; hər tərəf bitəndə uyğun sərhəd daralır (məs. <b>top++</b>). Bütün sərhədlər bir-birini keçənə qədər təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) cin >> a[i][j];
+
+    int top = 0, bottom = n - 1, left = 0, right = m - 1;
+    vector<int> res;
+    while (top <= bottom && left <= right){
+        for (int j = left; j <= right; j++) res.push_back(a[top][j]);
+        top++;
+        for (int i = top; i <= bottom; i++) res.push_back(a[i][right]);
+        right--;
+        if (top <= bottom){
+            for (int j = right; j >= left; j--) res.push_back(a[bottom][j]);
+            bottom--;
+        }
+        if (left <= right){
+            for (int i = bottom; i >= top; i--) res.push_back(a[i][left]);
+            left++;
+        }
+    }
+    for (int x : res) cout << x << " ";
+    cout << "\\n";
+}`
+  },
+  {
+    title: "32. Matrisin simmetrik olub-olmadığını yoxlamaq",
+    difficulty: "mid",
+    tags: ["2D massiv", "simmetriya"],
+    statement: "N×N ölçülü kvadrat matris verilib. Onun (əsas diaqonala görə) simmetrik olub-olmadığını yoxlayın — yəni bütün i,j üçün a[i][j] = a[j][i] şərti ödənilməlidir.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
+    output: "\"SIMMETRIK\" və ya \"SIMMETRIK DEYİL\".",
+    example: {in:"3\n1 2 3\n2 5 6\n3 6 9", out:"SIMMETRIK"},
+    approach: "Hər <b>(i,j)</b> cütü üçün <b>a[i][j]</b> ilə <b>a[j][i]</b> müqayisə olunur. Bir yerdə fərq tapılan kimi <b>false</b> bayrağı qoyulur və dövrdən çıxılır (əlavə yoxlamaya ehtiyac yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<vector<int>> a(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) cin >> a[i][j];
+
+    bool ok = true;
+    for (int i = 0; i < n && ok; i++)
+        for (int j = 0; j < n; j++)
+            if (a[i][j] != a[j][i]){ ok = false; break; }
+
+    cout << (ok ? "SIMMETRIK" : "SIMMETRIK DEYİL") << "\\n";
+}`
+  },
+  {
+    title: "33. Matrisi 90 dərəcə döndərmək",
+    difficulty: "mid",
+    tags: ["2D massiv", "rotate"],
+    statement: "N×N ölçülü kvadrat matris verilib. Onu saat əqrəbi istiqamətində 90 dərəcə döndərib çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
+    output: "Döndərilmiş N×N matris.",
+    example: {in:"2\n1 2\n3 4", out:"3 1\n4 2"},
+    approach: "90° saat əqrəbi istiqamətində döndərmədə köhnə matrisin <b>a[i][j]</b> elementi yeni matrisdə <b>b[j][n-1-i]</b> mövqeyinə keçir. Bu düstur ayrıca yeni matrisdə tətbiq olunur (əvvəlcə transpon edib sonra sətirləri güzgüləmək də alternativ üsuldur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<vector<int>> a(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) cin >> a[i][j];
+
+    vector<vector<int>> b(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            b[j][n - 1 - i] = a[i][j];
+
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++) cout << b[i][j] << " ";
+        cout << "\\n";
+    }
+}`
+  },
+  {
+    title: "34. Şahmat lövhəsi naxışı",
+    difficulty: "easy",
+    tags: ["2D massiv", "if", "%"],
+    statement: "N×M ölçüsündə şahmat lövhəsi naxışı çap edin — cüt cəmli (i+j cüt) xanalarda '#', tək cəmlilərdə isə '.' işarəsi olsun.",
+    input: "Bir sətirdə N və M (1 ≤ N, M ≤ 50).",
+    output: "N sətir, hər birində M simvol ('#' və ya '.').",
+    example: {in:"3 4", out:"#.#.\n.#.#\n#.#."},
+    approach: "Hər <b>(i,j)</b> xanası üçün <b>(i + j) % 2 == 0</b> şərti yoxlanılır — doğrudursa '#', əks halda '.' çap olunur. Bu, sətir və sütun indeksinin cəminin cütlüyünə əsaslanan klassik naxış üsuludur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < m; j++)
+            cout << ((i + j) % 2 == 0 ? '#' : '.');
+        cout << "\\n";
+    }
+}`
+  },
+  {
+    title: "35. Student struct — ortalama qiymət",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "N şagirdin adı və 3 qiyməti verilib. Hər şagirdin ortalama qiymətini <b>Student</b> strukturu istifadə edərək hesablayıb çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində ad və 3 tam ədəd qiymət.",
+    output: "Hər şagird üçün 'ad: ortalama' formatında sətir (ortalama 2 ondalıq dəqiqliklə).",
+    example: {in:"2\nAyan 8 9 10\nKamran 7 6 8", out:"Ayan: 9.00\nKamran: 7.00"},
+    approach: "<b>struct Student{ string name; int g1,g2,g3; };</b> ilə hər şagirdin məlumatı tək obyektdə saxlanılır. Vektor <b>vector&lt;Student&gt;</b>-də N şagird saxlanılır, sonra hər biri üçün <b>(g1+g2+g3)/3.0</b> ortalaması hesablanıb çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+struct Student{
+    string name;
+    int g1, g2, g3;
+};
+int main(){
+    int n; cin >> n;
+    vector<Student> students(n);
+    for (int i = 0; i < n; i++)
+        cin >> students[i].name >> students[i].g1 >> students[i].g2 >> students[i].g3;
+
+    for (auto &s : students){
+        double avg = (s.g1 + s.g2 + s.g3) / 3.0;
+        cout << s.name << ": " << fixed << setprecision(2) << avg << "\\n";
+    }
+}`
+  },
+  {
+    title: "36. Pair ilə id-ad cütləri",
+    difficulty: "easy",
+    tags: ["pair", "vector"],
+    statement: "N istifadəçinin id-si və adı verilib. Onları <b>pair&lt;int,string&gt;</b> vektorunda saxlayıb çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində id (int) və ad (string).",
+    output: "Hər cüt üçün 'id - ad' formatında sətir.",
+    example: {in:"2\n1 Ali\n2 Vusal", out:"1 - Ali\n2 - Vusal"},
+    approach: "Hər sətirdəki <b>id</b> və <b>ad</b> bir <b>pair&lt;int,string&gt;</b> daxilində birlikdə saxlanılır (<b>.first</b> — id, <b>.second</b> — ad). Bu, əlaqəli iki fərqli tipli dəyəri ayrıca dəyişənlərə bölmədən bir yerdə saxlamağın rahat üsuludur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,string>> users(n);
+    for (int i = 0; i < n; i++)
+        cin >> users[i].first >> users[i].second;
+
+    for (auto &u : users)
+        cout << u.first << " - " << u.second << "\\n";
+}`
+  },
+  {
+    title: "37. Struct vektorunu sıralamaq",
+    difficulty: "mid",
+    tags: ["struct", "sort", "comparator"],
+    statement: "N şagirdin adı və qiyməti verilib. Onları qiymətə görə AZALAN sırada sıralayıb çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə ad və tam ədəd qiymət.",
+    output: "Sıralanmış şagirdlər, hər biri ayrı sətirdə 'ad qiymət' formatında.",
+    example: {in:"3\nAli 70\nAygun 95\nVusal 80", out:"Aygun 95\nVusal 80\nAli 70"},
+    approach: "<b>struct Student{ string name; int score; };</b> vektoru <b>sort()</b> ilə xüsusi <b>comparator</b> (lambda funksiya) istifadə edərək sıralanır: <b>[](auto &a, auto &b){ return a.score &gt; b.score; }</b> — bu, azalan sıra üçün 'böyükdən kiçiyə' müqayisə şərtidir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+struct Student{
+    string name;
+    int score;
+};
+int main(){
+    int n; cin >> n;
+    vector<Student> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].name >> a[i].score;
+
+    sort(a.begin(), a.end(),
+         [](const Student &x, const Student &y){ return x.score > y.score; });
+
+    for (auto &s : a) cout << s.name << " " << s.score << "\\n";
+}`
+  },
+  {
+    title: "38. Struct vektorunda axtarış",
+    difficulty: "mid",
+    tags: ["struct", "axtarış"],
+    statement: "N məhsulun adı və qiyməti verilib. Verilən ada uyğun məhsulun qiymətini tapın (ad tapılmasa, \"TAPILMADI\" çap edin).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), sonra N sətirdə ad və tam ədəd qiymət, son sətirdə axtarılan ad.",
+    output: "Tapılan qiymət, ya da \"TAPILMADI\".",
+    example: {in:"3\nKitab 5\nQələm 2\nDəftər 3\nQələm", out:"2"},
+    approach: "<b>struct Product{ string name; int price; };</b> vektoru xətti (sıra ilə) gəzilir, hər elementin <b>name</b> sahəsi axtarılan adla müqayisə olunur. Tapılan kimi qiymət çap olunub funksiyadan/dövrdən çıxılır; dövr bitənədək tapılmasa, \"TAPILMADI\" çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+struct Product{
+    string name;
+    int price;
+};
+int main(){
+    int n; cin >> n;
+    vector<Product> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].name >> a[i].price;
+
+    string query; cin >> query;
+    bool found = false;
+    for (auto &p : a){
+        if (p.name == query){
+            cout << p.price << "\\n";
+            found = true;
+            break;
+        }
+    }
+    if (!found) cout << "TAPILMADI" << "\\n";
+}`
+  },
+  {
+    title: "39. Point strukturu — məsafə hesablamaq",
+    difficulty: "easy",
+    tags: ["struct", "riyaziyyat"],
+    statement: "İki nöqtənin (x1,y1) və (x2,y2) koordinatları verilib. Onlar arasındakı məsafəni <b>Point</b> strukturu istifadə edərək hesablayın.",
+    input: "Bir sətirdə dörd real ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə (2 ondalıq dəqiqliklə).",
+    example: {in:"0 0 3 4", out:"5.00"},
+    approach: "<b>struct Point{ double x, y; };</b> ilə hər nöqtə tək obyektdə saxlanılır. Məsafə klassik <b>√((x2-x1)² + (y2-y1)²)</b> düsturu ilə <b>sqrt()</b> və <b>pow()</b> (və ya sadə vurma) istifadə edərək hesablanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+struct Point{
+    double x, y;
+};
+double distance(Point a, Point b){
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return sqrt(dx * dx + dy * dy);
+}
+int main(){
+    Point a, b;
+    cin >> a.x >> a.y >> b.x >> b.y;
+    cout << fixed << setprecision(2) << distance(a, b) << "\\n";
+}`
+  },
+  {
+    title: "40. Pair ilə minimum cütü tapmaq",
+    difficulty: "mid",
+    tags: ["pair", "min"],
+    statement: "N cüt (a, b) tam ədəd verilib. Birinci elementə görə ən kiçik cütü tapın (bərabərlikdə ikinci elementə görə ən kiçiyi seçin).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), sonra N sətirdə hər birində iki tam ədəd a, b.",
+    output: "Ən kiçik cüt (a b formatında).",
+    example: {in:"3\n5 2\n3 8\n3 1", out:"3 1"},
+    approach: "Bütün cütlər <b>vector&lt;pair&lt;int,int&gt;&gt;</b>-də saxlanılır. C++-da <b>pair</b>-lərin standart müqayisəsi (<b>&lt;</b>) əvvəlcə <b>.first</b>-i, bərabərlikdə <b>.second</b>-u müqayisə edir — buna görə <b>*min_element()</b> birbaşa tələb olunan nəticəni verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+
+    auto best = *min_element(a.begin(), a.end());
+    cout << best.first << " " << best.second << "\\n";
+}`
+  },
+  {
+    title: "41. Strukturu funksiya ilə doldurmaq",
+    difficulty: "easy",
+    tags: ["struct", "funksiya"],
+    statement: "Düzbucaqlının eni və hündürlüyü verilib. <b>Rectangle</b> strukturunu bir funksiya vasitəsilə dolduraraq sahəsini və perimetrini hesablayın.",
+    input: "Bir sətirdə iki tam ədəd: en (width) və hündürlük (height).",
+    output: "Sahə və perimetr (bir sətirdə, boşluqla).",
+    example: {in:"4 5", out:"20 18"},
+    approach: "<b>struct Rectangle{ int width, height; };</b> elan olunur. <b>void readRectangle(Rectangle &r)</b> funksiyası strukturu referans ilə götürüb daxilini <b>cin</b> ilə doldurur. Sahə (<b>width*height</b>) və perimetr (<b>2*(width+height)</b>) ayrıca hesablanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+struct Rectangle{
+    int width, height;
+};
+void readRectangle(Rectangle &r){
+    cin >> r.width >> r.height;
+}
+int main(){
+    Rectangle r;
+    readRectangle(r);
+    cout << r.width * r.height << " " << 2 * (r.width + r.height) << "\\n";
+}`
+  },
+  {
+    title: "42. Tezlik cütlərini sıralamaq",
+    difficulty: "mid",
+    tags: ["vector", "pair", "map", "sort"],
+    statement: "N ədəd tam ədəd verilib. Hər fərqli ədədin neçə dəfə göründüyünü tapıb, nəticəni (ədəd, tezlik) cütləri şəklində — tezliyə görə AZALAN sırada — çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Hər fərqli ədəd üçün 'ədəd tezlik' formatında sətir, tezliyə görə azalan sırada.",
+    example: {in:"6\n4 2 4 3 2 4", out:"4 3\n2 2\n3 1"},
+    approach: "Əvvəlcə <b>map&lt;int,int&gt;</b> ilə tezlik cədvəli qurulur. Sonra map-in məzmunu <b>vector&lt;pair&lt;int,int&gt;&gt;</b>-ə köçürülür və <b>sort()</b> ilə <b>tezliyə görə azalan</b> sıralanır (lambda comparator ilə <b>.second</b> müqayisə olunur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++){
+        int x; cin >> x;
+        freq[x]++;
+    }
+
+    vector<pair<int,int>> a(freq.begin(), freq.end());
+    sort(a.begin(), a.end(),
+         [](auto &x, auto &y){ return x.second > y.second; });
+
+    for (auto &[val, cnt] : a) cout << val << " " << cnt << "\\n";
+}`
+  },
+  {
+    title: "43. Sətrin uzunluğu və alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Bir sətir verilib. Onun uzunluğunu və ilk 3 simvolunu (substr ilə) çap edin.",
+    input: "Bir sətir s (3 ≤ uzunluq ≤ 1000).",
+    output: "Birinci sətirdə uzunluq, ikinci sətirdə ilk 3 simvol.",
+    example: {in:"Azercell", out:"8\nAze"},
+    approach: "<b>s.length()</b> (və ya <b>s.size()</b>) sətrin uzunluğunu qaytarır. <b>s.substr(0, 3)</b> isə 0-cı indeksdən başlayaraq 3 simvoldan ibarət alt-sətri qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    cout << s.length() << "\\n";
+    cout << s.substr(0, 3) << "\\n";
+}`
+  },
+  {
+    title: "44. Sətirdə sözlərin sayı",
+    difficulty: "mid",
+    tags: ["string", "stringstream", "split"],
+    statement: "Bir sətir mətn verilib (boşluqla ayrılmış sözlər). Sözlərin sayını və ən uzun sözün uzunluğunu tapın.",
+    input: "Bir sətir mətn (1 ≤ uzunluq ≤ 10^4).",
+    output: "Sözlərin sayı və ən uzun sözün uzunluğu (bir sətirdə, boşluqla).",
+    example: {in:"Bu bir test cumlesidir", out:"4 10"},
+    approach: "<b>stringstream</b>-ə yüklənən mətn <b>while (ss &gt;&gt; word)</b> ilə söz-söz oxunur; hər sözdə sayğac artırılır və <b>word.length()</b> ilə maksimum uzunluq yenilənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word;
+    int cnt = 0, maxLen = 0;
+    while (ss >> word){
+        cnt++;
+        maxLen = max(maxLen, (int)word.length());
+    }
+    cout << cnt << " " << maxLen << "\\n";
+}`
+  },
+  {
+    title: "45. Sətri böyük hərflərə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "toupper"],
+    statement: "Bir sətir verilib. Bütün hərflərini böyük hərflərə çevirib çap edin.",
+    input: "Bir sətir s (yalnız latın hərfləri, 1 ≤ uzunluq ≤ 1000).",
+    output: "Böyük hərflərə çevrilmiş sətir.",
+    example: {in:"Azercell Cup", out:"AZERCELL CUP"},
+    approach: "Sətrin hər simvolu dövrlə gəzilir və <b>toupper(c)</b> funksiyası ilə böyük hərfə çevrilib yerinə yazılır — <b>toupper</b> artıq böyük olan simvolları və hərf olmayanları dəyişməz saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; getline(cin, s);
+    for (char &c : s) c = toupper(c);
+    cout << s << "\\n";
+}`
+  },
+  {
+    title: "46. Sətirdə simvol axtarışı",
+    difficulty: "easy",
+    tags: ["string", "find"],
+    statement: "Bir sətir və bir alt-sətir (axtarılan hissə) verilib. Alt-sətrin harada başladığını (0-əsaslı indeks) tapın, tapılmasa -1 çap edin.",
+    input: "Birinci sətirdə mətn s, ikinci sətirdə axtarılan alt-sətir t.",
+    output: "Alt-sətrin başlanğıc indeksi, ya da -1.",
+    example: {in:"Azercell Cup\nCup", out:"9"},
+    approach: "<b>s.find(t)</b> funksiyası <b>t</b> alt-sətrinin <b>s</b> daxilində ilk göründüyü indeksi qaytarır; tapılmasa xüsusi <b>string::npos</b> dəyəri qaytarılır — bu, -1 kimi çap olunmalıdır (npos int-ə çevriləndə mənfi dəyər kimi görünür, ona görə şərtlə yoxlamaq daha düzgündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s, t;
+    getline(cin, s);
+    getline(cin, t);
+    size_t pos = s.find(t);
+    if (pos == string::npos) cout << -1 << "\\n";
+    else cout << pos << "\\n";
+}`
+  },
+  {
+    title: "47. Palindrome sətir yoxlaması (funksiya ilə)",
+    difficulty: "easy",
+    tags: ["string", "funksiya", "palindrom"],
+    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını yoxlayan funksiya yazın.",
+    input: "Bir sətir s (1 ≤ uzunluq ≤ 1000, yalnız kiçik latın hərfləri).",
+    output: "\"PALINDROM\" və ya \"PALINDROM DEYİL\".",
+    example: {in:"adada", out:"PALINDROM"},
+    approach: "Funksiya <b>bool isPalindrome(string s)</b> iki göstərici (<b>left=0, right=n-1</b>) ilə sətrin əvvəlindən və sonundan eyni zamanda yaxınlaşır, hər addımda simvolları müqayisə edir; hər hansı fərq tapılarsa, <b>false</b> qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPalindrome(string s){
+    int left = 0, right = (int)s.length() - 1;
+    while (left < right){
+        if (s[left] != s[right]) return false;
+        left++; right--;
+    }
+    return true;
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPalindrome(s) ? "PALINDROM" : "PALINDROM DEYİL") << "\\n";
+}`
+  },
+  {
+    title: "48. Sətirləri birləşdirmək",
+    difficulty: "easy",
+    tags: ["string", "append", "+"],
+    statement: "İki sətir verilib. Onları aralarında boşluqla birləşdirib çap edin, sonra ikinci sətri birinciyə <b>append</b> ilə (boşluqsuz) əlavə edib bir də çap edin.",
+    input: "İki sətir, ayrı sətirlərdə: s1, s2.",
+    output: "Birinci sətirdə s1 + ' ' + s2, ikinci sətirdə s1 append edilmiş (boşluqsuz) hal.",
+    example: {in:"Azercell\nCup", out:"Azercell Cup\nAzercellCup"},
+    approach: "<b>s1 + \" \" + s2</b> ifadəsi (operator overloading sayəsində) sətirləri birləşdirir. <b>s1.append(s2)</b> isə <b>s1</b>-i birbaşa dəyişdirərək <b>s2</b>-ni sonuna əlavə edir (boşluqsuz).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s1, s2;
+    cin >> s1 >> s2;
+    string combined = s1 + " " + s2;
+    cout << combined << "\\n";
+    s1.append(s2);
+    cout << s1 << "\\n";
+}`
+  },
+  {
+    title: "49. Sətirdə boşluqları silmək",
+    difficulty: "mid",
+    tags: ["string", "for"],
+    statement: "Bir sətir verilib (boşluqlar ola bilər). Bütün boşluqları silib nəticəni çap edin.",
+    input: "Bir sətir s (boşluqlarla birlikdə, 1 ≤ uzunluq ≤ 1000).",
+    output: "Boşluqsuz sətir.",
+    example: {in:"A z e r  c e l l", out:"Azercell"},
+    approach: "Boş bir <b>result</b> sətri yaradılır, sonra orijinal sətrin hər simvolu gəzilir — boşluq (<b>' '</b>) olmayan hər simvol <b>result</b>-a əlavə olunur (<b>+=</b> ilə). Nəticədə boşluqsuz versiya alınır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; getline(cin, s);
+    string result = "";
+    for (char c : s)
+        if (c != ' ') result += c;
+    cout << result << "\\n";
+}`
+  },
+  {
+    title: "50. Sətirdə ən uzun sözü tapmaq",
+    difficulty: "mid",
+    tags: ["string", "stringstream"],
+    statement: "Bir sətir mətn verilib. Ən uzun sözü tapıb çap edin (bir neçəsi eyni uzunluqda olarsa, birincisini çap edin).",
+    input: "Bir sətir mətn (boşluqla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
+    output: "Ən uzun söz.",
+    example: {in:"Bu bir proqramlasdirma movzusudur", out:"proqramlasdirma"},
+    approach: "<b>stringstream</b> ilə mətn söz-söz oxunur; hər sözün uzunluğu cari ən uzun sözün uzunluğu ilə müqayisə olunur, böyükdürsə, həm uzunluq, həm də söz özü yenilənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string line;
+    getline(cin, line);
+    stringstream ss(line);
+    string word, best = "";
+    while (ss >> word){
+        if (word.length() > best.length()) best = word;
+    }
+    cout << best << "\\n";
+}`
+  },
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/01_vektorun_elementlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/02_vektorda_maksimum_ve_minimum.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/03_vektoru_tersine_cevirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/04_vektorda_cut_ededlerin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/05_vektorda_unikal_ededlerin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/06_vektoru_push_back_ile_qurmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/07_vektorda_en_cox_tekrarlanan_eded.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/08_iki_vektoru_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/09_vektorda_ikinci_en_boyuk_eded.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/10_vektoru_sola_suruşdurmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/11_deyerle_ve_referansla_oturme.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/12_funksiyaya_vektor_oturub_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/13_funksiya_ile_en_boyuk_ededi_tapmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/14_sade_eded_yoxlayan_funksiya.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/15_defolt_parametrli_funksiya.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/16_eyni_adli_funksiyalarin_yuklenmesi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/17_funksiya_ile_vektoru_deyisdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/18_funksiyadan_bir_nece_deyer_qaytarmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/19_suretli_daxilolma_ile_boyuk_cem.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/20_getline_ile_soz_sayini_tapmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/21_coxsayli_test_hallari.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/22_n_ile_cixisin_suretlendirilmesi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/23_sonsuz_oxuma_ile_cem.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/24_qarisiq_tipli_giris_oxumaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/25_matrisin_butun_elementlerinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/26_matrisin_esas_diaqonalinin_cemi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/27_matrisi_transponire_etmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/28_matrisde_setir_ve_sutun_cemleri.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/29_iki_matrisin_toplanmasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/30_matriside_maksimum_element_ve_movqeyi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/31_matrisi_spiral_formada_cap_etmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/32_matrisin_simmetrik_olub_olmadigini_yoxlamaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/33_matrisi_90_derece_dondermek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/34_sahmat_lovhesi_naxisi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/35_student_struct_ortalama_qiymet.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/36_pair_ile_id_ad_cutleri.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/37_struct_vektorunu_siralamaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/38_struct_vektorunda_axtaris.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/39_point_strukturu_mesafe_hesablamaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/40_pair_ile_minimum_cutu_tapmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/41_strukturu_funksiya_ile_doldurmaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/42_tezlik_cutlerini_siralamaq.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/43_setrin_uzunlugu_ve_alt_setri.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/44_setirde_sozlerin_sayi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/45_setri_boyuk_herflere_cevirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/46_setirde_simvol_axtarisi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/47_palindrome_setir_yoxlamasi.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/48_setirleri_birlesdirmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/49_setirde_boshluqlari_silmek.cpp",
+  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/50_setirde_en_uzun_sozu_tapmaq.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.innerHTML = `
+    <div class="problem-head">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+        <div class="problem-body">
+          <p>${p.statement}</p>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+            <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+          </div>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+            <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+          </div>
+          <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <div class="solution-inner approach-block">
+            <p class="sub-label">Yanaşma</p>
+            <p class="approach">${p.approach}</p>
+          </div>
+          <div class="submit-panel">
+            <p class="sub-label">Kodunu göndər</p>
+            <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
+            <div class="submit-row">
+              <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+              <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+              <span class="submit-hint" id="hint-${i}"></span>
+            </div>
+            <div class="history-list" id="history-${i}"></div>
+            <div class="verdict" id="verdict-${i}">
+              <span class="verdict-badge" id="badge-${i}"></span>
+              <div class="io-grid">
+                <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+                <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+            <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week2/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    badgeEl.textContent = VERDICT_LABELS[data.status] || data.status;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

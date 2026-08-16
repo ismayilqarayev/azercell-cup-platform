@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Məsələni Necə Həll Etmək Olar? — Universal Sxem</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0F19;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #141824;
+    --paper-warm:       #1B2030;
+    --well:             #05070C;
+    --ink:              #F2F4F8;
+    --ink-soft:         #8B93A8;
+    --gold:             #00E5FF;
+    --gold-bright:      #4DFFFF;
+    --on-accent:        #0B0F19;
+    --teal:             #00FFC2;
+    --teal-bright:      #5CFFDC;
+    --teal-text:        #5CFFDC;
+    --bronze:           #FF7A00;
+    --bronze-text:      #FF9E45;
+    --green:            #39FF6E;
+    --green-text:       #39FF6E;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--teal-bright); position:relative;
+    padding:26px 24px 20px; margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(63,196,178,0.07), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MƏSƏLƏ HƏLL SXEMİ / REV. 2 — İNTERAKTİV";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep); padding:0 10px;
+    font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--teal-text);
+  }
+  .titleblock h1{
+    font-family:var(--mono); font-size:clamp(22px,4.2vw,32px); line-height:1.25;
+    margin:8px 0 8px; color:var(--ink); letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--teal-text); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:660px; margin:0; }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--teal-text);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  /* ---------- Universal sxem: üfüqi axın (grid + oxlar) ---------- */
+  .flow-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+  }
+  .flow-card{
+    position:relative; background:var(--paper); color:var(--ink); border-radius:6px;
+    padding:14px 12px 12px; min-height:118px; border-top:3px solid var(--teal-bright);
+  }
+  .flow-card .fc-num{
+    font-family:var(--mono); font-size:11px; font-weight:700; color:var(--teal-text);
+    letter-spacing:1px; margin-bottom:6px;
+  }
+  .flow-card h4{ margin:0 0 5px; font-size:13.5px; line-height:1.35; }
+  .flow-card p{ margin:0; font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .flow-arrow{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--teal-text); font-size:18px; font-family:var(--mono);
+  }
+  @media (max-width:760px){
+    .flow-grid{ grid-template-columns:repeat(2, 1fr); }
+    .flow-arrow{ display:none; }
+  }
+
+  /* ---------- Nümunə seçici ---------- */
+  .example-tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .example-tab{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:0.3px;
+    background:transparent; color:var(--ink-soft); border:1px solid var(--grid-line-strong);
+    border-radius:20px; padding:8px 16px; cursor:pointer; transition:all 0.15s ease;
+  }
+  .example-tab:hover{ border-color:var(--teal-bright); color:var(--ink); }
+  .example-tab.active{ background:var(--teal-bright); color:#04241f; border-color:var(--teal-bright); font-weight:600; }
+
+  /* ---------- Stepper kartı ---------- */
+  .stepper-card{
+    background:var(--paper); color:var(--ink); border-radius:6px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); margin-top:14px; overflow:hidden;
+  }
+  .stepper-top{ padding:20px 22px 0; }
+  .stepper-top h3{ margin:0 0 6px; font-size:17px; }
+  .difficulty{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:1px;
+    font-weight:700; margin-bottom:10px;
+  }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .stepper-top .statement{ font-size:13.5px; line-height:1.6; color:var(--ink-soft); margin:0 0 16px; }
+
+  .progress-dots{ display:flex; gap:6px; padding:0 22px 16px; flex-wrap:wrap; }
+  .p-dot{
+    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:700; cursor:pointer;
+    background:var(--paper-warm); color:var(--ink-soft); border:1px solid var(--grid-line-strong);
+    transition:all 0.15s ease;
+  }
+  .p-dot.done{ background:var(--teal); color:var(--on-accent); border-color:var(--teal); }
+  .p-dot.current{ background:var(--teal-bright); color:#04241f; border-color:var(--teal-bright); transform:scale(1.12); }
+
+  .step-panel{
+    background:var(--well); color:var(--ink); padding:22px;
+    min-height:150px;
+  }
+  .step-panel .sp-label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:var(--teal-bright);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .step-panel .sp-title{ font-size:16px; margin:0 0 12px; color:var(--ink); }
+  .step-panel .sp-text{ font-size:13.5px; line-height:1.65; color:#c7d7e0; margin:0; }
+
+  .step-nav{
+    display:flex; align-items:center; gap:10px; padding:16px 22px; background:var(--paper);
+    border-top:1px solid var(--grid-line-strong); flex-wrap:wrap;
+  }
+  .nav-btn{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.3px;
+    background:var(--paper-warm); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:20px; padding:9px 18px; cursor:pointer; transition:background 0.15s ease;
+  }
+  .nav-btn:hover{ background:var(--grid-line-strong); }
+  .nav-btn:disabled{ opacity:0.3; cursor:not-allowed; }
+  .nav-btn.primary{ background:var(--teal-bright); color:#04241f; border-color:var(--teal-bright); font-weight:600; }
+  .nav-btn.primary:hover{ background:#57d4c3; }
+  .nav-counter{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-left:auto; }
+
+  /* ---------- Kod üzərində sxem (annotasiyalı diaqram) ---------- */
+  .code-diagram{ margin:14px 0 0; overflow-x:auto; }
+  .code-diagram svg{ display:block; min-width:640px; }
+  .cd-codebox{ fill:#0a1c2c; stroke:var(--grid-line-strong); stroke-width:1; }
+  .cd-codetext{ font-family:var(--mono); font-size:12px; fill:#cfe3ee; }
+  .cd-filename{ font-family:var(--mono); font-size:11px; fill:#7fa6bd; }
+  .cd-annbox{ fill:var(--paper); stroke-width:1.6; }
+  .cd-anntitle{ font-family:var(--sans); font-size:12.5px; font-weight:600; fill:var(--ink); }
+  .cd-annsub{ font-family:var(--sans); font-size:11px; fill:var(--ink-soft); }
+  .cd-hl{ opacity:0.16; }
+  @keyframes cdFlow{ to{ stroke-dashoffset:-16; } }
+  .cd-leader{
+    stroke-width:1.6; stroke-dasharray:5 4; fill:none;
+    stroke-linecap:round; animation:cdFlow 0.9s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .cd-leader{ animation:none; } }
+  .code-note{
+    font-family:var(--mono); font-size:11px; letter-spacing:1px; color:var(--teal-text);
+    text-transform:uppercase; margin:0 0 4px;
+  }
+
+  /* ---------- Kod bloku ---------- */
+  .code-block{
+    background:#0a1c2c; font-family:var(--mono); border-radius:4px;
+    overflow-x:auto; margin:12px 0 0; padding:12px 10px;
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:var(--teal-bright); font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  /* ---------- Necə əlavə etmək olar ---------- */
+  .howto-card{
+    background:rgba(47,158,143,0.08); border:1px dashed var(--grid-line-strong);
+    border-radius:6px; padding:18px 20px; margin-top:6px;
+  }
+  .howto-card ol{ margin:0; padding-left:18px; }
+  .howto-card li{ font-size:13.5px; line-height:1.7; color:var(--ink-soft); margin-bottom:8px; }
+  .howto-card li:last-child{ margin-bottom:0; }
+  .howto-card code{
+    font-family:var(--mono); font-size:12px; background:var(--well);
+    padding:1px 6px; border-radius:3px; color:var(--teal-bright);
+  }
+
+  .footer{
+    margin-top:60px; text-align:center; font-family:var(--mono); font-size:11px;
+    letter-spacing:1.5px; color:var(--ink-soft);
+  }
+
+  @media (max-width:600px){
+    .stepper-top, .step-panel, .step-nav{ padding-left:16px; padding-right:16px; }
+    .nav-counter{ order:3; flex-basis:100%; text-align:right; margin-left:0; margin-top:4px; }
+    .nav-btn{ padding:9px 14px; font-size:11.5px; }
+    .wrap{ padding-left:14px; padding-right:14px; }
+  }
+
+  /* ---------- Mobil: kod + annotasiyalar üst-üstə (SVG əvəzinə) ---------- */
+  .mobile-ann-list{ margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+  .mobile-ann-card{
+    display:flex; gap:10px; align-items:flex-start;
+    background:var(--paper-warm); border-left:4px solid; border-radius:4px;
+    padding:10px 12px;
+  }
+  .mac-line-badge{
+    flex-shrink:0; font-family:var(--mono); font-size:10px; font-weight:700; color:#04241f;
+    padding:3px 7px; border-radius:10px; white-space:nowrap; margin-top:1px;
+  }
+  .mac-body h5{ margin:0 0 3px; font-size:13px; color:var(--ink); }
+  .mac-body p{ margin:0; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Məsələni <span>Necə Həll Etmək</span> Olar?</h1>
+    <p>Hər məsələ eyni 8 addımla yaxınlaşdırıla bilər. Aşağıda əvvəlcə bu 8 addımın axın sxemi, sonra real məsələlər üzərində addım-addım (növbəti/geri düymələri ilə) tətbiqi var — dərsdə sinifə bir-bir göstərmək üçün nəzərdə tutulub.</p>
+  </div>
+
+  <div class="section-label">Universal Sxem</div>
+  <div class="flow-grid" id="universalFlow"></div>
+
+  <div class="section-label">Nümunə Üzərində Addım-Addım</div>
+  <div class="example-tabs" id="exampleTabs"></div>
+  <div class="stepper-card">
+    <div class="stepper-top" id="stepperTop"></div>
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="step-panel" id="stepPanel"></div>
+    <div class="step-nav">
+      <button class="nav-btn" id="btnPrevStep">← Geri</button>
+      <button class="nav-btn primary" id="btnNextStep">Növbəti →</button>
+      <span class="nav-counter" id="stepCounter">1 / 8</span>
+    </div>
+  </div>
+
+  <div class="section-label">Yeni Məsələ Necə Əlavə Etmək Olar?</div>
+  <div class="howto-card">
+    <ol>
+      <li>Bu faylı mətn redaktorunda aç, <code>&lt;script&gt;</code> hissəsindəki <code>problemWalkthroughs</code> massivini tap.</li>
+      <li>Massivdəki nümunə obyektlərdən birini kopyala və öz məsələn üçün doldur — hər addım üçün (understand, io, manual, topic, pseudocode, code, test, edge) öz izahını yaz.</li>
+      <li>Yeni obyekti massivə vergüllə əlavə et və faylı saxla — yeni məsələ avtomatik seçici siyahısına düşəcək.</li>
+      <li>Dərsdə "Növbəti →" düyməsi ilə addım-addım açaraq izah et — hər dəfə eyni düşüncə ardıcıllığı şagirdlərin gözü önündə canlanacaq.</li>
+    </ol>
+  </div>
+
+  <div class="footer">AZ·CUP — MƏSƏLƏ HƏLL SXEMİ — HƏR MƏSƏLƏ EYNİ YOLLA YAXINLAŞDIRILIR</div>
+</div>
+
+<script>
+const universalSteps = [
+  { title: "Şərti diqqətlə oxu", desc: "Nə istənildiyini tam başa düş." },
+  { title: "Giriş/çıxışı müəyyən et", desc: "Format nədir, hədlər nə qədərdir." },
+  { title: "Nümunəni əl ilə həll et", desc: "Kağız üzərində məntiqi yoxla." },
+  { title: "Mövzunu tap", desc: "Hansı tanış texnikaya bənzəyir?" },
+  { title: "Pseudokod yaz", desc: "Addımları sadə cümlələrlə qeyd et." },
+  { title: "Kodu yaz", desc: "Pseudokodu C++-a çevir." },
+  { title: "Nümunə testlə yoxla", desc: "Nəticəni gözlənilənlə müqayisə et." },
+  { title: "Sərhəd hallarını düşün", desc: "N=0, mənfi, təkrar dəyərlər və s." },
+];
+
+function renderUniversalFlow(){
+  const container = document.getElementById('universalFlow');
+  let html = '';
+  universalSteps.forEach((s, i) => {
+    html += `
+      <div class="flow-card">
+        <div class="fc-num">${String(i+1).padStart(2,'0')}</div>
+        <h4>${s.title}</h4>
+        <p>${s.desc}</p>
+      </div>`;
+    if ((i+1) % 4 !== 0 && i !== universalSteps.length - 1){
+      html += `<div class="flow-arrow">→</div>`;
+    }
+  });
+  container.innerHTML = html;
+}
+renderUniversalFlow();
+
+const problemWalkthroughs = [
+  {
+    title: "İki ədədin cəmi",
+    difficulty: "easy",
+    statement: "İki tam ədəd a və b verilib. Onların cəmini tapıb çap edin. Nümunə: giriş \"3 5\" → çıxış \"8\".",
+    steps: {
+      understand: "Məsələ çox sadədir: iki ədəd verilir, onların riyazi cəmini istəyirlər. Heç bir gizli şərt yoxdur — sadəcə a+b hesabla.",
+      io: "Giriş: bir sətirdə iki tam ədəd (boşluqla ayrılmış). Çıxış: tək bir ədəd — cəm. Hədlər verilməyib, amma \"tam ədəd\" dedikləri üçün mənfi ədədlər də ola bilər, ona görə uyğun tip seçməliyik (məs. long long, ehtiyat üçün).",
+      manual: "Nümunədə a=3, b=5. Əl ilə: 3+5=8. Deməli çıxış 8 olmalıdır — bu, kodumuzun düzgünlüyünü yoxlamaq üçün istinad nöqtəmizdir.",
+      topic: "Bu, ən sadə \"riyazi əməliyyat\" tipli məsələdir — heç bir xüsusi alqoritm və ya struktur lazım deyil, sadəcə dəyişənlər və toplama.",
+      pseudocode: "1) a və b-ni oxu. 2) cəm = a + b hesabla. 3) cəmi çap et.",
+      code: `#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b;
+    cin >> a >> b;
+    long long sum = a + b;
+    cout << sum << "\\n";
+}`,
+      test: "Kodu \"3 5\" girişi ilə işə salsaq, sum=8 alınır və ekrana 8 çap olunur — nümunə ilə uyğundur.",
+      edge: "Mənfi ədədlər (məs. -3 və 5) düzgün işləyir, çünki toplama əməliyyatı işarədən asılı olmayaraq eynidir. Çox böyük ədədlər üçün long long istifadə etməyimiz overflow-un qarşısını alır.",
+    },
+    codeAnnotations: [
+      { anchor: "cin >> a >> b;", label: "1. Dəyişənləri oxu", note: "a və b-ni gözlə" },
+      { anchor: "long long sum = a + b;", label: "2. Cəmi hesabla", note: "sum = a + b" },
+      { anchor: "cout << sum", label: "3. Nəticəni çap et", note: "sum-u ekrana çıxar" },
+    ]
+  },
+  {
+    title: "Massivdə ikinci ən böyük ədəd",
+    difficulty: "mid",
+    statement: "N elementdən ibarət massiv verilib (bütün elementlər fərqlidir). Massivdəki ikinci ən böyük elementi tapın. Nümunə: giriş \"5 / 4 9 2 7 1\" → çıxış \"7\".",
+    steps: {
+      understand: "Ən böyük elementi yox, ondan sonra gələn — İKİNCİ ən böyük elementi tapmaq istəyirlər. Sadəcə massivi sıralayıb sondan ikinci elementi götürmək olar, amma daha sürətli (bir keçidlə) yol da var.",
+      io: "Giriş: birinci sətirdə N (massivin uzunluğu), ikinci sətirdə N tam ədəd. Çıxış: ikinci ən böyük ədəd. N kiçik ola bilər (2-dən başlayaraq), böyük ola bilər (10^5, 10^6) — bu, sıralamadan (O(N log N)) daha sürətli, bir keçidli (O(N)) həll seçməyimizə səbəb ola bilər.",
+      manual: "Nümunədə massiv: 4, 9, 2, 7, 1. Əl ilə sıralasaq: 1, 2, 4, 7, 9. Ən böyük = 9, ikinci ən böyük = 7. Deməli gözlənilən çıxış 7-dir.",
+      topic: "Bu, \"massivi bir dəfə gəzərək iki dəyişəndə ən yaxşı iki nəticəni saxlamaq\" texnikasıdır — sıralamaya ehtiyac qalmadan tək keçiddə (single pass) həll olunur.",
+      pseudocode: "1) İki dəyişən yarat: first = -sonsuzluq, second = -sonsuzluq. 2) Massivi bir-bir gəz: əgər cari element first-dən böyükdürsə, second=first, first=cari; əks halda əgər cari element second-dən böyükdürsə (və first-dən kiçikdirsə), second=cari. 3) Sonda second-u çap et.",
+      code: `#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    long long first = LLONG_MIN, second = LLONG_MIN;
+    for (int i = 0; i < n; i++){
+        if (a[i] > first){
+            second = first;
+            first = a[i];
+        } else if (a[i] > second){
+            second = a[i];
+        }
+    }
+    cout << second << "\\n";
+}`,
+      test: "Nümunə ilə: massiv = [4,9,2,7,1]. Gəzintidən sonra first=9, second=7 alınır — nümunənin gözlənilən çıxışı ilə (7) uyğundur.",
+      edge: "N=1 olduqda ikinci ən böyük mövcud olmaya bilər (məsələ şərtinə görə bu halın olub-olmadığını yoxlamaq lazımdır). Bütün elementlər fərqli olduğu üçün bərabərlik halını düşünməyə ehtiyac yoxdur, amma real məsələlərdə təkrarlanan dəyərlər olarsa, bu alqoritmi bir az dəyişdirmək lazım gələ bilər.",
+    },
+    codeAnnotations: [
+      { anchor: "cin >> n;", label: "1. Uzunluğu oxu", note: "massivin ölçüsü n" },
+      { anchor: "cin >> a[i];", label: "2. Massivi doldur", note: "bütün elementləri oxu" },
+      { anchor: "long long first = LLONG_MIN", label: "3. Başlanğıc dəyərlər", note: "ən kiçik mümkün ədəd" },
+      { anchor: "second = first;", label: "4. Yeni lider tapılanda", note: "köhnə first, second olur" },
+      { anchor: "else if (a[i] > second)", label: "5. İkinci yerin yenilənməsi", note: "aralıq dəyəri saxla" },
+      { anchor: "cout << second", label: "6. Nəticəni çap et", note: "ikinci ən böyüyü göstər" },
+    ]
+  },
+  {
+    title: "Adicto şokoladları",
+    difficulty: "easy",
+    statement: "Sizdə n azn pulunuz var. Bir adicto şokoladının qiyməti m azn-dir. Ən çoxu neçə adicto ala bilərsiniz? Nümunə: pulunuz 20 azn, qiymət 0.6 azn olarsa, cavab 33-dür.",
+    steps: {
+      understand: "Bu, ən sadə sual: pulunuzu şokoladın qiymətinə bölürsünüz və nə qədər şokolad ala bildiyinizi tapırsınız. Məsələn, 20 manatınız var, bir şokolad 0.6 manatdırsa — 20-ni 0.6-ya bölürük.",
+      io: "Giriş: iki ədəd — pulunuz və bir şokoladın qiyməti. Diqqət: bu ədədlər tam olmaya bilər (məsələn 0.6 kimi kəsr ola bilər). Çıxış: alına biləcək şokoladların sayı. Bu, HƏMİŞƏ tam ədəddir — çünki yarım şokolad ala bilmərik.",
+      manual: "20 ÷ 0.6 = 33.33. Şokolad tam ədəd olduğu üçün 33 şokolad ala bilərik, 34-nü yox — çünki 34 şokolad üçün 34 × 0.6 = 20.4 manat lazımdır, bizdə isə cəmi 20 manat var. Başqa nümunə: 53 ÷ 1 = 53, tam ədəd çıxdığı üçün birbaşa 53 şokolad ala bilərik.",
+      topic: "Sadə bölmə məsələsidir. Yeganə xüsusi məqam: nəticəni HƏMİŞƏ aşağı tərəfə yuvarlaqlaşdırmaq lazımdır (33.33 → 33, 34 yox).",
+      pseudocode: "1) Pulu (n) və qiyməti (m) oxu. 2) cavab = n ÷ m hesabla. 3) Cavabın kəsr hissəsini at (aşağı yuvarlaqlaşdır). 4) Cavabı çap et.",
+      code: `#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    double n, m;      // pul ve qiymet (kesr ede biler)
+    cin >> n >> m;
+
+    if (m == 0) {                 // qiymet sifirdirsa, bolme mumkun deyil
+        cout << 0 << "\\n";
+        return 0;
+    }
+
+    double bolme = n / m;                      // adi bolme, meselen 33.33
+    long long cavab = (long long)(bolme + 1e-9); // kesr hissesini atiriq -> 33
+
+    cout << cavab << "\\n";
+}`,
+      test: "20 və 0.6 ilə yoxlayaq: bölmə = 20/0.6 = 33.333..., kəsr hissəsini atsaq 33 alırıq — nümunənin cavabı ilə (33) uyğundur. 53 və 1 ilə: bölmə = 53, kəsr hissəsi yoxdur, birbaşa 53 alırıq — bu da uyğundur.",
+      edge: "Əgər şokoladın qiyməti 0-dırsa, 0-a bölmək olmaz — proqram çökər. Ona görə bu halı əvvəlcədən yoxlayıb 0 çap edirik. Başqa incə məqam: kompüter kəsr ədədləri (0.6 kimi) həmişə tam dəqiq saxlaya bilmir — 20/0.6 əslində kompüterdə 33.33333... əvəzinə çox az fərqli (məs. 33.32999999) çıxa bilər. Bunu düzəltmək üçün bölməyə çox-çox kiçik bir ədəd (0.000000001) əlavə edirik ki, bu kiçik xəta bizi səhvən 33 əvəzinə 32 nəticəsinə aparmasın.",
+    },
+    codeAnnotations: [
+      { anchor: "cin >> n >> m;", label: "1. Dəyişənləri oxu", note: "pul və qiymət (kəsr ola bilər)" },
+      { anchor: "if (m == 0)", label: "2. Sıfır qiyməti yoxla", note: "0-a bölmənin qarşısı" },
+      { anchor: "return 0;", label: "3. Sıfırsa, dayan", note: "heç nə alına bilməz" },
+      { anchor: "double bolme = n / m;", label: "4. Bölməni hesabla", note: "n ÷ m" },
+      { anchor: "long long cavab", label: "5. Aşağı yuvarlaqlaşdır", note: "kəsr hissəsini at" },
+      { anchor: "cout << cavab", label: "6. Nəticəni çap et", note: "maksimum şokolad sayı" },
+    ]
+  },
+  // Yeni məsələ əlavə etmək üçün buraya, yuxarıdakı formatda,
+  // vergüllə ayrılmış yeni bir obyekt əlavə edin.
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+function escapeSvgText(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const CD_PALETTE = ['#FFA116', '#3fc4b2', '#e0708a', '#7fb3e0', '#b39ddb', '#8fd0a8'];
+
+function renderCodeDiagram(code, annotations){
+  if (!annotations || !annotations.length) return '';
+  const lines = code.split('\n');
+  const lineH = 18;
+  const codeX = 30, codeY = 56, codePadTop = 30;
+  const codeWidth = 470;
+  const codeHeight = codePadTop + lines.length * lineH + 14;
+  const firstLineCenterY = codeY + codePadTop + lineH / 2;
+
+  const annX = codeX + codeWidth + 40;
+  const annWidth = 300;
+  const annBoxH = 50;
+  const annGap = 12;
+  const annStartY = 56;
+
+  const found = annotations.map((a, i) => {
+    const idx = lines.findIndex(l => l.includes(a.anchor));
+    return { ...a, lineIdx: idx < 0 ? 0 : idx, color: CD_PALETTE[i % CD_PALETTE.length] };
+  });
+
+  const annBlockHeight = found.length * (annBoxH + annGap) - annGap;
+  const totalHeight = Math.max(codeY + codeHeight, annStartY + annBlockHeight) + 30;
+
+  let svg = `<svg viewBox="0 0 900 ${totalHeight}" width="100%">`;
+  svg += `<rect class="cd-codebox" x="${codeX}" y="${codeY}" width="${codeWidth}" height="${codeHeight}" rx="6"/>`;
+
+  found.forEach(a => {
+    const hlY = firstLineCenterY + a.lineIdx * lineH - lineH / 2;
+    svg += `<rect class="cd-hl" x="${codeX + 2}" y="${hlY}" width="${codeWidth - 4}" height="${lineH}" fill="${a.color}"/>`;
+  });
+
+  svg += `<text class="cd-filename" x="${codeX + 14}" y="${codeY + 18}" dominant-baseline="central">solution.cpp</text>`;
+  lines.forEach((line, i) => {
+    const yCenter = firstLineCenterY + i * lineH;
+    svg += `<text class="cd-codetext" x="${codeX + 14}" y="${yCenter}" dominant-baseline="central" xml:space="preserve">${escapeSvgText(line)}</text>`;
+  });
+
+  found.forEach((a, i) => {
+    const lineY = firstLineCenterY + a.lineIdx * lineH;
+    const boxY = annStartY + i * (annBoxH + annGap);
+    const boxMidY = boxY + annBoxH / 2;
+    const startX = codeX + codeWidth + 6;
+    svg += `<circle cx="${codeX + codeWidth}" cy="${lineY}" r="3" fill="${a.color}"/>`;
+    svg += `<path class="cd-leader" style="stroke:${a.color}" d="M${startX} ${lineY} L${annX - 18} ${boxMidY} L${annX} ${boxMidY}"/>`;
+    svg += `<rect class="cd-annbox" style="stroke:${a.color}" x="${annX}" y="${boxY}" width="${annWidth}" height="${annBoxH}" rx="6"/>`;
+    svg += `<rect x="${annX}" y="${boxY}" width="5" height="${annBoxH}" rx="2" fill="${a.color}"/>`;
+    svg += `<text class="cd-anntitle" x="${annX + 16}" y="${boxY + 20}" dominant-baseline="central">${escapeSvgText(a.label)}</text>`;
+    svg += `<text class="cd-annsub" x="${annX + 16}" y="${boxY + 37}" dominant-baseline="central">${escapeSvgText(a.note)}</text>`;
+  });
+
+  svg += `</svg>`;
+  return `<div class="code-diagram">${svg}</div>`;
+}
+
+function renderMobileCodeAnnotations(code, annotations){
+  const lines = code.split('\n');
+  const found = (annotations || []).map((a, i) => {
+    const idx = lines.findIndex(l => l.includes(a.anchor));
+    return { ...a, lineIdx: idx < 0 ? 0 : idx, color: CD_PALETTE[i % CD_PALETTE.length] };
+  });
+  const lineColor = {};
+  found.forEach(a => { lineColor[a.lineIdx] = a.color; });
+
+  const codeRows = lines.map((line, i) => {
+    const color = lineColor[i];
+    const style = color ? ` style="background:${color}26; border-left:3px solid ${color}; padding-left:9px; margin-left:-2px;"` : '';
+    return `<div class="code-line"${style}><span class="line-no">${i + 1}</span><code>${highlightCppLine(line)}</code></div>`;
+  }).join('');
+  const codeHtml = `<div class="code-block">${codeRows}</div>`;
+
+  const cardsHtml = found.map(a => `
+    <div class="mobile-ann-card" style="border-left-color:${a.color}">
+      <div class="mac-line-badge" style="background:${a.color}">Sətir ${a.lineIdx + 1}</div>
+      <div class="mac-body">
+        <h5>${escapeSvgText(a.label)}</h5>
+        <p>${escapeSvgText(a.note)}</p>
+      </div>
+    </div>
+  `).join('');
+
+  return `${codeHtml}<div class="mobile-ann-list">${cardsHtml}</div>`;
+}
+
+const stepMeta = [
+  { key:'understand', title:'Şərti başa düş' },
+  { key:'io',          title:'Giriş/çıxış formatını müəyyən et' },
+  { key:'manual',      title:'Nümunəni əl ilə həll et' },
+  { key:'topic',       title:'Hansı mövzuya aid olduğunu tap' },
+  { key:'pseudocode',  title:'Addımları (pseudokodu) yaz' },
+  { key:'code',        title:'Kodu yaz' },
+  { key:'test',        title:'Nümunə testlə yoxla' },
+  { key:'edge',        title:'Sərhəd hallarını düşün' },
+];
+
+let currentExampleIdx = 0;
+let currentStepIdx = 0;
+
+function renderExampleTabs(){
+  const tabsEl = document.getElementById('exampleTabs');
+  tabsEl.innerHTML = '';
+  problemWalkthroughs.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'example-tab' + (i === currentExampleIdx ? ' active' : '');
+    btn.textContent = p.title;
+    btn.addEventListener('click', () => {
+      currentExampleIdx = i;
+      currentStepIdx = 0;
+      renderExampleTabs();
+      renderStepperTop();
+      renderStep();
+    });
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderStepperTop(){
+  const p = problemWalkthroughs[currentExampleIdx];
+  const top = document.getElementById('stepperTop');
+  top.innerHTML = `
+    <h3>${p.title}</h3>
+    <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+    <p class="statement">${p.statement}</p>
+  `;
+  renderDots();
+}
+
+function renderDots(){
+  const dotsEl = document.getElementById('progressDots');
+  dotsEl.innerHTML = '';
+  stepMeta.forEach((meta, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'p-dot' + (i < currentStepIdx ? ' done' : '') + (i === currentStepIdx ? ' current' : '');
+    dot.textContent = i + 1;
+    dot.addEventListener('click', () => { currentStepIdx = i; renderStep(); });
+    dotsEl.appendChild(dot);
+  });
+}
+
+function renderStep(){
+  const p = problemWalkthroughs[currentExampleIdx];
+  const meta = stepMeta[currentStepIdx];
+  const panel = document.getElementById('stepPanel');
+  let content;
+  if (meta.key === 'code'){
+    const isNarrow = window.innerWidth <= 700;
+    if (isNarrow && p.codeAnnotations && p.codeAnnotations.length){
+      const note = `<div class="code-note">Kodun izahı (rəngli sətirlər)</div>`;
+      content = note + renderMobileCodeAnnotations(p.steps.code, p.codeAnnotations);
+    } else {
+      const diagram = renderCodeDiagram(p.steps.code, p.codeAnnotations);
+      const note = diagram ? `<div class="code-note">Kodun üzərindəki sxem</div>` : '';
+      content = note + diagram + renderCodeBlock(p.steps[meta.key]);
+    }
+  } else {
+    content = `<p class="sp-text">${p.steps[meta.key]}</p>`;
+  }
+
+  panel.innerHTML = `
+    <div class="sp-label">Addım ${currentStepIdx + 1}</div>
+    <h4 class="sp-title">${meta.title}</h4>
+    ${content}
+  `;
+
+  document.getElementById('stepCounter').textContent = `${currentStepIdx + 1} / ${stepMeta.length}`;
+  document.getElementById('btnPrevStep').disabled = currentStepIdx <= 0;
+  document.getElementById('btnNextStep').disabled = currentStepIdx >= stepMeta.length - 1;
+  renderDots();
+}
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (stepMeta[currentStepIdx] && stepMeta[currentStepIdx].key === 'code') renderStep();
+  }, 200);
+});
+
+document.getElementById('btnPrevStep').addEventListener('click', () => {
+  if (currentStepIdx > 0){ currentStepIdx--; renderStep(); }
+});
+document.getElementById('btnNextStep').addEventListener('click', () => {
+  if (currentStepIdx < stepMeta.length - 1){ currentStepIdx++; renderStep(); }
+});
+
+renderExampleTabs();
+renderStepperTop();
+renderStep();
+</script>
+</body>
+</html>
