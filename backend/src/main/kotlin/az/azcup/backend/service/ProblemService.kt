@@ -3,6 +3,7 @@ package az.azcup.backend.service
 import az.azcup.backend.dto.ProblemDetailDto
 import az.azcup.backend.dto.ProblemSummaryDto
 import az.azcup.backend.entity.Problem
+import az.azcup.backend.entity.Role
 import az.azcup.backend.entity.SubmissionStatus
 import az.azcup.backend.entity.User
 import az.azcup.backend.exception.NotFoundException
@@ -20,7 +21,7 @@ class ProblemService(
 
     @Transactional(readOnly = true)
     fun listByTopicSlug(slug: String, user: User): List<ProblemSummaryDto> {
-        val topic = topicService.getBySlug(slug)
+        val topic = topicService.getBySlug(slug, user)
         val problems = problemRepository.findAllByTopicOrderByOrderIndexAsc(topic)
         val solvedIds = submissionRepository.solvedProblemIdsForUserInTopic(user, topic).toSet()
         return problems.map { p ->
@@ -33,7 +34,7 @@ class ProblemService(
 
     @Transactional(readOnly = true)
     fun getDetail(id: Long, user: User): ProblemDetailDto {
-        val p = getEntity(id)
+        val p = getEntity(id, user)
         val solved = submissionRepository.existsByUserAndProblemAndStatus(user, p, SubmissionStatus.ACCEPTED)
         return ProblemDetailDto(
             p.id, p.topic!!.slug, p.orderIndex, p.subgroupLabel, p.title,
@@ -42,7 +43,18 @@ class ProblemService(
         )
     }
 
+    // ID ilə xam Problem entity-sini tapır — həm getDetail(), həm də
+    // SubmissionService (submit/history) buradan keçir, ona görə "bu məsələ
+    // hələ açıq elan olunmayan bir mövzudadırsa, STUDENT ona nə baxa, nə də
+    // kod göndərə bilməz" qaydası bir yerdə, mərkəzləşdirilmiş şəkildə
+    // tətbiq olunur — problem ID-sini əl ilə "təxmin edərək" bu qadağanı
+    // dolayı yolla keçmək mümkün olmasın deyə.
     @Transactional(readOnly = true)
-    fun getEntity(id: Long): Problem =
-        problemRepository.findById(id).orElseThrow { NotFoundException("Məsələ tapılmadı: $id") }
+    fun getEntity(id: Long, user: User): Problem {
+        val p = problemRepository.findById(id).orElseThrow { NotFoundException("Məsələ tapılmadı: $id") }
+        if (user.role == Role.STUDENT && p.topic?.published == false) {
+            throw NotFoundException("Məsələ tapılmadı: $id")
+        }
+        return p
+    }
 }

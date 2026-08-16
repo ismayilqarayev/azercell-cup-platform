@@ -453,6 +453,7 @@
     <button class="tab-btn" id="btn-scheme" role="tab" aria-selected="false" onclick="showTab(&#39;scheme&#39;)"><span class="tab-label">Məsələ Həll Sxemi</span></button>
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
+    <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
     <div class="tab-group-label" id="adminGroupLabel" style="display:none">Admin</div>
     <button class="tab-btn" id="btn-users" role="tab" aria-selected="false" onclick="showTab(&#39;users&#39;)" style="display:none"><span class="tab-label">İstifadəçilər</span></button>
     <button class="tab-btn" id="btn-approvals" role="tab" aria-selected="false" onclick="showTab(&#39;approvals&#39;)" style="display:none"><span class="tab-label">Müəllim təsdiqləri</span></button>
@@ -481,6 +482,14 @@
         <div id="teacherPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
+    <div class="teacher-panel" id="frame-topics">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">Dərs proqramı</h2>
+        <p class="teacher-panel-sub">Mövzu tələbəyə görünməzdən əvvəl "Aç" düyməsi ilə açıq elan edilməlidir — qapalı mövzular şagird panelində göstərilmir.</p>
+        <div id="topicsPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+
     <div class="teacher-panel" id="frame-approvals">
       <div class="teacher-panel-inner">
         <h2 class="teacher-panel-title">Müəllim təsdiqləri</h2>
@@ -738,6 +747,7 @@ function updateAuthUI(){
   const isTeacher = !!user && user.role === 'TEACHER';
   document.getElementById('teacherGroupLabel').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-teacher').style.display = (isAdmin || isTeacher) ? '' : 'none';
+  document.getElementById('btn-topics').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('adminGroupLabel').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-approvals').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-users').style.display = isAdmin ? '' : 'none';
@@ -883,8 +893,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', approvals:'frame-approvals', users:'frame-users'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', approvals:'btn-approvals', users:'btn-users'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', approvals:'frame-approvals', users:'frame-users'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', approvals:'btn-approvals', users:'btn-users'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -895,6 +905,7 @@ function showTab(name){
       document.getElementById(frames[key]).classList.toggle('active', key === name);
     });
     if (name === 'teacher') loadTeacherPanel();
+    if (name === 'topics') loadTopicsPanel();
     if (name === 'approvals') loadPendingTeachers();
     if (name === 'users') loadUsersPanel();
   });
@@ -967,6 +978,45 @@ async function rejectTeacher(id){
     loadPendingTeachers();
   } catch (err) {
     alert('Rədd etmək mümkün olmadı.');
+  }
+}
+
+/* ---------- "Dərs proqramı" müəllim paneli: mövzuların açıq/qapalı statusu ---------- */
+async function loadTopicsPanel(){
+  const body = document.getElementById('topicsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/topics');
+    if (!res.ok) throw new Error('fetch failed');
+    const topics = await res.json();
+    if (!topics.length) {
+      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir mövzu yoxdur.</div>';
+      return;
+    }
+    const rows = topics.map(t => {
+      const statusBadge = t.published
+        ? '<span class="user-badge active">Açıq</span>'
+        : '<span class="user-badge inactive">Qapalı</span>';
+      return '<tr><td>' + escapeHtml(t.title) + '<span class="user-email">' + escapeHtml(t.slug) + '</span></td><td>' + statusBadge + '</td><td class="approval-actions">'
+        + '<button type="button" class="approval-btn' + (t.published ? '' : ' approve') + '" onclick="toggleTopicPublished(' + t.id + ', ' + (!t.published) + ')">' + (t.published ? 'Bağla' : 'Aç') + '</button>'
+        + '</td></tr>';
+    }).join('');
+    body.innerHTML = '<table class="teacher-table"><thead><tr><th>Mövzu</th><th>Status</th><th>Əməliyyat</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Mövzu siyahısını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+async function toggleTopicPublished(id, published){
+  try {
+    const res = await azcupApiFetch('/api/teacher/topics/' + id + '/publish', {
+      method: 'PUT',
+      body: JSON.stringify({ published }),
+    });
+    if (!res.ok) throw new Error('toggle failed');
+    loadTopicsPanel();
+  } catch (err) {
+    alert('Mövzunun statusunu dəyişmək mümkün olmadı.');
   }
 }
 

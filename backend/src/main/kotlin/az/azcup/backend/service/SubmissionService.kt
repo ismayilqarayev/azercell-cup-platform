@@ -2,6 +2,7 @@ package az.azcup.backend.service
 
 import az.azcup.backend.dto.ProgressDto
 import az.azcup.backend.dto.SubmissionResponse
+import az.azcup.backend.entity.Role
 import az.azcup.backend.entity.Submission
 import az.azcup.backend.entity.User
 import az.azcup.backend.judge.JudgeService
@@ -22,7 +23,7 @@ class SubmissionService(
 
     @Transactional
     fun submit(problemId: Long, user: User, sourceCode: String): SubmissionResponse {
-        val problem = problemService.getEntity(problemId)
+        val problem = problemService.getEntity(problemId, user)
         val result = judgeService.judge(sourceCode, problem)
 
         val submission = Submission(
@@ -40,7 +41,7 @@ class SubmissionService(
 
     @Transactional(readOnly = true)
     fun history(problemId: Long, user: User): List<SubmissionResponse> {
-        val problem = problemService.getEntity(problemId)
+        val problem = problemService.getEntity(problemId, user)
         return submissionRepository.findByUserAndProblemOrderBySubmittedAtDesc(user, problem)
             .map { toResponse(it) }
     }
@@ -48,6 +49,7 @@ class SubmissionService(
     @Transactional(readOnly = true)
     fun progress(user: User): List<ProgressDto> {
         val topics = topicRepository.findAllByOrderByOrderIndexAsc()
+            .filter { user.role != Role.STUDENT || it.published }
         val solvedByTopicId = submissionRepository.solvedCountsByTopicForUser(user)
             .associate { it.topicId to it.solvedCount }
         return topics.map { t ->

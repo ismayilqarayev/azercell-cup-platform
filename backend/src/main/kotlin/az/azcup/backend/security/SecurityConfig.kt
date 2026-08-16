@@ -38,6 +38,7 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                     .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/admin/users").hasAnyRole("ADMIN", "TEACHER")
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().permitAll()
             }

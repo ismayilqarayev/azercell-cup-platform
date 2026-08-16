@@ -69,6 +69,24 @@ class AdminService(
         topicRepository.deleteById(id)
     }
 
+    // Müəllim panelindəki "Dərs proqramı" tabı üçün: bütün mövzuları (açıq və
+    // qapalı) sıra nömrəsinə görə qaytarır ki, müəllim hansının hələ tələbəyə
+    // görünmədiyini görüb aça bilsin.
+    @Transactional(readOnly = true)
+    fun listTopicsForManagement(): List<AdminTopicDto> =
+        topicRepository.findAllByOrderByOrderIndexAsc().map { toDto(it) }
+
+    // Bir mövzunun "published" bayrağını dəyişir — istənilən TEACHER (və ya
+    // ADMIN) bunu çağıra bilər (bax: TeacherController). Mövzu açıq elan
+    // olunmayana qədər TopicService/ProblemService STUDENT roluna onu (və
+    // ona aid məsələləri) göstərmir.
+    @Transactional
+    fun setTopicPublished(id: Long, published: Boolean): AdminTopicDto {
+        val topic = topicRepository.findById(id).orElseThrow { NotFoundException("Mövzu tapılmadı: $id") }
+        topic.published = published
+        return toDto(topicRepository.save(topic))
+    }
+
     @Transactional
     fun createProblem(req: ProblemUpsertRequest): AdminProblemDto {
         val topic = topicRepository.findBySlug(req.topicSlug)
