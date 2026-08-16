@@ -64,6 +64,14 @@
     font-family:var(--sans); font-size:20px; font-weight:700; color:var(--ink);
   }
   .lang-desc{ position:relative; z-index:1; font-size:12px; color:var(--ink-soft); line-height:1.5; }
+  .lang-icon{ position:relative; z-index:1; font-size:28px; line-height:1; }
+  .lang-badge{
+    position:relative; z-index:1; align-self:center;
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    border-radius:20px; padding:4px 12px; white-space:nowrap;
+  }
+  .lang-btn-cpp .lang-badge{ color:var(--gold); background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.35); }
+  .lang-btn-python .lang-badge{ color:var(--bronze); background:rgba(255,122,0,0.08); border:1px solid rgba(255,122,0,0.35); }
 
   .auth-form{ display:flex; flex-direction:column; gap:12px; max-width:340px; margin:0 auto; }
   .auth-input{
@@ -410,12 +418,16 @@
         <p class="lang-sub">Seçiminə görə sənə uyğun material göstəriləcək.</p>
         <div class="lang-options">
           <button type="button" class="lang-btn lang-btn-cpp" onclick="chooseLanguage('cpp')">
+            <span class="lang-icon">⚡</span>
+            <span class="lang-badge">Azercell Cup</span>
             <span class="lang-name">C++</span>
-            <span class="lang-desc">Azercell Cup hazırlıq planı, test vərəqləri, alqoritm simulyasiyası</span>
+            <span class="lang-desc">Hazırlıq planı, test vərəqləri, alqoritm simulyasiyası</span>
           </button>
           <button type="button" class="lang-btn lang-btn-python" onclick="chooseLanguage('python')">
-            <span class="lang-name">Computer Science in DP (International Baccalaureate)</span>
-            <span class="lang-desc">Python ilə IB Diploma Programme Computer Science materialları</span>
+            <span class="lang-icon">🐍</span>
+            <span class="lang-badge">IB Diploma Programme</span>
+            <span class="lang-name">Computer Science</span>
+            <span class="lang-desc">Python ilə praktiki proqramlaşdırma və məsələ həlli</span>
           </button>
         </div>
       </div>
