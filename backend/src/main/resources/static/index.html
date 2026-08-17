@@ -652,6 +652,10 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       errorEl.textContent = data.message || 'Xəta baş verdi';
       return;
     }
+    if (authMode === 'login' && data.role !== 'STUDENT') {
+      errorEl.textContent = 'Bu hesab şagird hesabı deyil.';
+      return;
+    }
     AzcupAuth.setSession(data);
     updateAuthUI();
   } catch (err) {
