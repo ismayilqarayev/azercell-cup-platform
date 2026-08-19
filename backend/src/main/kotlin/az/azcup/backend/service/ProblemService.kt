@@ -12,6 +12,8 @@ import az.azcup.backend.repository.SubmissionRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+// Problemlərin OXUNMASI (siyahı və detal) ilə bağlı biznes-məntiq.
+// Yaratma/redaktə AdminService-dədir, göndərmə/yoxlama SubmissionService-dədir.
 @Service
 class ProblemService(
     private val problemRepository: ProblemRepository,
@@ -19,10 +21,17 @@ class ProblemService(
     private val topicService: TopicService
 ) {
 
+    // Mövzunun slug-una görə (məs. "week1") o mövzudakı bütün problemlərin
+    // qısa siyahısını qaytarır. topicService.getBySlug() daxildə mövzunun
+    // açıq (published) olub-olmadığını da yoxlayır — STUDENT hələ açılmamış
+    // mövzunu bu yolla görə bilməz.
     @Transactional(readOnly = true)
     fun listByTopicSlug(slug: String, user: User): List<ProblemSummaryDto> {
         val topic = topicService.getBySlug(slug, user)
         val problems = problemRepository.findAllByTopicOrderByOrderIndexAsc(topic)
+        // Bu istifadəçinin hansı problemləri artıq həll etdiyini TƏK bir
+        // sorğu ilə əldə edib Set-ə çeviririk ki, aşağıdakı map() içində hər
+        // problem üçün ayrıca bazaya getmək əvəzinə O(1) yoxlama aparılsın.
         val solvedIds = submissionRepository.solvedProblemIdsForUserInTopic(user, topic).toSet()
         return problems.map { p ->
             ProblemSummaryDto(
@@ -32,6 +41,8 @@ class ProblemService(
         }
     }
 
+    // Bir problemin tam detallarını (şərt, giriş/çıxış spesifikasiyası,
+    // nümunələr) qaytarır.
     @Transactional(readOnly = true)
     fun getDetail(id: Long, user: User): ProblemDetailDto {
         val p = getEntity(id, user)

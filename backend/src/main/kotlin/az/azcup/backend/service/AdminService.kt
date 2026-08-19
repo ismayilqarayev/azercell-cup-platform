@@ -22,6 +22,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.security.SecureRandom
 
+// Admin panelinin bütün biznes-məntiqi: mövzu/problem CRUD-u və
+// istifadəçi idarəetməsi (rol dəyişmə, aktiv/deaktiv, parol sıfırlama,
+// silmə). Bir çox metodda "son admin"i və ya "özünü" korlamağın qarşısını
+// alan qoruyucu yoxlamalar var — aşağıda hər birinin niyəsi izah olunur.
 @Service
 class AdminService(
     private val topicRepository: TopicRepository,
@@ -31,6 +35,10 @@ class AdminService(
     private val passwordEncoder: PasswordEncoder
 ) {
 
+    // Təsadüfi parol yaratmaq üçün — java.util.Random YOX, məhz
+    // SecureRandom istifadə olunur, çünki adi Random kriptoqrafik cəhətdən
+    // proqnozlaşdırıla bilər (parol yaratmaq kimi təhlükəsizlik-kritik
+    // əməliyyatlar üçün yararsızdır).
     private val secureRandom = SecureRandom()
 
     @Transactional
@@ -66,6 +74,8 @@ class AdminService(
         if (!topicRepository.existsById(id)) {
             throw NotFoundException("Mövzu tapılmadı: $id")
         }
+        // DİQQƏT: mövzuya aid problemlər/təqdimatlar burada əl ilə silinmir —
+        // bazadakı FK (foreign key) ON DELETE davranışına etibar edilir.
         topicRepository.deleteById(id)
     }
 
@@ -114,6 +124,8 @@ class AdminService(
         val problem = problemRepository.findById(id).orElseThrow { NotFoundException("Məsələ tapılmadı: $id") }
         val topic = topicRepository.findBySlug(req.topicSlug)
             ?: throw NotFoundException("Mövzu tapılmadı: ${req.topicSlug}")
+        // Problemin mövzusu da dəyişdirilə bilər (məs. yanlış mövzuya
+        // düşmüş problemi düzgün mövzuya köçürmək üçün).
         problem.topic = topic
         problem.orderIndex = req.orderIndex ?: 0
         problem.subgroupLabel = req.subgroupLabel
@@ -138,6 +150,9 @@ class AdminService(
         problemRepository.deleteById(id)
     }
 
+    // Entity -> DTO çevirmə köməkçiləri. Kotlin-in overload dəstəyi
+    // sayəsində eyni "toDto" adı Problem və Topic üçün ayrıca istifadə
+    // oluna bilir (parametr tipinə görə fərqləndirilir).
     private fun toDto(t: Topic): AdminTopicDto =
         AdminTopicDto(t.id, t.slug, t.orderIndex, t.title, t.monthTag, t.description, t.published)
 
@@ -148,6 +163,8 @@ class AdminService(
             p.exampleInput, p.exampleOutput, p.approach, p.referenceSolution
         )
 
+    // Admin panelindəki şagird siyahısı — hər şagirdin cəmi neçə fərqli
+    // problem həll etdiyi də (totalSolved) birlikdə hesablanır.
     @Transactional(readOnly = true)
     fun listStudents(): List<AdminUserDto> =
         userRepository.findAllByRole(Role.STUDENT).map { u ->
@@ -157,6 +174,8 @@ class AdminService(
             )
         }
 
+    // Hələ təsdiqlənməmiş müəllim hesabları — admin panelinin "Müəllim
+    // təsdiqləri" ekranı bunu göstərir.
     @Transactional(readOnly = true)
     fun listPendingTeachers(): List<AdminUserDto> =
         userRepository.findAllByRole(Role.TEACHER)
@@ -173,6 +192,8 @@ class AdminService(
         userRepository.save(user)
     }
 
+    // "Rədd et" — hesabı sadəcə deaktiv etmək əvəzinə TAMAMILƏ SİLİR, çünki
+    // hələ təsdiqlənməmiş, real istifadə olunmayan bir qeydiyyat cəhdidir.
     @Transactional
     fun rejectTeacher(id: Long) {
         val user = userRepository.findById(id).orElseThrow { NotFoundException("Müəllim tapılmadı: $id") }
@@ -192,6 +213,9 @@ class AdminService(
     @Transactional
     fun updateProfile(id: Long, req: UserProfileUpdateRequest): AdminUserDetailDto {
         val user = findUserOrThrow(id)
+        // E-poçt YALNIZ dəyişəndə unikallıq yoxlanılır (ignoreCase ilə) —
+        // əks halda istifadəçi öz mövcud e-poçtunu "təkrar göndərəndə" belə
+        // "artıq istifadə olunur" xətası alardı.
         if (!user.email.equals(req.email, ignoreCase = true) && userRepository.existsByEmail(req.email)) {
             throw ConflictException("Bu email artıq başqa istifadəçi tərəfindən istifadə olunur")
         }
@@ -200,28 +224,41 @@ class AdminService(
         return toDetailDto(userRepository.save(user))
     }
 
+    // Bir istifadəçinin rolunu dəyişir. currentAdminId — bunu çağıran adminin
+    // ID-sidir (özünü redaktə etməsinin qarşısını almaq üçün).
     @Transactional
     fun changeRole(id: Long, newRole: Role, currentAdminId: Long): AdminUserDetailDto {
         val user = findUserOrThrow(id)
+        // Admin öz rolunu dəyişə bilməz — əks halda diqqətsizlikdən özünü
+        // sistemdən "kilidləyə" bilərdi (heç kimin admin qalmadığı vəziyyət).
         if (user.id == currentAdminId) {
             throw ConflictException("Öz rolunu dəyişə bilməzsən")
         }
+        // Sistemdə YALNIZ 1 admin qalıbsa, onun rolunu dəyişmək qadağandır —
+        // bu, "heç bir admin qalmayan" bərpa olunmaz vəziyyətin qarşısını alır.
         if (user.role == Role.ADMIN && newRole != Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
             throw ConflictException("Sistemdəki son admin hesabının rolu dəyişdirilə bilməz")
         }
         user.role = newRole
+        // TEACHER-dən başqa hər rola keçidlə birlikdə avtomatik təsdiqlənir
+        // (STUDENT/ADMIN-in "approved" statusu mənasızdır, yalnız TEACHER üçün əhəmiyyətlidir).
         if (newRole != Role.TEACHER) {
             user.approved = true
         }
         return toDetailDto(userRepository.save(user))
     }
 
+    // Bir istifadəçini aktiv/deaktiv edir — silmək əvəzinə, tarixçəni saxlayaraq
+    // girişini bloklamaq üçün istifadə olunur.
     @Transactional
     fun setActive(id: Long, active: Boolean, currentAdminId: Long): AdminUserDetailDto {
         val user = findUserOrThrow(id)
+        // Admin özünü deaktiv edərək özünü sistemdən çıxara bilməz.
         if (user.id == currentAdminId && !active) {
             throw ConflictException("Öz hesabını deaktiv edə bilməzsən")
         }
+        // Son (yeganə) admini deaktiv etmək də eyni səbəbdən qadağandır
+        // (bax: changeRole-dakı oxşar qoruma).
         if (!active && user.role == Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
             throw ConflictException("Sistemdəki son admin hesabı deaktiv edilə bilməz")
         }
@@ -229,18 +266,24 @@ class AdminService(
         return toDetailDto(userRepository.save(user))
     }
 
+    // Admin bir istifadəçinin parolunu sıfırlayır — ya öz istədiyi yeni
+    // parolu təyin edə bilər, ya da boş buraxaraq təsadüfi güclü parol
+    // yaratdıra bilər (bax: generateRandomPassword).
     @Transactional
     fun resetPassword(id: Long, requestedPassword: String?): String {
         val user = findUserOrThrow(id)
         val newPassword = if (requestedPassword.isNullOrBlank()) generateRandomPassword() else requestedPassword
         user.passwordHash = passwordEncoder.encode(newPassword)!!
         userRepository.save(user)
+        // Açıq mətn parol YALNIZ bir dəfəlik, bu cavabda qaytarılır —
+        // bazada heç vaxt saxlanılmır (yalnız hash-i saxlanılır).
         return newPassword
     }
 
     @Transactional
     fun deleteUser(id: Long, currentAdminId: Long) {
         val user = findUserOrThrow(id)
+        // Admin özünü silə bilməz (yenə eyni "sistemi kilidləməmə" məntiqi).
         if (user.id == currentAdminId) {
             throw ConflictException("Öz hesabını silə bilməzsən")
         }
@@ -253,6 +296,9 @@ class AdminService(
     private fun findUserOrThrow(id: Long): User =
         userRepository.findById(id).orElseThrow { NotFoundException("İstifadəçi tapılmadı: $id") }
 
+    // Kriptoqrafik cəhətdən təhlükəsiz təsadüfi parol yaradır. Qarışdırıcı
+    // ola bilən simvollar (böyük I/O, kiçik l, rəqəm 0/1) PASSWORD_CHARS
+    // siyahısından bilərəkdən çıxarılıb ki, admin parolu əl ilə köçürəndə səhv etməsin.
     private fun generateRandomPassword(): String {
         val sb = StringBuilder(GENERATED_PASSWORD_LENGTH)
         repeat(GENERATED_PASSWORD_LENGTH) {
@@ -261,6 +307,9 @@ class AdminService(
         return sb.toString()
     }
 
+    // Yalnız STUDENT rolunda "həll edilmiş problem sayı" mənalıdır —
+    // TEACHER/ADMIN üçün bu sahə həmişə 0 qaytarılır (əlavə, faydasız
+    // sorğu aparmamaq üçün).
     private fun toDetailDto(u: User): AdminUserDetailDto {
         val solved = if (u.role == Role.STUDENT) submissionRepository.countDistinctSolvedProblems(u) else 0L
         return AdminUserDetailDto(
@@ -270,6 +319,8 @@ class AdminService(
     }
 
     companion object {
+        // Böyük I/O, kiçik l və rəqəm 0/1 kimi vizual cəhətdən qarışdırıla
+        // bilən simvollar BİLƏRƏKDƏN çıxarılıb (bax: generateRandomPassword).
         private const val PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789"
         private const val GENERATED_PASSWORD_LENGTH = 14
     }

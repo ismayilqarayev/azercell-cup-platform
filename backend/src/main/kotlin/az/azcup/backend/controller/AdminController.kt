@@ -26,9 +26,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+// "/api/admin" prefiksi altında — SecurityConfig bu bütün yolu (GET
+// /api/admin/users istisna olmaqla, o həm TEACHER-ə açıqdır) yalnız ADMIN
+// roluna açır. Faktiki iş məntiqi AdminService-dədir, burada sadəcə
+// HTTP <-> DTO uyğunlaşdırması var.
 @RestController
 @RequestMapping("/api/admin")
 class AdminController(private val adminService: AdminService) {
+
+    // ---------- Mövzu (Topic) CRUD ----------
 
     @PostMapping("/topics")
     fun createTopic(@Valid @RequestBody request: TopicUpsertRequest): ResponseEntity<AdminTopicDto> =
@@ -44,6 +50,8 @@ class AdminController(private val adminService: AdminService) {
         return ResponseEntity.noContent().build()
     }
 
+    // ---------- Problem CRUD ----------
+
     @PostMapping("/problems")
     fun createProblem(@Valid @RequestBody request: ProblemUpsertRequest): ResponseEntity<AdminProblemDto> =
         ResponseEntity.status(HttpStatus.CREATED).body(adminService.createProblem(request))
@@ -58,6 +66,10 @@ class AdminController(private val adminService: AdminService) {
         return ResponseEntity.noContent().build()
     }
 
+    // ---------- İstifadəçi idarəetməsi ----------
+
+    // Bu endpoint həm ADMIN, həm TEACHER-ə açıqdır (bax: SecurityConfig) —
+    // müəllim şagird siyahısını görə bilməlidir, amma dəyişiklik edə bilməz.
     @GetMapping("/users")
     fun listStudents(): List<AdminUserDto> = adminService.listStudents()
 
@@ -88,6 +100,9 @@ class AdminController(private val adminService: AdminService) {
         @Valid @RequestBody request: UserProfileUpdateRequest
     ): AdminUserDetailDto = adminService.updateProfile(id, request)
 
+    // principal.user.id — bunu edən adminin öz ID-si AdminService-ə ötürülür
+    // ki, "özünü admin olmayan rola dəyişmə" kimi hallar bloklana bilsin
+    // (bax: AdminService.changeRole).
     @PutMapping("/users/{id}/role")
     fun changeUserRole(
         @PathVariable id: Long,
@@ -102,6 +117,8 @@ class AdminController(private val adminService: AdminService) {
         @AuthenticationPrincipal principal: UserPrincipal
     ): AdminUserDetailDto = adminService.setActive(id, request.active, principal.user.id!!)
 
+    // request(required = false) — gövdə tamamilə boş göndərilə bilər
+    // (admin sadəcə "təsadüfi parol yarat" istəyəndə).
     @PostMapping("/users/{id}/reset-password")
     fun resetUserPassword(
         @PathVariable id: Long,

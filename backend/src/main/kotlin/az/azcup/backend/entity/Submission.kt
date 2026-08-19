@@ -15,6 +15,10 @@ import jakarta.persistence.PrePersist
 import jakarta.persistence.Table
 import java.time.Instant
 
+// Bir şagirdin bir problemə göndərdiyi TƏK BİR kod təqdimatını (submission)
+// təmsil edir — JudgeService onu compile edib icra etdikdən sonra nəticə
+// (status, stdout, stderr, icra vaxtı) bura yazılır. Şagirdin tarixçəsi və
+// irəliləyişi (bax: ProgressDto) bu cədvəldəki sətirlərdən hesablanır.
 @Entity
 @Table(name = "submission")
 class Submission(
@@ -30,6 +34,8 @@ class Submission(
     @JoinColumn(name = "problem_id", nullable = false)
     var problem: Problem? = null,
 
+    // @Lob — kod potensial olaraq uzun ola biləcəyi üçün adi VARCHAR yerinə
+    // "böyük obyekt" sütun tipi istifadə olunur (TEXT-ə uyğun gəlir).
     @Lob
     @Column(nullable = false)
     var sourceCode: String = "",
@@ -38,6 +44,7 @@ class Submission(
     @Column(nullable = false)
     var status: SubmissionStatus? = null,
 
+    // Kompilyasiya uğursuz olarsa stdout boş qala bilər — ona görə nullable.
     @Lob
     var stdout: String? = null,
 
@@ -49,6 +56,8 @@ class Submission(
     @Column(nullable = false, updatable = false)
     var submittedAt: Instant? = null
 ) {
+    // Bax: User.onCreate() — eyni məntiq, sətir bazaya yazılmazdan əvvəl
+    // vaxt möhürünü avtomatik təyin edir.
     @PrePersist
     fun onCreate() {
         if (submittedAt == null) {

@@ -12,6 +12,8 @@ import az.azcup.backend.repository.TopicRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+// Şagirdin kod göndərməsini idarə edir: yoxlatdırır (JudgeService), nəticəni
+// bazaya yazır və irəliləyiş statistikasını hesablayır.
 @Service
 class SubmissionService(
     private val submissionRepository: SubmissionRepository,
@@ -21,8 +23,13 @@ class SubmissionService(
     private val judgeService: JudgeService
 ) {
 
+    // Kodu qəbul edir, compile+icra etdirir (JudgeService.judge) və nəticəni
+    // (uğurlu da olsa, uğursuz da) DAİMİ olaraq bazaya yazır — beləliklə
+    // tarixçə (history) heç vaxt boş qalmır, hətta kompilyasiya xətası olsa belə.
     @Transactional
     fun submit(problemId: Long, user: User, sourceCode: String): SubmissionResponse {
+        // getEntity() daxildə "bu problem hələ açıq olmayan mövzudadırsa,
+        // STUDENT ona kod göndərə bilməz" qaydasını da tətbiq edir.
         val problem = problemService.getEntity(problemId, user)
         val result = judgeService.judge(sourceCode, problem)
 
@@ -39,6 +46,7 @@ class SubmissionService(
         return toResponse(submission)
     }
 
+    // Bu istifadəçinin bu problemə etdiyi bütün cəhdlərin tarixçəsi.
     @Transactional(readOnly = true)
     fun history(problemId: Long, user: User): List<SubmissionResponse> {
         val problem = problemService.getEntity(problemId, user)
@@ -46,6 +54,10 @@ class SubmissionService(
             .map { toResponse(it) }
     }
 
+    // Hər mövzu üzrə "cəmi neçə problem var, onlardan neçəsini bu istifadəçi
+    // həll edib" statistikası — TopicService.listTopics-dəki eyni məntiqin
+    // (STUDENT üçün yalnız dərc olunmuş mövzuları filtrləmə) bir daha
+    // istifadəsi, sadəcə fərqli DTO (ProgressDto) formasında.
     @Transactional(readOnly = true)
     fun progress(user: User): List<ProgressDto> {
         val topics = topicRepository.findAllByOrderByOrderIndexAsc()

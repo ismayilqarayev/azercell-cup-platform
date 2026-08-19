@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 /**
- * Compiles and runs arbitrary C++ code with no backing [az.azcup.backend.entity.Problem] —
- * used by the free-write scratchpad ("Kod yazma sahəsi") so students can try code
- * without it being tied to a specific graded problem.
+ * Arxada heç bir [az.azcup.backend.entity.Problem] olmadan, ixtiyari C++
+ * kodunu compile edib icra edir — "Kod yazma sahəsi" (sərbəst scratchpad)
+ * bunu istifadə edir ki, şagird konkret qiymətləndirilən problemə bağlı
+ * olmadan da kodunu sınaya bilsin.
  */
 @RestController
 class RunController(private val judgeService: JudgeService) {

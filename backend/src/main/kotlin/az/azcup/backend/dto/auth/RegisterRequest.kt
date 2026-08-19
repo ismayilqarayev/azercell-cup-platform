@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
+// "POST /api/auth/register" gövdəsi. Parol üçün minimum 8 simvol tələbi
+// @Size ilə tətbiq olunur. role sahəsi nullable-dır — AuthService-də,
+// göndərilməyibsə default olaraq STUDENT təyin edilir (bax: AuthService.register).
 data class RegisterRequest(
     @field:NotBlank val fullName: String,
     @field:NotBlank @field:Email val email: String,

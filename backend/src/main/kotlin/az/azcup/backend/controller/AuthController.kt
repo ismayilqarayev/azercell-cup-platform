@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+// Qeydiyyat, giriş və "mən kiməm" sorğusu — yeganə tam AÇIQ (login tələb
+// etməyən) endpoint-lər /register və /login-dir (bax: SecurityConfig).
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(private val authService: AuthService) {
@@ -28,6 +30,10 @@ class AuthController(private val authService: AuthService) {
     @PostMapping("/login")
     fun login(@Valid @RequestBody request: LoginRequest): AuthResponse = authService.login(request)
 
+    // Frontend səhifə açılanda (yenilənəndə) hazırkı istifadəçinin kim
+    // olduğunu bilmək üçün çağırır — token localStorage-da saxlanılır,
+    // amma "bu token kimə aiddir və hələ etibarlıdırmı" sualının cavabı
+    // yalnız server-dən gələ bilər.
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     fun me(@AuthenticationPrincipal principal: UserPrincipal): MeResponse {
@@ -35,5 +41,7 @@ class AuthController(private val authService: AuthService) {
         return MeResponse(user.id, user.fullName, user.email, user.role)
     }
 
+    // Kiçik, yalnız bu endpoint-ə aid cavab tipi olduğu üçün ayrıca fayl
+    // yaratmaq əvəzinə birbaşa controller daxilində təyin olunub.
     data class MeResponse(val id: Long?, val fullName: String, val email: String, val role: Role?)
 }

@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
+// Qeydiyyat və giriş (login) biznes-məntiqi. AuthController birbaşa bunu çağırır.
 @Service
 class AuthService(
     private val userRepository: UserRepository,
@@ -27,10 +28,19 @@ class AuthService(
         if (userRepository.existsByEmail(request.email)) {
             throw ConflictException("Bu email artıq qeydiyyatdan keçib")
         }
+        // Rol göstərilməyibsə default STUDENT — açıq qeydiyyat forması
+        // heç kimin özünü rol seçmədən "yüksək səlahiyyətli" edə bilməyəcəyi
+        // ən təhlükəsiz defaultdur.
         val role = request.role ?: Role.STUDENT
+        // ADMIN rolu ilə açıq qeydiyyat formasından qeydiyyatdan keçmək
+        // MÜMKÜN DEYİL — yeganə admin AdminBootstrapRunner vasitəsilə
+        // ilk başlanğıcda yaradılır, sonradan yalnız mövcud admin başqasını
+        // admin edə bilər (bax: AdminController).
         if (role == Role.ADMIN) {
             throw ConflictException("Bu rolla qeydiyyatdan keçmək mümkün deyil")
         }
+        // Şagirdlər dərhal təsdiqlənir, müəllimlər isə admin təsdiqini gözləməlidir
+        // (saxta müəllim hesablarının qarşısını almaq üçün).
         val approved = role != Role.TEACHER
         val user = User(
             fullName = request.fullName,
@@ -41,26 +51,35 @@ class AuthService(
         )
         userRepository.save(user)
         if (!approved) {
+            // Hesab yaradıldı, amma hələ giriş edə bilməz — token qaytarılmır,
+            // sadəcə "qeydiyyat qəbul edildi, təsdiq gözlənilir" mənasında
+            // istifadəçi məlumatları göstərilir.
             return AuthResponse(null, user.id, user.fullName, user.email, user.role)
         }
         return toAuthResponse(user)
     }
 
     fun login(request: LoginRequest): AuthResponse {
+        // Bu çağırış daxildə CustomUserDetailsService-i işə salıb email/parolu
+        // yoxlayır — uyğunsuzluq olarsa BadCredentialsException atır (bax:
+        // GlobalExceptionHandler.handleBadCredentials).
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(request.email, request.password)
         )
         val user = userRepository.findByEmail(request.email)
             ?: throw IllegalStateException("İstifadəçi tapılmadı")
+        // Parol düzgün olsa belə, təsdiqlənməmiş müəllim daxil ola bilmir.
         if (user.role == Role.TEACHER && !user.approved) {
             throw ApiException(HttpStatus.FORBIDDEN, "Hesabınız hələ admin tərəfindən təsdiqlənməyib.")
         }
+        // Admin tərəfindən deaktiv edilmiş (bloklanmış) hesablar da rədd edilir.
         if (!user.active) {
             throw ApiException(HttpStatus.FORBIDDEN, "Hesabınız admin tərəfindən deaktiv edilib.")
         }
         return toAuthResponse(user)
     }
 
+    // İstifadəçi üçün yeni JWT yaradıb, onu AuthResponse formasına çevirir.
     private fun toAuthResponse(user: User): AuthResponse =
         AuthResponse(
             jwtService.generateToken(user),

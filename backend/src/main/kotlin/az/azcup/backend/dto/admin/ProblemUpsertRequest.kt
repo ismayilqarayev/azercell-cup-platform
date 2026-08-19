@@ -4,6 +4,10 @@ import az.azcup.backend.entity.Difficulty
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
+// "Upsert" — həm YARATMA (POST), həm YENİLƏMƏ (PUT) üçün eyni gövdə forması
+// istifadə olunur (bax: AdminController.createProblem/updateProblem).
+// Vacib sahələr (@NotBlank/@NotNull) admin panelindən yarımçıq problem
+// yaradılmasının qarşısını alır.
 data class ProblemUpsertRequest(
     @field:NotBlank val topicSlug: String,
     @field:NotNull val orderIndex: Int?,
