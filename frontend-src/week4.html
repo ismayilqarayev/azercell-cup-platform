@@ -85,7 +85,13 @@
   .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; margin-bottom:8px; }
   .difficulty.easy{ color:var(--green-text); }
   .difficulty.mid{ color:var(--bronze-text); }
-  .problem-body{ padding:0 18px 16px; }
+  .problem-body{ padding:0 18px 16px; display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
   .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
   .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
   .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
@@ -2494,40 +2500,44 @@ problems.forEach((p, i) => {
         <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
         <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
         <div class="problem-body">
-          <p>${p.statement}</p>
-          <div class="io-grid">
-            <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
-            <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
-          </div>
-          <div class="io-grid">
-            <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
-            <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
-          </div>
-          <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-          <div class="solution-inner approach-block">
-            <p class="sub-label">Yanaşma</p>
-            <p class="approach">${p.approach}</p>
-          </div>
-          <div class="submit-panel">
-            <p class="sub-label">Kodunu göndər</p>
-            <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
-            <div class="submit-row">
-              <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
-              <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
-              <span class="submit-hint" id="hint-${i}"></span>
+          <div class="problem-left">
+            <p>${p.statement}</p>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+              <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
             </div>
-            <div class="history-list" id="history-${i}"></div>
-            <div class="verdict" id="verdict-${i}">
-              <span class="verdict-badge" id="badge-${i}"></span>
-              <div class="io-grid">
-                <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
-                <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+              <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+            </div>
+            <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+            <div class="solution-inner approach-block">
+              <p class="sub-label">Yanaşma</p>
+              <p class="approach">${p.approach}</p>
+            </div>
+            <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+              <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+            </button>
+          </div>
+          <div class="problem-right">
+            <div class="submit-panel">
+              <p class="sub-label">Kodunu göndər</p>
+              <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
+              <div class="submit-row">
+                <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+                <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+                <span class="submit-hint" id="hint-${i}"></span>
+              </div>
+              <div class="history-list" id="history-${i}"></div>
+              <div class="verdict" id="verdict-${i}">
+                <span class="verdict-badge" id="badge-${i}"></span>
+                <div class="io-grid">
+                  <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+                  <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+                </div>
               </div>
             </div>
           </div>
-          <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
-            <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
-          </button>
         </div>
       </div>
     </div>

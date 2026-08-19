@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/azcup
     username: azcup
-    password: azcup
+    password: ${DB_PASSWORD:azcup}
   jpa:
     hibernate:
       ddl-auto: update

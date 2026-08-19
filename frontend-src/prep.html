@@ -81,6 +81,7 @@
   /* Bütün səhifə məzmununu ortalayan və maksimum eni 1000px-lə məhdudlaşdıran
      əsas konteyner. Yuxarı/aşağı padding səhifənin kənarlarında boşluq yaradır. */
   .wrap{ max-width:1000px; margin:0 auto; padding:36px 20px 100px; }
+  .wrap:has(.roadmap-split){ max-width:1360px; }
 
   /* ==========================================================================
      BAŞLIQ BLOKU (TITLE BLOCK) — mühəndislik çertyojlarının küncündəki
@@ -224,6 +225,14 @@
     align-items:center;
     gap:12px;
     margin:56px 0 18px;
+  }
+  /* Yol xəritəsini bir az sola sıxıb, sağ tərəfə sabit (sticky) kod yazma
+     sahəsi yerləşdirən əsas iki-sütunlu düzülüş. */
+  .roadmap-split{ display:grid; grid-template-columns:1fr 360px; gap:28px; align-items:start; }
+  .roadmap-split-right{ position:sticky; top:20px; }
+  @media (max-width:1100px){
+    .roadmap-split{ grid-template-columns:1fr; }
+    .roadmap-split-right{ position:static; }
   }
   .roadmap-layout{ display:flex; gap:22px; align-items:flex-start; }
   .roadmap-nav{
@@ -462,14 +471,129 @@
     color:var(--ink);
   }
   .topic-codes{ display:flex; flex-direction:column; gap:14px; margin-top:6px; }
-  .topic-code-item{ display:flex; flex-direction:column; gap:6px; }
+  .topic-code-item{
+    display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start;
+  }
+  @media (max-width: 900px){
+    .topic-code-item{ grid-template-columns:1fr; }
+  }
+  .topic-code-left{ min-width:0; }
   .topic-code-title{
     font-size:13px;
     font-weight:600;
     color:var(--bronze-text);
-    margin:0;
+    margin:0 0 6px;
     line-height:1.4;
   }
+  /* Sağ tərəfdəki sərbəst kod yazma (təcrübə) sahəsi — heç bir yoxlama/göndərmə
+     etmir, sadəcə tələbənin nümunə kodu dəyişdirib özü sınaya bilməsi üçündür. */
+  .topic-code-right{
+    position:sticky; top:16px; display:flex; flex-direction:column; gap:6px;
+  }
+  .scratch-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--bronze-text); margin:0;
+  }
+  .scratch-input{
+    width:100%; min-height:140px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px; resize:vertical; outline:none; box-sizing:border-box;
+  }
+  .scratch-input:focus{ border-color:var(--gold); }
+  .scratch-hint{ font-size:11px; color:var(--ink-soft); margin:0; }
+
+  /* Səhifənin yuxarısında, hər kəsə açıq, ümumi sərbəst kod yazma paneli */
+  .free-code-panel{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+
+  /* ==========================================================================
+     VS CODE ÜSLUBUNDA KOD EDİTORU
+     --------------------------------------------------------------------------
+     Canlı rəngli (syntax-highlight) editor: şəffaf mətnli <textarea> arxasında
+     eyni ölçülü <pre> qatı hərfləri rəngləndirir (overlay texnikası). Bunlara
+     əlavə olaraq: sətir nömrələri qutter-i, aktiv sətir vurğusu və VS Code
+     "Dark+" temasına bənzər rənglər. Padding/font/line-height dəyərləri
+     <pre> və <textarea> arasında PİKSEL DƏQİQLİYİ İLƏ eyni olmalıdır, əks
+     halda kursor mövqeyi ilə görünən mətn üst-üstə düşmür.
+     ========================================================================== */
+  .code-editor-wrap{
+    display:flex; background:#1e1e1e; border:1px solid #2d2d2d; border-radius:6px;
+    overflow:hidden; transition:border-color 0.15s ease; height:460px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.35);
+  }
+  .code-editor-wrap:focus-within{ border-color:#007acc; }
+  .code-editor-gutter{
+    flex-shrink:0; width:48px; overflow:hidden; background:#1e1e1e;
+    padding:12px 0; box-sizing:border-box; user-select:none;
+  }
+  .code-editor-gutter-inner{ will-change:transform; }
+  .code-editor-gutter-line{
+    font-family:var(--mono); font-size:14px; line-height:1.6; height:22.4px;
+    text-align:right; padding-right:12px; color:#5a5a5a;
+  }
+  .code-editor-gutter-line.active{ color:#c6c6c6; }
+  .code-editor-scroll{ position:relative; flex:1; min-width:0; }
+  .code-editor-active-line{
+    position:absolute; left:0; right:0; height:22.4px;
+    background:rgba(255,255,255,0.045); pointer-events:none;
+  }
+  .code-editor-highlight, .code-editor-textarea{
+    margin:0; box-sizing:border-box; width:100%; height:100%;
+    padding:12px 14px; font-family:var(--mono); font-size:14px; line-height:1.6;
+    white-space:pre; overflow:auto; tab-size:4;
+  }
+  .code-editor-highlight{
+    position:absolute; top:0; left:0; pointer-events:none;
+    color:#d4d4d4; background:transparent;
+  }
+  /* VS Code "Dark+" temasına bənzər token rəngləri */
+  .code-editor-highlight .cmt{ color:#6a9955; font-style:italic; }
+  .code-editor-highlight .kw{ color:#569cd6; font-weight:400; }
+  .code-editor-highlight .tp{ color:#4ec9b0; }
+  .code-editor-highlight .str{ color:#ce9178; }
+  .code-editor-highlight .num{ color:#b5cea8; }
+  .code-editor-highlight .pp{ color:#c586c0; }
+  /* Yazarkən görünən boz rəngli "təklif" (ghost) mətni — Tab ilə qəbul edilir */
+  .code-editor-highlight .ghost-suggestion{ color:#6f6f6f; opacity:0.8; }
+  .code-editor-textarea{
+    position:relative; z-index:1; background:transparent; color:transparent;
+    caret-color:#aeafad; border:none; outline:none; resize:none;
+  }
+  .code-editor-textarea::placeholder{ color:#5a5a5a; -webkit-text-fill-color:#5a5a5a; }
+
+  /* ---------- Run düyməsi, stdin sahəsi və nəticə paneli ---------- */
+  .run-row{ display:flex; align-items:center; gap:10px; margin-top:10px; }
+  .run-btn{
+    font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:4px;
+    padding:9px 18px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .run-btn:hover{ background:var(--bronze); }
+  .run-btn:disabled{ opacity:0.6; cursor:default; }
+  .run-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .stdin-details{ margin-top:10px; }
+  .stdin-details summary{
+    cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:0.5px;
+    color:var(--bronze-text); padding:2px 0;
+  }
+  .stdin-input{
+    width:100%; min-height:70px; margin-top:6px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:8px 10px; resize:vertical; outline:none; box-sizing:border-box;
+  }
+  .stdin-input:focus{ border-color:var(--gold); }
+  .run-output{ margin-top:12px; }
+  .run-status-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .run-status-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .run-status-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .run-status-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .run-status-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:12.5px; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
   .week-body li{ margin-bottom:4px; font-size:14px; line-height:1.5; }
   /* Hər mövzu kartının sonunda görünən "Testi həll et" düyməsi — mövzu ilə
      test vərəqi arasında körpü rolunu oynayır. Aktiv olanda kliklənəndə
@@ -478,10 +602,10 @@
   .topic-test-row{ margin-top:14px; }
   .test-btn{
     display:inline-flex; align-items:center; gap:8px;
-    font-family:var(--mono); font-size:12px; letter-spacing:0.5px;
+    font-family:var(--mono); font-size:14px; font-weight:700; letter-spacing:0.5px;
     color:var(--on-accent); background:var(--gold-bright);
     border:1px solid var(--gold); border-radius:4px;
-    padding:8px 14px; cursor:pointer;
+    padding:12px 20px; cursor:pointer; width:100%; justify-content:center;
     transition:background 0.15s ease, transform 0.15s ease;
   }
   .test-btn:hover{ background:var(--bronze); transform:translateY(-1px); }
@@ -625,10 +749,49 @@
     <p>Qiymətləndirmə üçün tövsiyə: hər mövzu sonu şagirdə 2-3 yeni məsələ verilib, onun izahı ilə birlikdə həll etməsi istənilə bilər (bu, sadəcə cavabı əzbərləmədiyini göstərir). 16 mövzunun bitməsindən sonra tam sınaq imtahanı formatında (3 saat, 5 məsələ, nəzarətli şərait) bir neçə məşq keçirilməlidir ki, şagird real müsabiqə gərginliyinə adaptasiya olsun.</p>
   </div>
 
-  <div class="section-label">Yol xəritəsi</div>
-  <div class="roadmap-layout">
-    <div class="roadmap-nav" id="roadmapNav"></div>
-    <div class="roadmap" id="roadmap"></div>
+  <div class="roadmap-split">
+    <div class="roadmap-split-left">
+      <div class="section-label">Yol xəritəsi</div>
+      <div class="roadmap-layout">
+        <div class="roadmap-nav" id="roadmapNav"></div>
+        <div class="roadmap" id="roadmap"></div>
+      </div>
+    </div>
+    <div class="roadmap-split-right">
+      <div class="section-label">Kod yazma sahəsi</div>
+      <div class="free-code-panel">
+        <p class="scratch-hint">Bura istədiyin C++ kodunu yaza, sına, qaralama apara bilərsən — yazdığın avtomatik yadda saxlanılır (səhifəni bağlayıb açsan da qalır). "Run" düyməsi kodu server-də compile edib icra edir. Konkret məsələni qiymətləndirmək üçün mövzu kartlarındakı "Test i-ni həll et" düyməsindən istifadə et.</p>
+        <div class="code-editor-wrap">
+          <div class="code-editor-gutter" id="freeCodeGutter"></div>
+          <div class="code-editor-scroll">
+            <div class="code-editor-active-line" id="freeCodeActiveLine"></div>
+            <pre class="code-editor-highlight" aria-hidden="true"><code id="freeCodeHighlight"></code></pre>
+            <textarea class="code-editor-textarea" id="freeCodeArea" spellcheck="false" placeholder="#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+
+    return 0;
+}"></textarea>
+          </div>
+        </div>
+        <div class="run-row">
+          <button type="button" class="run-btn" id="freeRunBtn" onclick="runFreeCode()">▶ Run</button>
+          <span class="run-hint" id="freeRunHint"></span>
+        </div>
+        <details class="stdin-details">
+          <summary>Giriş (stdin) — sınamaq üçün istəyə bağlı məlumat</summary>
+          <textarea class="stdin-input" id="freeStdinArea" spellcheck="false" placeholder="Proqram cin >> ilə oxuyacaqsa, sınaq üçün girişi bura yaz"></textarea>
+        </details>
+        <div class="run-output" id="freeRunOutput" style="display:none;">
+          <span class="run-status-badge" id="freeRunStatus"></span>
+          <div class="io-grid">
+            <div class="io-box"><div class="lbl">STDOUT</div><pre id="freeRunStdout"></pre></div>
+            <div class="io-box"><div class="lbl">STDERR</div><pre id="freeRunStderr"></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="section-label">Platformalar və mənbələr</div>
@@ -2324,17 +2487,26 @@ weeks.forEach((w, i) => {
         ${w.topicCodes ? `
         <h4>Mövzu üzrə kod nümunələri (C++)</h4>
         <div class="topic-codes">
-          ${w.topicCodes.map(tc => `
+          ${w.topicCodes.map(tc => {
+            const scratchId = 'scratch' + (codeLineUid++);
+            return `
             <div class="topic-code-item">
-              <p class="topic-code-title">${tc.topic}</p>
-              ${renderCodeBlock(tc.code)}
+              <div class="topic-code-left">
+                <p class="topic-code-title">${tc.topic}</p>
+                ${renderCodeBlock(tc.code)}
+              </div>
+              <div class="topic-code-right">
+                <p class="scratch-label">Öz kodunu yaz / sına</p>
+                <textarea class="scratch-input" id="${scratchId}" spellcheck="false">${escapeHtml(tc.code)}</textarea>
+                <p class="scratch-hint">Bura sərbəst yaza bilərsən — qeydə alınmır. Yoxlanılıb qiymətləndirilmək üçün aşağıdakı "Test ${i+1}-i həll et" düyməsindən istifadə et.</p>
+              </div>
             </div>
-          `).join('')}
+          `;}).join('')}
         </div>` : ''}
         <div class="tag-row"><span class="tag">${w.tag}</span>${w.hard ? `<span class="hard-badge">🔴 ÇƏTİN</span>` : ''}</div>
         <div class="topic-test-row">
           ${TEST_TABS[i] !== undefined
-            ? `<button type="button" class="test-btn" id="test-btn-${i}" onclick="window.parent.showTab('${TEST_TABS[i]}')">📝 Test ${i+1}-i həll et</button>`
+            ? `<button type="button" class="test-btn" id="test-btn-${i}" onclick="window.parent.showTab('${TEST_TABS[i]}')">📝 Test ${i+1}-i həll et (kodu göndər və yoxlat)</button>`
             : `<button type="button" class="test-btn test-btn-disabled" disabled>📝 Test ${i+1} (tezliklə)</button>`}
         </div>
       </div>
@@ -2433,6 +2605,267 @@ resources.forEach(r => {
   el.innerHTML = `<div class="name">${r.name}</div><div class="desc">${r.desc}</div><a href="${r.url}" target="_blank" rel="noopener">${r.url.replace('https://','')}</a>`;
   resEl.appendChild(el);
 });
+
+/* ============================================================================
+   RUN DÜYMƏSİ — sərbəst kod yazma sahəsindəki kodu backend-in /api/run
+   endpoint-inə göndərib compile+icra etdirir (heç bir problem/qiymətləndirmə
+   ilə bağlı deyil, sadəcə "kodu işə sal və nəticəni göstər").
+   ============================================================================ */
+const RUN_STATUS_LABELS = {
+  ACCEPTED: '✓ İCRA OLUNDU',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+async function runFreeCode(){
+  const btn = document.getElementById('freeRunBtn');
+  const hint = document.getElementById('freeRunHint');
+  const sourceCode = document.getElementById('freeCodeArea').value;
+  const stdin = document.getElementById('freeStdinArea').value;
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Kodu icra etmək üçün daxil ol.';
+    return;
+  }
+  if (!sourceCode.trim()){
+    hint.textContent = 'Əvvəlcə kod yaz.';
+    return;
+  }
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və icra olunur...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/run', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode, stdin }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'İcra uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const outputEl = document.getElementById('freeRunOutput');
+    const statusEl = document.getElementById('freeRunStatus');
+    outputEl.style.display = 'block';
+    statusEl.className = 'run-status-badge ' + data.status;
+    statusEl.textContent = (RUN_STATUS_LABELS[data.status] || data.status) + ' · ' + data.executionTimeMs + ' ms';
+    document.getElementById('freeRunStdout').textContent = data.stdout || '';
+    document.getElementById('freeRunStderr').textContent = data.stderr || '';
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================================
+   SƏRBƏST KOD YAZMA SAHƏSİ (freeCodeArea) — canlı rəngləmə + avtomatik yadda saxlama
+   ----------------------------------------------------------------------------
+   1. Səhifə açılanda localStorage-dan əvvəlki kod bərpa olunur (varsa).
+   2. Hər yazıda: (a) localStorage-a yazılır, (b) arxadakı <pre> elementi
+      highlightCppLine ilə yenidən rənglənir (overlay texnikası: textarea-nın
+      mətni şəffafdır, görünən rəngli mətn altındakı <pre>-dəndir).
+   3. Scroll sinxronu: textarea sürüşdürüləndə altdakı <pre> də eyni mövqeyə
+      sürüşdürülür ki, rənglənmiş mətn kursor ilə üst-üstə düşsün.
+   ============================================================================ */
+/* ============================================================================
+   C++ SNİPPET (TAMAMLAMA) LÜĞƏTİ
+   ----------------------------------------------------------------------------
+   Açar (key) — tetikləyici söz (kursordan əvvəlki yazılan hərflər onun prefiksi
+   olmalıdır). Dəyər (value) HƏMİŞƏ açarın özü ilə başlamalıdır ki, "yazılan
+   hissədən sonra qalan hissə" (ghost mətn) düzgün hesablansın:
+     remainder = value.slice(yazılanSözünUzunluğu)
+   ============================================================================ */
+const CPP_SNIPPETS = {
+  for: "for (int i = 0; i < n; i++) {\n        \n    }",
+  while: "while (condition) {\n        \n    }",
+  if: "if (condition) {\n        \n    }",
+  cin: "cin >> ",
+  cout: "cout << ",
+  include: "include <bits/stdc++.h>",
+  vector: "vector<int> v;",
+  main: "main(){\n    \n    return 0;\n}",
+  struct: "struct Node {\n        \n};",
+  map: "map<int,int> mp;",
+  sort: "sort(v.begin(), v.end());",
+  endl: "endl;",
+};
+
+const BRACKET_PAIRS = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+const BRACKET_CLOSERS = new Set(Object.values(BRACKET_PAIRS));
+
+(function initFreeCodeEditor(){
+  const ta = document.getElementById('freeCodeArea');
+  const hl = document.getElementById('freeCodeHighlight');
+  const gutter = document.getElementById('freeCodeGutter');
+  const activeLineEl = document.getElementById('freeCodeActiveLine');
+  if (!ta || !hl || !gutter) return;
+  const STORAGE_KEY = 'azcup_free_code_v1';
+  const LINE_HEIGHT = 22.4; // .code-editor-highlight/-textarea line-height (14px * 1.6) ilə eyni olmalıdır
+
+  // Kursordan əvvəlki "söz"ü (yalnız hərflər/altxətt) və onun başlanğıc
+  // indeksini tapır — bu, hansı snippet-in tetiklənəcəyini müəyyən etmək üçündür.
+  function wordBeforeCursor(text, pos){
+    let start = pos;
+    while (start > 0 && /[A-Za-z_]/.test(text[start - 1])) start--;
+    return { word: text.slice(start, pos), start };
+  }
+
+  // Hazırda kursorun mövqeyinə uyğun aktiv snippet təklifini hesablayır.
+  // Seçim şərtiliyi olmayanda (boşluq seçilibsə, söz çox qısadırsa, kursordan
+  // sonra hərf gəlirsə və s.) null qaytarır.
+  function computeSuggestion(){
+    if (ta.selectionStart !== ta.selectionEnd) return null;
+    const pos = ta.selectionStart;
+    const text = ta.value;
+    if (/[A-Za-z0-9_]/.test(text[pos] || '')) return null; // sözün ortasındayıq
+    const { word, start } = wordBeforeCursor(text, pos);
+    if (word.length < 2) return null;
+    const lower = word.toLowerCase();
+    const key = Object.keys(CPP_SNIPPETS).find(k => k.startsWith(lower) && CPP_SNIPPETS[k].length > word.length);
+    if (!key) return null;
+    const full = CPP_SNIPPETS[key];
+    return { word, wordStart: start, full, remainder: full.slice(word.length) };
+  }
+
+  function buildLineHtml(line, isCursorLine, cursorCol, suggestion){
+    if (!isCursorLine || !suggestion) return highlightCppLine(line);
+    const left = line.slice(0, cursorCol);
+    const right = line.slice(cursorCol);
+    return highlightCppLine(left)
+      + '<span class="ghost-suggestion">' + escapeHtml(suggestion.remainder) + '</span>'
+      + highlightCppLine(right);
+  }
+
+  function renderHighlight(){
+    const text = ta.value;
+    const lines = text.split('\n');
+    const pos = ta.selectionStart;
+    let cursorLineIdx = 0, cursorCol = 0, count = 0;
+    for (let i = 0; i < lines.length; i++){
+      if (pos <= count + lines[i].length){ cursorLineIdx = i; cursorCol = pos - count; break; }
+      count += lines[i].length + 1;
+    }
+    const suggestion = computeSuggestion();
+    hl.innerHTML = lines.map((line, idx) => buildLineHtml(line, idx === cursorLineIdx, cursorCol, suggestion)).join('\n');
+
+    // Sətir nömrələri qutter-i (VS Code-dakı kimi) yenidən qurulur
+    gutter.innerHTML = '<div class="code-editor-gutter-inner" id="freeCodeGutterInner">'
+      + lines.map((_, idx) => `<div class="code-editor-gutter-line${idx === cursorLineIdx ? ' active' : ''}">${idx + 1}</div>`).join('')
+      + '</div>';
+
+    // Aktiv sətir vurğusu, kursorun olduğu sətrin mövqeyinə qoyulur
+    activeLineEl.style.top = (cursorLineIdx * LINE_HEIGHT) + 'px';
+
+    return suggestion;
+  }
+  function syncScroll(){
+    hl.parentElement.scrollTop = ta.scrollTop;
+    hl.parentElement.scrollLeft = ta.scrollLeft;
+    const inner = document.getElementById('freeCodeGutterInner');
+    if (inner) inner.style.transform = 'translateY(' + (-ta.scrollTop) + 'px)';
+  }
+
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved !== null) ta.value = saved;
+  renderHighlight();
+
+  ta.addEventListener('input', () => {
+    renderHighlight();
+    syncScroll();
+    localStorage.setItem(STORAGE_KEY, ta.value);
+  });
+  ta.addEventListener('scroll', syncScroll);
+  ta.addEventListener('click', renderHighlight);
+  ta.addEventListener('keyup', (e) => {
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) renderHighlight();
+  });
+
+  // VS Code-a bənzər davranışlar: Tab (təklifi qəbul et / indent),
+  // avtomatik mötərizə/dırnaq bağlama, Enter-də avtomatik indent.
+  ta.addEventListener('keydown', (e) => {
+    const start = ta.selectionStart, end = ta.selectionEnd;
+
+    if (e.key === 'Tab'){
+      e.preventDefault();
+      const suggestion = computeSuggestion();
+      if (suggestion){
+        const before = ta.value.slice(0, suggestion.wordStart);
+        const after = ta.value.slice(start);
+        ta.value = before + suggestion.full + after;
+        ta.selectionStart = ta.selectionEnd = suggestion.wordStart + suggestion.full.length;
+      } else {
+        ta.value = ta.value.slice(0, start) + '    ' + ta.value.slice(end);
+        ta.selectionStart = ta.selectionEnd = start + 4;
+      }
+      renderHighlight();
+      localStorage.setItem(STORAGE_KEY, ta.value);
+      return;
+    }
+
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      const text = ta.value;
+      const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+      const currentLine = text.slice(lineStart, start);
+      const indentMatch = currentLine.match(/^[ \t]*/);
+      const baseIndent = indentMatch ? indentMatch[0] : '';
+      const opensBlock = /[{([]\s*$/.test(currentLine);
+      const closesRightAfter = BRACKET_CLOSERS.has(text[start] || '') && opensBlock;
+      let insert, newPos;
+      if (closesRightAfter){
+        // { kursor burda } → Enter basanda araya boş, indentli sətir düşür, } öz sətrinə enir
+        insert = '\n' + baseIndent + '    ' + '\n' + baseIndent;
+        newPos = start + 1 + baseIndent.length + 4;
+      } else if (opensBlock){
+        insert = '\n' + baseIndent + '    ';
+        newPos = start + insert.length;
+      } else {
+        insert = '\n' + baseIndent;
+        newPos = start + insert.length;
+      }
+      ta.value = text.slice(0, start) + insert + text.slice(end);
+      ta.selectionStart = ta.selectionEnd = newPos;
+      renderHighlight();
+      syncScroll();
+      localStorage.setItem(STORAGE_KEY, ta.value);
+      return;
+    }
+
+    // Açan mötərizə/dırnaq yazılanda qapananını avtomatik əlavə et
+    if (BRACKET_PAIRS[e.key] && start === end){
+      e.preventDefault();
+      const closer = BRACKET_PAIRS[e.key];
+      ta.value = ta.value.slice(0, start) + e.key + closer + ta.value.slice(end);
+      ta.selectionStart = ta.selectionEnd = start + 1;
+      renderHighlight();
+      localStorage.setItem(STORAGE_KEY, ta.value);
+      return;
+    }
+    // Qapanan mötərizə/dırnaq yazılanda, əgər dərhal sonda eyni işarə varsa,
+    // yeni işarə əlavə etmək əvəzinə sadəcə kursoru onun üstündən keçir
+    if (BRACKET_CLOSERS.has(e.key) && start === end && ta.value[start] === e.key){
+      e.preventDefault();
+      ta.selectionStart = ta.selectionEnd = start + 1;
+      renderHighlight();
+      return;
+    }
+    // Backspace: boş cüt mötərizə/dırnaq arasındaykən hər ikisini birdən sil
+    if (e.key === 'Backspace' && start === end && start > 0){
+      const prevChar = ta.value[start - 1];
+      const nextChar = ta.value[start];
+      if (BRACKET_PAIRS[prevChar] === nextChar){
+        e.preventDefault();
+        ta.value = ta.value.slice(0, start - 1) + ta.value.slice(start + 1);
+        ta.selectionStart = ta.selectionEnd = start - 1;
+        renderHighlight();
+        syncScroll();
+        localStorage.setItem(STORAGE_KEY, ta.value);
+        return;
+      }
+    }
+  });
+})();
 
 </script>
 </body>

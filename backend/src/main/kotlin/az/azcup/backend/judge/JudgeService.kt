@@ -72,6 +72,40 @@ class JudgeService(
         }
     }
 
+    /**
+     * Compiles and runs arbitrary source code against caller-supplied stdin,
+     * with no expected-output comparison — used by the free-write scratchpad
+     * ("Kod yazma sahəsi") where there is no backing [Problem].
+     */
+    fun runFree(sourceCode: String?, stdin: String?): JudgeResult {
+        if (sourceCode == null || sourceCode.isBlank()) {
+            throw ApiException(HttpStatus.BAD_REQUEST, "Kod boş ola bilməz")
+        }
+        if (sourceCode.length > maxSourceLength) {
+            throw ApiException(HttpStatus.BAD_REQUEST, "Kod çox uzundur (maksimum $maxSourceLength simvol)")
+        }
+
+        val workDir = workspaceDir.resolve(UUID.randomUUID().toString())
+        try {
+            Files.createDirectories(workDir)
+            val sourceFile = workDir.resolve("main.cpp")
+            Files.writeString(sourceFile, sourceCode, StandardCharsets.UTF_8)
+            val binary = workDir.resolve("main.exe")
+
+            val compileOutcome = compile(sourceFile, binary, workDir)
+            if (!compileOutcome.success) {
+                return JudgeResult(SubmissionStatus.COMPILE_ERROR, "", compileOutcome.stderr, 0)
+            }
+
+            return runNoComparison(binary, workDir, stdin)
+        } catch (e: IOException) {
+            log.error("Judge I/O error", e)
+            throw ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "İcra zamanı server xətası baş verdi")
+        } finally {
+            deleteRecursively(workDir)
+        }
+    }
+
     private data class CompileOutcome(val success: Boolean, val stderr: String)
 
     private fun compile(sourceFile: Path, binary: Path, workDir: Path): CompileOutcome {
@@ -135,6 +169,43 @@ class JudgeService(
         val matches = normalize(stdout) == normalize(expectedOutput)
         val status = if (matches) SubmissionStatus.ACCEPTED else SubmissionStatus.WRONG_ANSWER
         return JudgeResult(status, stdout, stderr, elapsed)
+    }
+
+    /** Same as [runAgainstInput] but with no expected-output comparison — ACCEPTED here just means "ran, exit code 0". */
+    private fun runNoComparison(binary: Path, workDir: Path, input: String?): JudgeResult {
+        val pb = ProcessBuilder(binary.toAbsolutePath().toString())
+        pb.directory(workDir.toFile())
+        val process = pb.start()
+
+        try {
+            process.outputStream.use { stdin ->
+                stdin.write((input ?: "").toByteArray(StandardCharsets.UTF_8))
+            }
+        } catch (ignored: IOException) {
+            // Proqram bütün girişi oxumadan bitə bilər — bu xəta deyil.
+        }
+
+        val stdoutReader = CappedStreamReader.start(process.inputStream, maxOutputBytes)
+        val stderrReader = CappedStreamReader.start(process.errorStream, maxOutputBytes)
+
+        val start = System.currentTimeMillis()
+        val finished = waitQuietly(process, runTimeoutSeconds)
+        val elapsed = System.currentTimeMillis() - start
+
+        if (!finished) {
+            process.destroyForcibly()
+            return JudgeResult(SubmissionStatus.TIME_LIMIT_EXCEEDED, "", "", elapsed)
+        }
+        stdoutReader.join()
+        stderrReader.join()
+
+        val stdout = stdoutReader.result()
+        val stderr = stderrReader.result()
+
+        if (process.exitValue() != 0) {
+            return JudgeResult(SubmissionStatus.RUNTIME_ERROR, stdout, stderr, elapsed)
+        }
+        return JudgeResult(SubmissionStatus.ACCEPTED, stdout, stderr, elapsed)
     }
 
     private class CappedStreamReader private constructor(inStream: InputStream, maxBytes: Int) {
