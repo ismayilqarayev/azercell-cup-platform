@@ -24,17 +24,21 @@ import java.util.List;
 @RequestMapping("/api/teacher")
 public class TeacherController {
 
+    // Mövzu idarəetməsi məntiqi AdminService-də mərkəzləşdirilib, bu controller onu yenidən istifadə edir.
     private final AdminService adminService;
 
+    // Spring tərəfindən inject olunan AdminService-i sahəyə təyin edir.
     public TeacherController(AdminService adminService) {
         this.adminService = adminService;
     }
 
+    // Müəllim panelində idarəetmə üçün bütün mövzuların (dərc statusundan asılı olmayaraq) siyahısını qaytarır.
     @GetMapping("/topics")
     public List<AdminTopicDto> listTopics() {
         return adminService.listTopicsForManagement();
     }
 
+    // Mövzunun dərc (published) statusunu dəyişir.
     @PutMapping("/topics/{id}/publish")
     public AdminTopicDto setPublished(@PathVariable Long id, @RequestBody PublishUpdateRequest request) {
         return adminService.setTopicPublished(id, request.isPublished());

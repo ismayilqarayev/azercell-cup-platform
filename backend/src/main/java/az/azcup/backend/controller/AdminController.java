@@ -36,24 +36,29 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminController {
 
+    // Bütün faktiki admin əməliyyatlarını (CRUD, istifadəçi idarəetməsi) yerinə yetirən servis.
     private final AdminService adminService;
 
+    // Spring tərəfindən inject olunan AdminService-i sahəyə təyin edir.
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
 
     // ---------- Mövzu (Topic) CRUD ----------
 
+    // Yeni mövzu yaradır və 201 CREATED statusu ilə yaradılmış mövzunu qaytarır.
     @PostMapping("/topics")
     public ResponseEntity<AdminTopicDto> createTopic(@Valid @RequestBody TopicUpsertRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createTopic(request));
     }
 
+    // Mövcud mövzunu ID-yə görə yeniləyir.
     @PutMapping("/topics/{id}")
     public AdminTopicDto updateTopic(@PathVariable Long id, @Valid @RequestBody TopicUpsertRequest request) {
         return adminService.updateTopic(id, request);
     }
 
+    // Mövzunu ID-yə görə silir və 204 NO_CONTENT qaytarır.
     @DeleteMapping("/topics/{id}")
     public ResponseEntity<Void> deleteTopic(@PathVariable Long id) {
         adminService.deleteTopic(id);
@@ -62,16 +67,19 @@ public class AdminController {
 
     // ---------- Problem CRUD ----------
 
+    // Yeni problem yaradır və 201 CREATED statusu ilə yaradılmış problemi qaytarır.
     @PostMapping("/problems")
     public ResponseEntity<AdminProblemDto> createProblem(@Valid @RequestBody ProblemUpsertRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createProblem(request));
     }
 
+    // Mövcud problemi ID-yə görə yeniləyir.
     @PutMapping("/problems/{id}")
     public AdminProblemDto updateProblem(@PathVariable Long id, @Valid @RequestBody ProblemUpsertRequest request) {
         return adminService.updateProblem(id, request);
     }
 
+    // Problemi ID-yə görə silir və 204 NO_CONTENT qaytarır.
     @DeleteMapping("/problems/{id}")
     public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
         adminService.deleteProblem(id);
@@ -87,33 +95,39 @@ public class AdminController {
         return adminService.listStudents();
     }
 
+    // Hələ təsdiqlənməmiş (approved=false) müəllim hesablarının siyahısını qaytarır.
     @GetMapping("/pending-teachers")
     public List<AdminUserDto> listPendingTeachers() {
         return adminService.listPendingTeachers();
     }
 
+    // Müəllim hesabını təsdiqləyir (approved=true edir).
     @PostMapping("/teachers/{id}/approve")
     public ResponseEntity<Void> approveTeacher(@PathVariable Long id) {
         adminService.approveTeacher(id);
         return ResponseEntity.noContent().build();
     }
 
+    // Təsdiq gözləyən müəllim hesabını rədd edir (silir).
     @DeleteMapping("/teachers/{id}")
     public ResponseEntity<Void> rejectTeacher(@PathVariable Long id) {
         adminService.rejectTeacher(id);
         return ResponseEntity.noContent().build();
     }
 
+    // Rolundan asılı olmayaraq bütün istifadəçilərin tam siyahısını qaytarır.
     @GetMapping("/users/all")
     public List<AdminUserDetailDto> listAllUsers() {
         return adminService.listAllUsers();
     }
 
+    // Tək bir istifadəçinin tam detallarını ID-yə görə qaytarır.
     @GetMapping("/users/{id}")
     public AdminUserDetailDto getUser(@PathVariable Long id) {
         return adminService.getUser(id);
     }
 
+    // İstifadəçinin ad/e-poçt profilini yeniləyir.
     @PutMapping("/users/{id}")
     public AdminUserDetailDto updateUserProfile(
         @PathVariable Long id,
@@ -160,6 +174,7 @@ public class AdminController {
         return new PasswordResetResponse(newPassword);
     }
 
+    // İstifadəçini silir (özünü silməyə cəhd AdminService tərəfindən bloklanır).
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal principal) {
         adminService.deleteUser(id, principal.getUser().getId());

@@ -20,8 +20,10 @@ import java.util.List;
 @RestController
 public class SubmissionController {
 
+    // Təqdimatlarla bağlı bütün əməliyyatların faktiki icraçısı.
     private final SubmissionService submissionService;
 
+    // Spring tərəfindən inject olunan SubmissionService-i sahəyə təyin edir.
     public SubmissionController(SubmissionService submissionService) {
         this.submissionService = submissionService;
     }

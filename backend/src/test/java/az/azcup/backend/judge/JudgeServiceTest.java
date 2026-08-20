@@ -10,15 +10,23 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// JudgeService-in compile+icra+müqayisə davranışını real g++ kompilyatoru
+// ilə (mock YOX, faktiki proses işə salınaraq) sınayan test dəsti.
 class JudgeServiceTest {
 
+    // JUnit hər testdən əvvəl yaradıb sonra avtomatik silən müvəqqəti qovluq —
+    // JudgeService-in workspace-dir-i kimi istifadə olunur ki, testlər real
+    // fayl sistemini çirkləndirməsin.
     @TempDir
     Path workspace;
 
+    // Standart (10s compile / 3s run) limitlərlə yeni bir JudgeService nümunəsi yaradır.
     private JudgeService newService() {
         return new JudgeService("g++", workspace.toString(), 10, 3, 20000, 65536);
     }
 
+    // Testlərdə istifadə olunacaq minimal, sadə bir Problem obyekti qurur —
+    // yalnız nümunə giriş/çıxış sahələri əhəmiyyətlidir, qalanları formallıq üçündür.
     private Problem problem(String exampleInput, String exampleOutput) {
         Problem p = new Problem();
         p.setId(1L);
@@ -31,6 +39,7 @@ class JudgeServiceTest {
         return p;
     }
 
+    // Düzgün cavab verən kod ACCEPTED statusu almalıdır.
     @Test
     void acceptsCorrectSolution() {
         String source = """
@@ -42,6 +51,7 @@ class JudgeServiceTest {
         assertThat(result.getStatus()).isEqualTo(SubmissionStatus.ACCEPTED);
     }
 
+    // Compile olan, amma yanlış nəticə verən kod WRONG_ANSWER statusu almalıdır.
     @Test
     void rejectsWrongOutput() {
         String source = """
@@ -53,6 +63,8 @@ class JudgeServiceTest {
         assertThat(result.getStatus()).isEqualTo(SubmissionStatus.WRONG_ANSWER);
     }
 
+    // Sintaktik cəhətdən yanlış (compile olunmayan) kod COMPILE_ERROR statusu
+    // almalı və g++-ın stderr çıxışı boş olmamalıdır.
     @Test
     void reportsCompileError() {
         String source = "int main( { this is not valid c++ }";
@@ -61,6 +73,9 @@ class JudgeServiceTest {
         assertThat(result.getStderr()).isNotBlank();
     }
 
+    // Sonsuz dövrlü kod, run timeout-u bitdikdən sonra məcburi dayandırılıb
+    // TIME_LIMIT_EXCEEDED statusu qaytarmalıdır (bu test üçün 1 saniyəlik
+    // qısa timeout-lu ayrıca JudgeService nümunəsi istifadə olunur).
     @Test
     void killsInfiniteLoopAsTimeLimitExceeded() {
         String source = """
@@ -71,6 +86,8 @@ class JudgeServiceTest {
         assertThat(result.getStatus()).isEqualTo(SubmissionStatus.TIME_LIMIT_EXCEEDED);
     }
 
+    // Çıxışın sonunda əlavə boş sətirlər olsa belə, normalize() sayəsində
+    // məzmunca eyni nəticə ACCEPTED kimi qəbul edilməlidir.
     @Test
     void normalizesTrailingWhitespaceWhenComparing() {
         String source = """

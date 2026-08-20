@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    // E-poçta görə istifadəçini bazadan tapmaq üçün.
     private final UserRepository userRepository;
 
+    // Spring tərəfindən inject olunan UserRepository-ni sahəyə təyin edir.
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

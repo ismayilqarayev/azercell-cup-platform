@@ -22,14 +22,19 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    // Tokeni doğrulamaq və içindəki e-poçtu çıxarmaq üçün.
     private final JwtService jwtService;
+    // Tokendəki e-poçta uyğun istifadəçini yükləmək üçün.
     private final CustomUserDetailsService userDetailsService;
 
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public JwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
 
+    // Hər sorğuda bir dəfə işə düşür — Authorization header-indəki JWT-ni
+    // oxuyub doğrulayır və uğurlu olarsa istifadəçini SecurityContext-ə yazır.
     @Override
     protected void doFilterInternal(
         HttpServletRequest request,

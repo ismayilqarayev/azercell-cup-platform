@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 @Table(name = "topic")
 public class Topic {
 
+    // Verilənlər bazasında avtomatik artırılan (IDENTITY) əsas açar.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +27,14 @@ public class Topic {
     @Column(nullable = false)
     private int orderIndex = 0;
 
+    // Mövzunun başlığı.
     @Column(nullable = false)
     private String title = "";
 
     // Məsələn "Ay 1", "Ay 2" kimi qruplaşdırma etiketi — sırf görüntü məqsədlidir.
     private String monthTag;
 
+    // Mövzunun qısa təsviri.
     @Column(length = 2000)
     private String description;
 
@@ -41,58 +44,73 @@ public class Topic {
     @Column(nullable = false)
     private boolean published = false;
 
+    // id sahəsinin dəyərini qaytarır.
     public Long getId() {
         return id;
     }
 
+    // id sahəsinə yeni dəyər təyin edir.
     public void setId(Long id) {
         this.id = id;
     }
 
+    // slug sahəsinin dəyərini qaytarır.
     public String getSlug() {
         return slug;
     }
 
+    // slug sahəsinə yeni dəyər təyin edir.
     public void setSlug(String slug) {
         this.slug = slug;
     }
 
+    // orderIndex sahəsinin dəyərini qaytarır.
     public int getOrderIndex() {
         return orderIndex;
     }
 
+    // orderIndex sahəsinə yeni dəyər təyin edir.
     public void setOrderIndex(int orderIndex) {
         this.orderIndex = orderIndex;
     }
 
+    // title sahəsinin dəyərini qaytarır.
     public String getTitle() {
         return title;
     }
 
+    // title sahəsinə yeni dəyər təyin edir.
     public void setTitle(String title) {
         this.title = title;
     }
 
+    // monthTag sahəsinin dəyərini qaytarır.
     public String getMonthTag() {
         return monthTag;
     }
 
+    // monthTag sahəsinə yeni dəyər təyin edir.
     public void setMonthTag(String monthTag) {
         this.monthTag = monthTag;
     }
 
+    // description sahəsinin dəyərini qaytarır.
     public String getDescription() {
         return description;
     }
 
+    // description sahəsinə yeni dəyər təyin edir.
     public void setDescription(String description) {
         this.description = description;
     }
 
+    // published sahəsinin dəyərini qaytarır. Boolean sahə olduğu üçün getter
+    // "get" əvəzinə "is" prefiksi ilə adlandırılıb (JavaBeans konvensiyası).
     public boolean isPublished() {
         return published;
     }
 
+    // published sahəsinə yeni dəyər təyin edir.
     public void setPublished(boolean published) {
         this.published = published;
     }

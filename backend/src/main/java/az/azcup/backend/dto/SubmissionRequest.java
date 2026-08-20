@@ -9,17 +9,21 @@ import java.util.Objects;
 // controller-ə çatmazdan əvvəl avtomatik rədd edilir (bax: GlobalExceptionHandler.handleValidation).
 public class SubmissionRequest {
 
+    // Şagirdin göndərdiyi C++ mənbə kodu — boş ola bilməz.
     @NotBlank
     private final String sourceCode;
 
+    // sourceCode sahəsini birbaşa təyin edən əsas (və yeganə) konstruktor.
     public SubmissionRequest(String sourceCode) {
         this.sourceCode = sourceCode;
     }
 
+    // sourceCode sahəsinin dəyərini qaytarır.
     public String getSourceCode() {
         return sourceCode;
     }
 
+    // İki SubmissionRequest obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -32,11 +36,15 @@ public class SubmissionRequest {
         return Objects.equals(sourceCode, that.sourceCode);
     }
 
+    // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
+    // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
+    // bütün sahələrin hash-lərini birləşdirir.
     @Override
     public int hashCode() {
         return Objects.hash(sourceCode);
     }
 
+    // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
     @Override
     public String toString() {
         return "SubmissionRequest{" +

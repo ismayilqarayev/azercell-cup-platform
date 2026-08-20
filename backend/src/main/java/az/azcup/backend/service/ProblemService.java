@@ -23,10 +23,14 @@ import java.util.Set;
 @Service
 public class ProblemService {
 
+    // Problemləri oxumaq üçün.
     private final ProblemRepository problemRepository;
+    // İstifadəçinin hansı problemləri həll etdiyini yoxlamaq üçün.
     private final SubmissionRepository submissionRepository;
+    // Mövzunun mövcudluğunu/giriş icazəsini yoxlamaq üçün (bax: getBySlug).
     private final TopicService topicService;
 
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public ProblemService(ProblemRepository problemRepository, SubmissionRepository submissionRepository, TopicService topicService) {
         this.problemRepository = problemRepository;
         this.submissionRepository = submissionRepository;
@@ -45,6 +49,8 @@ public class ProblemService {
         // sorğu ilə əldə edib Set-ə çeviririk ki, aşağıdakı dövr içində hər
         // problem üçün ayrıca bazaya getmək əvəzinə O(1) yoxlama aparılsın.
         Set<Long> solvedIds = new HashSet<>(submissionRepository.solvedProblemIdsForUserInTopic(user, topic));
+        // Hər problemi, "bu istifadəçi onu artıq həll edib mi" məlumatı ilə
+        // birlikdə ProblemSummaryDto-ya çevirib nəticə siyahısını qurur.
         List<ProblemSummaryDto> result = new ArrayList<>();
         for (Problem p : problems) {
             result.add(new ProblemSummaryDto(

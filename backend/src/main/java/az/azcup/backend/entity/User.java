@@ -20,10 +20,12 @@ import java.time.Instant;
 @Table(name = "app_user")
 public class User {
 
+    // Verilənlər bazasında avtomatik artırılan (IDENTITY) əsas açar.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // İstifadəçinin tam adı (ad və soyad).
     @Column(nullable = false)
     private String fullName = "";
 
@@ -38,6 +40,7 @@ public class User {
     @Column(nullable = false)
     private String passwordHash = "";
 
+    // İstifadəçinin rolu (STUDENT/TEACHER/ADMIN) — bax: Role enum-u.
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -53,6 +56,7 @@ public class User {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
+    // İstifadəçinin qeydiyyatdan keçdiyi vaxt (avtomatik təyin olunur, dəyişdirilə bilməz).
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -65,66 +69,83 @@ public class User {
         }
     }
 
+    // id sahəsinin dəyərini qaytarır.
     public Long getId() {
         return id;
     }
 
+    // id sahəsinə yeni dəyər təyin edir.
     public void setId(Long id) {
         this.id = id;
     }
 
+    // fullName sahəsinin dəyərini qaytarır.
     public String getFullName() {
         return fullName;
     }
 
+    // fullName sahəsinə yeni dəyər təyin edir.
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
+    // email sahəsinin dəyərini qaytarır.
     public String getEmail() {
         return email;
     }
 
+    // email sahəsinə yeni dəyər təyin edir.
     public void setEmail(String email) {
         this.email = email;
     }
 
+    // passwordHash sahəsinin dəyərini qaytarır.
     public String getPasswordHash() {
         return passwordHash;
     }
 
+    // passwordHash sahəsinə yeni dəyər təyin edir.
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
+    // role sahəsinin dəyərini qaytarır.
     public Role getRole() {
         return role;
     }
 
+    // role sahəsinə yeni dəyər təyin edir.
     public void setRole(Role role) {
         this.role = role;
     }
 
+    // approved sahəsinin dəyərini qaytarır. Boolean sahələr üçün getter adı
+    // "get" əvəzinə "is" ilə başlayır — bu, JavaBeans konvensiyasıdır.
     public boolean isApproved() {
         return approved;
     }
 
+    // approved sahəsinə yeni dəyər təyin edir.
     public void setApproved(boolean approved) {
         this.approved = approved;
     }
 
+    // active sahəsinin dəyərini qaytarır.
     public boolean isActive() {
         return active;
     }
 
+    // active sahəsinə yeni dəyər təyin edir.
     public void setActive(boolean active) {
         this.active = active;
     }
 
+    // createdAt sahəsinin dəyərini qaytarır.
     public Instant getCreatedAt() {
         return createdAt;
     }
 
+    // createdAt sahəsinə yeni dəyər təyin edir.
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }

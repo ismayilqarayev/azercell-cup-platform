@@ -22,8 +22,10 @@ public class JwtService {
     // HMAC-SHA açarı — secret mətnindən bir dəfə hesablanır və yaddaşda saxlanılır
     // (hər dəfə yenidən yaratmağa ehtiyac yoxdur).
     private final SecretKey key;
+    // Yaradılan tokenlərin nə qədər müddətdən sonra bitəcəyi (millisaniyələrlə).
     private final long expirationMillis;
 
+    // İmza açarını (secret-dən) hesablayır və bitmə müddətini millisaniyəyə çevirir.
     public JwtService(
         // JWT_SECRET environment dəyişənindən gəlir (bax: application.yml) —
         // bu, tokenləri imzalamaq üçün istifadə olunan məxfi açardır. Əgər bu

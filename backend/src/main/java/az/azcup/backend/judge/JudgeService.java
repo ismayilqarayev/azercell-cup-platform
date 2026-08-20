@@ -48,13 +48,19 @@ public class JudgeService {
     private final String gppPath;
     // Hər yoxlama üçün müvəqqəti fayllar (main.cpp, main.exe) buraya yazılır.
     private final Path workspaceDir;
+    // Kompilyasiya prosesinin icazə verilən maksimum müddəti (saniyə).
     private final long compileTimeoutSeconds;
+    // Kodun icra mərhələsinin icazə verilən maksimum müddəti (saniyə) —
+    // sonsuz dövrləri tutmaq üçün istifadə olunur.
     private final long runTimeoutSeconds;
     // Çox uzun kodların server resurslarını tükətməsinin qarşısını almaq üçün limit.
     private final int maxSourceLength;
     // Sonsuz dövrdə çap edən proqramların yaddaşı doldurmasının qarşısını alır.
     private final int maxOutputBytes;
 
+    // Spring tərəfindən application.yml-dəki "app.judge.*" dəyərləri ilə
+    // çağırılır; bütün sahələri təyin edir və servis işə düşərkən iş
+    // qovluğunun (workspaceDir) mövcud olduğuna əmin olur.
     public JudgeService(
         @Value("${app.judge.gpp-path}") String gppPath,
         @Value("${app.judge.workspace-dir}") String workspaceDirPath,
@@ -151,22 +157,28 @@ public class JudgeService {
     // compile() metodunun nəticəsini daşıyan kiçik köməkçi tip.
     private static final class CompileOutcome {
 
+        // Kompilyasiyanın uğurlu olub-olmadığı (g++ çıxış kodu 0-dırmı).
         private final boolean success;
+        // Uğursuz olduqda g++-ın stderr çıxışı (xəta mesajları).
         private final String stderr;
 
+        // Uğur statusunu və stderr mətnini birbaşa təyin edən konstruktor.
         private CompileOutcome(boolean success, String stderr) {
             this.success = success;
             this.stderr = stderr;
         }
 
+        // success sahəsinin dəyərini qaytarır.
         boolean isSuccess() {
             return success;
         }
 
+        // stderr sahəsinin dəyərini qaytarır.
         String getStderr() {
             return stderr;
         }
 
+        // İki CompileOutcome obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -179,11 +191,15 @@ public class JudgeService {
             return success == that.success && Objects.equals(stderr, that.stderr);
         }
 
+        // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
+        // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
+        // bütün sahələrin hash-lərini birləşdirir.
         @Override
         public int hashCode() {
             return Objects.hash(success, stderr);
         }
 
+        // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
         @Override
         public String toString() {
             return "CompileOutcome{" +
@@ -233,6 +249,8 @@ public class JudgeService {
         Process process = pb.start();
 
         try (OutputStream stdin = process.getOutputStream()) {
+            // input null gələ bilər (problemdə exampleInput təyin olunmayıbsa) —
+            // bu halda proqrama sadəcə boş stdin verilir.
             String stdinContent;
             if (input != null) {
                 stdinContent = input;
@@ -291,6 +309,8 @@ public class JudgeService {
         Process process = pb.start();
 
         try (OutputStream stdin = process.getOutputStream()) {
+            // input null gələ bilər (stdin göndərilməyibsə) — bu halda proqrama
+            // sadəcə boş stdin verilir.
             String stdinContent;
             if (input != null) {
                 stdinContent = input;
@@ -310,6 +330,7 @@ public class JudgeService {
         long elapsed = System.currentTimeMillis() - start;
 
         if (!finished) {
+            // Vaxt bitdi (məs. sonsuz dövr) — məcburi dayandır.
             process.destroyForcibly();
             return new JudgeResult(SubmissionStatus.TIME_LIMIT_EXCEEDED, "", "", elapsed);
         }
@@ -320,6 +341,7 @@ public class JudgeService {
         String stderr = stderrReader.result();
 
         if (process.exitValue() != 0) {
+            // Proqram sıfırdan fərqli kodla bitib.
             return new JudgeResult(SubmissionStatus.RUNTIME_ERROR, stdout, stderr, elapsed);
         }
         return new JudgeResult(SubmissionStatus.ACCEPTED, stdout, stderr, elapsed);
@@ -330,11 +352,16 @@ public class JudgeService {
     // baytlar sadəcə atılır (proses yenə də icra olunmağa davam edir,
     // amma çıxışı artıq yaddaşa yazılmır — yaddaş tükənməsinin qarşısı alınır).
     private static final class CappedStreamReader {
+        // Axını arxa planda oxuyan thread.
         private final Thread thread;
 
+        // Oxunmuş (və maxBytes-a qədər kəsilmiş) mətn nəticəsi — thread
+        // tərəfindən yazılıb əsas thread tərəfindən oxunacağı üçün "volatile".
         @SuppressWarnings("this-escape")
         private volatile String result = "";
 
+        // inStream-i maxBytes limiti ilə oxuyacaq daemon thread-i hazırlayır
+        // (hələ başlatmır — bax: start() statik metodu).
         private CappedStreamReader(InputStream inStream, int maxBytes) {
             this.thread = new Thread(() -> {
                 try {
@@ -356,6 +383,7 @@ public class JudgeService {
             thread.setDaemon(true);
         }
 
+        // Yeni bir CappedStreamReader yaradır və oxuma thread-ini dərhal başladır.
         static CappedStreamReader start(InputStream inStream, int maxBytes) {
             CappedStreamReader reader = new CappedStreamReader(inStream, maxBytes);
             reader.thread.start();
@@ -373,6 +401,8 @@ public class JudgeService {
             }
         }
 
+        // result sahəsinin cari dəyərini qaytarır (join()-dən sonra çağırılmalıdır
+        // ki, thread işini bitirmiş olsun).
         String result() {
             return result;
         }
@@ -423,12 +453,16 @@ public class JudgeService {
             return;
         }
         try (Stream<Path> walk = Files.walk(dir)) {
+            // Qovluq ağacındakı bütün yolları (həm fayllar, həm alt-qovluqlar)
+            // siyahıya yığır ki, sıralayıb (aşağıda) təhlükəsiz sırada silə bilək.
             List<Path> paths = new ArrayList<>();
             Iterator<Path> iterator = walk.iterator();
             while (iterator.hasNext()) {
                 paths.add(iterator.next());
             }
             paths.sort(Comparator.reverseOrder());
+            // Hər yolu (əvvəlcə ən dərin fayllar, sonda qovluqlar) silir;
+            // tək-tək faylın silinməsi uğursuz olsa belə, qalanlarını silməyə davam edir.
             for (Path p : paths) {
                 try {
                     Files.deleteIfExists(p);

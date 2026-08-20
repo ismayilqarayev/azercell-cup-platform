@@ -19,11 +19,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
+    // İstifadəçiləri oxumaq/yazmaq üçün.
     private final UserRepository userRepository;
+    // Parolları hash-ləmək üçün.
     private final PasswordEncoder passwordEncoder;
+    // Uğurlu giriş/qeydiyyatdan sonra JWT yaratmaq üçün.
     private final JwtService jwtService;
+    // Login zamanı email+parolu Spring Security vasitəsilə doğrulamaq üçün.
     private final AuthenticationManager authenticationManager;
 
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public AuthService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
@@ -36,6 +41,8 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    // Yeni istifadəçi qeydiyyatdan keçirir; rol qaydalarını tətbiq edir və
+    // (müəllim deyilsə) dərhal giriş üçün token qaytarır.
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ConflictException("Bu email artıq qeydiyyatdan keçib");
@@ -75,6 +82,8 @@ public class AuthService {
         return toAuthResponse(user);
     }
 
+    // E-poçt/parolu doğrulayır və hesabın giriş üçün əlverişli (təsdiqlənmiş,
+    // aktiv) olduğunu yoxlayaraq JWT token qaytarır.
     public AuthResponse login(LoginRequest request) {
         // Bu çağırış daxildə CustomUserDetailsService-i işə salıb email/parolu
         // yoxlayır — uyğunsuzluq olarsa BadCredentialsException atır (bax:

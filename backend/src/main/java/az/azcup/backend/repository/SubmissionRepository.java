@@ -56,8 +56,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     // siyahısındakı sütun adlarına (topicId, solvedCount) uyğun get-metodları.
     // Spring bunun arxasında dinamik proxy yaradıb nəticə sətirlərini bura map edir.
     interface TopicSolvedCount {
+        // Sorğudakı "topicId" alias-ına uyğun mövzu ID-sini qaytarır.
         Long getTopicId();
 
+        // Sorğudakı "solvedCount" alias-ına uyğun həll edilmiş problem sayını qaytarır.
         Long getSolvedCount();
     }
 }

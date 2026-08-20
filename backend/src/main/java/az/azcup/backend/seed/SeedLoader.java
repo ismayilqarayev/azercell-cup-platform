@@ -33,10 +33,15 @@ public class SeedLoader implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(SeedLoader.class);
 
+    // Mövzuları bazaya yazmaq/oxumaq üçün.
     private final TopicRepository topicRepository;
+    // Problemləri bazaya yazmaq/oxumaq üçün.
     private final ProblemRepository problemRepository;
+    // seed-data.json-u Java obyektlərinə (SeedData) çevirmək üçün Jackson kitabxanasının əsas sinfi.
     private final ObjectMapper objectMapper;
 
+    // Spring tərəfindən inject olunan asılılıqları (repository-lər və
+    // ObjectMapper) sahələrə təyin edir.
     public SeedLoader(TopicRepository topicRepository, ProblemRepository problemRepository, ObjectMapper objectMapper) {
         this.topicRepository = topicRepository;
         this.problemRepository = problemRepository;
@@ -90,6 +95,8 @@ public class SeedLoader implements CommandLineRunner {
             p.setTitle(sp.getTitle());
             // JSON-dakı mətn ("easy"/"mid"/"hard") Difficulty enum-una çevrilir.
             p.setDifficulty(Difficulty.valueOf(sp.getDifficulty().toUpperCase(Locale.ROOT)));
+            // JSON-da "tags" sahəsi olmaya bilər (null) — bu halda boş siyahı
+            // istifadə olunur ki, Problem.tags heç vaxt null olmasın.
             List<String> tags;
             if (sp.getTags() != null) {
                 tags = new ArrayList<>(sp.getTags());
@@ -100,6 +107,7 @@ public class SeedLoader implements CommandLineRunner {
             p.setStatement(sp.getStatement());
             p.setInputSpec(sp.getInputSpec());
             p.setOutputSpec(sp.getOutputSpec());
+            // exampleInput də JSON-da olmaya bilər — null yerinə boş sətir istifadə olunur.
             String exampleInput;
             if (sp.getExampleInput() != null) {
                 exampleInput = sp.getExampleInput();

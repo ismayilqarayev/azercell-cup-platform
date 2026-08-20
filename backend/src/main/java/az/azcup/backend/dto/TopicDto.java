@@ -7,17 +7,26 @@ import java.util.Objects;
 // (problemCount/solvedCount) birlikdə göstərilir.
 public class TopicDto {
 
+    // Mövzunun verilənlər bazasındakı ID-si.
     private final Long id;
+    // Mövzunun URL-dostu slug-u.
     private final String slug;
+    // Mövzunun roadmap-dakı göstərilmə sırası.
     private final int orderIndex;
+    // Mövzunun başlığı.
     private final String title;
+    // Qruplaşdırma etiketi (məs. "Ay 1").
     private final String monthTag;
+    // Mövzunun qısa təsviri.
     private final String description;
     // Müəllim mövzunu hələ "dərc etməyibsə" false olur — bax: Topic.published.
     private final boolean published;
+    // Mövzudakı ümumi problem sayı.
     private final long problemCount;
+    // İstifadəçinin bu mövzuda həll etdiyi problem sayı.
     private final long solvedCount;
 
+    // Bütün sahələri birbaşa təyin edən əsas (və yeganə) konstruktor.
     public TopicDto(
         Long id,
         String slug,
@@ -40,42 +49,53 @@ public class TopicDto {
         this.solvedCount = solvedCount;
     }
 
+    // id sahəsinin dəyərini qaytarır.
     public Long getId() {
         return id;
     }
 
+    // slug sahəsinin dəyərini qaytarır.
     public String getSlug() {
         return slug;
     }
 
+    // orderIndex sahəsinin dəyərini qaytarır.
     public int getOrderIndex() {
         return orderIndex;
     }
 
+    // title sahəsinin dəyərini qaytarır.
     public String getTitle() {
         return title;
     }
 
+    // monthTag sahəsinin dəyərini qaytarır.
     public String getMonthTag() {
         return monthTag;
     }
 
+    // description sahəsinin dəyərini qaytarır.
     public String getDescription() {
         return description;
     }
 
+    // published sahəsinin dəyərini qaytarır. Boolean sahə üçün getter "get"
+    // əvəzinə "is" prefiksi ilə adlandırılıb (JavaBeans konvensiyası).
     public boolean isPublished() {
         return published;
     }
 
+    // problemCount sahəsinin dəyərini qaytarır.
     public long getProblemCount() {
         return problemCount;
     }
 
+    // solvedCount sahəsinin dəyərini qaytarır.
     public long getSolvedCount() {
         return solvedCount;
     }
 
+    // İki TopicDto obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -96,11 +116,15 @@ public class TopicDto {
             && Objects.equals(description, that.description);
     }
 
+    // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
+    // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
+    // bütün sahələrin hash-lərini birləşdirir.
     @Override
     public int hashCode() {
         return Objects.hash(id, slug, orderIndex, title, monthTag, description, published, problemCount, solvedCount);
     }
 
+    // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
     @Override
     public String toString() {
         return "TopicDto{" +

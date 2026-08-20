@@ -37,10 +37,15 @@ public class AdminService {
     private static final String PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
     private static final int GENERATED_PASSWORD_LENGTH = 14;
 
+    // Mövzuların CRUD əməliyyatları üçün.
     private final TopicRepository topicRepository;
+    // Problemlərin CRUD əməliyyatları üçün.
     private final ProblemRepository problemRepository;
+    // İstifadəçilərin oxunması/yazılması üçün.
     private final UserRepository userRepository;
+    // İstifadəçinin həll etdiyi problem sayını hesablamaq üçün.
     private final SubmissionRepository submissionRepository;
+    // Yeni/sıfırlanmış parolları bazaya yazmazdan əvvəl hash-ləmək üçün.
     private final PasswordEncoder passwordEncoder;
 
     // Təsadüfi parol yaratmaq üçün — java.util.Random YOX, məhz
@@ -49,6 +54,7 @@ public class AdminService {
     // əməliyyatlar üçün yararsızdır).
     private final SecureRandom secureRandom = new SecureRandom();
 
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public AdminService(
         TopicRepository topicRepository,
         ProblemRepository problemRepository,
@@ -63,6 +69,7 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Yeni mövzu yaradır; slug-un artıq mövcud olub-olmadığını əvvəlcədən yoxlayır.
     @Transactional
     public AdminTopicDto createTopic(TopicUpsertRequest req) {
         if (topicRepository.findBySlug(req.getSlug()) != null) {
@@ -70,6 +77,7 @@ public class AdminService {
         }
         Topic topic = new Topic();
         topic.setSlug(req.getSlug());
+        // orderIndex göndərilməyibsə (null), default olaraq 0 istifadə olunur.
         int orderIndex;
         if (req.getOrderIndex() != null) {
             orderIndex = req.getOrderIndex();
@@ -84,10 +92,12 @@ public class AdminService {
         return toDto(topicRepository.save(topic));
     }
 
+    // Mövcud mövzunu ID-yə görə tapıb bütün sahələrini yeni dəyərlərlə əvəz edir.
     @Transactional
     public AdminTopicDto updateTopic(Long id, TopicUpsertRequest req) {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new NotFoundException("Mövzu tapılmadı: " + id));
         topic.setSlug(req.getSlug());
+        // orderIndex göndərilməyibsə (null), default olaraq 0 istifadə olunur.
         int orderIndex;
         if (req.getOrderIndex() != null) {
             orderIndex = req.getOrderIndex();
@@ -118,6 +128,7 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<AdminTopicDto> listTopicsForManagement() {
         List<Topic> topics = topicRepository.findAllByOrderByOrderIndexAsc();
+        // Hər Topic entity-sini admin DTO formasına çevirir.
         List<AdminTopicDto> result = new ArrayList<>();
         for (Topic topic : topics) {
             result.add(toDto(topic));
@@ -136,6 +147,7 @@ public class AdminService {
         return toDto(topicRepository.save(topic));
     }
 
+    // Yeni problem yaradır; verilmiş topicSlug-a uyğun mövzunun mövcud olduğunu yoxlayır.
     @Transactional
     public AdminProblemDto createProblem(ProblemUpsertRequest req) {
         Topic topic = topicRepository.findBySlug(req.getTopicSlug());
@@ -144,6 +156,7 @@ public class AdminService {
         }
         Problem problem = new Problem();
         problem.setTopic(topic);
+        // orderIndex göndərilməyibsə (null), default olaraq 0 istifadə olunur.
         int orderIndex;
         if (req.getOrderIndex() != null) {
             orderIndex = req.getOrderIndex();
@@ -154,6 +167,8 @@ public class AdminService {
         problem.setSubgroupLabel(req.getSubgroupLabel());
         problem.setTitle(req.getTitle());
         problem.setDifficulty(req.getDifficulty());
+        // tags göndərilməyibsə (null), Problem.tags-in heç vaxt null olmaması
+        // üçün boş siyahı istifadə olunur.
         List<String> tags;
         if (req.getTags() != null) {
             tags = new ArrayList<>(req.getTags());
@@ -164,6 +179,7 @@ public class AdminService {
         problem.setStatement(req.getStatement());
         problem.setInputSpec(req.getInputSpec());
         problem.setOutputSpec(req.getOutputSpec());
+        // exampleInput göndərilməyibsə (null), boş sətir istifadə olunur.
         String exampleInput;
         if (req.getExampleInput() != null) {
             exampleInput = req.getExampleInput();
@@ -177,6 +193,7 @@ public class AdminService {
         return toDto(problemRepository.save(problem));
     }
 
+    // Mövcud problemi ID-yə görə tapıb bütün sahələrini yeni dəyərlərlə əvəz edir.
     @Transactional
     public AdminProblemDto updateProblem(Long id, ProblemUpsertRequest req) {
         Problem problem = problemRepository.findById(id).orElseThrow(() -> new NotFoundException("Məsələ tapılmadı: " + id));
@@ -187,6 +204,7 @@ public class AdminService {
         // Problemin mövzusu da dəyişdirilə bilər (məs. yanlış mövzuya
         // düşmüş problemi düzgün mövzuya köçürmək üçün).
         problem.setTopic(topic);
+        // orderIndex göndərilməyibsə (null), default olaraq 0 istifadə olunur.
         int orderIndex;
         if (req.getOrderIndex() != null) {
             orderIndex = req.getOrderIndex();
@@ -197,6 +215,7 @@ public class AdminService {
         problem.setSubgroupLabel(req.getSubgroupLabel());
         problem.setTitle(req.getTitle());
         problem.setDifficulty(req.getDifficulty());
+        // tags göndərilməyibsə (null), boş siyahı istifadə olunur.
         List<String> tags;
         if (req.getTags() != null) {
             tags = new ArrayList<>(req.getTags());
@@ -207,6 +226,7 @@ public class AdminService {
         problem.setStatement(req.getStatement());
         problem.setInputSpec(req.getInputSpec());
         problem.setOutputSpec(req.getOutputSpec());
+        // exampleInput göndərilməyibsə (null), boş sətir istifadə olunur.
         String exampleInput;
         if (req.getExampleInput() != null) {
             exampleInput = req.getExampleInput();
@@ -220,6 +240,7 @@ public class AdminService {
         return toDto(problemRepository.save(problem));
     }
 
+    // Problemi ID-yə görə silir.
     @Transactional
     public void deleteProblem(Long id) {
         if (!problemRepository.existsById(id)) {
@@ -248,6 +269,8 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<AdminUserDto> listStudents() {
         List<User> students = userRepository.findAllByRole(Role.STUDENT);
+        // Hər şagird üçün, onun cəmi neçə fərqli problem həll etdiyini
+        // (submissionRepository ilə) hesablayıb AdminUserDto-ya çevirir.
         List<AdminUserDto> result = new ArrayList<>();
         for (User u : students) {
             result.add(new AdminUserDto(u.getId(), u.getFullName(), u.getEmail(), u.getCreatedAt(), submissionRepository.countDistinctSolvedProblems(u)));
@@ -260,6 +283,7 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<AdminUserDto> listPendingTeachers() {
         List<User> teachers = userRepository.findAllByRole(Role.TEACHER);
+        // Bütün TEACHER-lər arasından yalnız hələ təsdiqlənməmişləri seçir.
         List<AdminUserDto> result = new ArrayList<>();
         for (User u : teachers) {
             if (!u.isApproved()) {
@@ -269,6 +293,7 @@ public class AdminService {
         return result;
     }
 
+    // Müəllim hesabını təsdiqləyir (approved=true edir) — yalnız TEACHER rolunda olanlar üçün keçərlidir.
     @Transactional
     public void approveTeacher(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Müəllim tapılmadı: " + id));
@@ -290,9 +315,11 @@ public class AdminService {
         userRepository.delete(user);
     }
 
+    // Bazadakı bütün istifadəçilərin (rolundan asılı olmayaraq) tam detallı siyahısını qaytarır.
     @Transactional(readOnly = true)
     public List<AdminUserDetailDto> listAllUsers() {
         List<User> users = userRepository.findAll();
+        // Hər User entity-sini AdminUserDetailDto formasına çevirir.
         List<AdminUserDetailDto> result = new ArrayList<>();
         for (User u : users) {
             result.add(toDetailDto(u));
@@ -300,6 +327,7 @@ public class AdminService {
         return result;
     }
 
+    // Tək bir istifadəçinin tam detallarını ID-yə görə qaytarır (tapılmasa NotFoundException atır).
     @Transactional(readOnly = true)
     public AdminUserDetailDto getUser(Long id) {
         return toDetailDto(findUserOrThrow(id));
@@ -393,6 +421,8 @@ public class AdminService {
         userRepository.delete(user);
     }
 
+    // ID ilə istifadəçini tapan, tapılmasa NotFoundException atan köməkçi metod
+    // (bu sinifdəki demək olar hər metodda təkrarlanan naxışı mərkəzləşdirir).
     private User findUserOrThrow(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı: " + id));
     }
@@ -402,6 +432,8 @@ public class AdminService {
     // siyahısından bilərəkdən çıxarılıb ki, admin parolu əl ilə köçürəndə səhv etməsin.
     private String generateRandomPassword() {
         StringBuilder sb = new StringBuilder(GENERATED_PASSWORD_LENGTH);
+        // Hər addımda PASSWORD_CHARS-dan təsadüfi bir simvol seçib əlavə edir,
+        // beləliklə GENERATED_PASSWORD_LENGTH uzunluğunda təsadüfi parol qurulur.
         for (int i = 0; i < GENERATED_PASSWORD_LENGTH; i++) {
             sb.append(PASSWORD_CHARS.charAt(secureRandom.nextInt(PASSWORD_CHARS.length())));
         }

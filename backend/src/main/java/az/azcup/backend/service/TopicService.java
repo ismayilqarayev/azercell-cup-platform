@@ -19,10 +19,14 @@ import java.util.Map;
 @Service
 public class TopicService {
 
+    // Mövzuları oxumaq/yazmaq üçün.
     private final TopicRepository topicRepository;
+    // Hər mövzudakı ümumi problem sayını hesablamaq üçün.
     private final ProblemRepository problemRepository;
+    // İstifadəçinin hər mövzuda neçə problem həll etdiyini hesablamaq üçün.
     private final SubmissionRepository submissionRepository;
 
+    // Spring tərəfindən inject olunan repository-ləri sahələrə təyin edir.
     public TopicService(TopicRepository topicRepository, ProblemRepository problemRepository, SubmissionRepository submissionRepository) {
         this.topicRepository = topicRepository;
         this.problemRepository = problemRepository;
@@ -41,10 +45,14 @@ public class TopicService {
                 topics.add(t);
             }
         }
+        // Sorğunun nəticəsindəki (topicId, solvedCount) cütlərini sürətli
+        // axtarış üçün map-ə çeviririk — hər mövzu üçün ayrıca sorğuya ehtiyac qalmır.
         Map<Long, Long> solvedByTopicId = new HashMap<>();
         for (SubmissionRepository.TopicSolvedCount tsc : submissionRepository.solvedCountsByTopicForUser(user)) {
             solvedByTopicId.put(tsc.getTopicId(), tsc.getSolvedCount());
         }
+        // Süzülmüş mövzuların hər birini, hesablanmış problem/həll sayları ilə
+        // birlikdə TopicDto-ya çevirib nəticə siyahısını qurur.
         List<TopicDto> result = new ArrayList<>();
         for (Topic t : topics) {
             result.add(new TopicDto(

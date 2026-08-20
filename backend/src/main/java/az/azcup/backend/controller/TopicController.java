@@ -15,8 +15,10 @@ import java.util.List;
 @RequestMapping("/api/topics")
 public class TopicController {
 
+    // Mövzu siyahısı sorğularının faktiki icraçısı.
     private final TopicService topicService;
 
+    // Spring tərəfindən inject olunan TopicService-i sahəyə təyin edir.
     public TopicController(TopicService topicService) {
         this.topicService = topicService;
     }

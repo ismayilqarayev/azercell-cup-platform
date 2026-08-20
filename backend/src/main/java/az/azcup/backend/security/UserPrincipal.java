@@ -14,12 +14,15 @@ import java.util.List;
 // vasitəsilə əsl User entity-sinə çatmaq olur (bax: SubmissionController və s.).
 public class UserPrincipal implements UserDetails {
 
+    // Bu principal-ın "bükdüyü" əsl User entity-si.
     private final User user;
 
+    // user sahəsini birbaşa təyin edən əsas (və yeganə) konstruktor.
     public UserPrincipal(User user) {
         this.user = user;
     }
 
+    // user sahəsinin dəyərini qaytarır (əsl User entity-sinə çatmaq üçün).
     public User getUser() {
         return user;
     }
@@ -31,6 +34,7 @@ public class UserPrincipal implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
+    // Spring Security-nin login zamanı müqayisə etdiyi hash-lənmiş parolu qaytarır.
     @Override
     public String getPassword() {
         return user.getPasswordHash();

@@ -26,17 +26,21 @@ import java.util.Objects;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    // Qeydiyyat/giriş məntiqinin faktiki icraçısı.
     private final AuthService authService;
 
+    // Spring tərəfindən inject olunan AuthService-i sahəyə təyin edir.
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
+    // Yeni istifadəçi qeydiyyatdan keçirir və 201 CREATED statusu ilə token+profil cavabını qaytarır.
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
+    // E-poçt/parol ilə giriş edir və uğurlu olarsa JWT token qaytarır.
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
@@ -57,11 +61,16 @@ public class AuthController {
     // yaratmaq əvəzinə birbaşa controller daxilində təyin olunub.
     public static class MeResponse {
 
+        // Giriş etmiş istifadəçinin ID-si.
         private final Long id;
+        // İstifadəçinin tam adı.
         private final String fullName;
+        // İstifadəçinin e-poçt ünvanı.
         private final String email;
+        // İstifadəçinin rolu.
         private final Role role;
 
+        // Bütün sahələri birbaşa təyin edən əsas (və yeganə) konstruktor.
         public MeResponse(Long id, String fullName, String email, Role role) {
             this.id = id;
             this.fullName = fullName;
@@ -69,22 +78,27 @@ public class AuthController {
             this.role = role;
         }
 
+        // id sahəsinin dəyərini qaytarır.
         public Long getId() {
             return id;
         }
 
+        // fullName sahəsinin dəyərini qaytarır.
         public String getFullName() {
             return fullName;
         }
 
+        // email sahəsinin dəyərini qaytarır.
         public String getEmail() {
             return email;
         }
 
+        // role sahəsinin dəyərini qaytarır.
         public Role getRole() {
             return role;
         }
 
+        // İki MeResponse obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -100,11 +114,15 @@ public class AuthController {
                 && role == that.role;
         }
 
+        // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
+        // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
+        // bütün sahələrin hash-lərini birləşdirir.
         @Override
         public int hashCode() {
             return Objects.hash(id, fullName, email, role);
         }
 
+        // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
         @Override
         public String toString() {
             return "MeResponse{" +

@@ -25,8 +25,10 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    // Hər sorğuda JWT-ni yoxlayan öz filtrimiz (bax: filterChain() bean-i).
     private final JwtAuthFilter jwtAuthFilter;
 
+    // Spring tərəfindən inject olunan JwtAuthFilter-i sahəyə təyin edir.
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }

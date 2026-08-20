@@ -26,7 +26,9 @@ public class AdminBootstrapRunner implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(AdminBootstrapRunner.class);
 
+    // Admin hesabının mövcudluğunu yoxlamaq və yenisini yaratmaq üçün.
     private final UserRepository userRepository;
+    // Admin parolunu bazaya yazmazdan əvvəl BCrypt ilə hash-ləmək üçün.
     private final PasswordEncoder passwordEncoder;
 
     // Bu üç dəyər application.yml-dəki app.admin.* açarlarından gəlir, onlar da
@@ -41,6 +43,7 @@ public class AdminBootstrapRunner implements CommandLineRunner {
     @Value("${app.admin.full-name}")
     private String adminFullName;
 
+    // Spring tərəfindən inject olunan asılılıqları (repository və şifrələyici) sahələrə təyin edir.
     public AdminBootstrapRunner(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

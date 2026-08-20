@@ -25,12 +25,18 @@ import java.util.Map;
 @Service
 public class SubmissionService {
 
+    // Təqdimatları oxumaq/yazmaq üçün.
     private final SubmissionRepository submissionRepository;
+    // Problem entity-sini tapmaq və giriş icazəsini yoxlamaq üçün.
     private final ProblemService problemService;
+    // Mövzuları oxumaq üçün (progress() metodunda istifadə olunur).
     private final TopicRepository topicRepository;
+    // Hər mövzudakı ümumi problem sayını hesablamaq üçün.
     private final ProblemRepository problemRepository;
+    // Kodu compile edib icra etmək üçün mərkəzi yoxlayıcı servis.
     private final JudgeService judgeService;
 
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public SubmissionService(
         SubmissionRepository submissionRepository,
         ProblemService problemService,
@@ -72,6 +78,7 @@ public class SubmissionService {
     public List<SubmissionResponse> history(Long problemId, User user) {
         Problem problem = problemService.getEntity(problemId, user);
         List<Submission> submissions = submissionRepository.findByUserAndProblemOrderBySubmittedAtDesc(user, problem);
+        // Hər Submission entity-sini API-ya göstərilən SubmissionResponse formasına çevirir.
         List<SubmissionResponse> result = new ArrayList<>();
         for (Submission s : submissions) {
             result.add(toResponse(s));
@@ -86,16 +93,20 @@ public class SubmissionService {
     @Transactional(readOnly = true)
     public List<ProgressDto> progress(User user) {
         List<Topic> allTopics = topicRepository.findAllByOrderByOrderIndexAsc();
+        // STUDENT üçün yalnız dərc olunmuş (published) mövzular daxil edilir —
+        // TEACHER/ADMIN isə hamısını görür (bax: TopicService.listTopics-dəki eyni qayda).
         List<Topic> topics = new ArrayList<>();
         for (Topic t : allTopics) {
             if (user.getRole() != Role.STUDENT || t.isPublished()) {
                 topics.add(t);
             }
         }
+        // Sorğunun (topicId, solvedCount) nəticələrini sürətli axtarış üçün map-ə çevirir.
         Map<Long, Long> solvedByTopicId = new HashMap<>();
         for (SubmissionRepository.TopicSolvedCount tsc : submissionRepository.solvedCountsByTopicForUser(user)) {
             solvedByTopicId.put(tsc.getTopicId(), tsc.getSolvedCount());
         }
+        // Hər mövzunu, ümumi/həll edilmiş problem sayları ilə birlikdə ProgressDto-ya çevirir.
         List<ProgressDto> result = new ArrayList<>();
         for (Topic t : topics) {
             result.add(new ProgressDto(
@@ -108,7 +119,10 @@ public class SubmissionService {
         return result;
     }
 
+    // Submission entity-sini API-ya göstərilən SubmissionResponse DTO-suna çevirən köməkçi metod.
     private SubmissionResponse toResponse(Submission s) {
+        // problem əlaqəsi nəzəri olaraq null ola bilər (məs. problem silinibsə) —
+        // bu halda problemId də null qalır.
         Long problemId;
         if (s.getProblem() != null) {
             problemId = s.getProblem().getId();

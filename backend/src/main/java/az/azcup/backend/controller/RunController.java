@@ -18,12 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RunController {
 
+    // Kodu compile+icra edən mərkəzi yoxlayıcı servis.
     private final JudgeService judgeService;
 
+    // Spring tərəfindən inject olunan JudgeService-i sahəyə təyin edir.
     public RunController(JudgeService judgeService) {
         this.judgeService = judgeService;
     }
 
+    // Göndərilən kodu (problemə bağlı olmadan) compile edib icra edir və nəticəni qaytarır.
     @PostMapping("/api/run")
     public RunResponse run(@Valid @RequestBody RunRequest request) {
         JudgeResult result = judgeService.runFree(request.getSourceCode(), request.getStdin());

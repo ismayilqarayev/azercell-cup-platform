@@ -14,11 +14,16 @@ public class AuthResponse {
     // (bax: AuthService.register — TEACHER rolunda approved=false).
     private final String token;
 
+    // Giriş edən/qeydiyyatdan keçən istifadəçinin ID-si.
     private final Long userId;
+    // İstifadəçinin tam adı.
     private final String fullName;
+    // İstifadəçinin e-poçt ünvanı.
     private final String email;
+    // İstifadəçinin rolu.
     private final Role role;
 
+    // Bütün sahələri birbaşa təyin edən əsas (və yeganə) konstruktor.
     public AuthResponse(String token, Long userId, String fullName, String email, Role role) {
         this.token = token;
         this.userId = userId;
@@ -27,26 +32,32 @@ public class AuthResponse {
         this.role = role;
     }
 
+    // token sahəsinin dəyərini qaytarır.
     public String getToken() {
         return token;
     }
 
+    // userId sahəsinin dəyərini qaytarır.
     public Long getUserId() {
         return userId;
     }
 
+    // fullName sahəsinin dəyərini qaytarır.
     public String getFullName() {
         return fullName;
     }
 
+    // email sahəsinin dəyərini qaytarır.
     public String getEmail() {
         return email;
     }
 
+    // role sahəsinin dəyərini qaytarır.
     public Role getRole() {
         return role;
     }
 
+    // İki AuthResponse obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -63,11 +74,15 @@ public class AuthResponse {
             && role == that.role;
     }
 
+    // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
+    // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
+    // bütün sahələrin hash-lərini birləşdirir.
     @Override
     public int hashCode() {
         return Objects.hash(token, userId, fullName, email, role);
     }
 
+    // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
     @Override
     public String toString() {
         return "AuthResponse{" +

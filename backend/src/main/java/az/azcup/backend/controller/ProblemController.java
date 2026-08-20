@@ -15,8 +15,10 @@ import java.util.List;
 @RestController
 public class ProblemController {
 
+    // Problem sorğularının faktiki icraçısı.
     private final ProblemService problemService;
 
+    // Spring tərəfindən inject olunan ProblemService-i sahəyə təyin edir.
     public ProblemController(ProblemService problemService) {
         this.problemService = problemService;
     }
