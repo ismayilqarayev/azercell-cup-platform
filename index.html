@@ -775,7 +775,13 @@ function updateAuthUI(){
       document.getElementById('langSelect').classList.remove('hide');
       document.getElementById('mainApp').classList.remove('show');
       langGate.style.display = 'block';
-      if (isTeacher) showTab('teacher');
+      // Əvvəlki sessiyadan (admin/müəllim) qalan "active" tab-panel vəziyyətini
+      // hər zaman default panelə ('teacher' müəllim üçün, 'prep' şagird üçün)
+      // sıfırlayırıq — əks halda əvvəl admin kimi girib "İstifadəçilər" panelini
+      // aktiv edən sessiyadan sonra sadə şagird kimi (yeniləmə olmadan) daxil
+      // olanda köhnə admin paneli görünə bilər (bax: showTab funksiyası, o,
+      // yalnız çağırılanda tab-panellərin "active" class-ını yeniləyir).
+      showTab(isTeacher ? 'teacher' : 'prep');
     }
   } else {
     authGate.style.display = 'block';

@@ -1,6 +1,6 @@
-# Azercell Cup Platform — Kotlin Edition
+# Azercell Cup Platform
 
-A full **Kotlin** rewrite of the [azercell-cup-platform](https://github.com/ismayilqarayev/azercell-cup-platform) backend — a competitive-programming training platform used to prepare students for the Azercell Cup. Same architecture, same API, same data — the entire Spring Boot service was ported from Java to idiomatic Kotlin.
+A **Java** rewrite of the [azercell-cup-platform](https://github.com/ismayilqarayev/azercell-cup-platform) backend — a competitive-programming training platform used to prepare students for the Azercell Cup. Same architecture, same API, same data — the entire Spring Boot service is implemented in plain Java.
 
 ## What it is
 
@@ -15,15 +15,15 @@ A judge-style learning platform: students work through topics ("Ay 1: Massivlər
 
 | | |
 |---|---|
-| Language | Kotlin (JVM 21) |
+| Language | Java 21 |
 | Framework | Spring Boot 4.1 (Web MVC, Security, Data JPA, Validation) |
 | Database | PostgreSQL (H2 for tests) |
 | Auth | JWT (jjwt) + BCrypt |
-| Build | Maven (`kotlin-maven-plugin`, `spring`/`jpa` compiler plugins) |
+| Build | Maven |
 
 ## Why this exists
 
-The [original project](https://github.com/ismayilqarayev/azercell-cup-platform) is written in Java with Lombok. This repo is a 1:1 functional port to Kotlin — Lombok's `@Builder`/`@Getter`/`@Setter` replaced by Kotlin constructor properties, Java `record`s replaced by `data class`, `Optional`-returning repository methods replaced by nullable types where idiomatic — while keeping the exact same REST contract, database schema, and business rules. Verified with the full test suite plus a manual pass over every endpoint (auth, topics, problems, submissions, admin CRUD, user management).
+The [original project](https://github.com/ismayilqarayev/azercell-cup-platform) is written in Java with Lombok. This repo is a 1:1 functional port without Lombok — `@Builder`/`@Getter`/`@Setter` replaced by hand-written constructors/getters/setters on JPA entities, immutable DTOs implemented as Java `record`s — while keeping the exact same REST contract, database schema, and business rules. Verified with the full test suite plus a manual pass over every endpoint (auth, topics, problems, submissions, admin CRUD, user management).
 
 ## Running it
 
@@ -49,7 +49,7 @@ Run the tests:
 ## Project layout
 
 ```
-backend/          Spring Boot + Kotlin API (entities, services, controllers, JWT security, JudgeService)
+backend/          Spring Boot + Java API (entities, services, controllers, JWT security, JudgeService)
 frontend-src/      Legacy static frontend pages (carried over unchanged)
 tools/             Build scripts used to generate the static site / seed data
 index.html         Legacy static landing page (carried over unchanged)
