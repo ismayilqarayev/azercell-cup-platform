@@ -11034,1918 +11034,1821 @@
       "topicSlug": "week4",
       "orderIndex": 1,
       "subgroupLabel": null,
-      "title": "4827 ədədinin rəqəmlərinin cəmi",
+      "title": "12345 ədədinin rəqəmlərinin ayrıca çapı",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "string"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "4827",
-      "exampleOutput": "21",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərini soldan sağa, boşluqla ayıraraq çap edin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in rəqəmləri, boşluqla ayrılmış.",
+      "exampleInput": "12345",
+      "exampleOutput": "1 2 3 4 5",
+      "approach": "Ədəd əvvəlcə <b>to_string(n)</b> ilə sətrə çevrilir — bu, rəqəmlərə soldan sağa (əsl sırada) baxmağı asanlaşdırır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    for (int i = 0; i < (int)s.size(); i++) {\n        cout << s[i];\n        if (i < (int)s.size() - 1) cout << \" \";\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 2,
       "subgroupLabel": null,
-      "title": "999 ədədinin rəqəmlərinin cəmi",
+      "title": "908 ədədinin rəqəmlərinin ayrıca çapı",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "string"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "999",
-      "exampleOutput": "27",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərini soldan sağa, boşluqla ayıraraq çap edin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in rəqəmləri, boşluqla ayrılmış.",
+      "exampleInput": "908",
+      "exampleOutput": "9 0 8",
+      "approach": "Ədəd əvvəlcə <b>to_string(n)</b> ilə sətrə çevrilir — bu, rəqəmlərə soldan sağa (əsl sırada) baxmağı asanlaşdırır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    for (int i = 0; i < (int)s.size(); i++) {\n        cout << s[i];\n        if (i < (int)s.size() - 1) cout << \" \";\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 3,
       "subgroupLabel": null,
-      "title": "100 ədədinin rəqəmlərinin cəmi",
+      "title": "7 ədədinin rəqəmlərinin ayrıca çapı",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "string"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "100",
-      "exampleOutput": "1",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərini soldan sağa, boşluqla ayıraraq çap edin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in rəqəmləri, boşluqla ayrılmış.",
+      "exampleInput": "7",
+      "exampleOutput": "7",
+      "approach": "Ədəd əvvəlcə <b>to_string(n)</b> ilə sətrə çevrilir — bu, rəqəmlərə soldan sağa (əsl sırada) baxmağı asanlaşdırır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    for (int i = 0; i < (int)s.size(); i++) {\n        cout << s[i];\n        if (i < (int)s.size() - 1) cout << \" \";\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 4,
       "subgroupLabel": null,
-      "title": "12345 ədədinin rəqəmlərinin cəmi",
+      "title": "1000 ədədinin rəqəmlərinin ayrıca çapı",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "string"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "12345",
-      "exampleOutput": "15",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərini soldan sağa, boşluqla ayıraraq çap edin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in rəqəmləri, boşluqla ayrılmış.",
+      "exampleInput": "1000",
+      "exampleOutput": "1 0 0 0",
+      "approach": "Ədəd əvvəlcə <b>to_string(n)</b> ilə sətrə çevrilir — bu, rəqəmlərə soldan sağa (əsl sırada) baxmağı asanlaşdırır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    for (int i = 0; i < (int)s.size(); i++) {\n        cout << s[i];\n        if (i < (int)s.size() - 1) cout << \" \";\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 5,
       "subgroupLabel": null,
-      "title": "7 ədədinin rəqəmlərinin cəmi",
+      "title": "54321 ədədinin rəqəmlərinin ayrıca çapı",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "string"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "7",
-      "exampleOutput": "7",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərini soldan sağa, boşluqla ayıraraq çap edin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in rəqəmləri, boşluqla ayrılmış.",
+      "exampleInput": "54321",
+      "exampleOutput": "5 4 3 2 1",
+      "approach": "Ədəd əvvəlcə <b>to_string(n)</b> ilə sətrə çevrilir — bu, rəqəmlərə soldan sağa (əsl sırada) baxmağı asanlaşdırır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    for (int i = 0; i < (int)s.size(); i++) {\n        cout << s[i];\n        if (i < (int)s.size() - 1) cout << \" \";\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 6,
       "subgroupLabel": null,
-      "title": "88888 ədədinin rəqəmlərinin cəmi",
+      "title": "234 ədədinin rəqəmlərinin hasili",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "hasil"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "88888",
-      "exampleOutput": "40",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün rəqəmlərinin hasilini (vurma nəticəsini) tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Rəqəmlərin hasili.",
+      "exampleInput": "234",
+      "exampleOutput": "24",
+      "approach": "Hər addımda son rəqəm (<b>n%10</b>) alınıb hasilə vurulur, sonra <b>n/=10</b> ilə atılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long hasil = 1;\n    while (n > 0) {\n        hasil *= n % 10;\n        n /= 10;\n    }\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 7,
       "subgroupLabel": null,
-      "title": "10203 ədədinin rəqəmlərinin cəmi",
+      "title": "1234 ədədinin rəqəmlərinin hasili",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "hasil"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "10203",
-      "exampleOutput": "6",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün rəqəmlərinin hasilini (vurma nəticəsini) tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Rəqəmlərin hasili.",
+      "exampleInput": "1234",
+      "exampleOutput": "24",
+      "approach": "Hər addımda son rəqəm (<b>n%10</b>) alınıb hasilə vurulur, sonra <b>n/=10</b> ilə atılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long hasil = 1;\n    while (n > 0) {\n        hasil *= n % 10;\n        n /= 10;\n    }\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 8,
       "subgroupLabel": null,
-      "title": "55555 ədədinin rəqəmlərinin cəmi",
+      "title": "999 ədədinin rəqəmlərinin hasili",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "hasil"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "55555",
-      "exampleOutput": "25",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün rəqəmlərinin hasilini (vurma nəticəsini) tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Rəqəmlərin hasili.",
+      "exampleInput": "999",
+      "exampleOutput": "729",
+      "approach": "Hər addımda son rəqəm (<b>n%10</b>) alınıb hasilə vurulur, sonra <b>n/=10</b> ilə atılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long hasil = 1;\n    while (n > 0) {\n        hasil *= n % 10;\n        n /= 10;\n    }\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 9,
       "subgroupLabel": null,
-      "title": "1000000 ədədinin rəqəmlərinin cəmi",
+      "title": "105 ədədinin rəqəmlərinin hasili",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "hasil"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "1000000",
-      "exampleOutput": "1",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün rəqəmlərinin hasilini (vurma nəticəsini) tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Rəqəmlərin hasili.",
+      "exampleInput": "105",
+      "exampleOutput": "0",
+      "approach": "Hər addımda son rəqəm (<b>n%10</b>) alınıb hasilə vurulur, sonra <b>n/=10</b> ilə atılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long hasil = 1;\n    while (n > 0) {\n        hasil *= n % 10;\n        n /= 10;\n    }\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 10,
       "subgroupLabel": null,
-      "title": "246810 ədədinin rəqəmlərinin cəmi",
+      "title": "4444 ədədinin rəqəmlərinin hasili",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "hasil"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "246810",
-      "exampleOutput": "21",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün rəqəmlərinin hasilini (vurma nəticəsini) tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Rəqəmlərin hasili.",
+      "exampleInput": "4444",
+      "exampleOutput": "256",
+      "approach": "Hər addımda son rəqəm (<b>n%10</b>) alınıb hasilə vurulur, sonra <b>n/=10</b> ilə atılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long hasil = 1;\n    while (n > 0) {\n        hasil *= n % 10;\n        n /= 10;\n    }\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 11,
       "subgroupLabel": null,
-      "title": "13579 ədədinin rəqəmlərinin cəmi",
+      "title": "3829 ədədinin ən böyük rəqəmi",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "maksimum"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "13579",
-      "exampleOutput": "25",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmləri arasında ən böyüyünü tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Ən böyük rəqəm.",
+      "exampleInput": "3829",
+      "exampleOutput": "9",
+      "approach": "Hər rəqəm növbə ilə <b>mx</b> ilə müqayisə olunur, böyük olduqda <b>mx</b> yenilənir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int mx = 0;\n    while (n > 0) {\n        int d = n % 10;\n        if (d > mx) mx = d;\n        n /= 10;\n    }\n\n    cout << mx << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 12,
       "subgroupLabel": null,
-      "title": "90909 ədədinin rəqəmlərinin cəmi",
+      "title": "100 ədədinin ən böyük rəqəmi",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "maksimum"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "90909",
-      "exampleOutput": "27",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmləri arasında ən böyüyünü tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Ən böyük rəqəm.",
+      "exampleInput": "100",
+      "exampleOutput": "1",
+      "approach": "Hər rəqəm növbə ilə <b>mx</b> ilə müqayisə olunur, böyük olduqda <b>mx</b> yenilənir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int mx = 0;\n    while (n > 0) {\n        int d = n % 10;\n        if (d > mx) mx = d;\n        n /= 10;\n    }\n\n    cout << mx << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 13,
       "subgroupLabel": null,
-      "title": "123456789 ədədinin rəqəmlərinin cəmi",
+      "title": "777 ədədinin ən böyük rəqəmi",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "maksimum"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "123456789",
-      "exampleOutput": "45",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmləri arasında ən böyüyünü tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Ən böyük rəqəm.",
+      "exampleInput": "777",
+      "exampleOutput": "7",
+      "approach": "Hər rəqəm növbə ilə <b>mx</b> ilə müqayisə olunur, böyük olduqda <b>mx</b> yenilənir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int mx = 0;\n    while (n > 0) {\n        int d = n % 10;\n        if (d > mx) mx = d;\n        n /= 10;\n    }\n\n    cout << mx << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 14,
       "subgroupLabel": null,
-      "title": "42 ədədinin rəqəmlərinin cəmi",
+      "title": "50607 ədədinin ən böyük rəqəmi",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "maksimum"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "42",
-      "exampleOutput": "6",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmləri arasında ən böyüyünü tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Ən böyük rəqəm.",
+      "exampleInput": "50607",
+      "exampleOutput": "7",
+      "approach": "Hər rəqəm növbə ilə <b>mx</b> ilə müqayisə olunur, böyük olduqda <b>mx</b> yenilənir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int mx = 0;\n    while (n > 0) {\n        int d = n % 10;\n        if (d > mx) mx = d;\n        n /= 10;\n    }\n\n    cout << mx << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 15,
       "subgroupLabel": null,
-      "title": "8080 ədədinin rəqəmlərinin cəmi",
+      "title": "999999 ədədinin ən böyük rəqəmi",
       "difficulty": "easy",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "maksimum"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "8080",
-      "exampleOutput": "16",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmləri arasında ən böyüyünü tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "Ən böyük rəqəm.",
+      "exampleInput": "999999",
+      "exampleOutput": "9",
+      "approach": "Hər rəqəm növbə ilə <b>mx</b> ilə müqayisə olunur, böyük olduqda <b>mx</b> yenilənir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int mx = 0;\n    while (n > 0) {\n        int d = n % 10;\n        if (d > mx) mx = d;\n        n /= 10;\n    }\n\n    cout << mx << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 16,
       "subgroupLabel": null,
-      "title": "654321 ədədinin rəqəmlərinin cəmi",
-      "difficulty": "easy",
+      "title": "12345 ədədinin rəqəmlərinin artan sıra yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "sıralama"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "654321",
-      "exampleOutput": "21",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərinin soldan sağa artan (azalmayan) sırada olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "12345",
+      "exampleOutput": "BELE",
+      "approach": "Ədəd sətrə çevrilir, sonra hər QONŞU iki rəqəm müqayisə olunur — biri digərindən böyükdürsə, artan sıra pozulub.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    bool artandir = true;\n    for (int i = 0; i + 1 < (int)s.size(); i++) {\n        if (s[i] > s[i + 1]) {\n            artandir = false;\n            break;\n        }\n    }\n\n    cout << (artandir ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 17,
       "subgroupLabel": null,
-      "title": "99999 ədədinin rəqəmlərinin cəmi",
-      "difficulty": "easy",
+      "title": "1234567 ədədinin rəqəmlərinin artan sıra yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "rəqəmlərə ayırma",
-        "%",
-        "/",
-        "while"
+        "rəqəm",
+        "sıralama"
       ],
-      "statement": "Tam ədəd N verilib. Onun rəqəmlərinin cəmini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "Rəqəmlərin cəmi.",
-      "exampleInput": "99999",
-      "exampleOutput": "45",
-      "approach": "N sıfır olana qədər <b>N % 10</b> ilə sonuncu rəqəm ayrılır, cəmə əlavə olunur, sonra <b>N /= 10</b> ilə həmin rəqəm atılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long sum = 0;\n    while (n > 0){\n        sum += n % 10;\n        n /= 10;\n    }\n    cout << sum << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərinin soldan sağa artan (azalmayan) sırada olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "1234567",
+      "exampleOutput": "BELE",
+      "approach": "Ədəd sətrə çevrilir, sonra hər QONŞU iki rəqəm müqayisə olunur — biri digərindən böyükdürsə, artan sıra pozulub.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    bool artandir = true;\n    for (int i = 0; i + 1 < (int)s.size(); i++) {\n        if (s[i] > s[i + 1]) {\n            artandir = false;\n            break;\n        }\n    }\n\n    cout << (artandir ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 18,
       "subgroupLabel": null,
-      "title": "999999999 və 999999999 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "4321 ədədinin rəqəmlərinin artan sıra yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "rəqəm",
+        "sıralama"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "999999999 999999999 1000000007",
-      "exampleOutput": "999999991 64",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərinin soldan sağa artan (azalmayan) sırada olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "4321",
+      "exampleOutput": "XEYR",
+      "approach": "Ədəd sətrə çevrilir, sonra hər QONŞU iki rəqəm müqayisə olunur — biri digərindən böyükdürsə, artan sıra pozulub.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    bool artandir = true;\n    for (int i = 0; i + 1 < (int)s.size(); i++) {\n        if (s[i] > s[i + 1]) {\n            artandir = false;\n            break;\n        }\n    }\n\n    cout << (artandir ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 19,
       "subgroupLabel": null,
-      "title": "123456789 və 987654321 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "1123 ədədinin rəqəmlərinin artan sıra yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "rəqəm",
+        "sıralama"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "123456789 987654321 1000000007",
-      "exampleOutput": "111111103 259106859",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərinin soldan sağa artan (azalmayan) sırada olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "1123",
+      "exampleOutput": "BELE",
+      "approach": "Ədəd sətrə çevrilir, sonra hər QONŞU iki rəqəm müqayisə olunur — biri digərindən böyükdürsə, artan sıra pozulub.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    bool artandir = true;\n    for (int i = 0; i + 1 < (int)s.size(); i++) {\n        if (s[i] > s[i + 1]) {\n            artandir = false;\n            break;\n        }\n    }\n\n    cout << (artandir ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 20,
       "subgroupLabel": null,
-      "title": "500000000 və 600000000 ədədlərinin mod 998244353 üzrə cəmi və hasili",
+      "title": "987 ədədinin rəqəmlərinin artan sıra yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "rəqəm",
+        "sıralama"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "500000000 600000000 998244353",
-      "exampleOutput": "101755647 414470140",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun rəqəmlərinin soldan sağa artan (azalmayan) sırada olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "987",
+      "exampleOutput": "XEYR",
+      "approach": "Ədəd sətrə çevrilir, sonra hər QONŞU iki rəqəm müqayisə olunur — biri digərindən böyükdürsə, artan sıra pozulub.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    string s = to_string(n);\n\n    bool artandir = true;\n    for (int i = 0; i + 1 < (int)s.size(); i++) {\n        if (s[i] > s[i + 1]) {\n            artandir = false;\n            break;\n        }\n    }\n\n    cout << (artandir ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 21,
       "subgroupLabel": null,
-      "title": "17 və 5 ədədlərinin mod 12 üzrə cəmi və hasili",
-      "difficulty": "mid",
+      "title": "(7+5) mod 4",
+      "difficulty": "easy",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "%"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "17 5 12",
-      "exampleOutput": "10 1",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a+b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m ≠ 0).",
+      "outputSpec": "(a+b) mod m.",
+      "exampleInput": "7 5 4",
+      "exampleOutput": "0",
+      "approach": "Əvvəlcə a və b toplanır, sonra <b>% m</b> ilə m-ə görə qalıq tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a + b) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 22,
       "subgroupLabel": null,
-      "title": "100 və 200 ədədlərinin mod 7 üzrə cəmi və hasili",
-      "difficulty": "mid",
+      "title": "(100+250) mod 7",
+      "difficulty": "easy",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "%"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "100 200 7",
-      "exampleOutput": "6 1",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a+b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m ≠ 0).",
+      "outputSpec": "(a+b) mod m.",
+      "exampleInput": "100 250 7",
+      "exampleOutput": "0",
+      "approach": "Əvvəlcə a və b toplanır, sonra <b>% m</b> ilə m-ə görə qalıq tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a + b) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 23,
       "subgroupLabel": null,
-      "title": "999999999999 və 999999999999 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
-      "difficulty": "mid",
+      "title": "(999999999+999999999) mod 1000000007",
+      "difficulty": "easy",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "%"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "999999999999 999999999999 1000000007",
-      "exampleOutput": "999986005 49014001",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a+b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m ≠ 0).",
+      "outputSpec": "(a+b) mod m.",
+      "exampleInput": "999999999 999999999 1000000007",
+      "exampleOutput": "999999991",
+      "approach": "Əvvəlcə a və b toplanır, sonra <b>% m</b> ilə m-ə görə qalıq tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a + b) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 24,
       "subgroupLabel": null,
-      "title": "7 və 8 ədədlərinin mod 5 üzrə cəmi və hasili",
-      "difficulty": "mid",
+      "title": "(15+20) mod 6",
+      "difficulty": "easy",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "%"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "7 8 5",
-      "exampleOutput": "0 1",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a+b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m ≠ 0).",
+      "outputSpec": "(a+b) mod m.",
+      "exampleInput": "15 20 6",
+      "exampleOutput": "5",
+      "approach": "Əvvəlcə a və b toplanır, sonra <b>% m</b> ilə m-ə görə qalıq tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a + b) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 25,
       "subgroupLabel": null,
-      "title": "1000000000 və 1000000000 ədədlərinin mod 999999937 üzrə cəmi və hasili",
-      "difficulty": "mid",
+      "title": "(50+50) mod 13",
+      "difficulty": "easy",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "%"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "1000000000 1000000000 999999937",
-      "exampleOutput": "126 3969",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a+b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m ≠ 0).",
+      "outputSpec": "(a+b) mod m.",
+      "exampleInput": "50 50 13",
+      "exampleOutput": "9",
+      "approach": "Əvvəlcə a və b toplanır, sonra <b>% m</b> ilə m-ə görə qalıq tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a + b) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 26,
       "subgroupLabel": null,
-      "title": "55 və 66 ədədlərinin mod 13 üzrə cəmi və hasili",
+      "title": "(123456789*987654321) mod 1000000007",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "vurma"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "55 66 13",
-      "exampleOutput": "4 3",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a*b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a*b) mod m.",
+      "exampleInput": "123456789 987654321 1000000007",
+      "exampleOutput": "259106859",
+      "approach": "Birbaşa a*b hesablasaq ədəd çox böyük ola bilər. Ona görə əvvəlcə <b>a%m</b> və <b>b%m</b> tapılır (hər biri m-dən kiçik olur), onların hasili isə <b>long long</b>-a hələ də sığır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a % m) * (b % m) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 27,
       "subgroupLabel": null,
-      "title": "2 və 3 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "(10*20) mod 7",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "vurma"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "2 3 1000000007",
-      "exampleOutput": "5 6",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a*b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a*b) mod m.",
+      "exampleInput": "10 20 7",
+      "exampleOutput": "4",
+      "approach": "Birbaşa a*b hesablasaq ədəd çox böyük ola bilər. Ona görə əvvəlcə <b>a%m</b> və <b>b%m</b> tapılır (hər biri m-dən kiçik olur), onların hasili isə <b>long long</b>-a hələ də sığır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a % m) * (b % m) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 28,
       "subgroupLabel": null,
-      "title": "999999999 və 1 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "(999999999*2) mod 1000000000",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "vurma"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "999999999 1 1000000007",
-      "exampleOutput": "1000000000 999999999",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a*b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a*b) mod m.",
+      "exampleInput": "999999999 2 1000000000",
+      "exampleOutput": "999999998",
+      "approach": "Birbaşa a*b hesablasaq ədəd çox böyük ola bilər. Ona görə əvvəlcə <b>a%m</b> və <b>b%m</b> tapılır (hər biri m-dən kiçik olur), onların hasili isə <b>long long</b>-a hələ də sığır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a % m) * (b % m) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 29,
       "subgroupLabel": null,
-      "title": "444444444 və 555555555 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "(50*50) mod 100",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "vurma"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "444444444 555555555 1000000007",
-      "exampleOutput": "999999999 24691374",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a*b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a*b) mod m.",
+      "exampleInput": "50 50 100",
+      "exampleOutput": "0",
+      "approach": "Birbaşa a*b hesablasaq ədəd çox böyük ola bilər. Ona görə əvvəlcə <b>a%m</b> və <b>b%m</b> tapılır (hər biri m-dən kiçik olur), onların hasili isə <b>long long</b>-a hələ də sığır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a % m) * (b % m) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 30,
       "subgroupLabel": null,
-      "title": "81 və 27 ədədlərinin mod 100 üzrə cəmi və hasili",
+      "title": "(7*8) mod 5",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "vurma"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "81 27 100",
-      "exampleOutput": "8 87",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a*b) mod m nəticəsini tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a*b) mod m.",
+      "exampleInput": "7 8 5",
+      "exampleOutput": "1",
+      "approach": "Birbaşa a*b hesablasaq ədəd çox böyük ola bilər. Ona görə əvvəlcə <b>a%m</b> və <b>b%m</b> tapılır (hər biri m-dən kiçik olur), onların hasili isə <b>long long</b>-a hələ də sığır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    cout << (a % m) * (b % m) % m << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 31,
       "subgroupLabel": null,
-      "title": "9999999999 və 8888888888 ədədlərinin mod 998244353 üzrə cəmi və hasili",
+      "title": "(3-10) mod 7 (müsbət formada)",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "mənfi"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "9999999999 8888888888 998244353",
-      "exampleOutput": "920490533 951972827",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a-b) mod m nəticəsini, HƏMİŞƏ müsbət (0-dan böyük-bərabər) olacaq şəkildə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m > 0).",
+      "outputSpec": "(a-b) mod m, müsbət formada.",
+      "exampleInput": "3 10 7",
+      "exampleOutput": "0",
+      "approach": "Sadə <b>(a-b)%m</b> mənfi ola bilər (C++-da % işarəni bölünəndən götürür). Nəticəni HƏMİŞƏ müsbət etmək üçün əvvəlcə <b>+m</b> əlavə edib sonra yenidən <b>%m</b> edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = ((a - b) % m + m) % m;\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 32,
       "subgroupLabel": null,
-      "title": "1 və 1 ədədlərinin mod 2 üzrə cəmi və hasili",
+      "title": "(5-5) mod 4 (müsbət formada)",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "mənfi"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "1 1 2",
-      "exampleOutput": "0 1",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a-b) mod m nəticəsini, HƏMİŞƏ müsbət (0-dan böyük-bərabər) olacaq şəkildə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m > 0).",
+      "outputSpec": "(a-b) mod m, müsbət formada.",
+      "exampleInput": "5 5 4",
+      "exampleOutput": "0",
+      "approach": "Sadə <b>(a-b)%m</b> mənfi ola bilər (C++-da % işarəni bölünəndən götürür). Nəticəni HƏMİŞƏ müsbət etmək üçün əvvəlcə <b>+m</b> əlavə edib sonra yenidən <b>%m</b> edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = ((a - b) % m + m) % m;\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 33,
       "subgroupLabel": null,
-      "title": "777777777 və 333333333 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "(0-1) mod 3 (müsbət formada)",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "mənfi"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "777777777 333333333 1000000007",
-      "exampleOutput": "111111103 925925949",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a-b) mod m nəticəsini, HƏMİŞƏ müsbət (0-dan böyük-bərabər) olacaq şəkildə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m > 0).",
+      "outputSpec": "(a-b) mod m, müsbət formada.",
+      "exampleInput": "0 1 3",
+      "exampleOutput": "2",
+      "approach": "Sadə <b>(a-b)%m</b> mənfi ola bilər (C++-da % işarəni bölünəndən götürür). Nəticəni HƏMİŞƏ müsbət etmək üçün əvvəlcə <b>+m</b> əlavə edib sonra yenidən <b>%m</b> edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = ((a - b) % m + m) % m;\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 34,
       "subgroupLabel": null,
-      "title": "999999999999999999 və 1 ədədlərinin mod 1000000007 üzrə cəmi və hasili",
+      "title": "(100-150) mod 20 (müsbət formada)",
       "difficulty": "mid",
       "tags": [
-        "modul aritmetika",
-        "%",
-        "overflow"
+        "modul",
+        "mənfi"
       ],
-      "statement": "Üç tam ədəd a, b, m verilib. (a+b) mod m və (a×b) mod m dəyərlərini tapın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (1 ≤ a, b ≤ 10^18, 1 ≤ m ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: (a+b) mod m və (a×b) mod m (boşluqla ayrılmış).",
-      "exampleInput": "999999999999999999 1 1000000007",
-      "exampleOutput": "49 48",
-      "approach": "Toplama və vurmadan <b>əvvəl</b> hər ədəd üzərində <b>% m</b> tətbiq edilir ki, aralıq nəticələr böyük ədəd daşmasına (overflow) səbəb olmasın — <b>(a % m + b % m) % m</b> və <b>(a % m) * (b % m) % m</b> düsturları istifadə olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b, m; cin >> a >> b >> m;\n    long long sum = (a % m + b % m) % m;\n    long long prod = (a % m) * (b % m) % m;\n    cout << sum << \" \" << prod << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a-b) mod m nəticəsini, HƏMİŞƏ müsbət (0-dan böyük-bərabər) olacaq şəkildə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m > 0).",
+      "outputSpec": "(a-b) mod m, müsbət formada.",
+      "exampleInput": "100 150 20",
+      "exampleOutput": "10",
+      "approach": "Sadə <b>(a-b)%m</b> mənfi ola bilər (C++-da % işarəni bölünəndən götürür). Nəticəni HƏMİŞƏ müsbət etmək üçün əvvəlcə <b>+m</b> əlavə edib sonra yenidən <b>%m</b> edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = ((a - b) % m + m) % m;\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 35,
       "subgroupLabel": null,
-      "title": "2 ədədinin 10-ci dərəcəsi (mod 1000000007)",
+      "title": "(17-20) mod 6 (müsbət formada)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "mənfi"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "2 10 1000000007",
-      "exampleOutput": "1024",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib. (a-b) mod m nəticəsini, HƏMİŞƏ müsbət (0-dan böyük-bərabər) olacaq şəkildə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (m > 0).",
+      "outputSpec": "(a-b) mod m, müsbət formada.",
+      "exampleInput": "17 20 6",
+      "exampleOutput": "3",
+      "approach": "Sadə <b>(a-b)%m</b> mənfi ola bilər (C++-da % işarəni bölünəndən götürür). Nəticəni HƏMİŞƏ müsbət etmək üçün əvvəlcə <b>+m</b> əlavə edib sonra yenidən <b>%m</b> edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = ((a - b) % m + m) % m;\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 36,
       "subgroupLabel": null,
-      "title": "3 ədədinin 20-ci dərəcəsi (mod 1000000007)",
+      "title": "5 ədədin cəminin 7-ə görə qalığı",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "for"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "3 20 1000000007",
-      "exampleOutput": "486784380",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd və modul M verilib. Bütün ədədlərin cəminin M-ə görə qalığını tapın.",
+      "inputSpec": "Birinci sətirdə N və M, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmin M-ə görə qalığı.",
+      "exampleInput": "5 7\n10 20 30 40 50",
+      "exampleOutput": "3",
+      "approach": "Bütün ədədləri əvvəlcə cəmləyib SONRA % almaq əvəzinə, HƏR addımda cəmi dərhal <b>%m</b> ilə \"kiçildirik\" — bu, çox böyük N üçün cəmin daşmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    long long m;\n    cin >> n >> m;\n\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        sum = (sum + x) % m;\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 37,
       "subgroupLabel": null,
-      "title": "5 ədədinin 100-ci dərəcəsi (mod 998244353)",
+      "title": "3 ədədin cəminin 100-ə görə qalığı",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "for"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "5 100 998244353",
-      "exampleOutput": "993453594",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd və modul M verilib. Bütün ədədlərin cəminin M-ə görə qalığını tapın.",
+      "inputSpec": "Birinci sətirdə N və M, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmin M-ə görə qalığı.",
+      "exampleInput": "3 100\n999 888 777",
+      "exampleOutput": "64",
+      "approach": "Bütün ədədləri əvvəlcə cəmləyib SONRA % almaq əvəzinə, HƏR addımda cəmi dərhal <b>%m</b> ilə \"kiçildirik\" — bu, çox böyük N üçün cəmin daşmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    long long m;\n    cin >> n >> m;\n\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        sum = (sum + x) % m;\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 38,
       "subgroupLabel": null,
-      "title": "7 ədədinin 13-ci dərəcəsi (mod 1000000007)",
+      "title": "4 ədədin cəminin 13-ə görə qalığı",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "for"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "7 13 1000000007",
-      "exampleOutput": "889009735",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd və modul M verilib. Bütün ədədlərin cəminin M-ə görə qalığını tapın.",
+      "inputSpec": "Birinci sətirdə N və M, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmin M-ə görə qalığı.",
+      "exampleInput": "4 13\n1 2 3 4",
+      "exampleOutput": "10",
+      "approach": "Bütün ədədləri əvvəlcə cəmləyib SONRA % almaq əvəzinə, HƏR addımda cəmi dərhal <b>%m</b> ilə \"kiçildirik\" — bu, çox böyük N üçün cəmin daşmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    long long m;\n    cin >> n >> m;\n\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        sum = (sum + x) % m;\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 39,
       "subgroupLabel": null,
-      "title": "2 ədədinin 30-ci dərəcəsi (mod 1000000007)",
+      "title": "6 ədədin cəminin 1000000007-ə görə qalığı",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "for"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "2 30 1000000007",
-      "exampleOutput": "73741817",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd və modul M verilib. Bütün ədədlərin cəminin M-ə görə qalığını tapın.",
+      "inputSpec": "Birinci sətirdə N və M, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmin M-ə görə qalığı.",
+      "exampleInput": "6 1000000007\n100 200 300 400 500 600",
+      "exampleOutput": "2100",
+      "approach": "Bütün ədədləri əvvəlcə cəmləyib SONRA % almaq əvəzinə, HƏR addımda cəmi dərhal <b>%m</b> ilə \"kiçildirik\" — bu, çox böyük N üçün cəmin daşmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    long long m;\n    cin >> n >> m;\n\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        sum = (sum + x) % m;\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 40,
       "subgroupLabel": null,
-      "title": "10 ədədinin 9-ci dərəcəsi (mod 1000000007)",
+      "title": "2 ədədin cəminin 5-ə görə qalığı",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "modul",
+        "for"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "10 9 1000000007",
-      "exampleOutput": "1000000000",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd və modul M verilib. Bütün ədədlərin cəminin M-ə görə qalığını tapın.",
+      "inputSpec": "Birinci sətirdə N və M, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmin M-ə görə qalığı.",
+      "exampleInput": "2 5\n7 8",
+      "exampleOutput": "0",
+      "approach": "Bütün ədədləri əvvəlcə cəmləyib SONRA % almaq əvəzinə, HƏR addımda cəmi dərhal <b>%m</b> ilə \"kiçildirik\" — bu, çox böyük N üçün cəmin daşmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    long long m;\n    cin >> n >> m;\n\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        sum = (sum + x) % m;\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 41,
       "subgroupLabel": null,
-      "title": "4 ədədinin 50-ci dərəcəsi (mod 998244353)",
+      "title": "2^10 (sürətli qüvvətə yüksəltmə ilə)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "binar",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "4 50 998244353",
-      "exampleOutput": "882499718",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib (b ≥ 0). a^b-ni SÜRƏTLİ qüvvətə yüksəltmə üsulu ilə (b addım əvəzinə log(b) addımda) hesablayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 30).",
+      "outputSpec": "a^b-nin dəyəri.",
+      "exampleInput": "2 10",
+      "exampleOutput": "1024",
+      "approach": "b-ni ikilik sistemdə \"parçalayaraq\" gedirik: hər addımda əgər b-nin cari biti 1-dirsə bazanı nəticəyə vururuq, sonra bazanı özü-özünə vurub (baza²) b-ni bir bit sağa sürüşdürürük. Bu, nəticəni cəmi log₂(b) addımda tapır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a;\n    while (b > 0) {\n        if (b & 1) {\n            res *= baza;\n        }\n        baza *= baza;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 42,
       "subgroupLabel": null,
-      "title": "6 ədədinin 6-ci dərəcəsi (mod 1000000007)",
+      "title": "3^5 (sürətli qüvvətə yüksəltmə ilə)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "binar",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "6 6 1000000007",
-      "exampleOutput": "46656",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib (b ≥ 0). a^b-ni SÜRƏTLİ qüvvətə yüksəltmə üsulu ilə (b addım əvəzinə log(b) addımda) hesablayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 30).",
+      "outputSpec": "a^b-nin dəyəri.",
+      "exampleInput": "3 5",
+      "exampleOutput": "243",
+      "approach": "b-ni ikilik sistemdə \"parçalayaraq\" gedirik: hər addımda əgər b-nin cari biti 1-dirsə bazanı nəticəyə vururuq, sonra bazanı özü-özünə vurub (baza²) b-ni bir bit sağa sürüşdürürük. Bu, nəticəni cəmi log₂(b) addımda tapır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a;\n    while (b > 0) {\n        if (b & 1) {\n            res *= baza;\n        }\n        baza *= baza;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 43,
       "subgroupLabel": null,
-      "title": "2 ədədinin 1000000000-ci dərəcəsi (mod 1000000007)",
+      "title": "5^4 (sürətli qüvvətə yüksəltmə ilə)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "binar",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "2 1000000000 1000000007",
-      "exampleOutput": "140625001",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib (b ≥ 0). a^b-ni SÜRƏTLİ qüvvətə yüksəltmə üsulu ilə (b addım əvəzinə log(b) addımda) hesablayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 30).",
+      "outputSpec": "a^b-nin dəyəri.",
+      "exampleInput": "5 4",
+      "exampleOutput": "625",
+      "approach": "b-ni ikilik sistemdə \"parçalayaraq\" gedirik: hər addımda əgər b-nin cari biti 1-dirsə bazanı nəticəyə vururuq, sonra bazanı özü-özünə vurub (baza²) b-ni bir bit sağa sürüşdürürük. Bu, nəticəni cəmi log₂(b) addımda tapır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a;\n    while (b > 0) {\n        if (b & 1) {\n            res *= baza;\n        }\n        baza *= baza;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 44,
       "subgroupLabel": null,
-      "title": "9 ədədinin 9-ci dərəcəsi (mod 1000000007)",
+      "title": "2^20 (sürətli qüvvətə yüksəltmə ilə)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "binar",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "9 9 1000000007",
-      "exampleOutput": "387420489",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib (b ≥ 0). a^b-ni SÜRƏTLİ qüvvətə yüksəltmə üsulu ilə (b addım əvəzinə log(b) addımda) hesablayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 30).",
+      "outputSpec": "a^b-nin dəyəri.",
+      "exampleInput": "2 20",
+      "exampleOutput": "1048576",
+      "approach": "b-ni ikilik sistemdə \"parçalayaraq\" gedirik: hər addımda əgər b-nin cari biti 1-dirsə bazanı nəticəyə vururuq, sonra bazanı özü-özünə vurub (baza²) b-ni bir bit sağa sürüşdürürük. Bu, nəticəni cəmi log₂(b) addımda tapır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a;\n    while (b > 0) {\n        if (b & 1) {\n            res *= baza;\n        }\n        baza *= baza;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 45,
       "subgroupLabel": null,
-      "title": "11 ədədinin 11-ci dərəcəsi (mod 1000000007)",
+      "title": "7^3 (sürətli qüvvətə yüksəltmə ilə)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "binar",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "11 11 1000000007",
-      "exampleOutput": "311668616",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib (b ≥ 0). a^b-ni SÜRƏTLİ qüvvətə yüksəltmə üsulu ilə (b addım əvəzinə log(b) addımda) hesablayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 30).",
+      "outputSpec": "a^b-nin dəyəri.",
+      "exampleInput": "7 3",
+      "exampleOutput": "343",
+      "approach": "b-ni ikilik sistemdə \"parçalayaraq\" gedirik: hər addımda əgər b-nin cari biti 1-dirsə bazanı nəticəyə vururuq, sonra bazanı özü-özünə vurub (baza²) b-ni bir bit sağa sürüşdürürük. Bu, nəticəni cəmi log₂(b) addımda tapır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a;\n    while (b > 0) {\n        if (b & 1) {\n            res *= baza;\n        }\n        baza *= baza;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 46,
       "subgroupLabel": null,
-      "title": "13 ədədinin 13-ci dərəcəsi (mod 1000000007)",
+      "title": "2^10 mod 1000 (sürətli qüvvət + modul)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "13 13 1000000007",
-      "exampleOutput": "104472128",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib (b ≥ 0). (a^b) mod m nəticəsini sürətli qüvvətə yüksəltmə ilə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (0 ≤ b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a^b) mod m.",
+      "exampleInput": "2 10 1000",
+      "exampleOutput": "24",
+      "approach": "Eyni binar qüvvətə yüksəltmə üsulu, sadəcə HƏR vurmadan sonra dərhal <b>%m</b> alınır ki, ədəd böyüməsin — bu, rəqəmsal təhlükəsizlik (kriptoqrafiya) və yarışma proqramlaşdırmasında ən çox işlədilən texnikalardan biridir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = 1;\n    long long baza = a % m;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % m;\n        }\n        baza = baza * baza % m;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 47,
       "subgroupLabel": null,
-      "title": "3 ədədinin 100-ci dərəcəsi (mod 1000000007)",
+      "title": "3^1000000000 mod 1000000007 (sürətli qüvvət + modul)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "3 100 1000000007",
-      "exampleOutput": "886041711",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib (b ≥ 0). (a^b) mod m nəticəsini sürətli qüvvətə yüksəltmə ilə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (0 ≤ b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a^b) mod m.",
+      "exampleInput": "3 1000000000 1000000007",
+      "exampleOutput": "235939645",
+      "approach": "Eyni binar qüvvətə yüksəltmə üsulu, sadəcə HƏR vurmadan sonra dərhal <b>%m</b> alınır ki, ədəd böyüməsin — bu, rəqəmsal təhlükəsizlik (kriptoqrafiya) və yarışma proqramlaşdırmasında ən çox işlədilən texnikalardan biridir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = 1;\n    long long baza = a % m;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % m;\n        }\n        baza = baza * baza % m;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 48,
       "subgroupLabel": null,
-      "title": "2 ədədinin 63-ci dərəcəsi (mod 998244353)",
+      "title": "5^100 mod 13 (sürətli qüvvət + modul)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "2 63 998244353",
-      "exampleOutput": "466025955",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib (b ≥ 0). (a^b) mod m nəticəsini sürətli qüvvətə yüksəltmə ilə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (0 ≤ b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a^b) mod m.",
+      "exampleInput": "5 100 13",
+      "exampleOutput": "1",
+      "approach": "Eyni binar qüvvətə yüksəltmə üsulu, sadəcə HƏR vurmadan sonra dərhal <b>%m</b> alınır ki, ədəd böyüməsin — bu, rəqəmsal təhlükəsizlik (kriptoqrafiya) və yarışma proqramlaşdırmasında ən çox işlədilən texnikalardan biridir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = 1;\n    long long baza = a % m;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % m;\n        }\n        baza = baza * baza % m;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 49,
       "subgroupLabel": null,
-      "title": "5 ədədinin 5-ci dərəcəsi (mod 1000000007)",
+      "title": "7^50 mod 1000000007 (sürətli qüvvət + modul)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "5 5 1000000007",
-      "exampleOutput": "3125",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib (b ≥ 0). (a^b) mod m nəticəsini sürətli qüvvətə yüksəltmə ilə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (0 ≤ b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a^b) mod m.",
+      "exampleInput": "7 50 1000000007",
+      "exampleOutput": "839709617",
+      "approach": "Eyni binar qüvvətə yüksəltmə üsulu, sadəcə HƏR vurmadan sonra dərhal <b>%m</b> alınır ki, ədəd böyüməsin — bu, rəqəmsal təhlükəsizlik (kriptoqrafiya) və yarışma proqramlaşdırmasında ən çox işlədilən texnikalardan biridir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = 1;\n    long long baza = a % m;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % m;\n        }\n        baza = baza * baza % m;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 50,
       "subgroupLabel": null,
-      "title": "17 ədədinin 17-ci dərəcəsi (mod 1000000007)",
+      "title": "2^30 mod 7 (sürətli qüvvət + modul)",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "sürətli"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "17 17 1000000007",
-      "exampleOutput": "654971512",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, m verilib (b ≥ 0). (a^b) mod m nəticəsini sürətli qüvvətə yüksəltmə ilə tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, m (0 ≤ b ≤ 10^9, 1 ≤ m ≤ 10^9).",
+      "outputSpec": "(a^b) mod m.",
+      "exampleInput": "2 30 7",
+      "exampleOutput": "1",
+      "approach": "Eyni binar qüvvətə yüksəltmə üsulu, sadəcə HƏR vurmadan sonra dərhal <b>%m</b> alınır ki, ədəd böyüməsin — bu, rəqəmsal təhlükəsizlik (kriptoqrafiya) və yarışma proqramlaşdırmasında ən çox işlədilən texnikalardan biridir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, m;\n    cin >> a >> b >> m;\n\n    long long res = 1;\n    long long baza = a % m;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % m;\n        }\n        baza = baza * baza % m;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 51,
       "subgroupLabel": null,
-      "title": "7 ədədinin 100-ci dərəcəsi (mod 998244353)",
+      "title": "2^10-nin son rəqəmi",
       "difficulty": "mid",
       "tags": [
-        "sürətli qüvvət",
-        "modul aritmetika",
-        "O(log n)"
+        "qüvvət",
+        "modul",
+        "rəqəm"
       ],
-      "statement": "Üç tam ədəd base, exp, mod verilib. (base^exp) mod mod dəyərini hesablayın.",
-      "inputSpec": "Bir sətirdə üç tam ədəd base, exp, mod (0 ≤ base ≤ 10^9, 0 ≤ exp ≤ 10^9, 1 ≤ mod ≤ 10^9).",
-      "outputSpec": "(base^exp) mod mod dəyəri.",
-      "exampleInput": "7 100 998244353",
-      "exampleOutput": "680223855",
-      "approach": "Sadə dövrlə base-i exp dəfə vurmaq exp böyük olduqda çox yavaşdır. Əvəzinə <b>sürətli qüvvət</b> (binary exponentiation) istifadə olunur: hər addımda exp 2-yə bölünür, nəticədə O(exp) əvəzinə <b>O(log exp)</b> vaxt sərf olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long power(long long base, long long exp, long long mod){\n    long long result = 1;\n    base %= mod;\n    while (exp > 0){\n        if (exp % 2 == 1) result = result * base % mod;\n        base = base * base % mod;\n        exp /= 2;\n    }\n    return result;\n}\nint main(){\n    long long base, exp, mod; cin >> base >> exp >> mod;\n    cout << power(base, exp, mod) << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib. a^b-nin SON rəqəmini tapın (bütün a^b-ni hesablamadan).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 10^9).",
+      "outputSpec": "a^b-nin son rəqəmi.",
+      "exampleInput": "2 10",
+      "exampleOutput": "4",
+      "approach": "Son rəqəmi tapmaq üçün bütün a^b-ni hesablamağa EHTİYAC YOXDUR — sürətli qüvvətə yüksəltmədə hər addımda <b>mod 10</b> saxlamaq kifayətdir, çünki son rəqəm = ədəd mod 10.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a % 10;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % 10;\n        }\n        baza = baza * baza % 10;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 52,
       "subgroupLabel": null,
-      "title": "5! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "7^100-nin son rəqəmi",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "qüvvət",
+        "modul",
+        "rəqəm"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "5",
-      "exampleOutput": "120",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib. a^b-nin SON rəqəmini tapın (bütün a^b-ni hesablamadan).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 10^9).",
+      "outputSpec": "a^b-nin son rəqəmi.",
+      "exampleInput": "7 100",
+      "exampleOutput": "1",
+      "approach": "Son rəqəmi tapmaq üçün bütün a^b-ni hesablamağa EHTİYAC YOXDUR — sürətli qüvvətə yüksəltmədə hər addımda <b>mod 10</b> saxlamaq kifayətdir, çünki son rəqəm = ədəd mod 10.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a % 10;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % 10;\n        }\n        baza = baza * baza % 10;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 53,
       "subgroupLabel": null,
-      "title": "10! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "3^7-nin son rəqəmi",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "qüvvət",
+        "modul",
+        "rəqəm"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "10",
-      "exampleOutput": "3628800",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib. a^b-nin SON rəqəmini tapın (bütün a^b-ni hesablamadan).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 10^9).",
+      "outputSpec": "a^b-nin son rəqəmi.",
+      "exampleInput": "3 7",
+      "exampleOutput": "7",
+      "approach": "Son rəqəmi tapmaq üçün bütün a^b-ni hesablamağa EHTİYAC YOXDUR — sürətli qüvvətə yüksəltmədə hər addımda <b>mod 10</b> saxlamaq kifayətdir, çünki son rəqəm = ədəd mod 10.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a % 10;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % 10;\n        }\n        baza = baza * baza % 10;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 54,
       "subgroupLabel": null,
-      "title": "0! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "9^9-nin son rəqəmi",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "qüvvət",
+        "modul",
+        "rəqəm"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "0",
-      "exampleOutput": "1",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib. a^b-nin SON rəqəmini tapın (bütün a^b-ni hesablamadan).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 10^9).",
+      "outputSpec": "a^b-nin son rəqəmi.",
+      "exampleInput": "9 9",
+      "exampleOutput": "9",
+      "approach": "Son rəqəmi tapmaq üçün bütün a^b-ni hesablamağa EHTİYAC YOXDUR — sürətli qüvvətə yüksəltmədə hər addımda <b>mod 10</b> saxlamaq kifayətdir, çünki son rəqəm = ədəd mod 10.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a % 10;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % 10;\n        }\n        baza = baza * baza % 10;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 55,
       "subgroupLabel": null,
-      "title": "1! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "13^5-nin son rəqəmi",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "qüvvət",
+        "modul",
+        "rəqəm"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "1",
-      "exampleOutput": "1",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "İki ədəd a və b verilib. a^b-nin SON rəqəmini tapın (bütün a^b-ni hesablamadan).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ b ≤ 10^9).",
+      "outputSpec": "a^b-nin son rəqəmi.",
+      "exampleInput": "13 5",
+      "exampleOutput": "3",
+      "approach": "Son rəqəmi tapmaq üçün bütün a^b-ni hesablamağa EHTİYAC YOXDUR — sürətli qüvvətə yüksəltmədə hər addımda <b>mod 10</b> saxlamaq kifayətdir, çünki son rəqəm = ədəd mod 10.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long res = 1;\n    long long baza = a % 10;\n    while (b > 0) {\n        if (b & 1) {\n            res = res * baza % 10;\n        }\n        baza = baza * baza % 10;\n        b >>= 1;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 56,
       "subgroupLabel": null,
-      "title": "15! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "64 ədədinin 2-nin qüvvəti olma yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "bit",
+        "qüvvət"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "15",
-      "exampleOutput": "1307674368000",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun 2-nin tam qüvvəti (1, 2, 4, 8, 16, ...) olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "64",
+      "exampleOutput": "BELE",
+      "approach": "2-nin qüvvətləri ikilik yazılışda YALNIZ BİR \"1\" bitinə malikdir (1, 10, 100, ...). <b>n &amp; (n-1)</b> trükü bu tək biti \"söndürür\" — nəticə sıfırdırsa, n 2-nin qüvvətidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPowerOf2 = (n > 0) && ((n & (n - 1)) == 0);\n\n    cout << (isPowerOf2 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 57,
       "subgroupLabel": null,
-      "title": "12! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "100 ədədinin 2-nin qüvvəti olma yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "bit",
+        "qüvvət"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "12",
-      "exampleOutput": "479001600",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun 2-nin tam qüvvəti (1, 2, 4, 8, 16, ...) olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "100",
+      "exampleOutput": "XEYR",
+      "approach": "2-nin qüvvətləri ikilik yazılışda YALNIZ BİR \"1\" bitinə malikdir (1, 10, 100, ...). <b>n &amp; (n-1)</b> trükü bu tək biti \"söndürür\" — nəticə sıfırdırsa, n 2-nin qüvvətidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPowerOf2 = (n > 0) && ((n & (n - 1)) == 0);\n\n    cout << (isPowerOf2 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 58,
       "subgroupLabel": null,
-      "title": "18! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "1 ədədinin 2-nin qüvvəti olma yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "bit",
+        "qüvvət"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "18",
-      "exampleOutput": "6402373705728000",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun 2-nin tam qüvvəti (1, 2, 4, 8, 16, ...) olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "1",
+      "exampleOutput": "BELE",
+      "approach": "2-nin qüvvətləri ikilik yazılışda YALNIZ BİR \"1\" bitinə malikdir (1, 10, 100, ...). <b>n &amp; (n-1)</b> trükü bu tək biti \"söndürür\" — nəticə sıfırdırsa, n 2-nin qüvvətidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPowerOf2 = (n > 0) && ((n & (n - 1)) == 0);\n\n    cout << (isPowerOf2 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 59,
       "subgroupLabel": null,
-      "title": "7! (faktorial) hesablanması",
-      "difficulty": "easy",
+      "title": "1024 ədədinin 2-nin qüvvəti olma yoxlanması",
+      "difficulty": "mid",
       "tags": [
-        "faktorial",
-        "for",
-        "long long"
+        "bit",
+        "qüvvət"
       ],
-      "statement": "Tam ədəd N verilib. N! (N faktorial) dəyərini hesablayın.",
-      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 18).",
-      "outputSpec": "N! dəyəri.",
-      "exampleInput": "7",
-      "exampleOutput": "5040",
-      "approach": "<b>for</b> dövrü ilə 2-dən N-ə qədər olan bütün ədədlər ardıcıl vurulur. N=0 və N=1 üçün nəticə 1-dir (baza halı). 18-dən sonra nəticə <b>long long</b> tipinin belə həddini keçə bilər, ona görə N ≤ 18 ilə məhdudlaşdırılıb.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    long long res = 1;\n    for (int i = 2; i <= n; i++) res *= i;\n    cout << res << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun 2-nin tam qüvvəti (1, 2, 4, 8, 16, ...) olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "1024",
+      "exampleOutput": "BELE",
+      "approach": "2-nin qüvvətləri ikilik yazılışda YALNIZ BİR \"1\" bitinə malikdir (1, 10, 100, ...). <b>n &amp; (n-1)</b> trükü bu tək biti \"söndürür\" — nəticə sıfırdırsa, n 2-nin qüvvətidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPowerOf2 = (n > 0) && ((n & (n - 1)) == 0);\n\n    cout << (isPowerOf2 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 60,
       "subgroupLabel": null,
-      "title": "C(5,2) — 5 elementdən 2 seçmə",
+      "title": "1000 ədədinin 2-nin qüvvəti olma yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "bit",
+        "qüvvət"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "5 2",
-      "exampleOutput": "10",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun 2-nin tam qüvvəti (1, 2, 4, 8, 16, ...) olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "1000",
+      "exampleOutput": "XEYR",
+      "approach": "2-nin qüvvətləri ikilik yazılışda YALNIZ BİR \"1\" bitinə malikdir (1, 10, 100, ...). <b>n &amp; (n-1)</b> trükü bu tək biti \"söndürür\" — nəticə sıfırdırsa, n 2-nin qüvvətidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPowerOf2 = (n > 0) && ((n & (n - 1)) == 0);\n\n    cout << (isPowerOf2 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 61,
       "subgroupLabel": null,
-      "title": "C(10,3) — 10 elementdən 3 seçmə",
-      "difficulty": "mid",
+      "title": "10! faktorialının hesablanması",
+      "difficulty": "easy",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "faktorial"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "10 3",
-      "exampleOutput": "120",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd n verilib. n! (n faktorial) hesablayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 20).",
+      "outputSpec": "n!-nın dəyəri.",
+      "exampleInput": "10",
+      "exampleOutput": "3628800",
+      "approach": "2-dən n-ə qədər bütün ədədlər ardıcıl vurulur. n=0 üçün nəticə 1-dir (dövr heç işləmir, f öz başlanğıc dəyərində qalır).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long f = 1;\n    for (long long i = 2; i <= n; i++) {\n        f *= i;\n    }\n\n    cout << f << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 62,
       "subgroupLabel": null,
-      "title": "C(6,6) — 6 elementdən 6 seçmə",
-      "difficulty": "mid",
+      "title": "15! faktorialının hesablanması",
+      "difficulty": "easy",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "faktorial"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "6 6",
-      "exampleOutput": "1",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd n verilib. n! (n faktorial) hesablayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 20).",
+      "outputSpec": "n!-nın dəyəri.",
+      "exampleInput": "15",
+      "exampleOutput": "1307674368000",
+      "approach": "2-dən n-ə qədər bütün ədədlər ardıcıl vurulur. n=0 üçün nəticə 1-dir (dövr heç işləmir, f öz başlanğıc dəyərində qalır).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long f = 1;\n    for (long long i = 2; i <= n; i++) {\n        f *= i;\n    }\n\n    cout << f << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 63,
       "subgroupLabel": null,
-      "title": "C(7,0) — 7 elementdən 0 seçmə",
-      "difficulty": "mid",
+      "title": "20! faktorialının hesablanması",
+      "difficulty": "easy",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "faktorial"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "7 0",
-      "exampleOutput": "1",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd n verilib. n! (n faktorial) hesablayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 20).",
+      "outputSpec": "n!-nın dəyəri.",
+      "exampleInput": "20",
+      "exampleOutput": "2432902008176640000",
+      "approach": "2-dən n-ə qədər bütün ədədlər ardıcıl vurulur. n=0 üçün nəticə 1-dir (dövr heç işləmir, f öz başlanğıc dəyərində qalır).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long f = 1;\n    for (long long i = 2; i <= n; i++) {\n        f *= i;\n    }\n\n    cout << f << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 64,
       "subgroupLabel": null,
-      "title": "C(8,4) — 8 elementdən 4 seçmə",
-      "difficulty": "mid",
+      "title": "5! faktorialının hesablanması",
+      "difficulty": "easy",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "faktorial"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "8 4",
-      "exampleOutput": "70",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd n verilib. n! (n faktorial) hesablayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 20).",
+      "outputSpec": "n!-nın dəyəri.",
+      "exampleInput": "5",
+      "exampleOutput": "120",
+      "approach": "2-dən n-ə qədər bütün ədədlər ardıcıl vurulur. n=0 üçün nəticə 1-dir (dövr heç işləmir, f öz başlanğıc dəyərində qalır).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long f = 1;\n    for (long long i = 2; i <= n; i++) {\n        f *= i;\n    }\n\n    cout << f << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 65,
       "subgroupLabel": null,
-      "title": "C(12,5) — 12 elementdən 5 seçmə",
-      "difficulty": "mid",
+      "title": "0! faktorialının hesablanması",
+      "difficulty": "easy",
       "tags": [
-        "kombinatorika",
-        "faktorial",
-        "C(n,k)"
+        "faktorial"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "12 5",
-      "exampleOutput": "792",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "Tam ədəd n verilib. n! (n faktorial) hesablayın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 20).",
+      "outputSpec": "n!-nın dəyəri.",
+      "exampleInput": "0",
+      "exampleOutput": "1",
+      "approach": "2-dən n-ə qədər bütün ədədlər ardıcıl vurulur. n=0 üçün nəticə 1-dir (dövr heç işləmir, f öz başlanğıc dəyərində qalır).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long f = 1;\n    for (long long i = 2; i <= n; i++) {\n        f *= i;\n    }\n\n    cout << f << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 66,
       "subgroupLabel": null,
-      "title": "C(9,2) — 9 elementdən 2 seçmə",
+      "title": "C(5,2) kombinasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
         "kombinatorika",
-        "faktorial",
         "C(n,k)"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "9 2",
-      "exampleOutput": "36",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. C(n,k) (n-dən k-nın seçilməsi, sıra fərq etmir) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 30).",
+      "outputSpec": "C(n,k)-nin dəyəri.",
+      "exampleInput": "5 2",
+      "exampleOutput": "10",
+      "approach": "C(n,k) = n!/(k!(n-k)!) düsturunu birbaşa faktoriallarla hesablasaq böyük n üçün daşma baş verə bilər. Ona görə vurma və bölməni NÖVBƏ İLƏ aparırıq ki, aralıq nəticələr həmişə tam ədəd olsun (riyazi olaraq sübut olunub ki, bu sıra ilə hər addım tam bölünür).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 1; i <= k; i++) {\n        res = res * (n - k + i) / i;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 67,
       "subgroupLabel": null,
-      "title": "C(15,7) — 15 elementdən 7 seçmə",
+      "title": "C(10,3) kombinasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
         "kombinatorika",
-        "faktorial",
         "C(n,k)"
       ],
-      "statement": "İki tam ədəd n və k verilib (k ≤ n). n elementdən k elementin neçə fərqli üsulla seçilə biləcəyini (C(n,k)) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 15).",
-      "outputSpec": "C(n,k) dəyəri.",
-      "exampleInput": "15 7",
-      "exampleOutput": "6435",
-      "approach": "<b>C(n,k) = n! / (k! × (n−k)!)</b> düsturu tətbiq olunur — əvvəlcə faktorial funksiyası ilə hər üç faktorial hesablanır, sonra düstur üzrə bölünür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long fact(int n){\n    long long r = 1;\n    for (int i = 2; i <= n; i++) r *= i;\n    return r;\n}\nint main(){\n    int n, k; cin >> n >> k;\n    cout << fact(n) / (fact(k) * fact(n - k)) << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. C(n,k) (n-dən k-nın seçilməsi, sıra fərq etmir) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 30).",
+      "outputSpec": "C(n,k)-nin dəyəri.",
+      "exampleInput": "10 3",
+      "exampleOutput": "120",
+      "approach": "C(n,k) = n!/(k!(n-k)!) düsturunu birbaşa faktoriallarla hesablasaq böyük n üçün daşma baş verə bilər. Ona görə vurma və bölməni NÖVBƏ İLƏ aparırıq ki, aralıq nəticələr həmişə tam ədəd olsun (riyazi olaraq sübut olunub ki, bu sıra ilə hər addım tam bölünür).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 1; i <= k; i++) {\n        res = res * (n - k + i) / i;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 68,
       "subgroupLabel": null,
-      "title": "2000000000 və 2000000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "C(6,6) kombinasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "C(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2000000000 2000000000",
-      "exampleOutput": "4000000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. C(n,k) (n-dən k-nın seçilməsi, sıra fərq etmir) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 30).",
+      "outputSpec": "C(n,k)-nin dəyəri.",
+      "exampleInput": "6 6",
+      "exampleOutput": "1",
+      "approach": "C(n,k) = n!/(k!(n-k)!) düsturunu birbaşa faktoriallarla hesablasaq böyük n üçün daşma baş verə bilər. Ona görə vurma və bölməni NÖVBƏ İLƏ aparırıq ki, aralıq nəticələr həmişə tam ədəd olsun (riyazi olaraq sübut olunub ki, bu sıra ilə hər addım tam bölünür).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 1; i <= k; i++) {\n        res = res * (n - k + i) / i;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 69,
       "subgroupLabel": null,
-      "title": "1500000000 və 1800000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "C(8,0) kombinasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "C(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1500000000 1800000000",
-      "exampleOutput": "3300000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. C(n,k) (n-dən k-nın seçilməsi, sıra fərq etmir) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 30).",
+      "outputSpec": "C(n,k)-nin dəyəri.",
+      "exampleInput": "8 0",
+      "exampleOutput": "1",
+      "approach": "C(n,k) = n!/(k!(n-k)!) düsturunu birbaşa faktoriallarla hesablasaq böyük n üçün daşma baş verə bilər. Ona görə vurma və bölməni NÖVBƏ İLƏ aparırıq ki, aralıq nəticələr həmişə tam ədəd olsun (riyazi olaraq sübut olunub ki, bu sıra ilə hər addım tam bölünür).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 1; i <= k; i++) {\n        res = res * (n - k + i) / i;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 70,
       "subgroupLabel": null,
-      "title": "999999999 və 999999999 ədədlərinin cəmi (overflow-suz)",
+      "title": "C(20,10) kombinasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "C(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "999999999 999999999",
-      "exampleOutput": "1999999998",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. C(n,k) (n-dən k-nın seçilməsi, sıra fərq etmir) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 30).",
+      "outputSpec": "C(n,k)-nin dəyəri.",
+      "exampleInput": "20 10",
+      "exampleOutput": "184756",
+      "approach": "C(n,k) = n!/(k!(n-k)!) düsturunu birbaşa faktoriallarla hesablasaq böyük n üçün daşma baş verə bilər. Ona görə vurma və bölməni NÖVBƏ İLƏ aparırıq ki, aralıq nəticələr həmişə tam ədəd olsun (riyazi olaraq sübut olunub ki, bu sıra ilə hər addım tam bölünür).",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 1; i <= k; i++) {\n        res = res * (n - k + i) / i;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 71,
       "subgroupLabel": null,
-      "title": "2100000000 və 2100000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "P(5,2) permutasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "P(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2100000000 2100000000",
-      "exampleOutput": "4200000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. P(n,k) (n-dən k-nın sıra ilə düzülüşü) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 20).",
+      "outputSpec": "P(n,k)-nin dəyəri.",
+      "exampleInput": "5 2",
+      "exampleOutput": "20",
+      "approach": "P(n,k) = n*(n-1)*...*(n-k+1) — n-dən başlayaraq AZALARAQ k ədəd ardıcıl ədədi bir-birinə vururuq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 0; i < k; i++) {\n        res *= (n - i);\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 72,
       "subgroupLabel": null,
-      "title": "1234567890 və 1234567890 ədədlərinin cəmi (overflow-suz)",
+      "title": "P(10,3) permutasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "P(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1234567890 1234567890",
-      "exampleOutput": "2469135780",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. P(n,k) (n-dən k-nın sıra ilə düzülüşü) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 20).",
+      "outputSpec": "P(n,k)-nin dəyəri.",
+      "exampleInput": "10 3",
+      "exampleOutput": "720",
+      "approach": "P(n,k) = n*(n-1)*...*(n-k+1) — n-dən başlayaraq AZALARAQ k ədəd ardıcıl ədədi bir-birinə vururuq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 0; i < k; i++) {\n        res *= (n - i);\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 73,
       "subgroupLabel": null,
-      "title": "2000000000 və 100000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "P(6,6) permutasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "P(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2000000000 100000000",
-      "exampleOutput": "2100000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. P(n,k) (n-dən k-nın sıra ilə düzülüşü) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 20).",
+      "outputSpec": "P(n,k)-nin dəyəri.",
+      "exampleInput": "6 6",
+      "exampleOutput": "720",
+      "approach": "P(n,k) = n*(n-1)*...*(n-k+1) — n-dən başlayaraq AZALARAQ k ədəd ardıcıl ədədi bir-birinə vururuq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 0; i < k; i++) {\n        res *= (n - i);\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 74,
       "subgroupLabel": null,
-      "title": "1999999999 və 1999999999 ədədlərinin cəmi (overflow-suz)",
+      "title": "P(8,0) permutasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "P(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1999999999 1999999999",
-      "exampleOutput": "3999999998",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. P(n,k) (n-dən k-nın sıra ilə düzülüşü) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 20).",
+      "outputSpec": "P(n,k)-nin dəyəri.",
+      "exampleInput": "8 0",
+      "exampleOutput": "1",
+      "approach": "P(n,k) = n*(n-1)*...*(n-k+1) — n-dən başlayaraq AZALARAQ k ədəd ardıcıl ədədi bir-birinə vururuq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 0; i < k; i++) {\n        res *= (n - i);\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 75,
       "subgroupLabel": null,
-      "title": "1000000000 və 1000000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "P(7,4) permutasiyasının hesablanması",
       "difficulty": "mid",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "P(n,k)"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1000000000 1000000000",
-      "exampleOutput": "2000000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. P(n,k) (n-dən k-nın sıra ilə düzülüşü) qiymətini tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (0 ≤ k ≤ n ≤ 20).",
+      "outputSpec": "P(n,k)-nin dəyəri.",
+      "exampleInput": "7 4",
+      "exampleOutput": "840",
+      "approach": "P(n,k) = n*(n-1)*...*(n-k+1) — n-dən başlayaraq AZALARAQ k ədəd ardıcıl ədədi bir-birinə vururuq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long res = 1;\n    for (long long i = 0; i < k; i++) {\n        res *= (n - i);\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 76,
       "subgroupLabel": null,
-      "title": "1800000000 və 1900000000 ədədlərinin cəmi (overflow-suz)",
-      "difficulty": "mid",
+      "title": "3 elementlik çoxluğun alt-çoxluqlarının sayı",
+      "difficulty": "easy",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "2^n"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1800000000 1900000000",
-      "exampleOutput": "3700000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "N elementlik çoxluq verilib. Onun bütün alt-çoxluqlarının (boş və özü daxil) sayını tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 30).",
+      "outputSpec": "Alt-çoxluqların sayı.",
+      "exampleInput": "3",
+      "exampleOutput": "8",
+      "approach": "Hər element ya alt-çoxluğa daxildir, ya deyil — bu, 2 MÜSTƏQİL seçimdir. N element üçün ümumi say <b>2^N</b>-dir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long res = 1;\n    for (long long i = 0; i < n; i++) {\n        res *= 2;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 77,
       "subgroupLabel": null,
-      "title": "2147483000 və 2147483000 ədədlərinin cəmi (overflow-suz)",
-      "difficulty": "mid",
+      "title": "5 elementlik çoxluğun alt-çoxluqlarının sayı",
+      "difficulty": "easy",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "2^n"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2147483000 2147483000",
-      "exampleOutput": "4294966000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "N elementlik çoxluq verilib. Onun bütün alt-çoxluqlarının (boş və özü daxil) sayını tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 30).",
+      "outputSpec": "Alt-çoxluqların sayı.",
+      "exampleInput": "5",
+      "exampleOutput": "32",
+      "approach": "Hər element ya alt-çoxluğa daxildir, ya deyil — bu, 2 MÜSTƏQİL seçimdir. N element üçün ümumi say <b>2^N</b>-dir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long res = 1;\n    for (long long i = 0; i < n; i++) {\n        res *= 2;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 78,
       "subgroupLabel": null,
-      "title": "1500000001 və 1500000002 ədədlərinin cəmi (overflow-suz)",
-      "difficulty": "mid",
+      "title": "10 elementlik çoxluğun alt-çoxluqlarının sayı",
+      "difficulty": "easy",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "2^n"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1500000001 1500000002",
-      "exampleOutput": "3000000003",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "N elementlik çoxluq verilib. Onun bütün alt-çoxluqlarının (boş və özü daxil) sayını tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 30).",
+      "outputSpec": "Alt-çoxluqların sayı.",
+      "exampleInput": "10",
+      "exampleOutput": "1024",
+      "approach": "Hər element ya alt-çoxluğa daxildir, ya deyil — bu, 2 MÜSTƏQİL seçimdir. N element üçün ümumi say <b>2^N</b>-dir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long res = 1;\n    for (long long i = 0; i < n; i++) {\n        res *= 2;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 79,
       "subgroupLabel": null,
-      "title": "2000000001 və 999999999 ədədlərinin cəmi (overflow-suz)",
-      "difficulty": "mid",
+      "title": "0 elementlik çoxluğun alt-çoxluqlarının sayı",
+      "difficulty": "easy",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "2^n"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2000000001 999999999",
-      "exampleOutput": "3000000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "N elementlik çoxluq verilib. Onun bütün alt-çoxluqlarının (boş və özü daxil) sayını tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 30).",
+      "outputSpec": "Alt-çoxluqların sayı.",
+      "exampleInput": "0",
+      "exampleOutput": "1",
+      "approach": "Hər element ya alt-çoxluğa daxildir, ya deyil — bu, 2 MÜSTƏQİL seçimdir. N element üçün ümumi say <b>2^N</b>-dir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long res = 1;\n    for (long long i = 0; i < n; i++) {\n        res *= 2;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 80,
       "subgroupLabel": null,
-      "title": "1700000000 və 1700000000 ədədlərinin cəmi (overflow-suz)",
-      "difficulty": "mid",
+      "title": "20 elementlik çoxluğun alt-çoxluqlarının sayı",
+      "difficulty": "easy",
       "tags": [
-        "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "kombinatorika",
+        "2^n"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1700000000 1700000000",
-      "exampleOutput": "3400000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "N elementlik çoxluq verilib. Onun bütün alt-çoxluqlarının (boş və özü daxil) sayını tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 30).",
+      "outputSpec": "Alt-çoxluqların sayı.",
+      "exampleInput": "20",
+      "exampleOutput": "1048576",
+      "approach": "Hər element ya alt-çoxluğa daxildir, ya deyil — bu, 2 MÜSTƏQİL seçimdir. N element üçün ümumi say <b>2^N</b>-dir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long res = 1;\n    for (long long i = 0; i < n; i++) {\n        res *= 2;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 81,
       "subgroupLabel": null,
-      "title": "1900000000 və 1900000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "100000 * 100000 (int overflow nümunəsi)",
       "difficulty": "mid",
       "tags": [
         "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "int",
+        "vurma"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1900000000 1900000000",
-      "exampleOutput": "3800000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd verilib (int tipində). Onların hasilini int tipində çap edin (32-bit daşma baş verə bilər).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (int diapazonunda).",
+      "outputSpec": "a*b-nin int tipində (daşma ilə) nəticəsi.",
+      "exampleInput": "100000 100000",
+      "exampleOutput": "1410065408",
+      "approach": "a və b bilərəkdən <b>int</b> (32-bit) tipindədir. Hasil int-in tuta biləcəyi maksimum dəyəri (≈2.1 milyard) keçərsə, DAŞMA (overflow) baş verir və nəticə yanlış (mənfi və ya gözlənilməz) çıxır — böyük hasillərdə <b>long long</b> işlətmək lazımdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int a, b;\n    cin >> a >> b;\n\n    int hasil = a * b;\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 82,
       "subgroupLabel": null,
-      "title": "2050000000 və 2050000000 ədədlərinin cəmi (overflow-suz)",
+      "title": "50000 * 50000 (int overflow nümunəsi)",
       "difficulty": "mid",
       "tags": [
         "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "int",
+        "vurma"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "2050000000 2050000000",
-      "exampleOutput": "4100000000",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd verilib (int tipində). Onların hasilini int tipində çap edin (32-bit daşma baş verə bilər).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (int diapazonunda).",
+      "outputSpec": "a*b-nin int tipində (daşma ilə) nəticəsi.",
+      "exampleInput": "50000 50000",
+      "exampleOutput": "-1794967296",
+      "approach": "a və b bilərəkdən <b>int</b> (32-bit) tipindədir. Hasil int-in tuta biləcəyi maksimum dəyəri (≈2.1 milyard) keçərsə, DAŞMA (overflow) baş verir və nəticə yanlış (mənfi və ya gözlənilməz) çıxır — böyük hasillərdə <b>long long</b> işlətmək lazımdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int a, b;\n    cin >> a >> b;\n\n    int hasil = a * b;\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 83,
       "subgroupLabel": null,
-      "title": "1234567891 və 987654321 ədədlərinin cəmi (overflow-suz)",
+      "title": "2 * 2000000000 (int overflow nümunəsi)",
       "difficulty": "mid",
       "tags": [
         "overflow",
-        "long long",
-        "tam ədəd daşması"
+        "int",
+        "vurma"
       ],
-      "statement": "İki böyük tam ədəd a və b verilib. Onların cəmini tam ədəd daşması (overflow) olmadan hesablayın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 2×10^9).",
-      "outputSpec": "a + b cəmi.",
-      "exampleInput": "1234567891 987654321",
-      "exampleOutput": "2222222212",
-      "approach": "Adi <b>int</b> tipi təxminən 2.1 milyarda qədər dəyər saxlaya bilir — bu ədədlərin cəmi bu həddi keçdiyi üçün <b>int</b> ilə hesablasaq nəticə səhv (overflow) olardı. Ona görə dəyişənlər birbaşa <b>long long</b> tipində elan olunur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a + b << \"\\n\";\n}"
+      "statement": "İki ədəd verilib (int tipində). Onların hasilini int tipində çap edin (32-bit daşma baş verə bilər).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (int diapazonunda).",
+      "outputSpec": "a*b-nin int tipində (daşma ilə) nəticəsi.",
+      "exampleInput": "2 2000000000",
+      "exampleOutput": "-294967296",
+      "approach": "a və b bilərəkdən <b>int</b> (32-bit) tipindədir. Hasil int-in tuta biləcəyi maksimum dəyəri (≈2.1 milyard) keçərsə, DAŞMA (overflow) baş verir və nəticə yanlış (mənfi və ya gözlənilməz) çıxır — böyük hasillərdə <b>long long</b> işlətmək lazımdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int a, b;\n    cin >> a >> b;\n\n    int hasil = a * b;\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 84,
       "subgroupLabel": null,
-      "title": "36 ədədinin bölənlərinin sayı",
+      "title": "46341 * 46341 (int overflow nümunəsi)",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "overflow",
+        "int",
+        "vurma"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "36",
-      "exampleOutput": "9",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "İki ədəd verilib (int tipində). Onların hasilini int tipində çap edin (32-bit daşma baş verə bilər).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (int diapazonunda).",
+      "outputSpec": "a*b-nin int tipində (daşma ilə) nəticəsi.",
+      "exampleInput": "46341 46341",
+      "exampleOutput": "-2147479015",
+      "approach": "a və b bilərəkdən <b>int</b> (32-bit) tipindədir. Hasil int-in tuta biləcəyi maksimum dəyəri (≈2.1 milyard) keçərsə, DAŞMA (overflow) baş verir və nəticə yanlış (mənfi və ya gözlənilməz) çıxır — böyük hasillərdə <b>long long</b> işlətmək lazımdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int a, b;\n    cin >> a >> b;\n\n    int hasil = a * b;\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 85,
       "subgroupLabel": null,
-      "title": "100 ədədinin bölənlərinin sayı",
+      "title": "60000 * 40000 (int overflow nümunəsi)",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "overflow",
+        "int",
+        "vurma"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "100",
-      "exampleOutput": "9",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "İki ədəd verilib (int tipində). Onların hasilini int tipində çap edin (32-bit daşma baş verə bilər).",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (int diapazonunda).",
+      "outputSpec": "a*b-nin int tipində (daşma ilə) nəticəsi.",
+      "exampleInput": "60000 40000",
+      "exampleOutput": "-1894967296",
+      "approach": "a və b bilərəkdən <b>int</b> (32-bit) tipindədir. Hasil int-in tuta biləcəyi maksimum dəyəri (≈2.1 milyard) keçərsə, DAŞMA (overflow) baş verir və nəticə yanlış (mənfi və ya gözlənilməz) çıxır — böyük hasillərdə <b>long long</b> işlətmək lazımdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int a, b;\n    cin >> a >> b;\n\n    int hasil = a * b;\n\n    cout << hasil << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 86,
       "subgroupLabel": null,
-      "title": "17 ədədinin bölənlərinin sayı",
+      "title": "12 ədədinin bölənlərinin sayı",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "√n"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin sayını (√n-ə qədər axtararaq) tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
       "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "17",
-      "exampleOutput": "2",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "exampleInput": "12",
+      "exampleOutput": "6",
+      "approach": "Bölənlər CÜT-CÜT gəlir: əgər i, n-i bölürsə, n/i də bölür. Ona görə YALNIZ 1-dən √n-ə qədər axtarmaq kifayətdir (adi 1..n dövründən qat-qat sürətli) — hər tapılan i üçün, fərqlidirsə, n/i-ni də sayırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 87,
       "subgroupLabel": null,
-      "title": "60 ədədinin bölənlərinin sayı",
+      "title": "36 ədədinin bölənlərinin sayı",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "√n"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin sayını (√n-ə qədər axtararaq) tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
       "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "60",
-      "exampleOutput": "12",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "exampleInput": "36",
+      "exampleOutput": "9",
+      "approach": "Bölənlər CÜT-CÜT gəlir: əgər i, n-i bölürsə, n/i də bölür. Ona görə YALNIZ 1-dən √n-ə qədər axtarmaq kifayətdir (adi 1..n dövründən qat-qat sürətli) — hər tapılan i üçün, fərqlidirsə, n/i-ni də sayırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 88,
       "subgroupLabel": null,
-      "title": "1 ədədinin bölənlərinin sayı",
+      "title": "97 ədədinin bölənlərinin sayı",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "√n"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin sayını (√n-ə qədər axtararaq) tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
       "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "1",
-      "exampleOutput": "1",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "exampleInput": "97",
+      "exampleOutput": "2",
+      "approach": "Bölənlər CÜT-CÜT gəlir: əgər i, n-i bölürsə, n/i də bölür. Ona görə YALNIZ 1-dən √n-ə qədər axtarmaq kifayətdir (adi 1..n dövründən qat-qat sürətli) — hər tapılan i üçün, fərqlidirsə, n/i-ni də sayırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 89,
       "subgroupLabel": null,
-      "title": "999 ədədinin bölənlərinin sayı",
+      "title": "100 ədədinin bölənlərinin sayı",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "√n"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin sayını (√n-ə qədər axtararaq) tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
       "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "999",
-      "exampleOutput": "8",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "exampleInput": "100",
+      "exampleOutput": "9",
+      "approach": "Bölənlər CÜT-CÜT gəlir: əgər i, n-i bölürsə, n/i də bölür. Ona görə YALNIZ 1-dən √n-ə qədər axtarmaq kifayətdir (adi 1..n dövründən qat-qat sürətli) — hər tapılan i üçün, fərqlidirsə, n/i-ni də sayırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 90,
       "subgroupLabel": null,
-      "title": "720 ədədinin bölənlərinin sayı",
+      "title": "1 ədədinin bölənlərinin sayı",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "√n"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin sayını (√n-ə qədər axtararaq) tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
       "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "720",
-      "exampleOutput": "30",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Bölənlər CÜT-CÜT gəlir: əgər i, n-i bölürsə, n/i də bölür. Ona görə YALNIZ 1-dən √n-ə qədər axtarmaq kifayətdir (adi 1..n dövründən qat-qat sürətli) — hər tapılan i üçün, fərqlidirsə, n/i-ni də sayırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 91,
       "subgroupLabel": null,
-      "title": "1000000 ədədinin bölənlərinin sayı",
+      "title": "12 ədədinin bölənlərinin cəmi",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
+        "bölən",
         "√n",
-        "for"
+        "cəm"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "1000000",
-      "exampleOutput": "49",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin cəmini tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "Bölənlərin cəmi.",
+      "exampleInput": "12",
+      "exampleOutput": "28",
+      "approach": "Eyni √n texnikası — hər tapılan cüt bölənin (i, n/i) hər ikisi (fərqlidirsə) cəmə əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            sum += i;\n            if (i != n / i) sum += n / i;\n        }\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 92,
       "subgroupLabel": null,
-      "title": "97 ədədinin bölənlərinin sayı",
+      "title": "28 ədədinin bölənlərinin cəmi",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
+        "bölən",
         "√n",
-        "for"
+        "cəm"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "97",
-      "exampleOutput": "2",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin cəmini tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "Bölənlərin cəmi.",
+      "exampleInput": "28",
+      "exampleOutput": "56",
+      "approach": "Eyni √n texnikası — hər tapılan cüt bölənin (i, n/i) hər ikisi (fərqlidirsə) cəmə əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            sum += i;\n            if (i != n / i) sum += n / i;\n        }\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 93,
       "subgroupLabel": null,
-      "title": "144 ədədinin bölənlərinin sayı",
+      "title": "100 ədədinin bölənlərinin cəmi",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
+        "bölən",
         "√n",
-        "for"
+        "cəm"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "144",
-      "exampleOutput": "15",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin cəmini tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "Bölənlərin cəmi.",
+      "exampleInput": "100",
+      "exampleOutput": "217",
+      "approach": "Eyni √n texnikası — hər tapılan cüt bölənin (i, n/i) hər ikisi (fərqlidirsə) cəmə əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            sum += i;\n            if (i != n / i) sum += n / i;\n        }\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 94,
       "subgroupLabel": null,
-      "title": "360 ədədinin bölənlərinin sayı",
+      "title": "6 ədədinin bölənlərinin cəmi",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
+        "bölən",
         "√n",
-        "for"
+        "cəm"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "360",
-      "exampleOutput": "24",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin cəmini tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "Bölənlərin cəmi.",
+      "exampleInput": "6",
+      "exampleOutput": "12",
+      "approach": "Eyni √n texnikası — hər tapılan cüt bölənin (i, n/i) hər ikisi (fərqlidirsə) cəmə əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            sum += i;\n            if (i != n / i) sum += n / i;\n        }\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 95,
       "subgroupLabel": null,
-      "title": "1024 ədədinin bölənlərinin sayı",
+      "title": "49 ədədinin bölənlərinin cəmi",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
+        "bölən",
         "√n",
-        "for"
+        "cəm"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "1024",
-      "exampleOutput": "11",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun bütün müsbət bölənlərinin cəmini tapın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^9).",
+      "outputSpec": "Bölənlərin cəmi.",
+      "exampleInput": "49",
+      "exampleOutput": "57",
+      "approach": "Eyni √n texnikası — hər tapılan cüt bölənin (i, n/i) hər ikisi (fərqlidirsə) cəmə əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            sum += i;\n            if (i != n / i) sum += n / i;\n        }\n    }\n\n    cout << sum << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 96,
       "subgroupLabel": null,
-      "title": "210 ədədinin bölənlərinin sayı",
+      "title": "6 ədədinin mükəmməl ədəd yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "mükəmməl ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "210",
-      "exampleOutput": "16",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. \"Mükəmməl ədəd\" olub-olmadığını yoxlayın (özündən kiçik bütün bölənlərinin cəmi özünə bərabərdirsə).",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "6",
+      "exampleOutput": "BELE",
+      "approach": "Klassik nümunə: 6 mükəmməl ədəddir, çünki 6-dan kiçik bölənləri (1, 2, 3) toplananda 6 alınır. √n texnikası ilə n-in özü XARİC olmaqla bütün bölənləri cəmlənir, sonra n ilə müqayisə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            if (i != n) sum += i;\n            long long other = n / i;\n            if (other != i && other != n) sum += other;\n        }\n    }\n\n    cout << (sum == n ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 97,
       "subgroupLabel": null,
-      "title": "89 ədədinin bölənlərinin sayı",
+      "title": "28 ədədinin mükəmməl ədəd yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "mükəmməl ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "89",
-      "exampleOutput": "2",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. \"Mükəmməl ədəd\" olub-olmadığını yoxlayın (özündən kiçik bütün bölənlərinin cəmi özünə bərabərdirsə).",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "28",
+      "exampleOutput": "BELE",
+      "approach": "Klassik nümunə: 6 mükəmməl ədəddir, çünki 6-dan kiçik bölənləri (1, 2, 3) toplananda 6 alınır. √n texnikası ilə n-in özü XARİC olmaqla bütün bölənləri cəmlənir, sonra n ilə müqayisə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            if (i != n) sum += i;\n            long long other = n / i;\n            if (other != i && other != n) sum += other;\n        }\n    }\n\n    cout << (sum == n ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 98,
       "subgroupLabel": null,
-      "title": "500000 ədədinin bölənlərinin sayı",
+      "title": "10 ədədinin mükəmməl ədəd yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "mükəmməl ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "500000",
-      "exampleOutput": "42",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. \"Mükəmməl ədəd\" olub-olmadığını yoxlayın (özündən kiçik bütün bölənlərinin cəmi özünə bərabərdirsə).",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "10",
+      "exampleOutput": "XEYR",
+      "approach": "Klassik nümunə: 6 mükəmməl ədəddir, çünki 6-dan kiçik bölənləri (1, 2, 3) toplananda 6 alınır. √n texnikası ilə n-in özü XARİC olmaqla bütün bölənləri cəmlənir, sonra n ilə müqayisə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            if (i != n) sum += i;\n            long long other = n / i;\n            if (other != i && other != n) sum += other;\n        }\n    }\n\n    cout << (sum == n ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 99,
       "subgroupLabel": null,
-      "title": "999983 ədədinin bölənlərinin sayı",
+      "title": "496 ədədinin mükəmməl ədəd yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "mükəmməl ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "999983",
-      "exampleOutput": "2",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. \"Mükəmməl ədəd\" olub-olmadığını yoxlayın (özündən kiçik bütün bölənlərinin cəmi özünə bərabərdirsə).",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "496",
+      "exampleOutput": "BELE",
+      "approach": "Klassik nümunə: 6 mükəmməl ədəddir, çünki 6-dan kiçik bölənləri (1, 2, 3) toplananda 6 alınır. √n texnikası ilə n-in özü XARİC olmaqla bütün bölənləri cəmlənir, sonra n ilə müqayisə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            if (i != n) sum += i;\n            long long other = n / i;\n            if (other != i && other != n) sum += other;\n        }\n    }\n\n    cout << (sum == n ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
       "orderIndex": 100,
       "subgroupLabel": null,
-      "title": "720720 ədədinin bölənlərinin sayı",
+      "title": "12 ədədinin mükəmməl ədəd yoxlanması",
       "difficulty": "mid",
       "tags": [
-        "bölənlər",
-        "√n",
-        "for"
+        "bölən",
+        "mükəmməl ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in bütün müsbət bölənlərinin sayını tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Bölənlərin sayı.",
-      "exampleInput": "720720",
-      "exampleOutput": "240",
-      "approach": "Bölənlər həmişə <b>cüt-cüt</b> gəlir: əgər i, N-i bölürsə, N/i də bölür. Ona görə yalnız <b>1-dən √N-ə qədər</b> gəzmək kifayətdir — hər tapılan i üçün (i, N/i) cütünü sayır, i == N/i olduqda isə yalnız bir dəfə sayırıq.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    long long cnt = 0;\n    for (long long i = 1; i * i <= n; i++){\n        if (n % i == 0){\n            cnt++;\n            if (i != n / i) cnt++;\n        }\n    }\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. \"Mükəmməl ədəd\" olub-olmadığını yoxlayın (özündən kiçik bütün bölənlərinin cəmi özünə bərabərdirsə).",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "12",
+      "exampleOutput": "XEYR",
+      "approach": "Klassik nümunə: 6 mükəmməl ədəddir, çünki 6-dan kiçik bölənləri (1, 2, 3) toplananda 6 alınır. √n texnikası ilə n-in özü XARİC olmaqla bütün bölənləri cəmlənir, sonra n ilə müqayisə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    long long sum = 0;\n    for (long long i = 1; i * i <= n; i++) {\n        if (n % i == 0) {\n            if (i != n) sum += i;\n            long long other = n / i;\n            if (other != i && other != n) sum += other;\n        }\n    }\n\n    cout << (sum == n ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week5",
