@@ -239,9 +239,9 @@
 
   <div class="titleblock">
     <h1>Mövzu <span>02</span> — Test Vərəqi</h1>
-    <p>Mövzu: massiv/vector, funksiyalar (dəyərlə/referansla ötürmə), sürətli giriş-çıxış, 2D massiv, struct/pair, sətir (string) funksiyaları. Aşağıdakı 50 məsələ yalnız Mövzu 2-nin mövzularına əsaslanır.</p>
+    <p>Mövzu: massiv/vector, funksiyalar (dəyərlə/referansla ötürmə), sürətli giriş-çıxış, 2D massiv, struct/pair, sətir (string) funksiyaları. Aşağıdakı 100 məsələ yalnız Mövzu 2-nin mövzularına əsaslanır.</p>
     <div class="specs">
-      <div><div class="k">Məsələ sayı</div><div class="v">50</div></div>
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
       <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">240–300 dəqiqə</div></div>
       <div><div class="k">Səviyyə</div><div class="v">Başlanğıc–Aralıq (CF ~800–1000)</div></div>
       <div><div class="k">Dil</div><div class="v">C++</div></div>
@@ -263,7 +263,7 @@
 
 <script>
 /* ============================================================================
-   Bu massiv Mövzu 2 mövzularına uyğun 50 məsələni saxlayır. Hər element:
+   Bu massiv Mövzu 2 mövzularına uyğun 100 məsələni saxlayır. Hər element:
      title      — məsələnin adı
      difficulty — "easy" və ya "mid" (rəng/etiket üçün)
      tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
@@ -275,1209 +275,2600 @@
    ============================================================================ */
 const problems = [
   {
-    title: "1. Vektorun elementlərinin cəmi",
+    title: "4 ədədi push_back ilə vectora yığıb cəmləmək",
     difficulty: "easy",
-    tags: ["vector", "for"],
-    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb cəmini çap edin.",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları BOŞ bir vector-a push_back ilə əlavə edib, cəmini tapın.",
     input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
     output: "Bütün elementlərin cəmi.",
-    example: {in:"5\n1 2 3 4 5", out:"15"},
-    approach: "N ölçüsündə <b>vector&lt;int&gt;</b> elan olunur, <b>cin &gt;&gt;</b> ilə hər elementi oxuyaraq vektora yazırıq (indekslə və ya <b>push_back</b> ilə), sonra dövrlə hamısını toplayırıq. Cəm böyük ola biləcəyi üçün <b>long long</b> istifadə olunur.",
+    example: {in:"4\n5 10 15 20", out:"50"},
+    approach: "Əvvəlcə <b>boş vector</b> yaradılır, sonra hər oxunan ədəd <b>push_back</b> ilə vectorun sonuna əlavə olunur. Nəhayət, <b>range-based for</b> (\"vectorun hər elementi üçün\") ilə cəm tapılır.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    vector<long long> a;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    long long sum = 0;
+    for (long long x : a) sum += x;
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3 ədədi push_back ilə vectora yığıb cəmləmək",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları BOŞ bir vector-a push_back ilə əlavə edib, cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"3\n7 7 7", out:"21"},
+    approach: "Əvvəlcə <b>boş vector</b> yaradılır, sonra hər oxunan ədəd <b>push_back</b> ilə vectorun sonuna əlavə olunur. Nəhayət, <b>range-based for</b> (\"vectorun hər elementi üçün\") ilə cəm tapılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    vector<long long> a;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    long long sum = 0;
+    for (long long x : a) sum += x;
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5 ədədi push_back ilə vectora yığıb cəmləmək",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları BOŞ bir vector-a push_back ilə əlavə edib, cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"5\n1 -2 3 -4 5", out:"3"},
+    approach: "Əvvəlcə <b>boş vector</b> yaradılır, sonra hər oxunan ədəd <b>push_back</b> ilə vectorun sonuna əlavə olunur. Nəhayət, <b>range-based for</b> (\"vectorun hər elementi üçün\") ilə cəm tapılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    vector<long long> a;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    long long sum = 0;
+    for (long long x : a) sum += x;
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "6 ədədi push_back ilə vectora yığıb cəmləmək",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları BOŞ bir vector-a push_back ilə əlavə edib, cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"6\n100 200 300 400 500 600", out:"2100"},
+    approach: "Əvvəlcə <b>boş vector</b> yaradılır, sonra hər oxunan ədəd <b>push_back</b> ilə vectorun sonuna əlavə olunur. Nəhayət, <b>range-based for</b> (\"vectorun hər elementi üçün\") ilə cəm tapılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    vector<long long> a;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    long long sum = 0;
+    for (long long x : a) sum += x;
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "2 ədədi push_back ilə vectora yığıb cəmləmək",
+    difficulty: "easy",
+    tags: ["vector", "push_back"],
+    statement: "N ədəd tam ədəd verilib. Onları BOŞ bir vector-a push_back ilə əlavə edib, cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"2\n0 0", out:"0"},
+    approach: "Əvvəlcə <b>boş vector</b> yaradılır, sonra hər oxunan ədəd <b>push_back</b> ilə vectorun sonuna əlavə olunur. Nəhayət, <b>range-based for</b> (\"vectorun hər elementi üçün\") ilə cəm tapılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    vector<long long> a;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        a.push_back(x);
+    }
+
+    long long sum = 0;
+    for (long long x : a) sum += x;
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5 ədədlik vectoru reverse() ilə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["vector", "reverse"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, tərsinə çevirib çap edin.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Tərsinə çevrilmiş ədədlər, boşluqla ayrılmış.",
+    example: {in:"5\n1 2 3 4 5", out:"5 4 3 2 1"},
+    approach: "Hazır <b>reverse(a.begin(), a.end())</b> funksiyası vectoru başdan-sona tərsinə çevirir — əl ilə dövr qurmağa ehtiyac qalmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
 int main(){
     int n; cin >> n;
     vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    long long sum = 0;
-    for (int x : a) sum += x;
-    cout << sum << "\\n";
-}`
-  },
+
+    reverse(a.begin(), a.end());
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i];
+        if (i < n - 1) cout << " ";
+    }
+    cout << "\\n";
+}`},
   {
-    title: "2. Vektorda maksimum və minimum",
+    title: "4 ədədlik vectoru reverse() ilə tərsinə çevirmək",
     difficulty: "easy",
-    tags: ["vector", "max", "min"],
-    statement: "N ədəd tam ədəd verilib. Onların içindən ən böyük və ən kiçik dəyəri tapıb çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "İki ədəd: maksimum və minimum (bir sətirdə, boşluqla).",
-    example: {in:"6\n3 7 1 9 4 2", out:"9 1"},
-    approach: "Vektor <b>*max_element(a.begin(), a.end())</b> və <b>*min_element(a.begin(), a.end())</b> funksiyaları ilə birbaşa maksimum/minimum tapılır — massivi əl ilə gəzməyə ehtiyac qalmır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    cout << *max_element(a.begin(), a.end()) << " "
-         << *min_element(a.begin(), a.end()) << "\\n";
-}`
-  },
-  {
-    title: "3. Vektoru tərsinə çevirmək",
-    difficulty: "easy",
-    tags: ["vector", "for"],
-    statement: "N ədəd tam ədəd verilib. Onları TƏRS sırada (sonuncudan birinciyə doğru) çap edin. STL-in <b>reverse()</b> funksiyasından istifadə etməyin — özünüz dövrlə çevirin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
-    output: "Elementlər tərs sırada, boşluqla ayrılmış.",
+    tags: ["vector", "reverse"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, tərsinə çevirib çap edin.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Tərsinə çevrilmiş ədədlər, boşluqla ayrılmış.",
     example: {in:"4\n10 20 30 40", out:"40 30 20 10"},
-    approach: "Vektor <b>a</b>-nın son indeksindən (<b>n-1</b>) başlayaraq geriyə doğru (<b>i--</b>) dövr edilir və hər addımda elementi çap edirik — bu, massivi manual şəkildə tərsinə 'oxumaq' üsuludur.",
+    approach: "Hazır <b>reverse(a.begin(), a.end())</b> funksiyası vectoru başdan-sona tərsinə çevirir — əl ilə dövr qurmağa ehtiyac qalmır.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    for (int i = n - 1; i >= 0; i--) cout << a[i] << " ";
+
+    reverse(a.begin(), a.end());
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i];
+        if (i < n - 1) cout << " ";
+    }
     cout << "\\n";
-}`
-  },
+}`},
   {
-    title: "4. Vektorda cüt ədədlərin sayı",
+    title: "3 ədədlik vectoru reverse() ilə tərsinə çevirmək",
     difficulty: "easy",
-    tags: ["vector", "if", "%"],
-    statement: "N ədəd tam ədəd verilib. Onların arasında cüt ədədlərin sayını tapın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
+    tags: ["vector", "reverse"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, tərsinə çevirib çap edin.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Tərsinə çevrilmiş ədədlər, boşluqla ayrılmış.",
+    example: {in:"3\n9 8 7", out:"7 8 9"},
+    approach: "Hazır <b>reverse(a.begin(), a.end())</b> funksiyası vectoru başdan-sona tərsinə çevirir — əl ilə dövr qurmağa ehtiyac qalmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    reverse(a.begin(), a.end());
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i];
+        if (i < n - 1) cout << " ";
+    }
+    cout << "\\n";
+}`},
+  {
+    title: "6 ədədlik vectoru reverse() ilə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["vector", "reverse"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, tərsinə çevirib çap edin.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Tərsinə çevrilmiş ədədlər, boşluqla ayrılmış.",
+    example: {in:"6\n6 5 4 3 2 1", out:"1 2 3 4 5 6"},
+    approach: "Hazır <b>reverse(a.begin(), a.end())</b> funksiyası vectoru başdan-sona tərsinə çevirir — əl ilə dövr qurmağa ehtiyac qalmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    reverse(a.begin(), a.end());
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i];
+        if (i < n - 1) cout << " ";
+    }
+    cout << "\\n";
+}`},
+  {
+    title: "7 ədədlik vectoru reverse() ilə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["vector", "reverse"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, tərsinə çevirib çap edin.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Tərsinə çevrilmiş ədədlər, boşluqla ayrılmış.",
+    example: {in:"7\n-1 -2 -3 -4 -5 -6 -7", out:"-7 -6 -5 -4 -3 -2 -1"},
+    approach: "Hazır <b>reverse(a.begin(), a.end())</b> funksiyası vectoru başdan-sona tərsinə çevirir — əl ilə dövr qurmağa ehtiyac qalmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    reverse(a.begin(), a.end());
+
+    for (int i = 0; i < n; i++) {
+        cout << a[i];
+        if (i < n - 1) cout << " ";
+    }
+    cout << "\\n";
+}`},
+  {
+    title: "5 ədədlik vectorda cüt ədədlərin sayı",
+    difficulty: "easy",
+    tags: ["vector", "%"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, aralarında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
     output: "Cüt ədədlərin sayı.",
-    example: {in:"5\n1 2 3 4 5", out:"2"},
-    approach: "Vektor elementlərini bir-bir gəzərək hər biri üçün <b>x % 2 == 0</b> şərtini yoxlayırıq; doğrudursa, sayğacı artırırıq.",
+    example: {in:"5\n2 4 6 8 9", out:"4"},
+    approach: "Vector doldurulduqdan sonra <b>range-based for</b> ilə hər element gəzilir, <b>x%2==0</b> şərti ilə cüt olanlar sayaca əlavə olunur.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
+
     int cnt = 0;
-    for (int x : a) if (x % 2 == 0) cnt++;
+    for (long long x : a) {
+        if (x % 2 == 0) cnt++;
+    }
+
     cout << cnt << "\\n";
-}`
-  },
+}`},
   {
-    title: "5. Vektorda unikal elementlərin sayı",
-    difficulty: "mid",
-    tags: ["vector", "set"],
-    statement: "N ədəd tam ədəd verilib. Onların arasında neçə fərqli (unikal) dəyər olduğunu tapın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "Unikal dəyərlərin sayı.",
-    example: {in:"6\n1 2 2 3 3 3", out:"3"},
-    approach: "Bütün elementlər <b>set&lt;int&gt;</b>-ə əlavə olunur — set avtomatik olaraq təkrarları silir və elementləri saxlayır. Sonda <b>set.size()</b> unikal say verir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    set<int> s;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        s.insert(x);
-    }
-    cout << s.size() << "\\n";
-}`
-  },
-  {
-    title: "6. Vektoru push_back ilə qurmaq",
+    title: "6 ədədlik vectorda cüt ədədlərin sayı",
     difficulty: "easy",
-    tags: ["vector", "push_back"],
-    statement: "N ədəd tam ədəd verilib. Onları <b>push_back</b> ilə boş vektora əlavə edərək, sonra bütün elementləri çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
-    output: "Bütün elementlər bir sətirdə, boşluqla ayrılmış.",
-    example: {in:"3\n5 6 7", out:"5 6 7"},
-    approach: "Əvvəlcə <b>vector&lt;int&gt; a;</b> boş elan olunur (ölçü göstərilmir), sonra hər oxunan ədəd <b>a.push_back(x)</b> ilə sona əlavə olunur. Bu, ölçüsü əvvəlcədən bilinməyən girişlər üçün standart üsuldur.",
+    tags: ["vector", "%"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, aralarında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"6\n1 3 5 7 9 11", out:"0"},
+    approach: "Vector doldurulduqdan sonra <b>range-based for</b> ilə hər element gəzilir, <b>x%2==0</b> şərti ilə cüt olanlar sayaca əlavə olunur.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
     int n; cin >> n;
-    vector<int> a;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        a.push_back(x);
-    }
-    for (int x : a) cout << x << " ";
-    cout << "\\n";
-}`
-  },
-  {
-    title: "7. Vektorda ən çox təkrarlanan ədəd",
-    difficulty: "mid",
-    tags: ["vector", "map", "tezlik"],
-    statement: "N ədəd tam ədəd verilib. Ən çox təkrarlanan (tezliyi ən yüksək olan) ədədi tapın. Bir neçə variant varsa, ən kiçiyini çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd (0 ≤ hər biri ≤ 10^6).",
-    output: "Ən çox təkrarlanan ədəd.",
-    example: {in:"7\n4 2 4 3 2 4 1", out:"4"},
-    approach: "<b>map&lt;int,int&gt;</b> ilə hər ədədin neçə dəfə göründüyü sayılır (tezlik cədvəli). Sonra map üzərində gəzərək tezliyi ən böyük olan açarı (ədədi) seçirik; map açarları artan sırada saxladığı üçün bərabərlikdə avtomatik ən kiçik ədəd seçilir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    map<int,int> freq;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        freq[x]++;
-    }
-    int best = freq.begin()->first, bestCnt = 0;
-    for (auto &[val, cnt] : freq){
-        if (cnt > bestCnt){ bestCnt = cnt; best = val; }
-    }
-    cout << best << "\\n";
-}`
-  },
-  {
-    title: "8. İki vektoru birləşdirmək",
-    difficulty: "easy",
-    tags: ["vector", "push_back"],
-    statement: "İki ayrı vektor verilib. Onları birləşdirib (birincinin ardınca ikincini) çap edin.",
-    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 1000), ikinci sətirdə N ədəd, üçüncü sətirdə M ədəd.",
-    output: "Birləşmiş vektorun bütün elementləri, boşluqla ayrılmış.",
-    example: {in:"3 2\n1 2 3\n4 5", out:"1 2 3 4 5"},
-    approach: "Birinci vektor <b>a</b> oxunur, sonra ikinci vektorun hər elementi birbaşa <b>a.push_back(x)</b> ilə <b>a</b>-nın sonuna əlavə olunur — nəticədə <b>a</b> hər iki vektorun elementlərini ardıcıl saxlayır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    for (int i = 0; i < m; i++){
-        int x; cin >> x;
-        a.push_back(x);
+
+    int cnt = 0;
+    for (long long x : a) {
+        if (x % 2 == 0) cnt++;
     }
-    for (int x : a) cout << x << " ";
-    cout << "\\n";
-}`
-  },
+
+    cout << cnt << "\\n";
+}`},
   {
-    title: "9. Vektorda ikinci ən böyük ədəd",
+    title: "4 ədədlik vectorda cüt ədədlərin sayı",
+    difficulty: "easy",
+    tags: ["vector", "%"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, aralarında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"4\n10 15 20 25", out:"2"},
+    approach: "Vector doldurulduqdan sonra <b>range-based for</b> ilə hər element gəzilir, <b>x%2==0</b> şərti ilə cüt olanlar sayaca əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    int cnt = 0;
+    for (long long x : a) {
+        if (x % 2 == 0) cnt++;
+    }
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "7 ədədlik vectorda cüt ədədlərin sayı",
+    difficulty: "easy",
+    tags: ["vector", "%"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, aralarında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"7\n2 2 2 3 3 5 5", out:"3"},
+    approach: "Vector doldurulduqdan sonra <b>range-based for</b> ilə hər element gəzilir, <b>x%2==0</b> şərti ilə cüt olanlar sayaca əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    int cnt = 0;
+    for (long long x : a) {
+        if (x % 2 == 0) cnt++;
+    }
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "8 ədədlik vectorda cüt ədədlərin sayı",
+    difficulty: "easy",
+    tags: ["vector", "%"],
+    statement: "N ədəd tam ədəd verilib. Onları vector-a yığıb, aralarında cüt ədədlərin sayını tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"8\n0 1 2 3 4 5 6 7", out:"4"},
+    approach: "Vector doldurulduqdan sonra <b>range-based for</b> ilə hər element gəzilir, <b>x%2==0</b> şərti ilə cüt olanlar sayaca əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    int cnt = 0;
+    for (long long x : a) {
+        if (x % 2 == 0) cnt++;
+    }
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "5 ədədlik vectorda ikinci ən böyük dəyər",
     difficulty: "mid",
     tags: ["vector", "sort"],
-    statement: "N ədəd tam ədəd verilib (N ≥ 2). Ən böyük ikinci fərqli (təkrarlanmayan) dəyəri tapın.",
-    input: "Birinci sətirdə N (2 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "İkinci ən böyük fərqli dəyər.",
-    example: {in:"5\n4 4 6 2 6", out:"4"},
-    approach: "Vektor <b>sort()</b> ilə sıralanır, sonra <b>set&lt;int&gt;</b>-ə köçürülərək təkrarlar silinir (yaxud <b>unique()</b> istifadə oluna bilər). Sıralı unikal siyahının sondan ikinci elementi cavabdır.",
+    statement: "N (N ≥ 2) ədəd tam ədəd verilib. Onları vector-a yığıb sıralayaraq, ikinci ən böyük dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük dəyər.",
+    example: {in:"5\n3 9 2 7 5", out:"7"},
+    approach: "<b>sort(a.begin(), a.end())</b> vectoru kiçikdən böyüyə sıralayır — onda ən böyük son elementdə (a[n-1]), ikinci ən böyük isə ondan əvvəlkindədir (a[n-2]).",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    set<int> uniq(a.begin(), a.end());   // avtomatik sıralı, unikal
-    auto it = uniq.end();
-    --it; --it;                          // sondan ikinci elementə keç
-    cout << *it << "\\n";
-}`
-  },
+
+    sort(a.begin(), a.end());
+
+    cout << a[n - 2] << "\\n";
+}`},
   {
-    title: "10. Vektoru sola sürüşdürmək",
+    title: "4 ədədlik vectorda ikinci ən böyük dəyər",
     difficulty: "mid",
-    tags: ["vector", "rotate"],
-    statement: "N ədəd tam ədəd verilib. Vektoru sola doğru 1 addım dövri sürüşdürün (ilk element sona keçir).",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
-    output: "Sürüşdürülmüş vektorun elementləri.",
-    example: {in:"5\n1 2 3 4 5", out:"2 3 4 5 1"},
-    approach: "İlk element <b>a[0]</b> müvəqqəti dəyişəndə saxlanılır, sonra bütün elementlər bir mövqe sola köçürülür (<b>a[i] = a[i+1]</b>), son mövqeyə isə saxlanılan ilk element yazılır.",
+    tags: ["vector", "sort"],
+    statement: "N (N ≥ 2) ədəd tam ədəd verilib. Onları vector-a yığıb sıralayaraq, ikinci ən böyük dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük dəyər.",
+    example: {in:"4\n10 10 9 8", out:"10"},
+    approach: "<b>sort(a.begin(), a.end())</b> vectoru kiçikdən böyüyə sıralayır — onda ən böyük son elementdə (a[n-1]), ikinci ən böyük isə ondan əvvəlkindədir (a[n-2]).",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    if (n > 1){
-        int first = a[0];
-        for (int i = 0; i < n - 1; i++) a[i] = a[i + 1];
-        a[n - 1] = first;
-    }
-    for (int x : a) cout << x << " ";
-    cout << "\\n";
-}`
-  },
+
+    sort(a.begin(), a.end());
+
+    cout << a[n - 2] << "\\n";
+}`},
   {
-    title: "11. Dəyərlə və referansla ötürmə",
-    difficulty: "easy",
-    tags: ["funksiya", "referans"],
-    statement: "İki tam ədəd verilib. Onları yerlərini dəyişən <b>swap</b> funksiyası yazın (referans ilə parametr ötürərək) və nəticəni çap edin.",
-    input: "Bir sətirdə iki tam ədəd a və b.",
-    output: "Yerdəyişmiş a və b (bir sətirdə, boşluqla).",
-    example: {in:"3 7", out:"7 3"},
-    approach: "Funksiya parametrləri <b>int &a, int &b</b> kimi <b>referans</b> ilə götürülür ki, funksiya daxilində edilən dəyişiklik funksiyadan kənarda da (çağıran yerdə) görünsün. Funksiya daxilində üçüncü müvəqqəti dəyişənlə klassik yerdəyişmə edilir.",
+    title: "3 ədədlik vectorda ikinci ən böyük dəyər",
+    difficulty: "mid",
+    tags: ["vector", "sort"],
+    statement: "N (N ≥ 2) ədəd tam ədəd verilib. Onları vector-a yığıb sıralayaraq, ikinci ən böyük dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük dəyər.",
+    example: {in:"3\n1 2 3", out:"2"},
+    approach: "<b>sort(a.begin(), a.end())</b> vectoru kiçikdən böyüyə sıralayır — onda ən böyük son elementdə (a[n-1]), ikinci ən böyük isə ondan əvvəlkindədir (a[n-2]).",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-void mySwap(int &a, int &b){
-    int t = a;
-    a = b;
-    b = t;
-}
+
 int main(){
-    int a, b; cin >> a >> b;
-    mySwap(a, b);
-    cout << a << " " << b << "\\n";
-}`
-  },
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    sort(a.begin(), a.end());
+
+    cout << a[n - 2] << "\\n";
+}`},
   {
-    title: "12. Funksiyaya vektor ötürüb cəmini tapmaq",
-    difficulty: "easy",
-    tags: ["funksiya", "vector", "referans"],
-    statement: "N ədəd tam ədəd verilib. Vektoru bir funksiyaya (referans ilə) ötürüb, həmin funksiyada elementlərin cəmini hesablayıb qaytarın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "Elementlərin cəmi.",
-    example: {in:"4\n1 2 3 4", out:"10"},
-    approach: "Vektor böyük ola biləcəyi üçün funksiyaya <b>const vector&lt;int&gt; &a</b> kimi referans ilə ötürülür ki, kopyalanmasın (performans üçün vacibdir). Funksiya <b>long long</b> nəticə qaytarır.",
+    title: "6 ədədlik vectorda ikinci ən böyük dəyər",
+    difficulty: "mid",
+    tags: ["vector", "sort"],
+    statement: "N (N ≥ 2) ədəd tam ədəd verilib. Onları vector-a yığıb sıralayaraq, ikinci ən böyük dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük dəyər.",
+    example: {in:"6\n100 50 99 20 98 10", out:"99"},
+    approach: "<b>sort(a.begin(), a.end())</b> vectoru kiçikdən böyüyə sıralayır — onda ən böyük son elementdə (a[n-1]), ikinci ən böyük isə ondan əvvəlkindədir (a[n-2]).",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-long long sumVector(const vector<int> &a){
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    sort(a.begin(), a.end());
+
+    cout << a[n - 2] << "\\n";
+}`},
+  {
+    title: "2 ədədlik vectorda ikinci ən böyük dəyər",
+    difficulty: "mid",
+    tags: ["vector", "sort"],
+    statement: "N (N ≥ 2) ədəd tam ədəd verilib. Onları vector-a yığıb sıralayaraq, ikinci ən böyük dəyəri tapın.",
+    input: "Birinci sətirdə N (2 ≤ N), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük dəyər.",
+    example: {in:"2\n5 9", out:"5"},
+    approach: "<b>sort(a.begin(), a.end())</b> vectoru kiçikdən böyüyə sıralayır — onda ən böyük son elementdə (a[n-1]), ikinci ən böyük isə ondan əvvəlkindədir (a[n-2]).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    sort(a.begin(), a.end());
+
+    cout << a[n - 2] << "\\n";
+}`},
+  {
+    title: "3 ədədlik vectorun cəmini referansla funksiyaya ötürmək",
+    difficulty: "mid",
+    tags: ["funksiya", "referans", "vector"],
+    statement: "N ədəd tam ədəd verilib. Vectoru REFERANSLA qəbul edən funksiya yazıb, onun cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Vectorun bütün elementlərinin cəmi.",
+    example: {in:"3\n1 2 3", out:"6"},
+    approach: "Funksiya vectoru <b>const vector&lt;long long&gt;&amp;</b> (referansla, dəyişməz) qəbul edir — bu, böyük vectorun lazımsız yerə KOPYALANMASININ qarşısını alır. Funksiya cəmi hesablayıb <b>return</b> ilə qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long vectorCemi(const vector<long long>& v){
     long long s = 0;
-    for (int x : a) s += x;
+    for (long long x : v) s += x;
     return s;
 }
+
 int main(){
     int n; cin >> n;
-    vector<int> a(n);
+    vector<long long> a(n);
     for (int i = 0; i < n; i++) cin >> a[i];
-    cout << sumVector(a) << "\\n";
-}`
-  },
+
+    cout << vectorCemi(a) << "\\n";
+}`},
   {
-    title: "13. Funksiya ilə ən böyük ədədi tapmaq",
-    difficulty: "easy",
-    tags: ["funksiya", "return"],
-    statement: "Üç tam ədəd verilib. İki ədəd arasında böyüyünü qaytaran <b>maxOf2</b> funksiyası yazın və onu iki dəfə çağıraraq üçünün maksimumunu tapın.",
-    input: "Bir sətirdə üç tam ədəd a, b, c.",
-    output: "Üç ədədin maksimumu.",
-    example: {in:"4 9 7", out:"9"},
-    approach: "<b>maxOf2(int a, int b)</b> funksiyası sadəcə iki ədədi müqayisə edib böyüyünü <b>return</b> edir. Üç ədədin maksimumunu tapmaq üçün bu funksiya əvvəlcə a və b üçün, sonra nəticə ilə c üçün çağırılır — kiçik funksiyalardan böyük məntiq qurmaq nümunəsidir.",
+    title: "5 ədədlik vectorun cəmini referansla funksiyaya ötürmək",
+    difficulty: "mid",
+    tags: ["funksiya", "referans", "vector"],
+    statement: "N ədəd tam ədəd verilib. Vectoru REFERANSLA qəbul edən funksiya yazıb, onun cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Vectorun bütün elementlərinin cəmi.",
+    example: {in:"5\n10 20 30 40 50", out:"150"},
+    approach: "Funksiya vectoru <b>const vector&lt;long long&gt;&amp;</b> (referansla, dəyişməz) qəbul edir — bu, böyük vectorun lazımsız yerə KOPYALANMASININ qarşısını alır. Funksiya cəmi hesablayıb <b>return</b> ilə qaytarır.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-int maxOf2(int a, int b){
-    if (a > b) return a;
-    return b;
+
+long long vectorCemi(const vector<long long>& v){
+    long long s = 0;
+    for (long long x : v) s += x;
+    return s;
 }
+
 int main(){
-    int a, b, c; cin >> a >> b >> c;
-    cout << maxOf2(maxOf2(a, b), c) << "\\n";
-}`
-  },
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    cout << vectorCemi(a) << "\\n";
+}`},
   {
-    title: "14. Sadə ədəd yoxlayan funksiya",
+    title: "4 ədədlik vectorun cəmini referansla funksiyaya ötürmək",
+    difficulty: "mid",
+    tags: ["funksiya", "referans", "vector"],
+    statement: "N ədəd tam ədəd verilib. Vectoru REFERANSLA qəbul edən funksiya yazıb, onun cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Vectorun bütün elementlərinin cəmi.",
+    example: {in:"4\n-5 5 -5 5", out:"0"},
+    approach: "Funksiya vectoru <b>const vector&lt;long long&gt;&amp;</b> (referansla, dəyişməz) qəbul edir — bu, böyük vectorun lazımsız yerə KOPYALANMASININ qarşısını alır. Funksiya cəmi hesablayıb <b>return</b> ilə qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long vectorCemi(const vector<long long>& v){
+    long long s = 0;
+    for (long long x : v) s += x;
+    return s;
+}
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    cout << vectorCemi(a) << "\\n";
+}`},
+  {
+    title: "6 ədədlik vectorun cəmini referansla funksiyaya ötürmək",
+    difficulty: "mid",
+    tags: ["funksiya", "referans", "vector"],
+    statement: "N ədəd tam ədəd verilib. Vectoru REFERANSLA qəbul edən funksiya yazıb, onun cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Vectorun bütün elementlərinin cəmi.",
+    example: {in:"6\n1 1 1 1 1 1", out:"6"},
+    approach: "Funksiya vectoru <b>const vector&lt;long long&gt;&amp;</b> (referansla, dəyişməz) qəbul edir — bu, böyük vectorun lazımsız yerə KOPYALANMASININ qarşısını alır. Funksiya cəmi hesablayıb <b>return</b> ilə qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long vectorCemi(const vector<long long>& v){
+    long long s = 0;
+    for (long long x : v) s += x;
+    return s;
+}
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    cout << vectorCemi(a) << "\\n";
+}`},
+  {
+    title: "2 ədədlik vectorun cəmini referansla funksiyaya ötürmək",
+    difficulty: "mid",
+    tags: ["funksiya", "referans", "vector"],
+    statement: "N ədəd tam ədəd verilib. Vectoru REFERANSLA qəbul edən funksiya yazıb, onun cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Vectorun bütün elementlərinin cəmi.",
+    example: {in:"2\n1000 2000", out:"3000"},
+    approach: "Funksiya vectoru <b>const vector&lt;long long&gt;&amp;</b> (referansla, dəyişməz) qəbul edir — bu, böyük vectorun lazımsız yerə KOPYALANMASININ qarşısını alır. Funksiya cəmi hesablayıb <b>return</b> ilə qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long vectorCemi(const vector<long long>& v){
+    long long s = 0;
+    for (long long x : v) s += x;
+    return s;
+}
+
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    cout << vectorCemi(a) << "\\n";
+}`},
+  {
+    title: "a=5, b=5 üçün dəyərlə/referansla funksiya müqayisəsi",
+    difficulty: "mid",
+    tags: ["funksiya", "dəyərlə", "referansla"],
+    statement: "İki tam ədəd verilib. Birincini DƏYƏRLƏ, ikincini REFERANSLA qəbul edən iki funksiyaya göndərib, hər ikisinə 10 əlavə edin. Nəticədə əsl dəyişənlərə nə baş verdiyini müşahidə edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "a və b-nin funksiya çağırışından SONRAKI dəyərləri (boşluqla ayrılmış).",
+    example: {in:"5 5", out:"5 15"},
+    approach: "\"Dəyərlə\" ötürülən dəyişənin (parametrin) funksiya daxilində bir SURƏTİ yaradılır — funksiyadakı dəyişiklik əsl dəyişənə TƏSİR ETMİR. \"Referansla\" (&) ötürülən isə əsl dəyişənin ÖZÜNƏ keçiddir — funksiyadakı dəyişiklik əsl dəyişəni DƏYİŞDİRİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+void artirDeyerle(int x){
+    x += 10;
+}
+
+void artirReferansla(int &x){
+    x += 10;
+}
+
+int main(){
+    int a, b;
+    cin >> a >> b;
+
+    artirDeyerle(a);
+    artirReferansla(b);
+
+    cout << a << " " << b << "\\n";
+}`},
+  {
+    title: "a=0, b=0 üçün dəyərlə/referansla funksiya müqayisəsi",
+    difficulty: "mid",
+    tags: ["funksiya", "dəyərlə", "referansla"],
+    statement: "İki tam ədəd verilib. Birincini DƏYƏRLƏ, ikincini REFERANSLA qəbul edən iki funksiyaya göndərib, hər ikisinə 10 əlavə edin. Nəticədə əsl dəyişənlərə nə baş verdiyini müşahidə edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "a və b-nin funksiya çağırışından SONRAKI dəyərləri (boşluqla ayrılmış).",
+    example: {in:"0 0", out:"0 10"},
+    approach: "\"Dəyərlə\" ötürülən dəyişənin (parametrin) funksiya daxilində bir SURƏTİ yaradılır — funksiyadakı dəyişiklik əsl dəyişənə TƏSİR ETMİR. \"Referansla\" (&) ötürülən isə əsl dəyişənin ÖZÜNƏ keçiddir — funksiyadakı dəyişiklik əsl dəyişəni DƏYİŞDİRİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+void artirDeyerle(int x){
+    x += 10;
+}
+
+void artirReferansla(int &x){
+    x += 10;
+}
+
+int main(){
+    int a, b;
+    cin >> a >> b;
+
+    artirDeyerle(a);
+    artirReferansla(b);
+
+    cout << a << " " << b << "\\n";
+}`},
+  {
+    title: "a=10, b=-10 üçün dəyərlə/referansla funksiya müqayisəsi",
+    difficulty: "mid",
+    tags: ["funksiya", "dəyərlə", "referansla"],
+    statement: "İki tam ədəd verilib. Birincini DƏYƏRLƏ, ikincini REFERANSLA qəbul edən iki funksiyaya göndərib, hər ikisinə 10 əlavə edin. Nəticədə əsl dəyişənlərə nə baş verdiyini müşahidə edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "a və b-nin funksiya çağırışından SONRAKI dəyərləri (boşluqla ayrılmış).",
+    example: {in:"10 -10", out:"10 0"},
+    approach: "\"Dəyərlə\" ötürülən dəyişənin (parametrin) funksiya daxilində bir SURƏTİ yaradılır — funksiyadakı dəyişiklik əsl dəyişənə TƏSİR ETMİR. \"Referansla\" (&) ötürülən isə əsl dəyişənin ÖZÜNƏ keçiddir — funksiyadakı dəyişiklik əsl dəyişəni DƏYİŞDİRİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+void artirDeyerle(int x){
+    x += 10;
+}
+
+void artirReferansla(int &x){
+    x += 10;
+}
+
+int main(){
+    int a, b;
+    cin >> a >> b;
+
+    artirDeyerle(a);
+    artirReferansla(b);
+
+    cout << a << " " << b << "\\n";
+}`},
+  {
+    title: "a=100, b=1 üçün dəyərlə/referansla funksiya müqayisəsi",
+    difficulty: "mid",
+    tags: ["funksiya", "dəyərlə", "referansla"],
+    statement: "İki tam ədəd verilib. Birincini DƏYƏRLƏ, ikincini REFERANSLA qəbul edən iki funksiyaya göndərib, hər ikisinə 10 əlavə edin. Nəticədə əsl dəyişənlərə nə baş verdiyini müşahidə edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "a və b-nin funksiya çağırışından SONRAKI dəyərləri (boşluqla ayrılmış).",
+    example: {in:"100 1", out:"100 11"},
+    approach: "\"Dəyərlə\" ötürülən dəyişənin (parametrin) funksiya daxilində bir SURƏTİ yaradılır — funksiyadakı dəyişiklik əsl dəyişənə TƏSİR ETMİR. \"Referansla\" (&) ötürülən isə əsl dəyişənin ÖZÜNƏ keçiddir — funksiyadakı dəyişiklik əsl dəyişəni DƏYİŞDİRİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+void artirDeyerle(int x){
+    x += 10;
+}
+
+void artirReferansla(int &x){
+    x += 10;
+}
+
+int main(){
+    int a, b;
+    cin >> a >> b;
+
+    artirDeyerle(a);
+    artirReferansla(b);
+
+    cout << a << " " << b << "\\n";
+}`},
+  {
+    title: "a=-3, b=3 üçün dəyərlə/referansla funksiya müqayisəsi",
+    difficulty: "mid",
+    tags: ["funksiya", "dəyərlə", "referansla"],
+    statement: "İki tam ədəd verilib. Birincini DƏYƏRLƏ, ikincini REFERANSLA qəbul edən iki funksiyaya göndərib, hər ikisinə 10 əlavə edin. Nəticədə əsl dəyişənlərə nə baş verdiyini müşahidə edin.",
+    input: "Bir sətirdə iki tam ədəd a və b.",
+    output: "a və b-nin funksiya çağırışından SONRAKI dəyərləri (boşluqla ayrılmış).",
+    example: {in:"-3 3", out:"-3 13"},
+    approach: "\"Dəyərlə\" ötürülən dəyişənin (parametrin) funksiya daxilində bir SURƏTİ yaradılır — funksiyadakı dəyişiklik əsl dəyişənə TƏSİR ETMİR. \"Referansla\" (&) ötürülən isə əsl dəyişənin ÖZÜNƏ keçiddir — funksiyadakı dəyişiklik əsl dəyişəni DƏYİŞDİRİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+void artirDeyerle(int x){
+    x += 10;
+}
+
+void artirReferansla(int &x){
+    x += 10;
+}
+
+int main(){
+    int a, b;
+    cin >> a >> b;
+
+    artirDeyerle(a);
+    artirReferansla(b);
+
+    cout << a << " " << b << "\\n";
+}`},
+  {
+    title: "7 ədədinin sadəlik yoxlanması (funksiya ilə)",
     difficulty: "easy",
     tags: ["funksiya", "bool", "sadə ədəd"],
-    statement: "N ədəd tam ədəd verilib. Hər biri üçün sadə ədəd olub-olmadığını yoxlayan <b>bool isPrime(int)</b> funksiyasından istifadə edərək nəticələri çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N tam ədəd (2 ≤ hər biri ≤ 10^6).",
-    output: "Hər ədəd üçün ayrı sətirdə \"SADƏ\" və ya \"SADƏ DEYİL\".",
-    example: {in:"3\n7 8 13", out:"SADƏ\nSADƏ DEYİL\nSADƏ"},
-    approach: "<b>bool isPrime(int n)</b> funksiyası <b>2-dən √n-ə qədər</b> bölünmə yoxlayır və nəticəni <b>true/false</b> olaraq qaytarır. Bu funksiya <b>main()</b> daxilində hər ədəd üçün çağırılıb nəticəyə görə uyğun mətn çap olunur.",
+    statement: "Tam ədəd verilib. Onun sadə olub-olmadığını yoxlayan BOOL qaytaran funksiya yazın.",
+    input: "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+    output: "\"BELE\" (sadədir) və ya \"XEYR\".",
+    example: {in:"7", out:"BELE"},
+    approach: "Funksiya <b>bool</b> tipində qaytarır — nəticə ya <b>true</b>, ya <b>false</b> olur. main() funksiyası bu nəticəyə görə uyğun sözü çap edir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-bool isPrime(int n){
+
+bool sadedirmi(long long n){
     if (n < 2) return false;
-    for (int i = 2; i * i <= n; i++)
+    for (long long i = 2; i * i <= n; i++) {
         if (n % i == 0) return false;
+    }
     return true;
 }
+
 int main(){
-    int n; cin >> n;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        cout << (isPrime(x) ? "SADƏ" : "SADƏ DEYİL") << "\\n";
-    }
-}`
-  },
+    long long n; cin >> n;
+
+    cout << (sadedirmi(n) ? "BELE" : "XEYR") << "\\n";
+}`},
   {
-    title: "15. Defolt parametrli funksiya",
-    difficulty: "mid",
-    tags: ["funksiya", "default arqument"],
-    statement: "İki ədədin vurma cədvəlini çap edən funksiya yazın; funksiya defolt olaraq 1-dən 10-a qədər cədvəl çap etsin, amma ikinci arqument verilsə, o qədərə qədər çap etsin.",
-    input: "Bir sətirdə əsas ədəd n. İkinci sətirdə isə cədvəlin neçəyə qədər çap olunacağını göstərən k (əgər k = 0 verilibsə, defolt 10 istifadə olunmalıdır).",
-    output: "1-dən k-ya (və ya defolt 10-a) qədər 'n x i = nəticə' formatında sətirlər.",
-    example: {in:"3\n0", out:"3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30"},
-    approach: "Funksiya <b>void printTable(int n, int upTo = 10)</b> şəklində elan olunur — <b>upTo</b> parametrinin defolt dəyəri 10-dur. k = 0 gələndə funksiya defolt arqumentlə (yəni yalnız <b>n</b> ilə) çağırılır, əks halda hər iki arqumentlə çağırılır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-void printTable(int n, int upTo = 10){
-    for (int i = 1; i <= upTo; i++)
-        cout << n << " x " << i << " = " << n * i << "\\n";
-}
-int main(){
-    int n, k; cin >> n >> k;
-    if (k == 0) printTable(n);       // defolt arqumentlə çağırış
-    else printTable(n, k);
-}`
-  },
-  {
-    title: "16. Eyni adlı funksiyaların yüklənməsi (overload)",
-    difficulty: "mid",
-    tags: ["funksiya", "overload"],
-    statement: "İki tam ədədin, yoxsa iki real ədədin cəmini tapan <b>eyni adlı</b> (<b>sum</b>) funksiyalar yazın — parametr tiplərinə görə C++ düzgün variantı özü seçsin.",
-    input: "Bir sətirdə iki tam ədəd a, b. İkinci sətirdə iki real ədəd x, y.",
-    output: "Birinci sətirdə tam ədədlərin cəmi, ikinci sətirdə real ədədlərin cəmi (2 ondalıq dəqiqliklə).",
-    example: {in:"3 4\n1.5 2.25", out:"7\n3.75"},
-    approach: "C++ eyni adlı, amma <b>fərqli parametr tipli</b> iki funksiyanı ayrı-ayrı saxlaya bilir (<b>function overloading</b>) — <b>sum(int,int)</b> və <b>sum(double,double)</b>. Çağırış zamanı arqumentlərin tipinə görə kompilyator düzgün variantı avtomatik seçir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int sum(int a, int b){
-    return a + b;
-}
-double sum(double a, double b){
-    return a + b;
-}
-int main(){
-    int a, b; cin >> a >> b;
-    double x, y; cin >> x >> y;
-    cout << sum(a, b) << "\\n";
-    cout << fixed << setprecision(2) << sum(x, y) << "\\n";
-}`
-  },
-  {
-    title: "17. Funksiya ilə vektoru dəyişdirmək",
+    title: "20 ədədinin sadəlik yoxlanması (funksiya ilə)",
     difficulty: "easy",
-    tags: ["funksiya", "vector", "referans"],
-    statement: "N ədəd tam ədəd verilib. Vektoru referans ilə funksiyaya ötürüb, funksiya daxilində bütün elementləri 2 dəfə artırın (vektoru birbaşa dəyişdirin), sonra nəticəni çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
-    output: "İkiqat artırılmış elementlər, boşluqla ayrılmış.",
-    example: {in:"4\n1 2 3 4", out:"2 4 6 8"},
-    approach: "Funksiya <b>void doubleAll(vector&lt;int&gt; &a)</b> vektoru referans ilə götürür, ona görə funksiya daxilində <b>a[i] *= 2</b> etdikdə dəyişiklik <b>main()</b>-dəki əsl vektorda da baş verir (kopya deyil, orijinal üzərində işlənir).",
+    tags: ["funksiya", "bool", "sadə ədəd"],
+    statement: "Tam ədəd verilib. Onun sadə olub-olmadığını yoxlayan BOOL qaytaran funksiya yazın.",
+    input: "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+    output: "\"BELE\" (sadədir) və ya \"XEYR\".",
+    example: {in:"20", out:"XEYR"},
+    approach: "Funksiya <b>bool</b> tipində qaytarır — nəticə ya <b>true</b>, ya <b>false</b> olur. main() funksiyası bu nəticəyə görə uyğun sözü çap edir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-void doubleAll(vector<int> &a){
-    for (int i = 0; i < (int)a.size(); i++)
-        a[i] *= 2;
-}
-int main(){
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    doubleAll(a);
-    for (int x : a) cout << x << " ";
-    cout << "\\n";
-}`
-  },
-  {
-    title: "18. Funksiyadan bir neçə dəyər qaytarmaq",
-    difficulty: "mid",
-    tags: ["funksiya", "pair"],
-    statement: "N ədəd tam ədəd verilib. Bir funksiya yazın ki, eyni zamanda həm minimum, həm maksimum dəyəri <b>pair</b> şəklində qaytarsın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "Minimum və maksimum (bir sətirdə, boşluqla).",
-    example: {in:"5\n3 8 1 9 4", out:"1 9"},
-    approach: "Funksiya <b>pair&lt;int,int&gt; minMax(vector&lt;int&gt; &a)</b> vektoru gəzərək minimum və maksimumu tapır və onları <b>{mn, mx}</b> şəklində tək bir <b>pair</b> obyektində qaytarır — bu, C++-da funksiyadan 'iki dəyər' qaytarmağın standart üsuludur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-pair<int,int> minMax(vector<int> &a){
-    int mn = a[0], mx = a[0];
-    for (int x : a){
-        mn = min(mn, x);
-        mx = max(mx, x);
+
+bool sadedirmi(long long n){
+    if (n < 2) return false;
+    for (long long i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
     }
-    return {mn, mx};
+    return true;
 }
+
 int main(){
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    auto [mn, mx] = minMax(a);
-    cout << mn << " " << mx << "\\n";
-}`
-  },
+    long long n; cin >> n;
+
+    cout << (sadedirmi(n) ? "BELE" : "XEYR") << "\\n";
+}`},
   {
-    title: "19. Sürətli daxil olma ilə böyük cəm",
+    title: "2 ədədinin sadəlik yoxlanması (funksiya ilə)",
     difficulty: "easy",
-    tags: ["sürətli I/O", "for"],
-    statement: "N ədəd tam ədəd verilib (N böyük ola bilər). Sürətli giriş-çıxışdan istifadə edərək cəmini tapın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 2×10^5), ikinci sətirdə N tam ədəd.",
+    tags: ["funksiya", "bool", "sadə ədəd"],
+    statement: "Tam ədəd verilib. Onun sadə olub-olmadığını yoxlayan BOOL qaytaran funksiya yazın.",
+    input: "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+    output: "\"BELE\" (sadədir) və ya \"XEYR\".",
+    example: {in:"2", out:"BELE"},
+    approach: "Funksiya <b>bool</b> tipində qaytarır — nəticə ya <b>true</b>, ya <b>false</b> olur. main() funksiyası bu nəticəyə görə uyğun sözü çap edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+bool sadedirmi(long long n){
+    if (n < 2) return false;
+    for (long long i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main(){
+    long long n; cin >> n;
+
+    cout << (sadedirmi(n) ? "BELE" : "XEYR") << "\\n";
+}`},
+  {
+    title: "1 ədədinin sadəlik yoxlanması (funksiya ilə)",
+    difficulty: "easy",
+    tags: ["funksiya", "bool", "sadə ədəd"],
+    statement: "Tam ədəd verilib. Onun sadə olub-olmadığını yoxlayan BOOL qaytaran funksiya yazın.",
+    input: "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+    output: "\"BELE\" (sadədir) və ya \"XEYR\".",
+    example: {in:"1", out:"XEYR"},
+    approach: "Funksiya <b>bool</b> tipində qaytarır — nəticə ya <b>true</b>, ya <b>false</b> olur. main() funksiyası bu nəticəyə görə uyğun sözü çap edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+bool sadedirmi(long long n){
+    if (n < 2) return false;
+    for (long long i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main(){
+    long long n; cin >> n;
+
+    cout << (sadedirmi(n) ? "BELE" : "XEYR") << "\\n";
+}`},
+  {
+    title: "97 ədədinin sadəlik yoxlanması (funksiya ilə)",
+    difficulty: "easy",
+    tags: ["funksiya", "bool", "sadə ədəd"],
+    statement: "Tam ədəd verilib. Onun sadə olub-olmadığını yoxlayan BOOL qaytaran funksiya yazın.",
+    input: "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+    output: "\"BELE\" (sadədir) və ya \"XEYR\".",
+    example: {in:"97", out:"BELE"},
+    approach: "Funksiya <b>bool</b> tipində qaytarır — nəticə ya <b>true</b>, ya <b>false</b> olur. main() funksiyası bu nəticəyə görə uyğun sözü çap edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+bool sadedirmi(long long n){
+    if (n < 2) return false;
+    for (long long i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}
+
+int main(){
+    long long n; cin >> n;
+
+    cout << (sadedirmi(n) ? "BELE" : "XEYR") << "\\n";
+}`},
+  {
+    title: "5 ədədin sürətli oxunub cəmlənməsi",
+    difficulty: "mid",
+    tags: ["sürətli giriş-çıxış", "ios_base"],
+    statement: "N ədəd tam ədəd verilib. Sürətli giriş-çıxış aktivləşdirərək cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
     output: "Cəm.",
     example: {in:"5\n1 2 3 4 5", out:"15"},
-    approach: "<b>ios::sync_with_stdio(false); cin.tie(nullptr);</b> sətirləri C və C++ giriş-çıxış axınlarını ayırır və <b>cin/cout</b>-un avtomatik sinxronunu ləğv edir — nəticədə böyük N üçün oxuma/yazma xeyli sürətlənir. Bu, hər proqramın başında yazılmalı standart 'ilk iki sətir'dir.",
+    approach: "<b>ios_base::sync_with_stdio(false)</b> C++-ın cin/cout-unu C-nin scanf/printf-indən ayırır, <b>cin.tie(NULL)</b> isə cin-lə cout arasındakı lazımsız gözləməni aradan qaldırır — çox böyük girişlərdə bu, proqramı xeyli sürətləndirir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int n; cin >> n;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
     long long sum = 0;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
         sum += x;
     }
+
     cout << sum << "\\n";
-}`
-  },
+}`},
   {
-    title: "20. getline ilə söz sayını tapmaq",
+    title: "10 ədədin sürətli oxunub cəmlənməsi",
     difficulty: "mid",
-    tags: ["getline", "string", "split"],
-    statement: "Bir sətir mətn verilib. Ondakı sözlərin (boşluqla ayrılmış ardıcıllıqların) sayını tapın.",
-    input: "Bir sətir mətn (boşluqlarla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
-    output: "Sözlərin sayı.",
-    example: {in:"Azercell Cup ucun hazirliq", out:"4"},
-    approach: "<b>getline(cin, line)</b> bütün sətri (boşluqları ilə birlikdə) oxuyur. Sonra <b>stringstream</b>-ə yükləyib <b>while (ss &gt;&gt; word)</b> dövrü ilə hər sözü ayrıca oxuyub sayğacı artırırıq — bu, sətri boşluqlara görə 'bölmək'in ən sadə yoludur.",
+    tags: ["sürətli giriş-çıxış", "ios_base"],
+    statement: "N ədəd tam ədəd verilib. Sürətli giriş-çıxış aktivləşdirərək cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cəm.",
+    example: {in:"10\n1 1 1 1 1 1 1 1 1 1", out:"10"},
+    approach: "<b>ios_base::sync_with_stdio(false)</b> C++-ın cin/cout-unu C-nin scanf/printf-indən ayırır, <b>cin.tie(NULL)</b> isə cin-lə cout arasındakı lazımsız gözləməni aradan qaldırır — çox böyük girişlərdə bu, proqramı xeyli sürətləndirir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3 ədədin sürətli oxunub cəmlənməsi",
+    difficulty: "mid",
+    tags: ["sürətli giriş-çıxış", "ios_base"],
+    statement: "N ədəd tam ədəd verilib. Sürətli giriş-çıxış aktivləşdirərək cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cəm.",
+    example: {in:"3\n100 200 300", out:"600"},
+    approach: "<b>ios_base::sync_with_stdio(false)</b> C++-ın cin/cout-unu C-nin scanf/printf-indən ayırır, <b>cin.tie(NULL)</b> isə cin-lə cout arasındakı lazımsız gözləməni aradan qaldırır — çox böyük girişlərdə bu, proqramı xeyli sürətləndirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "6 ədədin sürətli oxunub cəmlənməsi",
+    difficulty: "mid",
+    tags: ["sürətli giriş-çıxış", "ios_base"],
+    statement: "N ədəd tam ədəd verilib. Sürətli giriş-çıxış aktivləşdirərək cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cəm.",
+    example: {in:"6\n5 10 15 20 25 30", out:"105"},
+    approach: "<b>ios_base::sync_with_stdio(false)</b> C++-ın cin/cout-unu C-nin scanf/printf-indən ayırır, <b>cin.tie(NULL)</b> isə cin-lə cout arasındakı lazımsız gözləməni aradan qaldırır — çox böyük girişlərdə bu, proqramı xeyli sürətləndirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "4 ədədin sürətli oxunub cəmlənməsi",
+    difficulty: "mid",
+    tags: ["sürətli giriş-çıxış", "ios_base"],
+    statement: "N ədəd tam ədəd verilib. Sürətli giriş-çıxış aktivləşdirərək cəmini tapın.",
+    input: "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+    output: "Cəm.",
+    example: {in:"4\n-1 -2 -3 -4", out:"-10"},
+    approach: "<b>ios_base::sync_with_stdio(false)</b> C++-ın cin/cout-unu C-nin scanf/printf-indən ayırır, <b>cin.tie(NULL)</b> isə cin-lə cout arasındakı lazımsız gözləməni aradan qaldırır — çox böyük girişlərdə bu, proqramı xeyli sürətləndirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        long long x;
+        cin >> x;
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "EOF-a qədər oxunan ədədlərin cəmi (5 ədəd)",
+    difficulty: "mid",
+    tags: ["EOF", "while"],
+    statement: "Neçə ədəd olacağı ƏVVƏLCƏDƏN verilMİR. Giriş bitənə (EOF-a) qədər bütün tam ədədləri oxuyub cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə, sayı bilinməyən tam ədədlər.",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"1 2 3 4 5", out:"15"},
+    approach: "<b>while (cin &gt;&gt; x)</b> ifadəsi HƏM ədədi oxuyur, HƏM DƏ giriş uğurlu olub-olmadığını yoxlayır — giriş bitəndə ifadə \"yalan\" olur və dövr avtomatik dayanır. Bu üsulla N-i əvvəlcədən bilmək lazım deyil.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    long long sum = 0;
+    long long x;
+    while (cin >> x) {
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "EOF-a qədər oxunan ədədlərin cəmi (3 ədəd)",
+    difficulty: "mid",
+    tags: ["EOF", "while"],
+    statement: "Neçə ədəd olacağı ƏVVƏLCƏDƏN verilMİR. Giriş bitənə (EOF-a) qədər bütün tam ədədləri oxuyub cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə, sayı bilinməyən tam ədədlər.",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"10 20 30", out:"60"},
+    approach: "<b>while (cin &gt;&gt; x)</b> ifadəsi HƏM ədədi oxuyur, HƏM DƏ giriş uğurlu olub-olmadığını yoxlayır — giriş bitəndə ifadə \"yalan\" olur və dövr avtomatik dayanır. Bu üsulla N-i əvvəlcədən bilmək lazım deyil.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    long long sum = 0;
+    long long x;
+    while (cin >> x) {
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "EOF-a qədər oxunan ədədlərin cəmi (mənfi ədədlər)",
+    difficulty: "mid",
+    tags: ["EOF", "while"],
+    statement: "Neçə ədəd olacağı ƏVVƏLCƏDƏN verilMİR. Giriş bitənə (EOF-a) qədər bütün tam ədədləri oxuyub cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə, sayı bilinməyən tam ədədlər.",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"-5 5 -10 10", out:"0"},
+    approach: "<b>while (cin &gt;&gt; x)</b> ifadəsi HƏM ədədi oxuyur, HƏM DƏ giriş uğurlu olub-olmadığını yoxlayır — giriş bitəndə ifadə \"yalan\" olur və dövr avtomatik dayanır. Bu üsulla N-i əvvəlcədən bilmək lazım deyil.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    long long sum = 0;
+    long long x;
+    while (cin >> x) {
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "EOF-a qədər oxunan ədədlərin cəmi (tək ədəd)",
+    difficulty: "mid",
+    tags: ["EOF", "while"],
+    statement: "Neçə ədəd olacağı ƏVVƏLCƏDƏN verilMİR. Giriş bitənə (EOF-a) qədər bütün tam ədədləri oxuyub cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə, sayı bilinməyən tam ədədlər.",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"100", out:"100"},
+    approach: "<b>while (cin &gt;&gt; x)</b> ifadəsi HƏM ədədi oxuyur, HƏM DƏ giriş uğurlu olub-olmadığını yoxlayır — giriş bitəndə ifadə \"yalan\" olur və dövr avtomatik dayanır. Bu üsulla N-i əvvəlcədən bilmək lazım deyil.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    long long sum = 0;
+    long long x;
+    while (cin >> x) {
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "EOF-a qədər oxunan ədədlərin cəmi (7 eyni ədəd)",
+    difficulty: "mid",
+    tags: ["EOF", "while"],
+    statement: "Neçə ədəd olacağı ƏVVƏLCƏDƏN verilMİR. Giriş bitənə (EOF-a) qədər bütün tam ədədləri oxuyub cəmini tapın.",
+    input: "Bir və ya bir neçə sətirdə, sayı bilinməyən tam ədədlər.",
+    output: "Bütün oxunan ədədlərin cəmi.",
+    example: {in:"7 7 7 7 7 7 7", out:"49"},
+    approach: "<b>while (cin &gt;&gt; x)</b> ifadəsi HƏM ədədi oxuyur, HƏM DƏ giriş uğurlu olub-olmadığını yoxlayır — giriş bitəndə ifadə \"yalan\" olur və dövr avtomatik dayanır. Bu üsulla N-i əvvəlcədən bilmək lazım deyil.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    long long sum = 0;
+    long long x;
+    while (cin >> x) {
+        sum += x;
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3 test halı ilə cəm hesablamaq",
+    difficulty: "easy",
+    tags: ["çoxsaylı test", "for"],
+    statement: "T test halı verilib. Hər test halında iki tam ədəd var — hər biri üçün cəmini AYRI sətirdə çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 1000), sonra T sətirdə hər birində iki tam ədəd.",
+    output: "T sətir — hər test halının cəmi.",
+    example: {in:"3\n1 2\n3 4\n5 6", out:"3\n7\n11"},
+    approach: "Əvvəlcə T (test sayı) oxunur, sonra <b>for</b> dövründə T dəfə iki ədəd oxunub, hər dəfə nəticə DƏRHAL (növbəti test halını gözləmədən) çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        long long a, b;
+        cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`},
+  {
+    title: "1 test halı ilə cəm hesablamaq",
+    difficulty: "easy",
+    tags: ["çoxsaylı test", "for"],
+    statement: "T test halı verilib. Hər test halında iki tam ədəd var — hər biri üçün cəmini AYRI sətirdə çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 1000), sonra T sətirdə hər birində iki tam ədəd.",
+    output: "T sətir — hər test halının cəmi.",
+    example: {in:"1\n10 20", out:"30"},
+    approach: "Əvvəlcə T (test sayı) oxunur, sonra <b>for</b> dövründə T dəfə iki ədəd oxunub, hər dəfə nəticə DƏRHAL (növbəti test halını gözləmədən) çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        long long a, b;
+        cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`},
+  {
+    title: "4 test halı ilə cəm hesablamaq",
+    difficulty: "easy",
+    tags: ["çoxsaylı test", "for"],
+    statement: "T test halı verilib. Hər test halında iki tam ədəd var — hər biri üçün cəmini AYRI sətirdə çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 1000), sonra T sətirdə hər birində iki tam ədəd.",
+    output: "T sətir — hər test halının cəmi.",
+    example: {in:"4\n0 0\n-5 5\n100 200\n7 8", out:"0\n0\n300\n15"},
+    approach: "Əvvəlcə T (test sayı) oxunur, sonra <b>for</b> dövründə T dəfə iki ədəd oxunub, hər dəfə nəticə DƏRHAL (növbəti test halını gözləmədən) çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        long long a, b;
+        cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`},
+  {
+    title: "2 test halı ilə cəm hesablamaq",
+    difficulty: "easy",
+    tags: ["çoxsaylı test", "for"],
+    statement: "T test halı verilib. Hər test halında iki tam ədəd var — hər biri üçün cəmini AYRI sətirdə çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 1000), sonra T sətirdə hər birində iki tam ədəd.",
+    output: "T sətir — hər test halının cəmi.",
+    example: {in:"2\n1 1\n2 2", out:"2\n4"},
+    approach: "Əvvəlcə T (test sayı) oxunur, sonra <b>for</b> dövründə T dəfə iki ədəd oxunub, hər dəfə nəticə DƏRHAL (növbəti test halını gözləmədən) çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        long long a, b;
+        cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`},
+  {
+    title: "5 test halı ilə cəm hesablamaq",
+    difficulty: "easy",
+    tags: ["çoxsaylı test", "for"],
+    statement: "T test halı verilib. Hər test halında iki tam ədəd var — hər biri üçün cəmini AYRI sətirdə çap edin.",
+    input: "Birinci sətirdə T (1 ≤ T ≤ 1000), sonra T sətirdə hər birində iki tam ədəd.",
+    output: "T sətir — hər test halının cəmi.",
+    example: {in:"5\n-1 -1\n-2 -2\n-3 -3\n-4 -4\n-5 -5", out:"-2\n-4\n-6\n-8\n-10"},
+    approach: "Əvvəlcə T (test sayı) oxunur, sonra <b>for</b> dövründə T dəfə iki ədəd oxunub, hər dəfə nəticə DƏRHAL (növbəti test halını gözləmədən) çap olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int t;
+    cin >> t;
+
+    for (int i = 0; i < t; i++) {
+        long long a, b;
+        cin >> a >> b;
+        cout << a + b << "\\n";
+    }
+}`},
+  {
+    title: "2x2 matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "matris"],
+    statement: "R sətir və C sütundan ibarət matris verilib. Bütün elementlərin cəmini tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə hər birində C tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"2 2\n1 2\n3 4", out:"10"},
+    approach: "İç-içə iki dövr istifadə olunur: xarici dövr sətirləri (R ədəd), daxili dövr sütunları (C ədəd) gəzir — beləliklə matrisin bütün xanaları bir dəfə oxunub cəmə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long sum = 0;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            long long x;
+            cin >> x;
+            sum += x;
+        }
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "2x3 matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "matris"],
+    statement: "R sətir və C sütundan ibarət matris verilib. Bütün elementlərin cəmini tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə hər birində C tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"21"},
+    approach: "İç-içə iki dövr istifadə olunur: xarici dövr sətirləri (R ədəd), daxili dövr sütunları (C ədəd) gəzir — beləliklə matrisin bütün xanaları bir dəfə oxunub cəmə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long sum = 0;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            long long x;
+            cin >> x;
+            sum += x;
+        }
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3x2 matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "matris"],
+    statement: "R sətir və C sütundan ibarət matris verilib. Bütün elementlərin cəmini tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə hər birində C tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"3 2\n1 1\n1 1\n1 1", out:"6"},
+    approach: "İç-içə iki dövr istifadə olunur: xarici dövr sətirləri (R ədəd), daxili dövr sütunları (C ədəd) gəzir — beləliklə matrisin bütün xanaları bir dəfə oxunub cəmə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long sum = 0;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            long long x;
+            cin >> x;
+            sum += x;
+        }
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1x4 matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "matris"],
+    statement: "R sətir və C sütundan ibarət matris verilib. Bütün elementlərin cəmini tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə hər birində C tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"1 4\n10 20 30 40", out:"100"},
+    approach: "İç-içə iki dövr istifadə olunur: xarici dövr sətirləri (R ədəd), daxili dövr sütunları (C ədəd) gəzir — beləliklə matrisin bütün xanaları bir dəfə oxunub cəmə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long sum = 0;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            long long x;
+            cin >> x;
+            sum += x;
+        }
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3x3 matrisin bütün elementlərinin cəmi",
+    difficulty: "easy",
+    tags: ["2D massiv", "matris"],
+    statement: "R sətir və C sütundan ibarət matris verilib. Bütün elementlərin cəmini tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə hər birində C tam ədəd.",
+    output: "Bütün elementlərin cəmi.",
+    example: {in:"3 3\n1 0 0\n0 1 0\n0 0 1", out:"3"},
+    approach: "İç-içə iki dövr istifadə olunur: xarici dövr sətirləri (R ədəd), daxili dövr sütunları (C ədəd) gəzir — beləliklə matrisin bütün xanaları bir dəfə oxunub cəmə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long sum = 0;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            long long x;
+            cin >> x;
+            sum += x;
+        }
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "2x2 matrisin əsas diaqonal cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N x N kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N, sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"2 2\n1 2\n3 4", out:"5"},
+    approach: "Əsas diaqonalda sətir nömrəsi sütun nömrəsinə bərabərdir — yəni yalnız <b>a[i][i]</b> xanalarını topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    long long a[50][50];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i][i];
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "3x3 matrisin əsas diaqonal cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N x N kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N, sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"3 3\n1 2 3\n4 5 6\n7 8 9", out:"15"},
+    approach: "Əsas diaqonalda sətir nömrəsi sütun nömrəsinə bərabərdir — yəni yalnız <b>a[i][i]</b> xanalarını topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    long long a[50][50];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i][i];
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5x5 matrisin əsas diaqonal cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N x N kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N, sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"5 5\n2 0 0 0 0\n0 2 0 0 0\n0 0 2 0 0\n0 0 0 2 0\n0 0 0 0 2", out:"5"},
+    approach: "Əsas diaqonalda sətir nömrəsi sütun nömrəsinə bərabərdir — yəni yalnız <b>a[i][i]</b> xanalarını topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    long long a[50][50];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i][i];
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "4x4 matrisin əsas diaqonal cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N x N kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N, sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"4 4\n1 1 1 1\n1 1 1 1\n1 1 1 1\n1 1 1 1", out:"7"},
+    approach: "Əsas diaqonalda sətir nömrəsi sütun nömrəsinə bərabərdir — yəni yalnız <b>a[i][i]</b> xanalarını topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    long long a[50][50];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i][i];
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "6x6 matrisin əsas diaqonal cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "diaqonal"],
+    statement: "N x N kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
+    input: "Birinci sətirdə N, sonra N sətirdə hər birində N tam ədəd.",
+    output: "Əsas diaqonalın cəmi.",
+    example: {in:"6 6\n1 0 0 0 0 0\n0 2 0 0 0 0\n0 0 3 0 0 0\n0 0 0 4 0 0\n0 0 0 0 5 0\n0 0 0 0 0 6", out:"6"},
+    approach: "Əsas diaqonalda sətir nömrəsi sütun nömrəsinə bərabərdir — yəni yalnız <b>a[i][i]</b> xanalarını topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n;
+    cin >> n;
+
+    long long a[50][50];
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i][i];
+    }
+
+    cout << sum << "\\n";
+}`},
+  {
+    title: "2x2 matrisdə 0-cı sətir və 1-ci sütunun cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "sətir", "sütun"],
+    statement: "R x C matris, sonra K (sətir) və M (sütun) indeksləri verilib. K-cı sətrin və M-ci sütunun elementlərinin cəmini (ayrı-ayrı) tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd, sonuncu sətirdə K və M (0-əsaslı indekslər).",
+    output: "İki ədəd: K-cı sətrin cəmi, M-ci sütunun cəmi (bir sətirdə, boşluqla).",
+    example: {in:"2 2\n1 2\n3 4\n0 1", out:"3 6"},
+    approach: "Sətir cəmi üçün <b>a[k][j]</b>-ni j üzrə (sütunlar boyu) topluyuruq, sütun cəmi üçün isə <b>a[i][m]</b>-ni i üzrə (sətirlər boyu) topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    int k, m;
+    cin >> k >> m;
+
+    long long rowSum = 0;
+    for (int j = 0; j < c; j++) rowSum += a[k][j];
+
+    long long colSum = 0;
+    for (int i = 0; i < r; i++) colSum += a[i][m];
+
+    cout << rowSum << " " << colSum << "\\n";
+}`},
+  {
+    title: "3x3 matrisdə 1-cı sətir və 2-ci sütunun cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "sətir", "sütun"],
+    statement: "R x C matris, sonra K (sətir) və M (sütun) indeksləri verilib. K-cı sətrin və M-ci sütunun elementlərinin cəmini (ayrı-ayrı) tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd, sonuncu sətirdə K və M (0-əsaslı indekslər).",
+    output: "İki ədəd: K-cı sətrin cəmi, M-ci sütunun cəmi (bir sətirdə, boşluqla).",
+    example: {in:"3 3\n1 2 3\n4 5 6\n7 8 9\n1 2", out:"15 18"},
+    approach: "Sətir cəmi üçün <b>a[k][j]</b>-ni j üzrə (sütunlar boyu) topluyuruq, sütun cəmi üçün isə <b>a[i][m]</b>-ni i üzrə (sətirlər boyu) topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    int k, m;
+    cin >> k >> m;
+
+    long long rowSum = 0;
+    for (int j = 0; j < c; j++) rowSum += a[k][j];
+
+    long long colSum = 0;
+    for (int i = 0; i < r; i++) colSum += a[i][m];
+
+    cout << rowSum << " " << colSum << "\\n";
+}`},
+  {
+    title: "2x3 matrisdə 1-cı sətir və 0-ci sütunun cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "sətir", "sütun"],
+    statement: "R x C matris, sonra K (sətir) və M (sütun) indeksləri verilib. K-cı sətrin və M-ci sütunun elementlərinin cəmini (ayrı-ayrı) tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd, sonuncu sətirdə K və M (0-əsaslı indekslər).",
+    output: "İki ədəd: K-cı sətrin cəmi, M-ci sütunun cəmi (bir sətirdə, boşluqla).",
+    example: {in:"2 3\n1 1 1\n2 2 2\n1 0", out:"6 3"},
+    approach: "Sətir cəmi üçün <b>a[k][j]</b>-ni j üzrə (sütunlar boyu) topluyuruq, sütun cəmi üçün isə <b>a[i][m]</b>-ni i üzrə (sətirlər boyu) topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    int k, m;
+    cin >> k >> m;
+
+    long long rowSum = 0;
+    for (int j = 0; j < c; j++) rowSum += a[k][j];
+
+    long long colSum = 0;
+    for (int i = 0; i < r; i++) colSum += a[i][m];
+
+    cout << rowSum << " " << colSum << "\\n";
+}`},
+  {
+    title: "3x2 matrisdə 2-cı sətir və 1-ci sütunun cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "sətir", "sütun"],
+    statement: "R x C matris, sonra K (sətir) və M (sütun) indeksləri verilib. K-cı sətrin və M-ci sütunun elementlərinin cəmini (ayrı-ayrı) tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd, sonuncu sətirdə K və M (0-əsaslı indekslər).",
+    output: "İki ədəd: K-cı sətrin cəmi, M-ci sütunun cəmi (bir sətirdə, boşluqla).",
+    example: {in:"3 2\n5 5\n10 10\n15 15\n2 1", out:"30 30"},
+    approach: "Sətir cəmi üçün <b>a[k][j]</b>-ni j üzrə (sütunlar boyu) topluyuruq, sütun cəmi üçün isə <b>a[i][m]</b>-ni i üzrə (sətirlər boyu) topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    int k, m;
+    cin >> k >> m;
+
+    long long rowSum = 0;
+    for (int j = 0; j < c; j++) rowSum += a[k][j];
+
+    long long colSum = 0;
+    for (int i = 0; i < r; i++) colSum += a[i][m];
+
+    cout << rowSum << " " << colSum << "\\n";
+}`},
+  {
+    title: "1x5 matrisdə 0-cı sətir və 4-ci sütunun cəmi",
+    difficulty: "mid",
+    tags: ["2D massiv", "sətir", "sütun"],
+    statement: "R x C matris, sonra K (sətir) və M (sütun) indeksləri verilib. K-cı sətrin və M-ci sütunun elementlərinin cəmini (ayrı-ayrı) tapın.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd, sonuncu sətirdə K və M (0-əsaslı indekslər).",
+    output: "İki ədəd: K-cı sətrin cəmi, M-ci sütunun cəmi (bir sətirdə, boşluqla).",
+    example: {in:"1 5\n1 2 3 4 5\n0 4", out:"15 5"},
+    approach: "Sətir cəmi üçün <b>a[k][j]</b>-ni j üzrə (sütunlar boyu) topluyuruq, sütun cəmi üçün isə <b>a[i][m]</b>-ni i üzrə (sətirlər boyu) topluyuruq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    int k, m;
+    cin >> k >> m;
+
+    long long rowSum = 0;
+    for (int j = 0; j < c; j++) rowSum += a[k][j];
+
+    long long colSum = 0;
+    for (int i = 0; i < r; i++) colSum += a[i][m];
+
+    cout << rowSum << " " << colSum << "\\n";
+}`},
+  {
+    title: "2x3 matrisin transponirəsi",
+    difficulty: "mid",
+    tags: ["2D massiv", "transponirə"],
+    statement: "R x C matris verilib. Onun transponirə olunmuşunu (sətir və sütunları yerini dəyişmiş halını) çap edin.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd.",
+    output: "C sətir, hər birində R tam ədəd — transponirə olunmuş matris.",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"1 4\n2 5\n3 6"},
+    approach: "Transponirə edilmiş matrisin <b>[j][i]</b> xanası, orijinal matrisin <b>[i][j]</b> xanasına bərabərdir — sadəcə sətir və sütun indekslərini YERİNİ DƏYİŞƏRƏK çap edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++) {
+            cout << a[i][j];
+            if (i < r - 1) cout << " ";
+        }
+        cout << "\\n";
+    }
+}`},
+  {
+    title: "3x2 matrisin transponirəsi",
+    difficulty: "mid",
+    tags: ["2D massiv", "transponirə"],
+    statement: "R x C matris verilib. Onun transponirə olunmuşunu (sətir və sütunları yerini dəyişmiş halını) çap edin.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd.",
+    output: "C sətir, hər birində R tam ədəd — transponirə olunmuş matris.",
+    example: {in:"3 2\n1 2\n3 4\n5 6", out:"1 3 5\n2 4 6"},
+    approach: "Transponirə edilmiş matrisin <b>[j][i]</b> xanası, orijinal matrisin <b>[i][j]</b> xanasına bərabərdir — sadəcə sətir və sütun indekslərini YERİNİ DƏYİŞƏRƏK çap edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++) {
+            cout << a[i][j];
+            if (i < r - 1) cout << " ";
+        }
+        cout << "\\n";
+    }
+}`},
+  {
+    title: "2x2 matrisin transponirəsi",
+    difficulty: "mid",
+    tags: ["2D massiv", "transponirə"],
+    statement: "R x C matris verilib. Onun transponirə olunmuşunu (sətir və sütunları yerini dəyişmiş halını) çap edin.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd.",
+    output: "C sətir, hər birində R tam ədəd — transponirə olunmuş matris.",
+    example: {in:"2 2\n1 0\n0 1", out:"1 0\n0 1"},
+    approach: "Transponirə edilmiş matrisin <b>[j][i]</b> xanası, orijinal matrisin <b>[i][j]</b> xanasına bərabərdir — sadəcə sətir və sütun indekslərini YERİNİ DƏYİŞƏRƏK çap edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++) {
+            cout << a[i][j];
+            if (i < r - 1) cout << " ";
+        }
+        cout << "\\n";
+    }
+}`},
+  {
+    title: "1x3 matrisin transponirəsi",
+    difficulty: "mid",
+    tags: ["2D massiv", "transponirə"],
+    statement: "R x C matris verilib. Onun transponirə olunmuşunu (sətir və sütunları yerini dəyişmiş halını) çap edin.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd.",
+    output: "C sətir, hər birində R tam ədəd — transponirə olunmuş matris.",
+    example: {in:"1 3\n7 8 9", out:"7\n8\n9"},
+    approach: "Transponirə edilmiş matrisin <b>[j][i]</b> xanası, orijinal matrisin <b>[i][j]</b> xanasına bərabərdir — sadəcə sətir və sütun indekslərini YERİNİ DƏYİŞƏRƏK çap edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++) {
+            cout << a[i][j];
+            if (i < r - 1) cout << " ";
+        }
+        cout << "\\n";
+    }
+}`},
+  {
+    title: "3x3 matrisin transponirəsi",
+    difficulty: "mid",
+    tags: ["2D massiv", "transponirə"],
+    statement: "R x C matris verilib. Onun transponirə olunmuşunu (sətir və sütunları yerini dəyişmiş halını) çap edin.",
+    input: "Birinci sətirdə R və C, sonra R sətirdə C tam ədəd.",
+    output: "C sətir, hər birində R tam ədəd — transponirə olunmuş matris.",
+    example: {in:"3 3\n1 2 3\n4 5 6\n7 8 9", out:"1 4 7\n2 5 8\n3 6 9"},
+    approach: "Transponirə edilmiş matrisin <b>[j][i]</b> xanası, orijinal matrisin <b>[i][j]</b> xanasına bərabərdir — sadəcə sətir və sütun indekslərini YERİNİ DƏYİŞƏRƏK çap edirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int r, c;
+    cin >> r >> c;
+
+    long long a[50][50];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> a[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++) {
+            cout << a[i][j];
+            if (i < r - 1) cout << " ";
+        }
+        cout << "\\n";
+    }
+}`},
+  {
+    title: "(0,0) və (3,4) nöqtələri arasındakı məsafə (struct ilə)",
+    difficulty: "mid",
+    tags: ["struct", "həndəsə"],
+    statement: "İki nöqtənin koordinatları verilib (struct Point istifadə edərək). Aralarındaki məsafəni tapın.",
+    input: "Bir sətirdə dörd həqiqi ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə, 2 onluq rəqəmlə.",
+    example: {in:"0 0 3 4", out:"5.00"},
+    approach: "<b>struct Point</b> bir nöqtənin x və y koordinatlarını BİR YERDƏ saxlayır. Məsafə düsturu: <b>√((x2-x1)² + (y2-y1)²)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+int main(){
+    Point p1, p2;
+    cin >> p1.x >> p1.y;
+    cin >> p2.x >> p2.y;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    cout << fixed << setprecision(2) << dist << "\\n";
+}`},
+  {
+    title: "(1,1) və (4,5) nöqtələri arasındakı məsafə (struct ilə)",
+    difficulty: "mid",
+    tags: ["struct", "həndəsə"],
+    statement: "İki nöqtənin koordinatları verilib (struct Point istifadə edərək). Aralarındaki məsafəni tapın.",
+    input: "Bir sətirdə dörd həqiqi ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə, 2 onluq rəqəmlə.",
+    example: {in:"1 1 4 5", out:"5.00"},
+    approach: "<b>struct Point</b> bir nöqtənin x və y koordinatlarını BİR YERDƏ saxlayır. Məsafə düsturu: <b>√((x2-x1)² + (y2-y1)²)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+int main(){
+    Point p1, p2;
+    cin >> p1.x >> p1.y;
+    cin >> p2.x >> p2.y;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    cout << fixed << setprecision(2) << dist << "\\n";
+}`},
+  {
+    title: "(0,0) və (0,0) nöqtələri arasındakı məsafə (struct ilə)",
+    difficulty: "mid",
+    tags: ["struct", "həndəsə"],
+    statement: "İki nöqtənin koordinatları verilib (struct Point istifadə edərək). Aralarındaki məsafəni tapın.",
+    input: "Bir sətirdə dörd həqiqi ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə, 2 onluq rəqəmlə.",
+    example: {in:"0 0 0 0", out:"0.00"},
+    approach: "<b>struct Point</b> bir nöqtənin x və y koordinatlarını BİR YERDƏ saxlayır. Məsafə düsturu: <b>√((x2-x1)² + (y2-y1)²)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+int main(){
+    Point p1, p2;
+    cin >> p1.x >> p1.y;
+    cin >> p2.x >> p2.y;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    cout << fixed << setprecision(2) << dist << "\\n";
+}`},
+  {
+    title: "(-2,-2) və (2,2) nöqtələri arasındakı məsafə (struct ilə)",
+    difficulty: "mid",
+    tags: ["struct", "həndəsə"],
+    statement: "İki nöqtənin koordinatları verilib (struct Point istifadə edərək). Aralarındaki məsafəni tapın.",
+    input: "Bir sətirdə dörd həqiqi ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə, 2 onluq rəqəmlə.",
+    example: {in:"-2 -2 2 2", out:"5.66"},
+    approach: "<b>struct Point</b> bir nöqtənin x və y koordinatlarını BİR YERDƏ saxlayır. Məsafə düsturu: <b>√((x2-x1)² + (y2-y1)²)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+int main(){
+    Point p1, p2;
+    cin >> p1.x >> p1.y;
+    cin >> p2.x >> p2.y;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    cout << fixed << setprecision(2) << dist << "\\n";
+}`},
+  {
+    title: "(5,0) və (0,0) nöqtələri arasındakı məsafə (struct ilə)",
+    difficulty: "mid",
+    tags: ["struct", "həndəsə"],
+    statement: "İki nöqtənin koordinatları verilib (struct Point istifadə edərək). Aralarındaki məsafəni tapın.",
+    input: "Bir sətirdə dörd həqiqi ədəd: x1 y1 x2 y2.",
+    output: "İki nöqtə arasındakı məsafə, 2 onluq rəqəmlə.",
+    example: {in:"5 0 0 0", out:"5.00"},
+    approach: "<b>struct Point</b> bir nöqtənin x və y koordinatlarını BİR YERDƏ saxlayır. Məsafə düsturu: <b>√((x2-x1)² + (y2-y1)²)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+    double x, y;
+};
+
+int main(){
+    Point p1, p2;
+    cin >> p1.x >> p1.y;
+    cin >> p2.x >> p2.y;
+
+    double dx = p2.x - p1.x;
+    double dy = p2.y - p1.y;
+    double dist = sqrt(dx * dx + dy * dy);
+
+    cout << fixed << setprecision(2) << dist << "\\n";
+}`},
+  {
+    title: "(10,3) pair-inin cəmi və fərqi",
+    difficulty: "easy",
+    tags: ["pair"],
+    statement: "İki ədəd BİR pair daxilində verilib. Onların cəmini və fərqini (ayrı sətirdə) tapın.",
+    input: "Bir sətirdə iki tam ədəd (pair-in first və second hissələri).",
+    output: "2 sətir: cəm, fərq.",
+    example: {in:"10 3", out:"13\n7"},
+    approach: "<b>pair&lt;long long, long long&gt;</b> iki dəyəri BİR dəyişəndə saxlayır — birinci hissəyə <b>.first</b>, ikinciyə <b>.second</b> ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    pair<long long, long long> p;
+    cin >> p.first >> p.second;
+
+    cout << p.first + p.second << "\\n";
+    cout << p.first - p.second << "\\n";
+}`},
+  {
+    title: "(100,50) pair-inin cəmi və fərqi",
+    difficulty: "easy",
+    tags: ["pair"],
+    statement: "İki ədəd BİR pair daxilində verilib. Onların cəmini və fərqini (ayrı sətirdə) tapın.",
+    input: "Bir sətirdə iki tam ədəd (pair-in first və second hissələri).",
+    output: "2 sətir: cəm, fərq.",
+    example: {in:"100 50", out:"150\n50"},
+    approach: "<b>pair&lt;long long, long long&gt;</b> iki dəyəri BİR dəyişəndə saxlayır — birinci hissəyə <b>.first</b>, ikinciyə <b>.second</b> ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    pair<long long, long long> p;
+    cin >> p.first >> p.second;
+
+    cout << p.first + p.second << "\\n";
+    cout << p.first - p.second << "\\n";
+}`},
+  {
+    title: "(-5,5) pair-inin cəmi və fərqi",
+    difficulty: "easy",
+    tags: ["pair"],
+    statement: "İki ədəd BİR pair daxilində verilib. Onların cəmini və fərqini (ayrı sətirdə) tapın.",
+    input: "Bir sətirdə iki tam ədəd (pair-in first və second hissələri).",
+    output: "2 sətir: cəm, fərq.",
+    example: {in:"-5 5", out:"0\n-10"},
+    approach: "<b>pair&lt;long long, long long&gt;</b> iki dəyəri BİR dəyişəndə saxlayır — birinci hissəyə <b>.first</b>, ikinciyə <b>.second</b> ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    pair<long long, long long> p;
+    cin >> p.first >> p.second;
+
+    cout << p.first + p.second << "\\n";
+    cout << p.first - p.second << "\\n";
+}`},
+  {
+    title: "(7,7) pair-inin cəmi və fərqi",
+    difficulty: "easy",
+    tags: ["pair"],
+    statement: "İki ədəd BİR pair daxilində verilib. Onların cəmini və fərqini (ayrı sətirdə) tapın.",
+    input: "Bir sətirdə iki tam ədəd (pair-in first və second hissələri).",
+    output: "2 sətir: cəm, fərq.",
+    example: {in:"7 7", out:"14\n0"},
+    approach: "<b>pair&lt;long long, long long&gt;</b> iki dəyəri BİR dəyişəndə saxlayır — birinci hissəyə <b>.first</b>, ikinciyə <b>.second</b> ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    pair<long long, long long> p;
+    cin >> p.first >> p.second;
+
+    cout << p.first + p.second << "\\n";
+    cout << p.first - p.second << "\\n";
+}`},
+  {
+    title: "(1000,1) pair-inin cəmi və fərqi",
+    difficulty: "easy",
+    tags: ["pair"],
+    statement: "İki ədəd BİR pair daxilində verilib. Onların cəmini və fərqini (ayrı sətirdə) tapın.",
+    input: "Bir sətirdə iki tam ədəd (pair-in first və second hissələri).",
+    output: "2 sətir: cəm, fərq.",
+    example: {in:"1000 1", out:"1001\n999"},
+    approach: "<b>pair&lt;long long, long long&gt;</b> iki dəyəri BİR dəyişəndə saxlayır — birinci hissəyə <b>.first</b>, ikinciyə <b>.second</b> ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    pair<long long, long long> p;
+    cin >> p.first >> p.second;
+
+    cout << p.first + p.second << "\\n";
+    cout << p.first - p.second << "\\n";
+}`},
+  {
+    title: "5x3 düzbucaqlının sahə/perimetri (struct ilə)",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "Düzbucaqlının en və hündürlüyü struct daxilində verilib. Sahəsini və perimetrini tapın.",
+    input: "Bir sətirdə iki tam ədəd: en və hündürlük.",
+    output: "2 sətir: sahə, perimetr.",
+    example: {in:"5 3", out:"15\n16"},
+    approach: "<b>struct Rectangle</b> en (width) və hündürlük (height) sahələrini bir yerdə saxlayır, onlara <b>.</b> (nöqtə) ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Rectangle {
+    long long width, height;
+};
+
+int main(){
+    Rectangle r;
+    cin >> r.width >> r.height;
+
+    cout << r.width * r.height << "\\n";
+    cout << 2 * (r.width + r.height) << "\\n";
+}`},
+  {
+    title: "10x10 düzbucaqlının sahə/perimetri (struct ilə)",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "Düzbucaqlının en və hündürlüyü struct daxilində verilib. Sahəsini və perimetrini tapın.",
+    input: "Bir sətirdə iki tam ədəd: en və hündürlük.",
+    output: "2 sətir: sahə, perimetr.",
+    example: {in:"10 10", out:"100\n40"},
+    approach: "<b>struct Rectangle</b> en (width) və hündürlük (height) sahələrini bir yerdə saxlayır, onlara <b>.</b> (nöqtə) ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Rectangle {
+    long long width, height;
+};
+
+int main(){
+    Rectangle r;
+    cin >> r.width >> r.height;
+
+    cout << r.width * r.height << "\\n";
+    cout << 2 * (r.width + r.height) << "\\n";
+}`},
+  {
+    title: "7x2 düzbucaqlının sahə/perimetri (struct ilə)",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "Düzbucaqlının en və hündürlüyü struct daxilində verilib. Sahəsini və perimetrini tapın.",
+    input: "Bir sətirdə iki tam ədəd: en və hündürlük.",
+    output: "2 sətir: sahə, perimetr.",
+    example: {in:"7 2", out:"14\n18"},
+    approach: "<b>struct Rectangle</b> en (width) və hündürlük (height) sahələrini bir yerdə saxlayır, onlara <b>.</b> (nöqtə) ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Rectangle {
+    long long width, height;
+};
+
+int main(){
+    Rectangle r;
+    cin >> r.width >> r.height;
+
+    cout << r.width * r.height << "\\n";
+    cout << 2 * (r.width + r.height) << "\\n";
+}`},
+  {
+    title: "12x8 düzbucaqlının sahə/perimetri (struct ilə)",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "Düzbucaqlının en və hündürlüyü struct daxilində verilib. Sahəsini və perimetrini tapın.",
+    input: "Bir sətirdə iki tam ədəd: en və hündürlük.",
+    output: "2 sətir: sahə, perimetr.",
+    example: {in:"12 8", out:"96\n40"},
+    approach: "<b>struct Rectangle</b> en (width) və hündürlük (height) sahələrini bir yerdə saxlayır, onlara <b>.</b> (nöqtə) ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Rectangle {
+    long long width, height;
+};
+
+int main(){
+    Rectangle r;
+    cin >> r.width >> r.height;
+
+    cout << r.width * r.height << "\\n";
+    cout << 2 * (r.width + r.height) << "\\n";
+}`},
+  {
+    title: "1x1 düzbucaqlının sahə/perimetri (struct ilə)",
+    difficulty: "easy",
+    tags: ["struct"],
+    statement: "Düzbucaqlının en və hündürlüyü struct daxilində verilib. Sahəsini və perimetrini tapın.",
+    input: "Bir sətirdə iki tam ədəd: en və hündürlük.",
+    output: "2 sətir: sahə, perimetr.",
+    example: {in:"1 1", out:"1\n4"},
+    approach: "<b>struct Rectangle</b> en (width) və hündürlük (height) sahələrini bir yerdə saxlayır, onlara <b>.</b> (nöqtə) ilə çatırıq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Rectangle {
+    long long width, height;
+};
+
+int main(){
+    Rectangle r;
+    cin >> r.width >> r.height;
+
+    cout << r.width * r.height << "\\n";
+    cout << 2 * (r.width + r.height) << "\\n";
+}`},
+  {
+    title: "\"proqramlasdirma\" sətrinin [0,4) alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Sətir, başlanğıc indeks və uzunluq verilib. substr() ilə uyğun alt-sətri tapın.",
+    input: "Bir sətirdə: sətir, başlanğıc indeks, uzunluq.",
+    output: "Alt-sətir.",
+    example: {in:"proqramlasdirma 0 4", out:"proq"},
+    approach: "<b>s.substr(başlanğıc, uzunluq)</b> sətrin göstərilən indeksdən başlayan, göstərilən uzunluqdakı hissəsini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    int start, len;
+    cin >> s >> start >> len;
+
+    cout << s.substr(start, len) << "\\n";
+}`},
+  {
+    title: "\"azercellcup\" sətrinin [3,7) alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Sətir, başlanğıc indeks və uzunluq verilib. substr() ilə uyğun alt-sətri tapın.",
+    input: "Bir sətirdə: sətir, başlanğıc indeks, uzunluq.",
+    output: "Alt-sətir.",
+    example: {in:"azercellcup 3 4", out:"rcel"},
+    approach: "<b>s.substr(başlanğıc, uzunluq)</b> sətrin göstərilən indeksdən başlayan, göstərilən uzunluqdakı hissəsini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    int start, len;
+    cin >> s >> start >> len;
+
+    cout << s.substr(start, len) << "\\n";
+}`},
+  {
+    title: "\"helloworld\" sətrinin [5,10) alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Sətir, başlanğıc indeks və uzunluq verilib. substr() ilə uyğun alt-sətri tapın.",
+    input: "Bir sətirdə: sətir, başlanğıc indeks, uzunluq.",
+    output: "Alt-sətir.",
+    example: {in:"helloworld 5 5", out:"world"},
+    approach: "<b>s.substr(başlanğıc, uzunluq)</b> sətrin göstərilən indeksdən başlayan, göstərilən uzunluqdakı hissəsini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    int start, len;
+    cin >> s >> start >> len;
+
+    cout << s.substr(start, len) << "\\n";
+}`},
+  {
+    title: "\"abcdef\" sətrinin [1,4) alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Sətir, başlanğıc indeks və uzunluq verilib. substr() ilə uyğun alt-sətri tapın.",
+    input: "Bir sətirdə: sətir, başlanğıc indeks, uzunluq.",
+    output: "Alt-sətir.",
+    example: {in:"abcdef 1 3", out:"bcd"},
+    approach: "<b>s.substr(başlanğıc, uzunluq)</b> sətrin göstərilən indeksdən başlayan, göstərilən uzunluqdakı hissəsini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    int start, len;
+    cin >> s >> start >> len;
+
+    cout << s.substr(start, len) << "\\n";
+}`},
+  {
+    title: "\"movzu02\" sətrinin [0,7) alt-sətri",
+    difficulty: "easy",
+    tags: ["string", "substr"],
+    statement: "Sətir, başlanğıc indeks və uzunluq verilib. substr() ilə uyğun alt-sətri tapın.",
+    input: "Bir sətirdə: sətir, başlanğıc indeks, uzunluq.",
+    output: "Alt-sətir.",
+    example: {in:"movzu02 0 7", out:"movzu02"},
+    approach: "<b>s.substr(başlanğıc, uzunluq)</b> sətrin göstərilən indeksdən başlayan, göstərilən uzunluqdakı hissəsini qaytarır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    int start, len;
+    cin >> s >> start >> len;
+
+    cout << s.substr(start, len) << "\\n";
+}`},
+  {
+    title: "\"men bu meseleni sevirem\" cümləsindəki söz sayı",
+    difficulty: "mid",
+    tags: ["string", "getline", "stringstream"],
+    statement: "Bir sətir (boşluqlarla ayrılmış sözlərdən ibarət) verilib. Sözlərin sayını tapın.",
+    input: "Bir sətir mətn.",
+    output: "Söz sayı.",
+    example: {in:"men bu meseleni sevirem", out:"4"},
+    approach: "<b>getline</b> bütün sətri (boşluqlarla birlikdə) oxuyur, <b>stringstream</b> isə sətri boşluqlara görə \"sözlərə\" bölməyə kömək edir — hər uğurlu <b>ss &gt;&gt; word</b> bir söz deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
 int main(){
     string line;
     getline(cin, line);
+
     stringstream ss(line);
     string word;
     int cnt = 0;
-    while (ss >> word) cnt++;
+    while (ss >> word) {
+        cnt++;
+    }
+
     cout << cnt << "\\n";
-}`
-  },
+}`},
   {
-    title: "21. Çoxsaylı test halları",
-    difficulty: "easy",
-    tags: ["sürətli I/O", "for", "T test"],
-    statement: "Əvvəlcə T (test sayı) verilir. Sonra T sətirdə hər dəfə iki tam ədəd a, b verilir. Hər test üçün a+b-ni çap edin.",
-    input: "Birinci sətirdə T (1 ≤ T ≤ 10^5). Sonrakı T sətirdə hər birində iki tam ədəd a, b.",
-    output: "Hər test üçün a+b, ayrı sətirdə.",
-    example: {in:"3\n1 2\n5 5\n10 20", out:"3\n10\n30"},
-    approach: "Yarışlarda çox rast gəlinən 'çoxsaylı test halı' formatıdır: əvvəlcə T oxunur, sonra <b>for (int t = 0; t &lt; T; t++)</b> dövründə hər test ayrıca oxunub həll olunur. Sürətli I/O (sync_with_stdio(false)) böyük T üçün vacibdir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int t; cin >> t;
-    while (t--){
-        long long a, b; cin >> a >> b;
-        cout << a + b << "\\n";
-    }
-}`
-  },
-  {
-    title: "22. \"\\n\" ilə çıxışın sürətləndirilməsi",
-    difficulty: "easy",
-    tags: ["cout", "format"],
-    statement: "N ədəd tam ədəd verilib. Onları ayrı-ayrı sətirlərdə çap edin — çıxışda <b>endl</b> əvəzinə <b>\"\\n\"</b> istifadə edin (endl əlavə olaraq bufferi 'flush' etdiyi üçün böyük çıxışlarda yavaşlığa səbəb olur).",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), ikinci sətirdə N tam ədəd.",
-    output: "Hər ədəd ayrı sətirdə.",
-    example: {in:"3\n7 8 9", out:"7\n8\n9"},
-    approach: "<b>cout &lt;&lt; endl</b> hər dəfə çıxış bufferini məcburi boşaldır (flush edir), bu da çoxsaylı çıxışlarda proqramı yavaşlada bilər. Onun yerinə <b>\"\\n\"</b> istifadə etmək eyni nəticəni verir, amma proqram avtomatik olaraq sonda (və ya bufferin dolduğu vaxt) flush edir — daha sürətlidir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    int n; cin >> n;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        cout << x << "\\n";   // endl yox, "\\n"
-    }
-}`
-  },
-  {
-    title: "23. Sonsuz oxuma ilə cəm (EOF-a qədər)",
+    title: "\"bir\" cümləsindəki söz sayı",
     difficulty: "mid",
-    tags: ["cin", "while", "EOF"],
-    statement: "Girişdə neçə ədəd olacağı verilmir — ədədlər fayl/giriş sonuna (EOF) qədər davam edir. Bütün ədədlərin cəmini tapın.",
-    input: "Bir və ya bir neçə sətirdə tam ədədlər (giriş sonuna qədər, ümumi say əvvəlcədən bilinmir).",
-    output: "Bütün oxunan ədədlərin cəmi.",
-    example: {in:"1 2 3\n4 5", out:"15"},
-    approach: "<b>while (cin &gt;&gt; x)</b> konstruksiyası — <b>cin &gt;&gt; x</b> uğurlu oxunanda <b>true</b>, giriş bitəndə (EOF) isə <b>false</b> qaytarır. Bu üsul say əvvəlcədən verilmədiyi giriş formatlarında istifadə olunur.",
+    tags: ["string", "getline", "stringstream"],
+    statement: "Bir sətir (boşluqlarla ayrılmış sözlərdən ibarət) verilib. Sözlərin sayını tapın.",
+    input: "Bir sətir mətn.",
+    output: "Söz sayı.",
+    example: {in:"bir", out:"1"},
+    approach: "<b>getline</b> bütün sətri (boşluqlarla birlikdə) oxuyur, <b>stringstream</b> isə sətri boşluqlara görə \"sözlərə\" bölməyə kömək edir — hər uğurlu <b>ss &gt;&gt; word</b> bir söz deməkdir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-int main(){
-    long long sum = 0, x;
-    while (cin >> x) sum += x;
-    cout << sum << "\\n";
-}`
-  },
-  {
-    title: "24. Qarışıq tipli giriş oxumaq",
-    difficulty: "easy",
-    tags: ["cin", "string", "double"],
-    statement: "Bir sətirdə tələbənin adı (boşluqsuz), yaşı (tam ədəd) və qiyməti (real ədəd) verilir. Onları oxuyub formatlı şəkildə çap edin.",
-    input: "Bir sətirdə: ad (string), yaş (int), qiymət (double) — boşluqla ayrılmış.",
-    output: "\"Ad: X, Yaş: Y, Qiymət: Z\" formatında (qiymət 1 ondalıq dəqiqliklə).",
-    example: {in:"Ayan 13 8.5", out:"Ad: Ayan, Yaş: 13, Qiymət: 8.5"},
-    approach: "<b>cin</b> eyni sətirdə fərqli tipli dəyərləri ardıcıl oxuya bilir — <b>cin &gt;&gt; name &gt;&gt; age &gt;&gt; grade</b> boşluqlara görə avtomatik ayırır, tipinə uyğun (string/int/double) çevirir. Çıxışda <b>fixed &lt;&lt; setprecision(1)</b> ilə dəqiq format verilir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    string name;
-    int age;
-    double grade;
-    cin >> name >> age >> grade;
-    cout << "Ad: " << name << ", Yaş: " << age
-         << ", Qiymət: " << fixed << setprecision(1) << grade << "\\n";
-}`
-  },
-  {
-    title: "25. Matrisin bütün elementlərinin cəmi",
-    difficulty: "easy",
-    tags: ["2D massiv", "for"],
-    statement: "N×M ölçülü matris verilib. Bütün elementlərinin cəmini tapın.",
-    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
-    output: "Bütün elementlərin cəmi.",
-    example: {in:"2 3\n1 2 3\n4 5 6", out:"21"},
-    approach: "<b>vector&lt;vector&lt;int&gt;&gt;</b> ilə N×M matris elan olunur (iç-içə iki dövrlə oxunur), sonra yenə iç-içə iki dövrlə hər elementi cəmə əlavə edirik.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            cin >> a[i][j];
 
-    long long sum = 0;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            sum += a[i][j];
-
-    cout << sum << "\\n";
-}`
-  },
-  {
-    title: "26. Matrisin əsas diaqonalının cəmi",
-    difficulty: "easy",
-    tags: ["2D massiv", "diaqonal"],
-    statement: "N×N ölçülü kvadrat matris verilib. Əsas diaqonalın (sol yuxarıdan sağ aşağıya) elementlərinin cəmini tapın.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
-    output: "Əsas diaqonalın cəmi.",
-    example: {in:"3\n1 2 3\n4 5 6\n7 8 9", out:"15"},
-    approach: "Əsas diaqonalın elementləri həmişə <b>a[i][i]</b> şəklindədir (sətir və sütun indeksi bərabərdir). Tək bir dövrlə <b>i = 0..n-1</b> gəzərək bu elementləri toplayırıq.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<vector<int>> a(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            cin >> a[i][j];
-
-    long long sum = 0;
-    for (int i = 0; i < n; i++) sum += a[i][i];
-    cout << sum << "\\n";
-}`
-  },
-  {
-    title: "27. Matrisi transponirə etmək",
-    difficulty: "mid",
-    tags: ["2D massiv", "transpon"],
-    statement: "N×M ölçülü matris verilib. Onun transponirəsini (sətirlərlə sütunları yerini dəyişmiş formasını, M×N ölçüsündə) çap edin.",
-    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
-    output: "M sətir, hər birində N tam ədəd — transponirə olunmuş matris.",
-    example: {in:"2 3\n1 2 3\n4 5 6", out:"1 4\n2 5\n3 6"},
-    approach: "Transponirədə köhnə matrisin <b>a[i][j]</b> elementi yeni matrisdə <b>b[j][i]</b> mövqeyinə keçir — yəni sətir və sütun indeksləri yerini dəyişir. Yeni matris M×N ölçüsündə qurulur və köhnə matrisdən bu düsturla doldurulur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            cin >> a[i][j];
-
-    vector<vector<int>> b(m, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            b[j][i] = a[i][j];
-
-    for (int i = 0; i < m; i++){
-        for (int j = 0; j < n; j++) cout << b[i][j] << " ";
-        cout << "\\n";
-    }
-}`
-  },
-  {
-    title: "28. Matrisdə sətir və sütun cəmləri",
-    difficulty: "mid",
-    tags: ["2D massiv", "for"],
-    statement: "N×M ölçülü matris verilib. Hər sətrin cəmini, sonra hər sütunun cəmini çap edin.",
-    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 100), sonra N sətirdə hər birində M tam ədəd.",
-    output: "Əvvəlcə N ədəd sətir cəmi (bir sətirdə), sonra M ədəd sütun cəmi (bir sətirdə).",
-    example: {in:"2 3\n1 2 3\n4 5 6", out:"6 15\n5 7 9"},
-    approach: "Sətir cəmləri üçün hər sətir daxilində (<b>j</b> üzrə) gəzib toplayırıq. Sütun cəmləri üçün isə hər sütun <b>j</b> sabit saxlanaraq bütün sətirlər (<b>i</b>) üzrə toplanır — iki fərqli 'gəzmə istiqaməti' tələb olunur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            cin >> a[i][j];
-
-    for (int i = 0; i < n; i++){
-        int rowSum = 0;
-        for (int j = 0; j < m; j++) rowSum += a[i][j];
-        cout << rowSum << (i + 1 < n ? " " : "\\n");
-    }
-    for (int j = 0; j < m; j++){
-        int colSum = 0;
-        for (int i = 0; i < n; i++) colSum += a[i][j];
-        cout << colSum << (j + 1 < m ? " " : "\\n");
-    }
-}`
-  },
-  {
-    title: "29. İki matrisin toplanması",
-    difficulty: "easy",
-    tags: ["2D massiv", "for"],
-    statement: "Eyni ölçülü (N×M) iki matris verilib. Onları elementbəelement toplayıb nəticəni çap edin.",
-    input: "Birinci sətirdə N və M, sonra N sətirdə birinci matris, daha sonra N sətirdə ikinci matris.",
-    output: "Toplanmış N×M matris.",
-    example: {in:"2 2\n1 2\n3 4\n5 6\n7 8", out:"6 8\n10 12"},
-    approach: "İki matris ayrı-ayrı oxunur, sonra hər <b>(i,j)</b> mövqeyi üçün <b>c[i][j] = a[i][j] + b[i][j]</b> düsturu ilə iç-içə dövrdə nəticə matrisi qurulur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m)), b(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++) cin >> a[i][j];
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++) cin >> b[i][j];
-
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++) cout << a[i][j] + b[i][j] << " ";
-        cout << "\\n";
-    }
-}`
-  },
-  {
-    title: "30. Matrisdə maksimum element və mövqeyi",
-    difficulty: "mid",
-    tags: ["2D massiv", "max"],
-    statement: "N×M ölçülü matris verilib. Ən böyük elementi və onun (sətir, sütun) mövqeyini (0-əsaslı) tapın.",
-    input: "Birinci sətirdə N və M, sonra N sətirdə hər birində M tam ədəd.",
-    output: "Üç ədəd: maksimum dəyər, sətir indeksi, sütun indeksi.",
-    example: {in:"2 3\n1 9 3\n4 5 6", out:"9 0 1"},
-    approach: "İç-içə dövrlə bütün elementlər gəzilir; hər elementin cari maksimumdan böyük olub-olmadığı yoxlanılır, doğrudursa, həm maksimum dəyər, həm də uyğun <b>i, j</b> indeksləri yenilənir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++) cin >> a[i][j];
-
-    int best = a[0][0], bi = 0, bj = 0;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            if (a[i][j] > best){ best = a[i][j]; bi = i; bj = j; }
-
-    cout << best << " " << bi << " " << bj << "\\n";
-}`
-  },
-  {
-    title: "31. Matrisi spiral formada çap etmək",
-    difficulty: "mid",
-    tags: ["2D massiv", "spiral"],
-    statement: "N×M ölçülü matris verilib. Elementləri xaricdən mərkəzə doğru spiral (saat əqrəbi istiqamətində) sırada çap edin.",
-    input: "Birinci sətirdə N və M (1 ≤ N, M ≤ 50), sonra N sətirdə hər birində M tam ədəd.",
-    output: "Bütün elementlər spiral sırada, boşluqla ayrılmış.",
-    example: {in:"3 3\n1 2 3\n4 5 6\n7 8 9", out:"1 2 3 6 9 8 7 4 5"},
-    approach: "Dörd sərhəd dəyişəni (<b>top, bottom, left, right</b>) saxlanılır. Növbə ilə üst sətir soldan-sağa, sağ sütun yuxarıdan-aşağı, alt sətir sağdan-sola, sol sütun aşağıdan-yuxarı gəzilir; hər tərəf bitəndə uyğun sərhəd daralır (məs. <b>top++</b>). Bütün sərhədlər bir-birini keçənə qədər təkrarlanır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    vector<vector<int>> a(n, vector<int>(m));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++) cin >> a[i][j];
-
-    int top = 0, bottom = n - 1, left = 0, right = m - 1;
-    vector<int> res;
-    while (top <= bottom && left <= right){
-        for (int j = left; j <= right; j++) res.push_back(a[top][j]);
-        top++;
-        for (int i = top; i <= bottom; i++) res.push_back(a[i][right]);
-        right--;
-        if (top <= bottom){
-            for (int j = right; j >= left; j--) res.push_back(a[bottom][j]);
-            bottom--;
-        }
-        if (left <= right){
-            for (int i = bottom; i >= top; i--) res.push_back(a[i][left]);
-            left++;
-        }
-    }
-    for (int x : res) cout << x << " ";
-    cout << "\\n";
-}`
-  },
-  {
-    title: "32. Matrisin simmetrik olub-olmadığını yoxlamaq",
-    difficulty: "mid",
-    tags: ["2D massiv", "simmetriya"],
-    statement: "N×N ölçülü kvadrat matris verilib. Onun (əsas diaqonala görə) simmetrik olub-olmadığını yoxlayın — yəni bütün i,j üçün a[i][j] = a[j][i] şərti ödənilməlidir.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
-    output: "\"SIMMETRIK\" və ya \"SIMMETRIK DEYİL\".",
-    example: {in:"3\n1 2 3\n2 5 6\n3 6 9", out:"SIMMETRIK"},
-    approach: "Hər <b>(i,j)</b> cütü üçün <b>a[i][j]</b> ilə <b>a[j][i]</b> müqayisə olunur. Bir yerdə fərq tapılan kimi <b>false</b> bayrağı qoyulur və dövrdən çıxılır (əlavə yoxlamaya ehtiyac yoxdur).",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<vector<int>> a(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-
-    bool ok = true;
-    for (int i = 0; i < n && ok; i++)
-        for (int j = 0; j < n; j++)
-            if (a[i][j] != a[j][i]){ ok = false; break; }
-
-    cout << (ok ? "SIMMETRIK" : "SIMMETRIK DEYİL") << "\\n";
-}`
-  },
-  {
-    title: "33. Matrisi 90 dərəcə döndərmək",
-    difficulty: "mid",
-    tags: ["2D massiv", "rotate"],
-    statement: "N×N ölçülü kvadrat matris verilib. Onu saat əqrəbi istiqamətində 90 dərəcə döndərib çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində N tam ədəd.",
-    output: "Döndərilmiş N×N matris.",
-    example: {in:"2\n1 2\n3 4", out:"3 1\n4 2"},
-    approach: "90° saat əqrəbi istiqamətində döndərmədə köhnə matrisin <b>a[i][j]</b> elementi yeni matrisdə <b>b[j][n-1-i]</b> mövqeyinə keçir. Bu düstur ayrıca yeni matrisdə tətbiq olunur (əvvəlcə transpon edib sonra sətirləri güzgüləmək də alternativ üsuldur).",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<vector<int>> a(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++) cin >> a[i][j];
-
-    vector<vector<int>> b(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            b[j][n - 1 - i] = a[i][j];
-
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++) cout << b[i][j] << " ";
-        cout << "\\n";
-    }
-}`
-  },
-  {
-    title: "34. Şahmat lövhəsi naxışı",
-    difficulty: "easy",
-    tags: ["2D massiv", "if", "%"],
-    statement: "N×M ölçüsündə şahmat lövhəsi naxışı çap edin — cüt cəmli (i+j cüt) xanalarda '#', tək cəmlilərdə isə '.' işarəsi olsun.",
-    input: "Bir sətirdə N və M (1 ≤ N, M ≤ 50).",
-    output: "N sətir, hər birində M simvol ('#' və ya '.').",
-    example: {in:"3 4", out:"#.#.\n.#.#\n#.#."},
-    approach: "Hər <b>(i,j)</b> xanası üçün <b>(i + j) % 2 == 0</b> şərti yoxlanılır — doğrudursa '#', əks halda '.' çap olunur. Bu, sətir və sütun indeksinin cəminin cütlüyünə əsaslanan klassik naxış üsuludur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n, m; cin >> n >> m;
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++)
-            cout << ((i + j) % 2 == 0 ? '#' : '.');
-        cout << "\\n";
-    }
-}`
-  },
-  {
-    title: "35. Student struct — ortalama qiymət",
-    difficulty: "easy",
-    tags: ["struct"],
-    statement: "N şagirdin adı və 3 qiyməti verilib. Hər şagirdin ortalama qiymətini <b>Student</b> strukturu istifadə edərək hesablayıb çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində ad və 3 tam ədəd qiymət.",
-    output: "Hər şagird üçün 'ad: ortalama' formatında sətir (ortalama 2 ondalıq dəqiqliklə).",
-    example: {in:"2\nAyan 8 9 10\nKamran 7 6 8", out:"Ayan: 9.00\nKamran: 7.00"},
-    approach: "<b>struct Student{ string name; int g1,g2,g3; };</b> ilə hər şagirdin məlumatı tək obyektdə saxlanılır. Vektor <b>vector&lt;Student&gt;</b>-də N şagird saxlanılır, sonra hər biri üçün <b>(g1+g2+g3)/3.0</b> ortalaması hesablanıb çap olunur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-struct Student{
-    string name;
-    int g1, g2, g3;
-};
-int main(){
-    int n; cin >> n;
-    vector<Student> students(n);
-    for (int i = 0; i < n; i++)
-        cin >> students[i].name >> students[i].g1 >> students[i].g2 >> students[i].g3;
-
-    for (auto &s : students){
-        double avg = (s.g1 + s.g2 + s.g3) / 3.0;
-        cout << s.name << ": " << fixed << setprecision(2) << avg << "\\n";
-    }
-}`
-  },
-  {
-    title: "36. Pair ilə id-ad cütləri",
-    difficulty: "easy",
-    tags: ["pair", "vector"],
-    statement: "N istifadəçinin id-si və adı verilib. Onları <b>pair&lt;int,string&gt;</b> vektorunda saxlayıb çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə hər birində id (int) və ad (string).",
-    output: "Hər cüt üçün 'id - ad' formatında sətir.",
-    example: {in:"2\n1 Ali\n2 Vusal", out:"1 - Ali\n2 - Vusal"},
-    approach: "Hər sətirdəki <b>id</b> və <b>ad</b> bir <b>pair&lt;int,string&gt;</b> daxilində birlikdə saxlanılır (<b>.first</b> — id, <b>.second</b> — ad). Bu, əlaqəli iki fərqli tipli dəyəri ayrıca dəyişənlərə bölmədən bir yerdə saxlamağın rahat üsuludur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<pair<int,string>> users(n);
-    for (int i = 0; i < n; i++)
-        cin >> users[i].first >> users[i].second;
-
-    for (auto &u : users)
-        cout << u.first << " - " << u.second << "\\n";
-}`
-  },
-  {
-    title: "37. Struct vektorunu sıralamaq",
-    difficulty: "mid",
-    tags: ["struct", "sort", "comparator"],
-    statement: "N şagirdin adı və qiyməti verilib. Onları qiymətə görə AZALAN sırada sıralayıb çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 100), sonra N sətirdə ad və tam ədəd qiymət.",
-    output: "Sıralanmış şagirdlər, hər biri ayrı sətirdə 'ad qiymət' formatında.",
-    example: {in:"3\nAli 70\nAygun 95\nVusal 80", out:"Aygun 95\nVusal 80\nAli 70"},
-    approach: "<b>struct Student{ string name; int score; };</b> vektoru <b>sort()</b> ilə xüsusi <b>comparator</b> (lambda funksiya) istifadə edərək sıralanır: <b>[](auto &a, auto &b){ return a.score &gt; b.score; }</b> — bu, azalan sıra üçün 'böyükdən kiçiyə' müqayisə şərtidir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-struct Student{
-    string name;
-    int score;
-};
-int main(){
-    int n; cin >> n;
-    vector<Student> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i].name >> a[i].score;
-
-    sort(a.begin(), a.end(),
-         [](const Student &x, const Student &y){ return x.score > y.score; });
-
-    for (auto &s : a) cout << s.name << " " << s.score << "\\n";
-}`
-  },
-  {
-    title: "38. Struct vektorunda axtarış",
-    difficulty: "mid",
-    tags: ["struct", "axtarış"],
-    statement: "N məhsulun adı və qiyməti verilib. Verilən ada uyğun məhsulun qiymətini tapın (ad tapılmasa, \"TAPILMADI\" çap edin).",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), sonra N sətirdə ad və tam ədəd qiymət, son sətirdə axtarılan ad.",
-    output: "Tapılan qiymət, ya da \"TAPILMADI\".",
-    example: {in:"3\nKitab 5\nQələm 2\nDəftər 3\nQələm", out:"2"},
-    approach: "<b>struct Product{ string name; int price; };</b> vektoru xətti (sıra ilə) gəzilir, hər elementin <b>name</b> sahəsi axtarılan adla müqayisə olunur. Tapılan kimi qiymət çap olunub funksiyadan/dövrdən çıxılır; dövr bitənədək tapılmasa, \"TAPILMADI\" çap olunur.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-struct Product{
-    string name;
-    int price;
-};
-int main(){
-    int n; cin >> n;
-    vector<Product> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i].name >> a[i].price;
-
-    string query; cin >> query;
-    bool found = false;
-    for (auto &p : a){
-        if (p.name == query){
-            cout << p.price << "\\n";
-            found = true;
-            break;
-        }
-    }
-    if (!found) cout << "TAPILMADI" << "\\n";
-}`
-  },
-  {
-    title: "39. Point strukturu — məsafə hesablamaq",
-    difficulty: "easy",
-    tags: ["struct", "riyaziyyat"],
-    statement: "İki nöqtənin (x1,y1) və (x2,y2) koordinatları verilib. Onlar arasındakı məsafəni <b>Point</b> strukturu istifadə edərək hesablayın.",
-    input: "Bir sətirdə dörd real ədəd: x1 y1 x2 y2.",
-    output: "İki nöqtə arasındakı məsafə (2 ondalıq dəqiqliklə).",
-    example: {in:"0 0 3 4", out:"5.00"},
-    approach: "<b>struct Point{ double x, y; };</b> ilə hər nöqtə tək obyektdə saxlanılır. Məsafə klassik <b>√((x2-x1)² + (y2-y1)²)</b> düsturu ilə <b>sqrt()</b> və <b>pow()</b> (və ya sadə vurma) istifadə edərək hesablanır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-struct Point{
-    double x, y;
-};
-double distance(Point a, Point b){
-    double dx = a.x - b.x;
-    double dy = a.y - b.y;
-    return sqrt(dx * dx + dy * dy);
-}
-int main(){
-    Point a, b;
-    cin >> a.x >> a.y >> b.x >> b.y;
-    cout << fixed << setprecision(2) << distance(a, b) << "\\n";
-}`
-  },
-  {
-    title: "40. Pair ilə minimum cütü tapmaq",
-    difficulty: "mid",
-    tags: ["pair", "min"],
-    statement: "N cüt (a, b) tam ədəd verilib. Birinci elementə görə ən kiçik cütü tapın (bərabərlikdə ikinci elementə görə ən kiçiyi seçin).",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 10^5), sonra N sətirdə hər birində iki tam ədəd a, b.",
-    output: "Ən kiçik cüt (a b formatında).",
-    example: {in:"3\n5 2\n3 8\n3 1", out:"3 1"},
-    approach: "Bütün cütlər <b>vector&lt;pair&lt;int,int&gt;&gt;</b>-də saxlanılır. C++-da <b>pair</b>-lərin standart müqayisəsi (<b>&lt;</b>) əvvəlcə <b>.first</b>-i, bərabərlikdə <b>.second</b>-u müqayisə edir — buna görə <b>*min_element()</b> birbaşa tələb olunan nəticəni verir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    vector<pair<int,int>> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
-
-    auto best = *min_element(a.begin(), a.end());
-    cout << best.first << " " << best.second << "\\n";
-}`
-  },
-  {
-    title: "41. Strukturu funksiya ilə doldurmaq",
-    difficulty: "easy",
-    tags: ["struct", "funksiya"],
-    statement: "Düzbucaqlının eni və hündürlüyü verilib. <b>Rectangle</b> strukturunu bir funksiya vasitəsilə dolduraraq sahəsini və perimetrini hesablayın.",
-    input: "Bir sətirdə iki tam ədəd: en (width) və hündürlük (height).",
-    output: "Sahə və perimetr (bir sətirdə, boşluqla).",
-    example: {in:"4 5", out:"20 18"},
-    approach: "<b>struct Rectangle{ int width, height; };</b> elan olunur. <b>void readRectangle(Rectangle &r)</b> funksiyası strukturu referans ilə götürüb daxilini <b>cin</b> ilə doldurur. Sahə (<b>width*height</b>) və perimetr (<b>2*(width+height)</b>) ayrıca hesablanır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-struct Rectangle{
-    int width, height;
-};
-void readRectangle(Rectangle &r){
-    cin >> r.width >> r.height;
-}
-int main(){
-    Rectangle r;
-    readRectangle(r);
-    cout << r.width * r.height << " " << 2 * (r.width + r.height) << "\\n";
-}`
-  },
-  {
-    title: "42. Tezlik cütlərini sıralamaq",
-    difficulty: "mid",
-    tags: ["vector", "pair", "map", "sort"],
-    statement: "N ədəd tam ədəd verilib. Hər fərqli ədədin neçə dəfə göründüyünü tapıb, nəticəni (ədəd, tezlik) cütləri şəklində — tezliyə görə AZALAN sırada — çap edin.",
-    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
-    output: "Hər fərqli ədəd üçün 'ədəd tezlik' formatında sətir, tezliyə görə azalan sırada.",
-    example: {in:"6\n4 2 4 3 2 4", out:"4 3\n2 2\n3 1"},
-    approach: "Əvvəlcə <b>map&lt;int,int&gt;</b> ilə tezlik cədvəli qurulur. Sonra map-in məzmunu <b>vector&lt;pair&lt;int,int&gt;&gt;</b>-ə köçürülür və <b>sort()</b> ilə <b>tezliyə görə azalan</b> sıralanır (lambda comparator ilə <b>.second</b> müqayisə olunur).",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin >> n;
-    map<int,int> freq;
-    for (int i = 0; i < n; i++){
-        int x; cin >> x;
-        freq[x]++;
-    }
-
-    vector<pair<int,int>> a(freq.begin(), freq.end());
-    sort(a.begin(), a.end(),
-         [](auto &x, auto &y){ return x.second > y.second; });
-
-    for (auto &[val, cnt] : a) cout << val << " " << cnt << "\\n";
-}`
-  },
-  {
-    title: "43. Sətrin uzunluğu və alt-sətri",
-    difficulty: "easy",
-    tags: ["string", "substr"],
-    statement: "Bir sətir verilib. Onun uzunluğunu və ilk 3 simvolunu (substr ilə) çap edin.",
-    input: "Bir sətir s (3 ≤ uzunluq ≤ 1000).",
-    output: "Birinci sətirdə uzunluq, ikinci sətirdə ilk 3 simvol.",
-    example: {in:"Azercell", out:"8\nAze"},
-    approach: "<b>s.length()</b> (və ya <b>s.size()</b>) sətrin uzunluğunu qaytarır. <b>s.substr(0, 3)</b> isə 0-cı indeksdən başlayaraq 3 simvoldan ibarət alt-sətri qaytarır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    string s; cin >> s;
-    cout << s.length() << "\\n";
-    cout << s.substr(0, 3) << "\\n";
-}`
-  },
-  {
-    title: "44. Sətirdə sözlərin sayı",
-    difficulty: "mid",
-    tags: ["string", "stringstream", "split"],
-    statement: "Bir sətir mətn verilib (boşluqla ayrılmış sözlər). Sözlərin sayını və ən uzun sözün uzunluğunu tapın.",
-    input: "Bir sətir mətn (1 ≤ uzunluq ≤ 10^4).",
-    output: "Sözlərin sayı və ən uzun sözün uzunluğu (bir sətirdə, boşluqla).",
-    example: {in:"Bu bir test cumlesidir", out:"4 10"},
-    approach: "<b>stringstream</b>-ə yüklənən mətn <b>while (ss &gt;&gt; word)</b> ilə söz-söz oxunur; hər sözdə sayğac artırılır və <b>word.length()</b> ilə maksimum uzunluq yenilənir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
 int main(){
     string line;
     getline(cin, line);
+
     stringstream ss(line);
     string word;
-    int cnt = 0, maxLen = 0;
-    while (ss >> word){
+    int cnt = 0;
+    while (ss >> word) {
         cnt++;
-        maxLen = max(maxLen, (int)word.length());
     }
-    cout << cnt << " " << maxLen << "\\n";
-}`
-  },
+
+    cout << cnt << "\\n";
+}`},
   {
-    title: "45. Sətri böyük hərflərə çevirmək",
-    difficulty: "easy",
-    tags: ["string", "toupper"],
-    statement: "Bir sətir verilib. Bütün hərflərini böyük hərflərə çevirib çap edin.",
-    input: "Bir sətir s (yalnız latın hərfləri, 1 ≤ uzunluq ≤ 1000).",
-    output: "Böyük hərflərə çevrilmiş sətir.",
-    example: {in:"Azercell Cup", out:"AZERCELL CUP"},
-    approach: "Sətrin hər simvolu dövrlə gəzilir və <b>toupper(c)</b> funksiyası ilə böyük hərfə çevrilib yerinə yazılır — <b>toupper</b> artıq böyük olan simvolları və hərf olmayanları dəyişməz saxlayır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    string s; getline(cin, s);
-    for (char &c : s) c = toupper(c);
-    cout << s << "\\n";
-}`
-  },
-  {
-    title: "46. Sətirdə simvol axtarışı",
-    difficulty: "easy",
-    tags: ["string", "find"],
-    statement: "Bir sətir və bir alt-sətir (axtarılan hissə) verilib. Alt-sətrin harada başladığını (0-əsaslı indeks) tapın, tapılmasa -1 çap edin.",
-    input: "Birinci sətirdə mətn s, ikinci sətirdə axtarılan alt-sətir t.",
-    output: "Alt-sətrin başlanğıc indeksi, ya da -1.",
-    example: {in:"Azercell Cup\nCup", out:"9"},
-    approach: "<b>s.find(t)</b> funksiyası <b>t</b> alt-sətrinin <b>s</b> daxilində ilk göründüyü indeksi qaytarır; tapılmasa xüsusi <b>string::npos</b> dəyəri qaytarılır — bu, -1 kimi çap olunmalıdır (npos int-ə çevriləndə mənfi dəyər kimi görünür, ona görə şərtlə yoxlamaq daha düzgündür).",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    string s, t;
-    getline(cin, s);
-    getline(cin, t);
-    size_t pos = s.find(t);
-    if (pos == string::npos) cout << -1 << "\\n";
-    else cout << pos << "\\n";
-}`
-  },
-  {
-    title: "47. Palindrome sətir yoxlaması (funksiya ilə)",
-    difficulty: "easy",
-    tags: ["string", "funksiya", "palindrom"],
-    statement: "Bir sətir verilib. Onun palindrom (soldan-sağa və sağdan-sola eyni oxunan) olub-olmadığını yoxlayan funksiya yazın.",
-    input: "Bir sətir s (1 ≤ uzunluq ≤ 1000, yalnız kiçik latın hərfləri).",
-    output: "\"PALINDROM\" və ya \"PALINDROM DEYİL\".",
-    example: {in:"adada", out:"PALINDROM"},
-    approach: "Funksiya <b>bool isPalindrome(string s)</b> iki göstərici (<b>left=0, right=n-1</b>) ilə sətrin əvvəlindən və sonundan eyni zamanda yaxınlaşır, hər addımda simvolları müqayisə edir; hər hansı fərq tapılarsa, <b>false</b> qaytarır.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-bool isPalindrome(string s){
-    int left = 0, right = (int)s.length() - 1;
-    while (left < right){
-        if (s[left] != s[right]) return false;
-        left++; right--;
-    }
-    return true;
-}
-int main(){
-    string s; cin >> s;
-    cout << (isPalindrome(s) ? "PALINDROM" : "PALINDROM DEYİL") << "\\n";
-}`
-  },
-  {
-    title: "48. Sətirləri birləşdirmək",
-    difficulty: "easy",
-    tags: ["string", "append", "+"],
-    statement: "İki sətir verilib. Onları aralarında boşluqla birləşdirib çap edin, sonra ikinci sətri birinciyə <b>append</b> ilə (boşluqsuz) əlavə edib bir də çap edin.",
-    input: "İki sətir, ayrı sətirlərdə: s1, s2.",
-    output: "Birinci sətirdə s1 + ' ' + s2, ikinci sətirdə s1 append edilmiş (boşluqsuz) hal.",
-    example: {in:"Azercell\nCup", out:"Azercell Cup\nAzercellCup"},
-    approach: "<b>s1 + \" \" + s2</b> ifadəsi (operator overloading sayəsində) sətirləri birləşdirir. <b>s1.append(s2)</b> isə <b>s1</b>-i birbaşa dəyişdirərək <b>s2</b>-ni sonuna əlavə edir (boşluqsuz).",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    string s1, s2;
-    cin >> s1 >> s2;
-    string combined = s1 + " " + s2;
-    cout << combined << "\\n";
-    s1.append(s2);
-    cout << s1 << "\\n";
-}`
-  },
-  {
-    title: "49. Sətirdə boşluqları silmək",
+    title: "\"azercell cup 2026\" cümləsindəki söz sayı",
     difficulty: "mid",
-    tags: ["string", "for"],
-    statement: "Bir sətir verilib (boşluqlar ola bilər). Bütün boşluqları silib nəticəni çap edin.",
-    input: "Bir sətir s (boşluqlarla birlikdə, 1 ≤ uzunluq ≤ 1000).",
-    output: "Boşluqsuz sətir.",
-    example: {in:"A z e r  c e l l", out:"Azercell"},
-    approach: "Boş bir <b>result</b> sətri yaradılır, sonra orijinal sətrin hər simvolu gəzilir — boşluq (<b>' '</b>) olmayan hər simvol <b>result</b>-a əlavə olunur (<b>+=</b> ilə). Nəticədə boşluqsuz versiya alınır.",
+    tags: ["string", "getline", "stringstream"],
+    statement: "Bir sətir (boşluqlarla ayrılmış sözlərdən ibarət) verilib. Sözlərin sayını tapın.",
+    input: "Bir sətir mətn.",
+    output: "Söz sayı.",
+    example: {in:"azercell cup 2026", out:"3"},
+    approach: "<b>getline</b> bütün sətri (boşluqlarla birlikdə) oxuyur, <b>stringstream</b> isə sətri boşluqlara görə \"sözlərə\" bölməyə kömək edir — hər uğurlu <b>ss &gt;&gt; word</b> bir söz deməkdir.",
     solution:
 `#include <bits/stdc++.h>
 using namespace std;
-int main(){
-    string s; getline(cin, s);
-    string result = "";
-    for (char c : s)
-        if (c != ' ') result += c;
-    cout << result << "\\n";
-}`
-  },
-  {
-    title: "50. Sətirdə ən uzun sözü tapmaq",
-    difficulty: "mid",
-    tags: ["string", "stringstream"],
-    statement: "Bir sətir mətn verilib. Ən uzun sözü tapıb çap edin (bir neçəsi eyni uzunluqda olarsa, birincisini çap edin).",
-    input: "Bir sətir mətn (boşluqla ayrılmış sözlər, 1 ≤ uzunluq ≤ 10^4).",
-    output: "Ən uzun söz.",
-    example: {in:"Bu bir proqramlasdirma movzusudur", out:"proqramlasdirma"},
-    approach: "<b>stringstream</b> ilə mətn söz-söz oxunur; hər sözün uzunluğu cari ən uzun sözün uzunluğu ilə müqayisə olunur, böyükdürsə, həm uzunluq, həm də söz özü yenilənir.",
-    solution:
-`#include <bits/stdc++.h>
-using namespace std;
+
 int main(){
     string line;
     getline(cin, line);
+
     stringstream ss(line);
-    string word, best = "";
-    while (ss >> word){
-        if (word.length() > best.length()) best = word;
+    string word;
+    int cnt = 0;
+    while (ss >> word) {
+        cnt++;
     }
-    cout << best << "\\n";
-}`
-  },
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"a b c d e f\" cümləsindəki söz sayı",
+    difficulty: "mid",
+    tags: ["string", "getline", "stringstream"],
+    statement: "Bir sətir (boşluqlarla ayrılmış sözlərdən ibarət) verilib. Sözlərin sayını tapın.",
+    input: "Bir sətir mətn.",
+    output: "Söz sayı.",
+    example: {in:"a b c d e f", out:"6"},
+    approach: "<b>getline</b> bütün sətri (boşluqlarla birlikdə) oxuyur, <b>stringstream</b> isə sətri boşluqlara görə \"sözlərə\" bölməyə kömək edir — hər uğurlu <b>ss &gt;&gt; word</b> bir söz deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string line;
+    getline(cin, line);
+
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) {
+        cnt++;
+    }
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"proqramlasdirma cox maraqlidir\" cümləsindəki söz sayı",
+    difficulty: "mid",
+    tags: ["string", "getline", "stringstream"],
+    statement: "Bir sətir (boşluqlarla ayrılmış sözlərdən ibarət) verilib. Sözlərin sayını tapın.",
+    input: "Bir sətir mətn.",
+    output: "Söz sayı.",
+    example: {in:"proqramlasdirma cox maraqlidir", out:"3"},
+    approach: "<b>getline</b> bütün sətri (boşluqlarla birlikdə) oxuyur, <b>stringstream</b> isə sətri boşluqlara görə \"sözlərə\" bölməyə kömək edir — hər uğurlu <b>ss &gt;&gt; word</b> bir söz deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string line;
+    getline(cin, line);
+
+    stringstream ss(line);
+    string word;
+    int cnt = 0;
+    while (ss >> word) {
+        cnt++;
+    }
+
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "\"salam\" sətrini dövrlə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "for"],
+    statement: "Sətir verilib. Onu (hazır funksiya işlətmədən, dövrlə) tərsinə çevirin.",
+    input: "Bir sətir s.",
+    output: "Tərsinə çevrilmiş sətir.",
+    example: {in:"salam", out:"malas"},
+    approach: "Sətir SONDAN BAŞA doğru gəzilir (<b>i</b> ən son indeksdən 0-a qədər azalır), hər simvol <b>+=</b> ilə yeni sətrin sonuna əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    cin >> s;
+
+    string rev = "";
+    for (int i = (int)s.size() - 1; i >= 0; i--) {
+        rev += s[i];
+    }
+
+    cout << rev << "\\n";
+}`},
+  {
+    title: "\"azercell\" sətrini dövrlə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "for"],
+    statement: "Sətir verilib. Onu (hazır funksiya işlətmədən, dövrlə) tərsinə çevirin.",
+    input: "Bir sətir s.",
+    output: "Tərsinə çevrilmiş sətir.",
+    example: {in:"azercell", out:"llecreza"},
+    approach: "Sətir SONDAN BAŞA doğru gəzilir (<b>i</b> ən son indeksdən 0-a qədər azalır), hər simvol <b>+=</b> ilə yeni sətrin sonuna əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    cin >> s;
+
+    string rev = "";
+    for (int i = (int)s.size() - 1; i >= 0; i--) {
+        rev += s[i];
+    }
+
+    cout << rev << "\\n";
+}`},
+  {
+    title: "\"a\" sətrini dövrlə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "for"],
+    statement: "Sətir verilib. Onu (hazır funksiya işlətmədən, dövrlə) tərsinə çevirin.",
+    input: "Bir sətir s.",
+    output: "Tərsinə çevrilmiş sətir.",
+    example: {in:"a", out:"a"},
+    approach: "Sətir SONDAN BAŞA doğru gəzilir (<b>i</b> ən son indeksdən 0-a qədər azalır), hər simvol <b>+=</b> ilə yeni sətrin sonuna əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    cin >> s;
+
+    string rev = "";
+    for (int i = (int)s.size() - 1; i >= 0; i--) {
+        rev += s[i];
+    }
+
+    cout << rev << "\\n";
+}`},
+  {
+    title: "\"12345\" sətrini dövrlə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "for"],
+    statement: "Sətir verilib. Onu (hazır funksiya işlətmədən, dövrlə) tərsinə çevirin.",
+    input: "Bir sətir s.",
+    output: "Tərsinə çevrilmiş sətir.",
+    example: {in:"12345", out:"54321"},
+    approach: "Sətir SONDAN BAŞA doğru gəzilir (<b>i</b> ən son indeksdən 0-a qədər azalır), hər simvol <b>+=</b> ilə yeni sətrin sonuna əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    cin >> s;
+
+    string rev = "";
+    for (int i = (int)s.size() - 1; i >= 0; i--) {
+        rev += s[i];
+    }
+
+    cout << rev << "\\n";
+}`},
+  {
+    title: "\"movzu\" sətrini dövrlə tərsinə çevirmək",
+    difficulty: "easy",
+    tags: ["string", "for"],
+    statement: "Sətir verilib. Onu (hazır funksiya işlətmədən, dövrlə) tərsinə çevirin.",
+    input: "Bir sətir s.",
+    output: "Tərsinə çevrilmiş sətir.",
+    example: {in:"movzu", out:"uzvom"},
+    approach: "Sətir SONDAN BAŞA doğru gəzilir (<b>i</b> ən son indeksdən 0-a qədər azalır), hər simvol <b>+=</b> ilə yeni sətrin sonuna əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s;
+    cin >> s;
+
+    string rev = "";
+    for (int i = (int)s.size() - 1; i >= 0; i--) {
+        rev += s[i];
+    }
+
+    cout << rev << "\\n";
+}`},
 ];
 
 function escapeHtml(str){
@@ -1519,56 +2910,106 @@ function renderCodeBlock(code){
 }
 
 const solutionLinks = [
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/01_vektorun_elementlerinin_cemi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/02_vektorda_maksimum_ve_minimum.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/03_vektoru_tersine_cevirmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/04_vektorda_cut_ededlerin_sayi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/05_vektorda_unikal_ededlerin_sayi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/06_vektoru_push_back_ile_qurmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/07_vektorda_en_cox_tekrarlanan_eded.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/08_iki_vektoru_birlesdirmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/09_vektorda_ikinci_en_boyuk_eded.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/10_vektoru_sola_suruşdurmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/11_deyerle_ve_referansla_oturme.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/12_funksiyaya_vektor_oturub_cemi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/13_funksiya_ile_en_boyuk_ededi_tapmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/14_sade_eded_yoxlayan_funksiya.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/15_defolt_parametrli_funksiya.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/16_eyni_adli_funksiyalarin_yuklenmesi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/17_funksiya_ile_vektoru_deyisdirmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/18_funksiyadan_bir_nece_deyer_qaytarmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/19_suretli_daxilolma_ile_boyuk_cem.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/20_getline_ile_soz_sayini_tapmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/21_coxsayli_test_hallari.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/22_n_ile_cixisin_suretlendirilmesi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/23_sonsuz_oxuma_ile_cem.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/24_qarisiq_tipli_giris_oxumaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/25_matrisin_butun_elementlerinin_cemi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/26_matrisin_esas_diaqonalinin_cemi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/27_matrisi_transponire_etmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/28_matrisde_setir_ve_sutun_cemleri.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/29_iki_matrisin_toplanmasi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/30_matriside_maksimum_element_ve_movqeyi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/31_matrisi_spiral_formada_cap_etmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/32_matrisin_simmetrik_olub_olmadigini_yoxlamaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/33_matrisi_90_derece_dondermek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/34_sahmat_lovhesi_naxisi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/35_student_struct_ortalama_qiymet.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/36_pair_ile_id_ad_cutleri.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/37_struct_vektorunu_siralamaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/38_struct_vektorunda_axtaris.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/39_point_strukturu_mesafe_hesablamaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/40_pair_ile_minimum_cutu_tapmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/41_strukturu_funksiya_ile_doldurmaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/42_tezlik_cutlerini_siralamaq.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/43_setrin_uzunlugu_ve_alt_setri.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/44_setirde_sozlerin_sayi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/45_setri_boyuk_herflere_cevirmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/46_setirde_simvol_axtarisi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/47_palindrome_setir_yoxlamasi.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/48_setirleri_birlesdirmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/49_setirde_boshluqlari_silmek.cpp",
-  "https://github.com/ismayilqarayev/eolymp/blob/main/cpp/Azercell_cup_movzu2/50_setirde_en_uzun_sozu_tapmaq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/001_vector_sum_push_back.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/002_vector_sum_push_back.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/003_vector_sum_push_back.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/004_vector_sum_push_back.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/005_vector_sum_push_back.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/006_vector_reverse_stl.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/007_vector_reverse_stl.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/008_vector_reverse_stl.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/009_vector_reverse_stl.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/010_vector_reverse_stl.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/011_vector_count_even.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/012_vector_count_even.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/013_vector_count_even.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/014_vector_count_even.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/015_vector_count_even.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/016_vector_second_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/017_vector_second_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/018_vector_second_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/019_vector_second_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/020_vector_second_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/021_func_vector_sum_by_ref.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/022_func_vector_sum_by_ref.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/023_func_vector_sum_by_ref.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/024_func_vector_sum_by_ref.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/025_func_vector_sum_by_ref.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/026_func_by_value_vs_reference.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/027_func_by_value_vs_reference.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/028_func_by_value_vs_reference.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/029_func_by_value_vs_reference.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/030_func_by_value_vs_reference.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/031_func_is_prime_bool.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/032_func_is_prime_bool.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/033_func_is_prime_bool.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/034_func_is_prime_bool.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/035_func_is_prime_bool.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/036_fast_io_sum_many.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/037_fast_io_sum_many.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/038_fast_io_sum_many.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/039_fast_io_sum_many.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/040_fast_io_sum_many.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/041_read_until_eof_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/042_read_until_eof_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/043_read_until_eof_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/044_read_until_eof_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/045_read_until_eof_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/046_multiple_test_cases.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/047_multiple_test_cases.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/048_multiple_test_cases.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/049_multiple_test_cases.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/050_multiple_test_cases.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/051_matrix_sum_all.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/052_matrix_sum_all.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/053_matrix_sum_all.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/054_matrix_sum_all.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/055_matrix_sum_all.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/056_matrix_diagonal_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/057_matrix_diagonal_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/058_matrix_diagonal_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/059_matrix_diagonal_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/060_matrix_diagonal_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/061_matrix_row_col_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/062_matrix_row_col_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/063_matrix_row_col_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/064_matrix_row_col_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/065_matrix_row_col_sum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/066_matrix_transpose.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/067_matrix_transpose.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/068_matrix_transpose.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/069_matrix_transpose.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/070_matrix_transpose.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/071_struct_point_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/072_struct_point_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/073_struct_point_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/074_struct_point_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/075_struct_point_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/076_pair_sum_diff.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/077_pair_sum_diff.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/078_pair_sum_diff.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/079_pair_sum_diff.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/080_pair_sum_diff.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/081_struct_rectangle_area_perimeter.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/082_struct_rectangle_area_perimeter.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/083_struct_rectangle_area_perimeter.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/084_struct_rectangle_area_perimeter.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/085_struct_rectangle_area_perimeter.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/086_string_substr.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/087_string_substr.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/088_string_substr.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/089_string_substr.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/090_string_substr.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/091_string_word_count.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/092_string_word_count.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/093_string_word_count.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/094_string_word_count.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/095_string_word_count.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/096_string_reverse_manual.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/097_string_reverse_manual.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/098_string_reverse_manual.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/099_string_reverse_manual.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu02/100_string_reverse_manual.cpp",
 ];
 
 const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
