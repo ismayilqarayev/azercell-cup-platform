@@ -9219,1921 +9219,1816 @@
       "topicSlug": "week3",
       "orderIndex": 1,
       "subgroupLabel": null,
-      "title": "N ədədinin 2-ya bölünməsi",
+      "title": "20-in 4-ya bölünmə yoxlanması",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "%"
       ],
-      "statement": "Tam ədəd N verilib. N-in 2-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "84",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 2</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 2-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 2 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd n və k verilib. n-in k-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (k ≠ 0).",
+      "outputSpec": "\"BELE\" (bölünür) və ya \"XEYR\".",
+      "exampleInput": "20 4",
+      "exampleOutput": "BELE",
+      "approach": "n-in k-ya qalıqsız bölünməsi o deməkdir ki, <b>n % k</b> (qalıq) sıfıra bərabərdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    if (n % k == 0)\n        cout << \"BELE\" << \"\\n\";\n    else\n        cout << \"XEYR\" << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 2,
       "subgroupLabel": null,
-      "title": "N ədədinin 3-ya bölünməsi",
+      "title": "17-in 5-ya bölünmə yoxlanması",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "%"
       ],
-      "statement": "Tam ədəd N verilib. N-in 3-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "57",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 3</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 3-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 3 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd n və k verilib. n-in k-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (k ≠ 0).",
+      "outputSpec": "\"BELE\" (bölünür) və ya \"XEYR\".",
+      "exampleInput": "17 5",
+      "exampleOutput": "XEYR",
+      "approach": "n-in k-ya qalıqsız bölünməsi o deməkdir ki, <b>n % k</b> (qalıq) sıfıra bərabərdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    if (n % k == 0)\n        cout << \"BELE\" << \"\\n\";\n    else\n        cout << \"XEYR\" << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 3,
       "subgroupLabel": null,
-      "title": "N ədədinin 4-ya bölünməsi",
+      "title": "100-in 10-ya bölünmə yoxlanması",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "%"
       ],
-      "statement": "Tam ədəd N verilib. N-in 4-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "128",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 4</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 4-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 4 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd n və k verilib. n-in k-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (k ≠ 0).",
+      "outputSpec": "\"BELE\" (bölünür) və ya \"XEYR\".",
+      "exampleInput": "100 10",
+      "exampleOutput": "BELE",
+      "approach": "n-in k-ya qalıqsız bölünməsi o deməkdir ki, <b>n % k</b> (qalıq) sıfıra bərabərdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    if (n % k == 0)\n        cout << \"BELE\" << \"\\n\";\n    else\n        cout << \"XEYR\" << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 4,
       "subgroupLabel": null,
-      "title": "N ədədinin 5-ya bölünməsi",
+      "title": "37-in 7-ya bölünmə yoxlanması",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "%"
       ],
-      "statement": "Tam ədəd N verilib. N-in 5-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "100",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 5</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 5-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 5 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd n və k verilib. n-in k-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (k ≠ 0).",
+      "outputSpec": "\"BELE\" (bölünür) və ya \"XEYR\".",
+      "exampleInput": "37 7",
+      "exampleOutput": "XEYR",
+      "approach": "n-in k-ya qalıqsız bölünməsi o deməkdir ki, <b>n % k</b> (qalıq) sıfıra bərabərdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    if (n % k == 0)\n        cout << \"BELE\" << \"\\n\";\n    else\n        cout << \"XEYR\" << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 5,
       "subgroupLabel": null,
-      "title": "N ədədinin 6-ya bölünməsi",
+      "title": "81-in 9-ya bölünmə yoxlanması",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "%"
       ],
-      "statement": "Tam ədəd N verilib. N-in 6-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "156",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 6</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 6-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 6 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd n və k verilib. n-in k-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k (k ≠ 0).",
+      "outputSpec": "\"BELE\" (bölünür) və ya \"XEYR\".",
+      "exampleInput": "81 9",
+      "exampleOutput": "BELE",
+      "approach": "n-in k-ya qalıqsız bölünməsi o deməkdir ki, <b>n % k</b> (qalıq) sıfıra bərabərdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    if (n % k == 0)\n        cout << \"BELE\" << \"\\n\";\n    else\n        cout << \"XEYR\" << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 6,
       "subgroupLabel": null,
-      "title": "N ədədinin 7-ya bölünməsi",
+      "title": "17-nin 5-yə bölmə nəticəsi və qalığı",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "tam bölmə",
+        "qalıq"
       ],
-      "statement": "Tam ədəd N verilib. N-in 7-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "91",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 7</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 7-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 7 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd verilib. Tam bölmə nəticəsini və qalığı (ayrı sətirdə) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (b ≠ 0).",
+      "outputSpec": "2 sətir: a/b (tam bölmə), a%b (qalıq).",
+      "exampleInput": "17 5",
+      "exampleOutput": "3\n2",
+      "approach": "Tam bölmə (<b>/</b>) kəsr hissəni atır, qalıq (<b>%</b>) isə bölmədən sonra qalan hissədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    cout << a / b << \"\\n\";\n    cout << a % b << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 7,
       "subgroupLabel": null,
-      "title": "N ədədinin 8-ya bölünməsi",
+      "title": "100-nin 7-yə bölmə nəticəsi və qalığı",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "tam bölmə",
+        "qalıq"
       ],
-      "statement": "Tam ədəd N verilib. N-in 8-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "144",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 8</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 8-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 8 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd verilib. Tam bölmə nəticəsini və qalığı (ayrı sətirdə) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (b ≠ 0).",
+      "outputSpec": "2 sətir: a/b (tam bölmə), a%b (qalıq).",
+      "exampleInput": "100 7",
+      "exampleOutput": "14\n2",
+      "approach": "Tam bölmə (<b>/</b>) kəsr hissəni atır, qalıq (<b>%</b>) isə bölmədən sonra qalan hissədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    cout << a / b << \"\\n\";\n    cout << a % b << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 8,
       "subgroupLabel": null,
-      "title": "N ədədinin 9-ya bölünməsi",
+      "title": "23-nin 6-yə bölmə nəticəsi və qalığı",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "tam bölmə",
+        "qalıq"
       ],
-      "statement": "Tam ədəd N verilib. N-in 9-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "99",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 9</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 9-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 9 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd verilib. Tam bölmə nəticəsini və qalığı (ayrı sətirdə) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (b ≠ 0).",
+      "outputSpec": "2 sətir: a/b (tam bölmə), a%b (qalıq).",
+      "exampleInput": "23 6",
+      "exampleOutput": "3\n5",
+      "approach": "Tam bölmə (<b>/</b>) kəsr hissəni atır, qalıq (<b>%</b>) isə bölmədən sonra qalan hissədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    cout << a / b << \"\\n\";\n    cout << a % b << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 9,
       "subgroupLabel": null,
-      "title": "N ədədinin 11-ya bölünməsi",
+      "title": "365-nin 24-yə bölmə nəticəsi və qalığı",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "tam bölmə",
+        "qalıq"
       ],
-      "statement": "Tam ədəd N verilib. N-in 11-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "121",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 11</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 11-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 11 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd verilib. Tam bölmə nəticəsini və qalığı (ayrı sətirdə) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (b ≠ 0).",
+      "outputSpec": "2 sətir: a/b (tam bölmə), a%b (qalıq).",
+      "exampleInput": "365 24",
+      "exampleOutput": "15\n5",
+      "approach": "Tam bölmə (<b>/</b>) kəsr hissəni atır, qalıq (<b>%</b>) isə bölmədən sonra qalan hissədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    cout << a / b << \"\\n\";\n    cout << a % b << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 10,
       "subgroupLabel": null,
-      "title": "N ədədinin 12-ya bölünməsi",
+      "title": "999-nin 17-yə bölmə nəticəsi və qalığı",
       "difficulty": "easy",
       "tags": [
         "bölünmə",
-        "%",
-        "if"
+        "tam bölmə",
+        "qalıq"
       ],
-      "statement": "Tam ədəd N verilib. N-in 12-ya qalıqsız bölünüb-bölünmədiyini yoxlayın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "\"BÖLÜNÜR\" və ya \"BÖLÜNMÜR\".",
-      "exampleInput": "108",
-      "exampleOutput": "BÖLÜNÜR",
-      "approach": "<b>N % 12</b> ifadəsinin nəticəsi 0-a bərabərdirsə, N ədədi 12-ya qalıqsız bölünür — bu, bölünmə yoxlamasının standart üsuludur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << (n % 12 == 0 ? \"B\\u00d6L\\u00dcN\\u00dcR\" : \"B\\u00d6L\\u00dcNM\\u00dcR\") << \"\\n\";\n}"
+      "statement": "İki tam ədəd verilib. Tam bölmə nəticəsini və qalığı (ayrı sətirdə) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (b ≠ 0).",
+      "outputSpec": "2 sətir: a/b (tam bölmə), a%b (qalıq).",
+      "exampleInput": "999 17",
+      "exampleOutput": "58\n13",
+      "approach": "Tam bölmə (<b>/</b>) kəsr hissəni atır, qalıq (<b>%</b>) isə bölmədən sonra qalan hissədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    cout << a / b << \"\\n\";\n    cout << a % b << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 11,
       "subgroupLabel": null,
-      "title": "17 ədədini 5-yə bölmə",
-      "difficulty": "easy",
+      "title": "[1,50] aralığında 5-ya bölünənlərin sayı",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "for",
+        "sayma"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "17 5",
-      "exampleOutput": "3 2",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, k verilib (a ≤ b). [a, b] aralığında k-ya bölünən ədədlərin sayını tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, k.",
+      "outputSpec": "k-ya bölünən ədədlərin sayı.",
+      "exampleInput": "1 50 5",
+      "exampleOutput": "10",
+      "approach": "[a,b] aralığındakı hər ədəd növbə ilə yoxlanılır, <b>i % k == 0</b> şərtinə uyğun olanlar sayaca əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, k;\n    cin >> a >> b >> k;\n\n    long long cnt = 0;\n    for (long long i = a; i <= b; i++) {\n        if (i % k == 0) cnt++;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 12,
       "subgroupLabel": null,
-      "title": "29 ədədini 4-yə bölmə",
-      "difficulty": "easy",
+      "title": "[10,100] aralığında 7-ya bölünənlərin sayı",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "for",
+        "sayma"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "29 4",
-      "exampleOutput": "7 1",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, k verilib (a ≤ b). [a, b] aralığında k-ya bölünən ədədlərin sayını tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, k.",
+      "outputSpec": "k-ya bölünən ədədlərin sayı.",
+      "exampleInput": "10 100 7",
+      "exampleOutput": "13",
+      "approach": "[a,b] aralığındakı hər ədəd növbə ilə yoxlanılır, <b>i % k == 0</b> şərtinə uyğun olanlar sayaca əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, k;\n    cin >> a >> b >> k;\n\n    long long cnt = 0;\n    for (long long i = a; i <= b; i++) {\n        if (i % k == 0) cnt++;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 13,
       "subgroupLabel": null,
-      "title": "100 ədədini 7-yə bölmə",
-      "difficulty": "easy",
+      "title": "[1,20] aralığında 3-ya bölünənlərin sayı",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "for",
+        "sayma"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "100 7",
-      "exampleOutput": "14 2",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, k verilib (a ≤ b). [a, b] aralığında k-ya bölünən ədədlərin sayını tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, k.",
+      "outputSpec": "k-ya bölünən ədədlərin sayı.",
+      "exampleInput": "1 20 3",
+      "exampleOutput": "6",
+      "approach": "[a,b] aralığındakı hər ədəd növbə ilə yoxlanılır, <b>i % k == 0</b> şərtinə uyğun olanlar sayaca əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, k;\n    cin >> a >> b >> k;\n\n    long long cnt = 0;\n    for (long long i = a; i <= b; i++) {\n        if (i % k == 0) cnt++;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 14,
       "subgroupLabel": null,
-      "title": "53 ədədini 6-yə bölmə",
-      "difficulty": "easy",
+      "title": "[50,150] aralığında 10-ya bölünənlərin sayı",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "for",
+        "sayma"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "53 6",
-      "exampleOutput": "8 5",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, k verilib (a ≤ b). [a, b] aralığında k-ya bölünən ədədlərin sayını tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, k.",
+      "outputSpec": "k-ya bölünən ədədlərin sayı.",
+      "exampleInput": "50 150 10",
+      "exampleOutput": "11",
+      "approach": "[a,b] aralığındakı hər ədəd növbə ilə yoxlanılır, <b>i % k == 0</b> şərtinə uyğun olanlar sayaca əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, k;\n    cin >> a >> b >> k;\n\n    long long cnt = 0;\n    for (long long i = a; i <= b; i++) {\n        if (i % k == 0) cnt++;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 15,
       "subgroupLabel": null,
-      "title": "200 ədədini 13-yə bölmə",
-      "difficulty": "easy",
+      "title": "[1,1000] aralığında 13-ya bölünənlərin sayı",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "for",
+        "sayma"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "200 13",
-      "exampleOutput": "15 5",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "Üç ədəd a, b, k verilib (a ≤ b). [a, b] aralığında k-ya bölünən ədədlərin sayını tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, k.",
+      "outputSpec": "k-ya bölünən ədədlərin sayı.",
+      "exampleInput": "1 1000 13",
+      "exampleOutput": "76",
+      "approach": "[a,b] aralığındakı hər ədəd növbə ilə yoxlanılır, <b>i % k == 0</b> şərtinə uyğun olanlar sayaca əlavə olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, k;\n    cin >> a >> b >> k;\n\n    long long cnt = 0;\n    for (long long i = a; i <= b; i++) {\n        if (i % k == 0) cnt++;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 16,
       "subgroupLabel": null,
-      "title": "77 ədədini 9-yə bölmə",
-      "difficulty": "easy",
+      "title": "123 ədədinin rəqəm cəminin 3-ya bölünməsi",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "rəqəm cəmi"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "77 9",
-      "exampleOutput": "8 5",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. n-in rəqəmlərinin cəmini tapıb, bu cəmin k-ya bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k.",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "123 3",
+      "exampleOutput": "BELE",
+      "approach": "Klassik qayda: bir ədədin 3-ə (və ya 9-a) bölünməsini onun RƏQƏMLƏRİNİN CƏMİNƏ baxaraq da yoxlamaq olar. Əvvəlcə rəqəmlərin cəmi tapılır, sonra bu cəmin k-ya bölünməsi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long s = 0;\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n\n    cout << (s % k == 0 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 17,
       "subgroupLabel": null,
-      "title": "365 ədədini 24-yə bölmə",
-      "difficulty": "easy",
+      "title": "47 ədədinin rəqəm cəminin 3-ya bölünməsi",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "rəqəm cəmi"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "365 24",
-      "exampleOutput": "15 5",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. n-in rəqəmlərinin cəmini tapıb, bu cəmin k-ya bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k.",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "47 3",
+      "exampleOutput": "XEYR",
+      "approach": "Klassik qayda: bir ədədin 3-ə (və ya 9-a) bölünməsini onun RƏQƏMLƏRİNİN CƏMİNƏ baxaraq da yoxlamaq olar. Əvvəlcə rəqəmlərin cəmi tapılır, sonra bu cəmin k-ya bölünməsi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long s = 0;\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n\n    cout << (s % k == 0 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 18,
       "subgroupLabel": null,
-      "title": "1000 ədədini 33-yə bölmə",
-      "difficulty": "easy",
+      "title": "729 ədədinin rəqəm cəminin 9-ya bölünməsi",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "rəqəm cəmi"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "1000 33",
-      "exampleOutput": "30 10",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. n-in rəqəmlərinin cəmini tapıb, bu cəmin k-ya bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k.",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "729 9",
+      "exampleOutput": "BELE",
+      "approach": "Klassik qayda: bir ədədin 3-ə (və ya 9-a) bölünməsini onun RƏQƏMLƏRİNİN CƏMİNƏ baxaraq da yoxlamaq olar. Əvvəlcə rəqəmlərin cəmi tapılır, sonra bu cəmin k-ya bölünməsi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long s = 0;\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n\n    cout << (s % k == 0 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 19,
       "subgroupLabel": null,
-      "title": "48 ədədini 11-yə bölmə",
-      "difficulty": "easy",
+      "title": "100 ədədinin rəqəm cəminin 3-ya bölünməsi",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "rəqəm cəmi"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "48 11",
-      "exampleOutput": "4 4",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. n-in rəqəmlərinin cəmini tapıb, bu cəmin k-ya bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k.",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "100 3",
+      "exampleOutput": "XEYR",
+      "approach": "Klassik qayda: bir ədədin 3-ə (və ya 9-a) bölünməsini onun RƏQƏMLƏRİNİN CƏMİNƏ baxaraq da yoxlamaq olar. Əvvəlcə rəqəmlərin cəmi tapılır, sonra bu cəmin k-ya bölünməsi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long s = 0;\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n\n    cout << (s % k == 0 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 20,
       "subgroupLabel": null,
-      "title": "999 ədədini 17-yə bölmə",
-      "difficulty": "easy",
+      "title": "999 ədədinin rəqəm cəminin 9-ya bölünməsi",
+      "difficulty": "mid",
       "tags": [
         "bölünmə",
-        "%",
-        "/"
+        "rəqəm cəmi"
       ],
-      "statement": "İki tam ədəd a və b verilib (b ≠ 0). a-nı b-yə böləndə alınan tam hissəni və qalığı tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ b ≤ a ≤ 10^9).",
-      "outputSpec": "İki tam ədəd: tam hissə və qalıq (boşluqla ayrılmış).",
-      "exampleInput": "999 17",
-      "exampleOutput": "58 13",
-      "approach": "<b>a / b</b> tam bölmə nəticəsini (tam hissəni), <b>a % b</b> isə qalığı verir — C++-da tam ədədlər üzərində bölmə avtomatik olaraq aşağı yuvarlaqlaşdırılır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << a / b << \" \" << a % b << \"\\n\";\n}"
+      "statement": "İki ədəd n və k verilib. n-in rəqəmlərinin cəmini tapıb, bu cəmin k-ya bölünüb-bölünmədiyini yoxlayın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və k.",
+      "outputSpec": "\"BELE\" və ya \"XEYR\".",
+      "exampleInput": "999 9",
+      "exampleOutput": "BELE",
+      "approach": "Klassik qayda: bir ədədin 3-ə (və ya 9-a) bölünməsini onun RƏQƏMLƏRİNİN CƏMİNƏ baxaraq da yoxlamaq olar. Əvvəlcə rəqəmlərin cəmi tapılır, sonra bu cəmin k-ya bölünməsi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, k;\n    cin >> n >> k;\n\n    long long s = 0;\n    while (n > 0) {\n        s += n % 10;\n        n /= 10;\n    }\n\n    cout << (s % k == 0 ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 21,
       "subgroupLabel": null,
-      "title": "24 və 36 ədədlərinin ƏBOB-u",
+      "title": "24 və 36 ədədlərinin ƏBOB-u (Evklid alqoritmi)",
       "difficulty": "easy",
       "tags": [
         "ƏBOB",
-        "GCD",
         "Evklid alqoritmi"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
+      "statement": "İki ədədin ƏBOB-unu (ən böyük ortaq bölənini) Evklid alqoritmi ilə tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ hər biri ≤ 10^9).",
       "outputSpec": "ƏBOB dəyəri.",
       "exampleInput": "24 36",
       "exampleOutput": "12",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "approach": "Evklid alqoritmi: b sıfır olana qədər (a,b) cütünü (b, a mod b) ilə əvəz edirik. b sıfır olanda, a-da qalan dəyər ƏBOB-dur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    while (b != 0) {\n        long long t = a % b;\n        a = b;\n        b = t;\n    }\n\n    cout << a << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 22,
       "subgroupLabel": null,
-      "title": "48 və 18 ədədlərinin ƏBOB-u",
+      "title": "17 və 51 ədədlərinin ƏBOB-u (Evklid alqoritmi)",
       "difficulty": "easy",
       "tags": [
         "ƏBOB",
-        "GCD",
         "Evklid alqoritmi"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
+      "statement": "İki ədədin ƏBOB-unu (ən böyük ortaq bölənini) Evklid alqoritmi ilə tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ hər biri ≤ 10^9).",
       "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "48 18",
-      "exampleOutput": "6",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "exampleInput": "17 51",
+      "exampleOutput": "17",
+      "approach": "Evklid alqoritmi: b sıfır olana qədər (a,b) cütünü (b, a mod b) ilə əvəz edirik. b sıfır olanda, a-da qalan dəyər ƏBOB-dur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    while (b != 0) {\n        long long t = a % b;\n        a = b;\n        b = t;\n    }\n\n    cout << a << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 23,
       "subgroupLabel": null,
-      "title": "100 və 75 ədədlərinin ƏBOB-u",
+      "title": "210 və 45 ədədlərinin ƏBOB-u (Evklid alqoritmi)",
       "difficulty": "easy",
       "tags": [
         "ƏBOB",
-        "GCD",
         "Evklid alqoritmi"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
+      "statement": "İki ədədin ƏBOB-unu (ən böyük ortaq bölənini) Evklid alqoritmi ilə tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ hər biri ≤ 10^9).",
       "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "100 75",
-      "exampleOutput": "25",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "exampleInput": "210 45",
+      "exampleOutput": "15",
+      "approach": "Evklid alqoritmi: b sıfır olana qədər (a,b) cütünü (b, a mod b) ilə əvəz edirik. b sıfır olanda, a-da qalan dəyər ƏBOB-dur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    while (b != 0) {\n        long long t = a % b;\n        a = b;\n        b = t;\n    }\n\n    cout << a << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 24,
       "subgroupLabel": null,
-      "title": "17 və 5 ədədlərinin ƏBOB-u",
+      "title": "1 və 500 ədədlərinin ƏBOB-u (Evklid alqoritmi)",
       "difficulty": "easy",
       "tags": [
         "ƏBOB",
-        "GCD",
         "Evklid alqoritmi"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
+      "statement": "İki ədədin ƏBOB-unu (ən böyük ortaq bölənini) Evklid alqoritmi ilə tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ hər biri ≤ 10^9).",
       "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "17 5",
+      "exampleInput": "1 500",
       "exampleOutput": "1",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "approach": "Evklid alqoritmi: b sıfır olana qədər (a,b) cütünü (b, a mod b) ilə əvəz edirik. b sıfır olanda, a-da qalan dəyər ƏBOB-dur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    while (b != 0) {\n        long long t = a % b;\n        a = b;\n        b = t;\n    }\n\n    cout << a << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 25,
       "subgroupLabel": null,
-      "title": "1000 və 600 ədədlərinin ƏBOB-u",
+      "title": "360 və 225 ədədlərinin ƏBOB-u (Evklid alqoritmi)",
       "difficulty": "easy",
       "tags": [
         "ƏBOB",
-        "GCD",
         "Evklid alqoritmi"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
+      "statement": "İki ədədin ƏBOB-unu (ən böyük ortaq bölənini) Evklid alqoritmi ilə tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ hər biri ≤ 10^9).",
       "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "1000 600",
-      "exampleOutput": "200",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "exampleInput": "360 225",
+      "exampleOutput": "45",
+      "approach": "Evklid alqoritmi: b sıfır olana qədər (a,b) cütünü (b, a mod b) ilə əvəz edirik. b sıfır olanda, a-da qalan dəyər ƏBOB-dur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    while (b != 0) {\n        long long t = a % b;\n        a = b;\n        b = t;\n    }\n\n    cout << a << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 26,
       "subgroupLabel": null,
-      "title": "81 və 27 ədədlərinin ƏBOB-u",
-      "difficulty": "easy",
+      "title": "4 və 6 ədədlərinin ƏKOB-u",
+      "difficulty": "mid",
       "tags": [
-        "ƏBOB",
-        "GCD",
-        "Evklid alqoritmi"
+        "ƏKOB",
+        "ƏBOB"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
-      "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "81 27",
-      "exampleOutput": "27",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "statement": "İki ədədin ƏKOB-unu (ən kiçik ortaq bölünənini) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b.",
+      "outputSpec": "ƏKOB dəyəri.",
+      "exampleInput": "4 6",
+      "exampleOutput": "12",
+      "approach": "Əvvəlcə Evklid alqoritmi ilə ƏBOB tapılır, sonra <b>ƏKOB = (a/ƏBOB) * b</b> düsturu tətbiq olunur — əvvəlcə bölüb sonra vurmaq, birbaşa a*b hesablamaqdan (böyük ədədlərdə daşma riski) daha təhlükəsizdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob = x;\n\n    long long ekob = (a / ebob) * b;\n\n    cout << ekob << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 27,
       "subgroupLabel": null,
-      "title": "56 və 98 ədədlərinin ƏBOB-u",
-      "difficulty": "easy",
+      "title": "15 və 20 ədədlərinin ƏKOB-u",
+      "difficulty": "mid",
       "tags": [
-        "ƏBOB",
-        "GCD",
-        "Evklid alqoritmi"
+        "ƏKOB",
+        "ƏBOB"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
-      "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "56 98",
-      "exampleOutput": "14",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "statement": "İki ədədin ƏKOB-unu (ən kiçik ortaq bölünənini) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b.",
+      "outputSpec": "ƏKOB dəyəri.",
+      "exampleInput": "15 20",
+      "exampleOutput": "60",
+      "approach": "Əvvəlcə Evklid alqoritmi ilə ƏBOB tapılır, sonra <b>ƏKOB = (a/ƏBOB) * b</b> düsturu tətbiq olunur — əvvəlcə bölüb sonra vurmaq, birbaşa a*b hesablamaqdan (böyük ədədlərdə daşma riski) daha təhlükəsizdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob = x;\n\n    long long ekob = (a / ebob) * b;\n\n    cout << ekob << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 28,
       "subgroupLabel": null,
-      "title": "144 və 60 ədədlərinin ƏBOB-u",
-      "difficulty": "easy",
+      "title": "7 və 5 ədədlərinin ƏKOB-u",
+      "difficulty": "mid",
       "tags": [
-        "ƏBOB",
-        "GCD",
-        "Evklid alqoritmi"
+        "ƏKOB",
+        "ƏBOB"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
-      "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "144 60",
-      "exampleOutput": "12",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "statement": "İki ədədin ƏKOB-unu (ən kiçik ortaq bölünənini) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b.",
+      "outputSpec": "ƏKOB dəyəri.",
+      "exampleInput": "7 5",
+      "exampleOutput": "35",
+      "approach": "Əvvəlcə Evklid alqoritmi ilə ƏBOB tapılır, sonra <b>ƏKOB = (a/ƏBOB) * b</b> düsturu tətbiq olunur — əvvəlcə bölüb sonra vurmaq, birbaşa a*b hesablamaqdan (böyük ədədlərdə daşma riski) daha təhlükəsizdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob = x;\n\n    long long ekob = (a / ebob) * b;\n\n    cout << ekob << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 29,
       "subgroupLabel": null,
-      "title": "1 və 999 ədədlərinin ƏBOB-u",
-      "difficulty": "easy",
+      "title": "100 və 80 ədədlərinin ƏKOB-u",
+      "difficulty": "mid",
       "tags": [
-        "ƏBOB",
-        "GCD",
-        "Evklid alqoritmi"
+        "ƏKOB",
+        "ƏBOB"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
-      "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "1 999",
-      "exampleOutput": "1",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "statement": "İki ədədin ƏKOB-unu (ən kiçik ortaq bölünənini) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b.",
+      "outputSpec": "ƏKOB dəyəri.",
+      "exampleInput": "100 80",
+      "exampleOutput": "400",
+      "approach": "Əvvəlcə Evklid alqoritmi ilə ƏBOB tapılır, sonra <b>ƏKOB = (a/ƏBOB) * b</b> düsturu tətbiq olunur — əvvəlcə bölüb sonra vurmaq, birbaşa a*b hesablamaqdan (böyük ədədlərdə daşma riski) daha təhlükəsizdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob = x;\n\n    long long ekob = (a / ebob) * b;\n\n    cout << ekob << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 30,
       "subgroupLabel": null,
-      "title": "360 və 210 ədədlərinin ƏBOB-u",
-      "difficulty": "easy",
+      "title": "9 və 12 ədədlərinin ƏKOB-u",
+      "difficulty": "mid",
       "tags": [
-        "ƏBOB",
-        "GCD",
-        "Evklid alqoritmi"
+        "ƏKOB",
+        "ƏBOB"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən böyük ortaq bölənini (ƏBOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^9).",
-      "outputSpec": "ƏBOB dəyəri.",
-      "exampleInput": "360 210",
-      "exampleOutput": "30",
-      "approach": "<b>Evklid alqoritmi</b> istifadə olunur: <b>while (b){ a %= b; swap(a,b); }</b> dövrü b sıfır olana qədər davam edir, sonda a ƏBOB-dur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    while (b){ a %= b; swap(a, b); }\n    cout << a << \"\\n\";\n}"
+      "statement": "İki ədədin ƏKOB-unu (ən kiçik ortaq bölünənini) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və b.",
+      "outputSpec": "ƏKOB dəyəri.",
+      "exampleInput": "9 12",
+      "exampleOutput": "36",
+      "approach": "Əvvəlcə Evklid alqoritmi ilə ƏBOB tapılır, sonra <b>ƏKOB = (a/ƏBOB) * b</b> düsturu tətbiq olunur — əvvəlcə bölüb sonra vurmaq, birbaşa a*b hesablamaqdan (böyük ədədlərdə daşma riski) daha təhlükəsizdir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b;\n    cin >> a >> b;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob = x;\n\n    long long ekob = (a / ebob) * b;\n\n    cout << ekob << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 31,
       "subgroupLabel": null,
-      "title": "4 və 6 ədədlərinin ƏKOB-u",
+      "title": "12, 18, 24 ədədlərinin ƏBOB-u",
       "difficulty": "mid",
       "tags": [
-        "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "ƏBOB",
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "4 6",
-      "exampleOutput": "12",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏBOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏBOB-u.",
+      "exampleInput": "12 18 24",
+      "exampleOutput": "6",
+      "approach": "ƏBOB(a,b,c) = ƏBOB(ƏBOB(a,b), c) — əvvəlcə a və b-nin ƏBOB-u tapılır, sonra bu nəticənin c ilə ƏBOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob1 = x;\n\n    x = ebob1; y = c;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n\n    cout << x << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 32,
       "subgroupLabel": null,
-      "title": "3 və 5 ədədlərinin ƏKOB-u",
+      "title": "100, 75, 50 ədədlərinin ƏBOB-u",
       "difficulty": "mid",
       "tags": [
-        "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "ƏBOB",
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "3 5",
-      "exampleOutput": "15",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏBOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏBOB-u.",
+      "exampleInput": "100 75 50",
+      "exampleOutput": "25",
+      "approach": "ƏBOB(a,b,c) = ƏBOB(ƏBOB(a,b), c) — əvvəlcə a və b-nin ƏBOB-u tapılır, sonra bu nəticənin c ilə ƏBOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob1 = x;\n\n    x = ebob1; y = c;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n\n    cout << x << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 33,
       "subgroupLabel": null,
-      "title": "12 və 18 ədədlərinin ƏKOB-u",
+      "title": "8, 12, 20 ədədlərinin ƏBOB-u",
       "difficulty": "mid",
       "tags": [
-        "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "ƏBOB",
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "12 18",
-      "exampleOutput": "36",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏBOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏBOB-u.",
+      "exampleInput": "8 12 20",
+      "exampleOutput": "4",
+      "approach": "ƏBOB(a,b,c) = ƏBOB(ƏBOB(a,b), c) — əvvəlcə a və b-nin ƏBOB-u tapılır, sonra bu nəticənin c ilə ƏBOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob1 = x;\n\n    x = ebob1; y = c;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n\n    cout << x << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 34,
       "subgroupLabel": null,
-      "title": "7 və 9 ədədlərinin ƏKOB-u",
+      "title": "9, 27, 81 ədədlərinin ƏBOB-u",
       "difficulty": "mid",
       "tags": [
-        "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "ƏBOB",
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "7 9",
-      "exampleOutput": "63",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏBOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏBOB-u.",
+      "exampleInput": "9 27 81",
+      "exampleOutput": "9",
+      "approach": "ƏBOB(a,b,c) = ƏBOB(ƏBOB(a,b), c) — əvvəlcə a və b-nin ƏBOB-u tapılır, sonra bu nəticənin c ilə ƏBOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob1 = x;\n\n    x = ebob1; y = c;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n\n    cout << x << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 35,
       "subgroupLabel": null,
-      "title": "15 və 20 ədədlərinin ƏKOB-u",
+      "title": "14, 21, 35 ədədlərinin ƏBOB-u",
       "difficulty": "mid",
       "tags": [
-        "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "ƏBOB",
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "15 20",
-      "exampleOutput": "60",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏBOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏBOB-u.",
+      "exampleInput": "14 21 35",
+      "exampleOutput": "7",
+      "approach": "ƏBOB(a,b,c) = ƏBOB(ƏBOB(a,b), c) — əvvəlcə a və b-nin ƏBOB-u tapılır, sonra bu nəticənin c ilə ƏBOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n    long long ebob1 = x;\n\n    x = ebob1; y = c;\n    while (y != 0) {\n        long long t = x % y;\n        x = y;\n        y = t;\n    }\n\n    cout << x << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 36,
       "subgroupLabel": null,
-      "title": "8 və 12 ədədlərinin ƏKOB-u",
+      "title": "2, 3, 4 ədədlərinin ƏKOB-u",
       "difficulty": "mid",
       "tags": [
         "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "8 12",
-      "exampleOutput": "24",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏKOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏKOB-u.",
+      "exampleInput": "2 3 4",
+      "exampleOutput": "12",
+      "approach": "ƏKOB(a,b,c) = ƏKOB(ƏKOB(a,b), c) — əvvəlcə a və b-nin ƏKOB-u tapılır (ƏBOB vasitəsilə), sonra bu nəticənin c ilə ƏKOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob1 = (a / x) * b;\n\n    x = ekob1; y = c;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob2 = (ekob1 / x) * c;\n\n    cout << ekob2 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 37,
       "subgroupLabel": null,
-      "title": "21 və 14 ədədlərinin ƏKOB-u",
+      "title": "4, 6, 8 ədədlərinin ƏKOB-u",
       "difficulty": "mid",
       "tags": [
         "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "21 14",
-      "exampleOutput": "42",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏKOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏKOB-u.",
+      "exampleInput": "4 6 8",
+      "exampleOutput": "24",
+      "approach": "ƏKOB(a,b,c) = ƏKOB(ƏKOB(a,b), c) — əvvəlcə a və b-nin ƏKOB-u tapılır (ƏBOB vasitəsilə), sonra bu nəticənin c ilə ƏKOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob1 = (a / x) * b;\n\n    x = ekob1; y = c;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob2 = (ekob1 / x) * c;\n\n    cout << ekob2 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 38,
       "subgroupLabel": null,
-      "title": "9 və 6 ədədlərinin ƏKOB-u",
+      "title": "5, 10, 15 ədədlərinin ƏKOB-u",
       "difficulty": "mid",
       "tags": [
         "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "9 6",
-      "exampleOutput": "18",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏKOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏKOB-u.",
+      "exampleInput": "5 10 15",
+      "exampleOutput": "30",
+      "approach": "ƏKOB(a,b,c) = ƏKOB(ƏKOB(a,b), c) — əvvəlcə a və b-nin ƏKOB-u tapılır (ƏBOB vasitəsilə), sonra bu nəticənin c ilə ƏKOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob1 = (a / x) * b;\n\n    x = ekob1; y = c;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob2 = (ekob1 / x) * c;\n\n    cout << ekob2 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 39,
       "subgroupLabel": null,
-      "title": "25 və 10 ədədlərinin ƏKOB-u",
+      "title": "3, 5, 7 ədədlərinin ƏKOB-u",
       "difficulty": "mid",
       "tags": [
         "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "25 10",
-      "exampleOutput": "50",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏKOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏKOB-u.",
+      "exampleInput": "3 5 7",
+      "exampleOutput": "105",
+      "approach": "ƏKOB(a,b,c) = ƏKOB(ƏKOB(a,b), c) — əvvəlcə a və b-nin ƏKOB-u tapılır (ƏBOB vasitəsilə), sonra bu nəticənin c ilə ƏKOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob1 = (a / x) * b;\n\n    x = ekob1; y = c;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob2 = (ekob1 / x) * c;\n\n    cout << ekob2 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 40,
       "subgroupLabel": null,
-      "title": "6 və 8 ədədlərinin ƏKOB-u",
+      "title": "6, 9, 12 ədədlərinin ƏKOB-u",
       "difficulty": "mid",
       "tags": [
         "ƏKOB",
-        "LCM",
-        "ƏBOB"
+        "üç ədəd"
       ],
-      "statement": "İki tam ədəd verilib. Onların ən kiçik ortaq bölünəni (ƏKOB) tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (1 ≤ a, b ≤ 10^6).",
-      "outputSpec": "ƏKOB dəyəri.",
-      "exampleInput": "6 8",
-      "exampleOutput": "24",
-      "approach": "Əvvəlcə <b>ƏBOB</b> Evklid alqoritmi ilə tapılır, sonra <b>ƏKOB = (a / ƏBOB) × b</b> düsturu tətbiq olunur. Əvvəlcə bölmək tam ədəd daşmasının (overflow) qarşısını alır.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nlong long gcdF(long long a, long long b){\n    while (b){ a %= b; swap(a, b); }\n    return a;\n}\nint main(){\n    long long a, b; cin >> a >> b;\n    long long g = gcdF(a, b);\n    cout << (a / g) * b << \"\\n\";\n}"
+      "statement": "Üç ədədin ƏKOB-unu tapın.",
+      "inputSpec": "Bir sətirdə üç tam ədəd a, b, c.",
+      "outputSpec": "Üçünün ƏKOB-u.",
+      "exampleInput": "6 9 12",
+      "exampleOutput": "36",
+      "approach": "ƏKOB(a,b,c) = ƏKOB(ƏKOB(a,b), c) — əvvəlcə a və b-nin ƏKOB-u tapılır (ƏBOB vasitəsilə), sonra bu nəticənin c ilə ƏKOB-u tapılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, b, c;\n    cin >> a >> b >> c;\n\n    long long x = a, y = b;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob1 = (a / x) * b;\n\n    x = ekob1; y = c;\n    while (y != 0) { long long t = x % y; x = y; y = t; }\n    long long ekob2 = (ekob1 / x) * c;\n\n    cout << ekob2 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 41,
       "subgroupLabel": null,
-      "title": "17 ədədi sadədirmi?",
+      "title": "29 ədədinin sadəlik yoxlanması",
       "difficulty": "easy",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "17",
-      "exampleOutput": "SADƏDİR",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Sadə ədəd olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" (sadədir) və ya \"XEYR\".",
+      "exampleInput": "29",
+      "exampleOutput": "BELE",
+      "approach": "2-dən √n-ə qədər bölən axtarılır. Bölən tapılarsa sadə deyil, tapılmazsa (və n≥2 olarsa) sadədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPrime = true;\n    if (n < 2) isPrime = false;\n    for (long long i = 2; i * i <= n && isPrime; i++) {\n        if (n % i == 0) isPrime = false;\n    }\n\n    cout << (isPrime ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 42,
       "subgroupLabel": null,
-      "title": "91 ədədi sadədirmi?",
+      "title": "100 ədədinin sadəlik yoxlanması",
       "difficulty": "easy",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "91",
-      "exampleOutput": "SADƏ DEYİL",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Sadə ədəd olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" (sadədir) və ya \"XEYR\".",
+      "exampleInput": "100",
+      "exampleOutput": "XEYR",
+      "approach": "2-dən √n-ə qədər bölən axtarılır. Bölən tapılarsa sadə deyil, tapılmazsa (və n≥2 olarsa) sadədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPrime = true;\n    if (n < 2) isPrime = false;\n    for (long long i = 2; i * i <= n && isPrime; i++) {\n        if (n % i == 0) isPrime = false;\n    }\n\n    cout << (isPrime ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 43,
       "subgroupLabel": null,
-      "title": "97 ədədi sadədirmi?",
+      "title": "2 ədədinin sadəlik yoxlanması",
       "difficulty": "easy",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "97",
-      "exampleOutput": "SADƏDİR",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Sadə ədəd olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" (sadədir) və ya \"XEYR\".",
+      "exampleInput": "2",
+      "exampleOutput": "BELE",
+      "approach": "2-dən √n-ə qədər bölən axtarılır. Bölən tapılarsa sadə deyil, tapılmazsa (və n≥2 olarsa) sadədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPrime = true;\n    if (n < 2) isPrime = false;\n    for (long long i = 2; i * i <= n && isPrime; i++) {\n        if (n % i == 0) isPrime = false;\n    }\n\n    cout << (isPrime ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 44,
       "subgroupLabel": null,
-      "title": "100 ədədi sadədirmi?",
+      "title": "1 ədədinin sadəlik yoxlanması",
       "difficulty": "easy",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "100",
-      "exampleOutput": "SADƏ DEYİL",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Sadə ədəd olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" (sadədir) və ya \"XEYR\".",
+      "exampleInput": "1",
+      "exampleOutput": "XEYR",
+      "approach": "2-dən √n-ə qədər bölən axtarılır. Bölən tapılarsa sadə deyil, tapılmazsa (və n≥2 olarsa) sadədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPrime = true;\n    if (n < 2) isPrime = false;\n    for (long long i = 2; i * i <= n && isPrime; i++) {\n        if (n % i == 0) isPrime = false;\n    }\n\n    cout << (isPrime ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 45,
       "subgroupLabel": null,
-      "title": "101 ədədi sadədirmi?",
+      "title": "113 ədədinin sadəlik yoxlanması",
       "difficulty": "easy",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "101",
-      "exampleOutput": "SADƏDİR",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Sadə ədəd olub-olmadığını yoxlayın.",
+      "inputSpec": "Bir tam ədəd n (1 ≤ n ≤ 10^6).",
+      "outputSpec": "\"BELE\" (sadədir) və ya \"XEYR\".",
+      "exampleInput": "113",
+      "exampleOutput": "BELE",
+      "approach": "2-dən √n-ə qədər bölən axtarılır. Bölən tapılarsa sadə deyil, tapılmazsa (və n≥2 olarsa) sadədir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool isPrime = true;\n    if (n < 2) isPrime = false;\n    for (long long i = 2; i * i <= n && isPrime; i++) {\n        if (n % i == 0) isPrime = false;\n    }\n\n    cout << (isPrime ? \"BELE\" : \"XEYR\") << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 46,
       "subgroupLabel": null,
-      "title": "143 ədədi sadədirmi?",
-      "difficulty": "easy",
+      "title": "30-ə qədər sadə ədədlər (Eratosfen ələyi ilə)",
+      "difficulty": "mid",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "Eratosfen ələyi",
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "143",
-      "exampleOutput": "SADƏ DEYİL",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "N ədədi verilib. N-ə qədər (N daxil) bütün sadə ədədləri Eratosfen ələyi ilə tapıb çap edin.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 10^5).",
+      "outputSpec": "Sadə ədədlər, boşluqla ayrılmış.",
+      "exampleInput": "30",
+      "exampleOutput": "2 3 5 7 11 13 17 19 23 29",
+      "approach": "Eratosfen ələyi: əvvəlcə hər ədədi \"sadədir\" sayırıq, sonra 2-dən başlayaraq hər sadə ədədin BÜTÜN mislərini \"sadə deyil\" işarələyirik — bu, tək-tək yoxlamaqdan qat-qat sürətlidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    bool eleme[100005];\n    for (int i = 0; i <= n; i++) eleme[i] = true;\n    eleme[0] = false;\n    if (n >= 1) eleme[1] = false;\n\n    for (int i = 2; (long long)i * i <= n; i++) {\n        if (eleme[i]) {\n            for (int j = i * i; j <= n; j += i) {\n                eleme[j] = false;\n            }\n        }\n    }\n\n    bool first = true;\n    for (int i = 2; i <= n; i++) {\n        if (eleme[i]) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n        }\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 47,
       "subgroupLabel": null,
-      "title": "173 ədədi sadədirmi?",
-      "difficulty": "easy",
+      "title": "50-ə qədər sadə ədədlər (Eratosfen ələyi ilə)",
+      "difficulty": "mid",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "Eratosfen ələyi",
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "173",
-      "exampleOutput": "SADƏDİR",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "N ədədi verilib. N-ə qədər (N daxil) bütün sadə ədədləri Eratosfen ələyi ilə tapıb çap edin.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 10^5).",
+      "outputSpec": "Sadə ədədlər, boşluqla ayrılmış.",
+      "exampleInput": "50",
+      "exampleOutput": "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47",
+      "approach": "Eratosfen ələyi: əvvəlcə hər ədədi \"sadədir\" sayırıq, sonra 2-dən başlayaraq hər sadə ədədin BÜTÜN mislərini \"sadə deyil\" işarələyirik — bu, tək-tək yoxlamaqdan qat-qat sürətlidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    bool eleme[100005];\n    for (int i = 0; i <= n; i++) eleme[i] = true;\n    eleme[0] = false;\n    if (n >= 1) eleme[1] = false;\n\n    for (int i = 2; (long long)i * i <= n; i++) {\n        if (eleme[i]) {\n            for (int j = i * i; j <= n; j += i) {\n                eleme[j] = false;\n            }\n        }\n    }\n\n    bool first = true;\n    for (int i = 2; i <= n; i++) {\n        if (eleme[i]) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n        }\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 48,
       "subgroupLabel": null,
-      "title": "561 ədədi sadədirmi?",
-      "difficulty": "easy",
+      "title": "20-ə qədər sadə ədədlər (Eratosfen ələyi ilə)",
+      "difficulty": "mid",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "Eratosfen ələyi",
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "561",
-      "exampleOutput": "SADƏ DEYİL",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "N ədədi verilib. N-ə qədər (N daxil) bütün sadə ədədləri Eratosfen ələyi ilə tapıb çap edin.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 10^5).",
+      "outputSpec": "Sadə ədədlər, boşluqla ayrılmış.",
+      "exampleInput": "20",
+      "exampleOutput": "2 3 5 7 11 13 17 19",
+      "approach": "Eratosfen ələyi: əvvəlcə hər ədədi \"sadədir\" sayırıq, sonra 2-dən başlayaraq hər sadə ədədin BÜTÜN mislərini \"sadə deyil\" işarələyirik — bu, tək-tək yoxlamaqdan qat-qat sürətlidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    bool eleme[100005];\n    for (int i = 0; i <= n; i++) eleme[i] = true;\n    eleme[0] = false;\n    if (n >= 1) eleme[1] = false;\n\n    for (int i = 2; (long long)i * i <= n; i++) {\n        if (eleme[i]) {\n            for (int j = i * i; j <= n; j += i) {\n                eleme[j] = false;\n            }\n        }\n    }\n\n    bool first = true;\n    for (int i = 2; i <= n; i++) {\n        if (eleme[i]) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n        }\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 49,
       "subgroupLabel": null,
-      "title": "997 ədədi sadədirmi?",
-      "difficulty": "easy",
+      "title": "100-ə qədər sadə ədədlər (Eratosfen ələyi ilə)",
+      "difficulty": "mid",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "Eratosfen ələyi",
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "997",
-      "exampleOutput": "SADƏDİR",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "N ədədi verilib. N-ə qədər (N daxil) bütün sadə ədədləri Eratosfen ələyi ilə tapıb çap edin.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 10^5).",
+      "outputSpec": "Sadə ədədlər, boşluqla ayrılmış.",
+      "exampleInput": "100",
+      "exampleOutput": "2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97",
+      "approach": "Eratosfen ələyi: əvvəlcə hər ədədi \"sadədir\" sayırıq, sonra 2-dən başlayaraq hər sadə ədədin BÜTÜN mislərini \"sadə deyil\" işarələyirik — bu, tək-tək yoxlamaqdan qat-qat sürətlidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    bool eleme[100005];\n    for (int i = 0; i <= n; i++) eleme[i] = true;\n    eleme[0] = false;\n    if (n >= 1) eleme[1] = false;\n\n    for (int i = 2; (long long)i * i <= n; i++) {\n        if (eleme[i]) {\n            for (int j = i * i; j <= n; j += i) {\n                eleme[j] = false;\n            }\n        }\n    }\n\n    bool first = true;\n    for (int i = 2; i <= n; i++) {\n        if (eleme[i]) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n        }\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 50,
       "subgroupLabel": null,
-      "title": "1000 ədədi sadədirmi?",
-      "difficulty": "easy",
+      "title": "15-ə qədər sadə ədədlər (Eratosfen ələyi ilə)",
+      "difficulty": "mid",
       "tags": [
-        "sadə ədəd",
-        "bölünmə",
-        "for"
+        "Eratosfen ələyi",
+        "sadə ədəd"
       ],
-      "statement": "Tam ədəd N verilib. N-in sadə ədəd olub-olmadığını müəyyən edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "\"SADƏDİR\" və ya \"SADƏ DEYİL\".",
-      "exampleInput": "1000",
-      "exampleOutput": "SADƏ DEYİL",
-      "approach": "2-dən <b>√N</b>-ə qədər olan bütün ədədlərin N-i bölüb-bölmədiyi yoxlanılır — √N-dən sonrakı bölənləri yoxlamağa ehtiyac yoxdur, çünki onlar artıq tapılmış kiçik bölənlərin cütüdür.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nbool isPrime(long long n){\n    if (n < 2) return false;\n    for (long long i = 2; i * i <= n; i++)\n        if (n % i == 0) return false;\n    return true;\n}\nint main(){\n    long long n; cin >> n;\n    cout << (isPrime(n) ? \"SAD\\u018fD\\u0130R\" : \"SAD\\u018f DEY\\u0130L\") << \"\\n\";\n}"
+      "statement": "N ədədi verilib. N-ə qədər (N daxil) bütün sadə ədədləri Eratosfen ələyi ilə tapıb çap edin.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 10^5).",
+      "outputSpec": "Sadə ədədlər, boşluqla ayrılmış.",
+      "exampleInput": "15",
+      "exampleOutput": "2 3 5 7 11 13",
+      "approach": "Eratosfen ələyi: əvvəlcə hər ədədi \"sadədir\" sayırıq, sonra 2-dən başlayaraq hər sadə ədədin BÜTÜN mislərini \"sadə deyil\" işarələyirik — bu, tək-tək yoxlamaqdan qat-qat sürətlidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    bool eleme[100005];\n    for (int i = 0; i <= n; i++) eleme[i] = true;\n    eleme[0] = false;\n    if (n >= 1) eleme[1] = false;\n\n    for (int i = 2; (long long)i * i <= n; i++) {\n        if (eleme[i]) {\n            for (int j = i * i; j <= n; j += i) {\n                eleme[j] = false;\n            }\n        }\n    }\n\n    bool first = true;\n    for (int i = 2; i <= n; i++) {\n        if (eleme[i]) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n        }\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 51,
       "subgroupLabel": null,
-      "title": "1-dən 10-ə qədər sadə ədədlərin sayı",
+      "title": "1-cı sadə ədəd",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
         "sadə ədəd",
-        "sieve"
+        "sıra"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "10",
-      "exampleOutput": "4",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "K ədədi verilib. Sadə ədədlər sırasında K-cı sadə ədədi tapın (1-ci sadə ədəd = 2).",
+      "inputSpec": "Bir tam ədəd K (1 ≤ K ≤ 1000).",
+      "outputSpec": "K-cı sadə ədəd.",
+      "exampleInput": "1",
+      "exampleOutput": "2",
+      "approach": "Ədədləri 2-dən başlayaraq növbə ilə sadəlik üçün yoxlayırıq, hər sadə tapdıqda sayğacı artırırıq — sayğac K-ya çatanda dayanırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int k;\n    cin >> k;\n\n    int cnt = 0;\n    long long num = 1;\n    while (cnt < k) {\n        num++;\n        bool isPrime = true;\n        for (long long i = 2; i * i <= num; i++) {\n            if (num % i == 0) { isPrime = false; break; }\n        }\n        if (isPrime) cnt++;\n    }\n\n    cout << num << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 52,
       "subgroupLabel": null,
-      "title": "1-dən 20-ə qədər sadə ədədlərin sayı",
+      "title": "5-cı sadə ədəd",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
         "sadə ədəd",
-        "sieve"
+        "sıra"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "20",
-      "exampleOutput": "8",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "K ədədi verilib. Sadə ədədlər sırasında K-cı sadə ədədi tapın (1-ci sadə ədəd = 2).",
+      "inputSpec": "Bir tam ədəd K (1 ≤ K ≤ 1000).",
+      "outputSpec": "K-cı sadə ədəd.",
+      "exampleInput": "5",
+      "exampleOutput": "11",
+      "approach": "Ədədləri 2-dən başlayaraq növbə ilə sadəlik üçün yoxlayırıq, hər sadə tapdıqda sayğacı artırırıq — sayğac K-ya çatanda dayanırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int k;\n    cin >> k;\n\n    int cnt = 0;\n    long long num = 1;\n    while (cnt < k) {\n        num++;\n        bool isPrime = true;\n        for (long long i = 2; i * i <= num; i++) {\n            if (num % i == 0) { isPrime = false; break; }\n        }\n        if (isPrime) cnt++;\n    }\n\n    cout << num << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 53,
       "subgroupLabel": null,
-      "title": "1-dən 30-ə qədər sadə ədədlərin sayı",
+      "title": "10-cı sadə ədəd",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
         "sadə ədəd",
-        "sieve"
+        "sıra"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "30",
-      "exampleOutput": "10",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "K ədədi verilib. Sadə ədədlər sırasında K-cı sadə ədədi tapın (1-ci sadə ədəd = 2).",
+      "inputSpec": "Bir tam ədəd K (1 ≤ K ≤ 1000).",
+      "outputSpec": "K-cı sadə ədəd.",
+      "exampleInput": "10",
+      "exampleOutput": "29",
+      "approach": "Ədədləri 2-dən başlayaraq növbə ilə sadəlik üçün yoxlayırıq, hər sadə tapdıqda sayğacı artırırıq — sayğac K-ya çatanda dayanırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int k;\n    cin >> k;\n\n    int cnt = 0;\n    long long num = 1;\n    while (cnt < k) {\n        num++;\n        bool isPrime = true;\n        for (long long i = 2; i * i <= num; i++) {\n            if (num % i == 0) { isPrime = false; break; }\n        }\n        if (isPrime) cnt++;\n    }\n\n    cout << num << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 54,
       "subgroupLabel": null,
-      "title": "1-dən 50-ə qədər sadə ədədlərin sayı",
+      "title": "3-cı sadə ədəd",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
         "sadə ədəd",
-        "sieve"
+        "sıra"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "50",
-      "exampleOutput": "15",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "K ədədi verilib. Sadə ədədlər sırasında K-cı sadə ədədi tapın (1-ci sadə ədəd = 2).",
+      "inputSpec": "Bir tam ədəd K (1 ≤ K ≤ 1000).",
+      "outputSpec": "K-cı sadə ədəd.",
+      "exampleInput": "3",
+      "exampleOutput": "5",
+      "approach": "Ədədləri 2-dən başlayaraq növbə ilə sadəlik üçün yoxlayırıq, hər sadə tapdıqda sayğacı artırırıq — sayğac K-ya çatanda dayanırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int k;\n    cin >> k;\n\n    int cnt = 0;\n    long long num = 1;\n    while (cnt < k) {\n        num++;\n        bool isPrime = true;\n        for (long long i = 2; i * i <= num; i++) {\n            if (num % i == 0) { isPrime = false; break; }\n        }\n        if (isPrime) cnt++;\n    }\n\n    cout << num << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 55,
       "subgroupLabel": null,
-      "title": "1-dən 100-ə qədər sadə ədədlərin sayı",
+      "title": "15-cı sadə ədəd",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
         "sadə ədəd",
-        "sieve"
+        "sıra"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "100",
-      "exampleOutput": "25",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "K ədədi verilib. Sadə ədədlər sırasında K-cı sadə ədədi tapın (1-ci sadə ədəd = 2).",
+      "inputSpec": "Bir tam ədəd K (1 ≤ K ≤ 1000).",
+      "outputSpec": "K-cı sadə ədəd.",
+      "exampleInput": "15",
+      "exampleOutput": "47",
+      "approach": "Ədədləri 2-dən başlayaraq növbə ilə sadəlik üçün yoxlayırıq, hər sadə tapdıqda sayğacı artırırıq — sayğac K-ya çatanda dayanırıq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int k;\n    cin >> k;\n\n    int cnt = 0;\n    long long num = 1;\n    while (cnt < k) {\n        num++;\n        bool isPrime = true;\n        for (long long i = 2; i * i <= num; i++) {\n            if (num % i == 0) { isPrime = false; break; }\n        }\n        if (isPrime) cnt++;\n    }\n\n    cout << num << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 56,
       "subgroupLabel": null,
-      "title": "1-dən 200-ə qədər sadə ədədlərin sayı",
+      "title": "12 ədədinin sadə vuruqlara ayrılması",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
-        "sadə ədəd",
-        "sieve"
+        "sadə vuruq",
+        "faktorizasiya"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "200",
-      "exampleOutput": "46",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onu sadə vuruqlarına (təkrarla) ayırıb çap edin.",
+      "inputSpec": "Bir tam ədəd n (2 ≤ n ≤ 10^9).",
+      "outputSpec": "Sadə vuruqlar (kiçikdən böyüyə, təkrarla), boşluqla ayrılmış.",
+      "exampleInput": "12",
+      "exampleOutput": "2 2 3",
+      "approach": "2-dən başlayaraq n-i bölə bilən hər sadə ədədi TƏKRAR-TƏKRAR (bölən qalmayana qədər) n-dən çıxarırıq. Sonda 1-dən böyük qalan varsa, o da öz-özlüyündə sadə vuruqdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool first = true;\n    for (long long i = 2; i * i <= n; i++) {\n        while (n % i == 0) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n            n /= i;\n        }\n    }\n    if (n > 1) {\n        if (!first) cout << \" \";\n        cout << n;\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 57,
       "subgroupLabel": null,
-      "title": "1-dən 500-ə qədər sadə ədədlərin sayı",
+      "title": "60 ədədinin sadə vuruqlara ayrılması",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
-        "sadə ədəd",
-        "sieve"
+        "sadə vuruq",
+        "faktorizasiya"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "500",
-      "exampleOutput": "95",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onu sadə vuruqlarına (təkrarla) ayırıb çap edin.",
+      "inputSpec": "Bir tam ədəd n (2 ≤ n ≤ 10^9).",
+      "outputSpec": "Sadə vuruqlar (kiçikdən böyüyə, təkrarla), boşluqla ayrılmış.",
+      "exampleInput": "60",
+      "exampleOutput": "2 2 3 5",
+      "approach": "2-dən başlayaraq n-i bölə bilən hər sadə ədədi TƏKRAR-TƏKRAR (bölən qalmayana qədər) n-dən çıxarırıq. Sonda 1-dən böyük qalan varsa, o da öz-özlüyündə sadə vuruqdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool first = true;\n    for (long long i = 2; i * i <= n; i++) {\n        while (n % i == 0) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n            n /= i;\n        }\n    }\n    if (n > 1) {\n        if (!first) cout << \" \";\n        cout << n;\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 58,
       "subgroupLabel": null,
-      "title": "1-dən 1000-ə qədər sadə ədədlərin sayı",
+      "title": "97 ədədinin sadə vuruqlara ayrılması",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
-        "sadə ədəd",
-        "sieve"
+        "sadə vuruq",
+        "faktorizasiya"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "1000",
-      "exampleOutput": "168",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onu sadə vuruqlarına (təkrarla) ayırıb çap edin.",
+      "inputSpec": "Bir tam ədəd n (2 ≤ n ≤ 10^9).",
+      "outputSpec": "Sadə vuruqlar (kiçikdən böyüyə, təkrarla), boşluqla ayrılmış.",
+      "exampleInput": "97",
+      "exampleOutput": "97",
+      "approach": "2-dən başlayaraq n-i bölə bilən hər sadə ədədi TƏKRAR-TƏKRAR (bölən qalmayana qədər) n-dən çıxarırıq. Sonda 1-dən böyük qalan varsa, o da öz-özlüyündə sadə vuruqdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool first = true;\n    for (long long i = 2; i * i <= n; i++) {\n        while (n % i == 0) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n            n /= i;\n        }\n    }\n    if (n > 1) {\n        if (!first) cout << \" \";\n        cout << n;\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 59,
       "subgroupLabel": null,
-      "title": "1-dən 37-ə qədər sadə ədədlərin sayı",
+      "title": "100 ədədinin sadə vuruqlara ayrılması",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
-        "sadə ədəd",
-        "sieve"
+        "sadə vuruq",
+        "faktorizasiya"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "37",
-      "exampleOutput": "12",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onu sadə vuruqlarına (təkrarla) ayırıb çap edin.",
+      "inputSpec": "Bir tam ədəd n (2 ≤ n ≤ 10^9).",
+      "outputSpec": "Sadə vuruqlar (kiçikdən böyüyə, təkrarla), boşluqla ayrılmış.",
+      "exampleInput": "100",
+      "exampleOutput": "2 2 5 5",
+      "approach": "2-dən başlayaraq n-i bölə bilən hər sadə ədədi TƏKRAR-TƏKRAR (bölən qalmayana qədər) n-dən çıxarırıq. Sonda 1-dən böyük qalan varsa, o da öz-özlüyündə sadə vuruqdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool first = true;\n    for (long long i = 2; i * i <= n; i++) {\n        while (n % i == 0) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n            n /= i;\n        }\n    }\n    if (n > 1) {\n        if (!first) cout << \" \";\n        cout << n;\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 60,
       "subgroupLabel": null,
-      "title": "1-dən 77-ə qədər sadə ədədlərin sayı",
+      "title": "84 ədədinin sadə vuruqlara ayrılması",
       "difficulty": "mid",
       "tags": [
-        "Eratosfen ələyi",
-        "sadə ədəd",
-        "sieve"
+        "sadə vuruq",
+        "faktorizasiya"
       ],
-      "statement": "Tam ədəd N verilib. 1-dən N-ə qədər (N daxil) neçə sadə ədəd olduğunu tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^6).",
-      "outputSpec": "Sadə ədədlərin sayı.",
-      "exampleInput": "77",
-      "exampleOutput": "21",
-      "approach": "<b>Eratosfen ələyi</b> istifadə olunur: hər asal ədədin bütün mislərini kompozit (asal olmayan) kimi işarələyirik, sonda işarələnməmiş ədədlərin sayı cavabdır. Bu üsul N-ə qədər bütün sadə ədədləri tək-tək yoxlamaqdan (O(N√N)) qat-qat sürətlidir (O(N log log N)).",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    vector<bool> isComposite(n + 1, false);\n    for (int i = 2; (long long)i * i <= n; i++)\n        if (!isComposite[i])\n            for (int j = i * i; j <= n; j += i)\n                isComposite[j] = true;\n    int cnt = 0;\n    for (int i = 2; i <= n; i++) if (!isComposite[i]) cnt++;\n    cout << cnt << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onu sadə vuruqlarına (təkrarla) ayırıb çap edin.",
+      "inputSpec": "Bir tam ədəd n (2 ≤ n ≤ 10^9).",
+      "outputSpec": "Sadə vuruqlar (kiçikdən böyüyə, təkrarla), boşluqla ayrılmış.",
+      "exampleInput": "84",
+      "exampleOutput": "2 2 3 7",
+      "approach": "2-dən başlayaraq n-i bölə bilən hər sadə ədədi TƏKRAR-TƏKRAR (bölən qalmayana qədər) n-dən çıxarırıq. Sonda 1-dən böyük qalan varsa, o da öz-özlüyündə sadə vuruqdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    bool first = true;\n    for (long long i = 2; i * i <= n; i++) {\n        while (n % i == 0) {\n            if (!first) cout << \" \";\n            cout << i;\n            first = false;\n            n /= i;\n        }\n    }\n    if (n > 1) {\n        if (!first) cout << \" \";\n        cout << n;\n    }\n    cout << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 61,
       "subgroupLabel": null,
-      "title": "6 və 3 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "13 ədədinin ikilik yazılışında 1 bitlərinin sayı",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "popcount"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "6 3",
-      "exampleOutput": "2 7 5",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun ikilik yazılışında neçə \"1\" biti olduğunu tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "1 bitlərinin sayı.",
+      "exampleInput": "13",
+      "exampleOutput": "3",
+      "approach": "Hər addımda son biti (<b>n&amp;1</b>) yoxlayırıq, sonra n-i 1 bit sağa sürüşdürürük (<b>n&gt;&gt;=1</b>) — beləliklə bütün bitləri növbə ilə gəzmiş oluruq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    while (n > 0) {\n        if (n & 1) cnt++;\n        n >>= 1;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 62,
       "subgroupLabel": null,
-      "title": "12 və 10 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "255 ədədinin ikilik yazılışında 1 bitlərinin sayı",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "popcount"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "12 10",
-      "exampleOutput": "8 14 6",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun ikilik yazılışında neçə \"1\" biti olduğunu tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "1 bitlərinin sayı.",
+      "exampleInput": "255",
+      "exampleOutput": "8",
+      "approach": "Hər addımda son biti (<b>n&amp;1</b>) yoxlayırıq, sonra n-i 1 bit sağa sürüşdürürük (<b>n&gt;&gt;=1</b>) — beləliklə bütün bitləri növbə ilə gəzmiş oluruq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    while (n > 0) {\n        if (n & 1) cnt++;\n        n >>= 1;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 63,
       "subgroupLabel": null,
-      "title": "5 və 9 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "16 ədədinin ikilik yazılışında 1 bitlərinin sayı",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "popcount"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "5 9",
-      "exampleOutput": "1 13 12",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun ikilik yazılışında neçə \"1\" biti olduğunu tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "1 bitlərinin sayı.",
+      "exampleInput": "16",
+      "exampleOutput": "1",
+      "approach": "Hər addımda son biti (<b>n&amp;1</b>) yoxlayırıq, sonra n-i 1 bit sağa sürüşdürürük (<b>n&gt;&gt;=1</b>) — beləliklə bütün bitləri növbə ilə gəzmiş oluruq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    while (n > 0) {\n        if (n & 1) cnt++;\n        n >>= 1;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 64,
       "subgroupLabel": null,
-      "title": "15 və 7 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "100 ədədinin ikilik yazılışında 1 bitlərinin sayı",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "popcount"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "15 7",
-      "exampleOutput": "7 15 8",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun ikilik yazılışında neçə \"1\" biti olduğunu tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "1 bitlərinin sayı.",
+      "exampleInput": "100",
+      "exampleOutput": "3",
+      "approach": "Hər addımda son biti (<b>n&amp;1</b>) yoxlayırıq, sonra n-i 1 bit sağa sürüşdürürük (<b>n&gt;&gt;=1</b>) — beləliklə bütün bitləri növbə ilə gəzmiş oluruq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    while (n > 0) {\n        if (n & 1) cnt++;\n        n >>= 1;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 65,
       "subgroupLabel": null,
-      "title": "20 və 6 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "7 ədədinin ikilik yazılışında 1 bitlərinin sayı",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "popcount"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "20 6",
-      "exampleOutput": "4 22 18",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd verilib. Onun ikilik yazılışında neçə \"1\" biti olduğunu tapın.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "1 bitlərinin sayı.",
+      "exampleInput": "7",
+      "exampleOutput": "3",
+      "approach": "Hər addımda son biti (<b>n&amp;1</b>) yoxlayırıq, sonra n-i 1 bit sağa sürüşdürürük (<b>n&gt;&gt;=1</b>) — beləliklə bütün bitləri növbə ilə gəzmiş oluruq.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    int cnt = 0;\n    while (n > 0) {\n        if (n & 1) cnt++;\n        n >>= 1;\n    }\n\n    cout << cnt << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 66,
       "subgroupLabel": null,
-      "title": "33 və 17 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "5 ədədinin 3 bit sürüşdürülməsi (vurma/bölmə kimi)",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "shift",
+        "vurma",
+        "bölmə"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "33 17",
-      "exampleOutput": "1 49 48",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd a və K verilib. a-nı K bit sola (a*2^K-ya bərabər) və sağa (a/2^K-ya bərabər) sürüşdürün.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və K.",
+      "outputSpec": "2 sətir: a &lt;&lt; K, a &gt;&gt; K.",
+      "exampleInput": "5 3",
+      "exampleOutput": "40\n0",
+      "approach": "Sola sürüşdürmə (<b>&lt;&lt;</b>) ədədi 2^K-ya vurmaqla, sağa sürüşdürmə (<b>&gt;&gt;</b>) isə 2^K-ya tam bölməklə eynidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, k;\n    cin >> a >> k;\n\n    cout << (a << k) << \"\\n\";\n    cout << (a >> k) << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 67,
       "subgroupLabel": null,
-      "title": "255 və 15 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "100 ədədinin 2 bit sürüşdürülməsi (vurma/bölmə kimi)",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "shift",
+        "vurma",
+        "bölmə"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "255 15",
-      "exampleOutput": "15 255 240",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd a və K verilib. a-nı K bit sola (a*2^K-ya bərabər) və sağa (a/2^K-ya bərabər) sürüşdürün.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və K.",
+      "outputSpec": "2 sətir: a &lt;&lt; K, a &gt;&gt; K.",
+      "exampleInput": "100 2",
+      "exampleOutput": "400\n25",
+      "approach": "Sola sürüşdürmə (<b>&lt;&lt;</b>) ədədi 2^K-ya vurmaqla, sağa sürüşdürmə (<b>&gt;&gt;</b>) isə 2^K-ya tam bölməklə eynidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, k;\n    cin >> a >> k;\n\n    cout << (a << k) << \"\\n\";\n    cout << (a >> k) << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 68,
       "subgroupLabel": null,
-      "title": "100 və 50 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "7 ədədinin 4 bit sürüşdürülməsi (vurma/bölmə kimi)",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "shift",
+        "vurma",
+        "bölmə"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "100 50",
-      "exampleOutput": "32 118 86",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd a və K verilib. a-nı K bit sola (a*2^K-ya bərabər) və sağa (a/2^K-ya bərabər) sürüşdürün.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və K.",
+      "outputSpec": "2 sətir: a &lt;&lt; K, a &gt;&gt; K.",
+      "exampleInput": "7 4",
+      "exampleOutput": "112\n0",
+      "approach": "Sola sürüşdürmə (<b>&lt;&lt;</b>) ədədi 2^K-ya vurmaqla, sağa sürüşdürmə (<b>&gt;&gt;</b>) isə 2^K-ya tam bölməklə eynidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, k;\n    cin >> a >> k;\n\n    cout << (a << k) << \"\\n\";\n    cout << (a >> k) << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 69,
       "subgroupLabel": null,
-      "title": "7 və 7 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "64 ədədinin 3 bit sürüşdürülməsi (vurma/bölmə kimi)",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "shift",
+        "vurma",
+        "bölmə"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "7 7",
-      "exampleOutput": "7 7 0",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd a və K verilib. a-nı K bit sola (a*2^K-ya bərabər) və sağa (a/2^K-ya bərabər) sürüşdürün.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və K.",
+      "outputSpec": "2 sətir: a &lt;&lt; K, a &gt;&gt; K.",
+      "exampleInput": "64 3",
+      "exampleOutput": "512\n8",
+      "approach": "Sola sürüşdürmə (<b>&lt;&lt;</b>) ədədi 2^K-ya vurmaqla, sağa sürüşdürmə (<b>&gt;&gt;</b>) isə 2^K-ya tam bölməklə eynidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, k;\n    cin >> a >> k;\n\n    cout << (a << k) << \"\\n\";\n    cout << (a >> k) << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 70,
       "subgroupLabel": null,
-      "title": "64 və 32 ədədləri üzərində bit əməliyyatları",
-      "difficulty": "easy",
+      "title": "20 ədədinin 1 bit sürüşdürülməsi (vurma/bölmə kimi)",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "AND",
-        "OR",
-        "XOR"
+        "bit",
+        "shift",
+        "vurma",
+        "bölmə"
       ],
-      "statement": "İki tam ədəd a və b verilib. a AND b, a OR b və a XOR b nəticələrini tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd a və b (0 ≤ a, b ≤ 10^9).",
-      "outputSpec": "Üç tam ədəd: AND, OR, XOR nəticələri (boşluqla ayrılmış).",
-      "exampleInput": "64 32",
-      "exampleOutput": "0 96 96",
-      "approach": "C++-da <b>&</b> AND, <b>|</b> OR, <b>^</b> XOR əməliyyatlarını bit-bit tətbiq edir. Bu əməliyyatlar hər ədədin ikilik (binary) görünüşü üzərində işləyir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long a, b; cin >> a >> b;\n    cout << (a & b) << \" \" << (a | b) << \" \" << (a ^ b) << \"\\n\";\n}"
+      "statement": "Tam ədəd a və K verilib. a-nı K bit sola (a*2^K-ya bərabər) və sağa (a/2^K-ya bərabər) sürüşdürün.",
+      "inputSpec": "Bir sətirdə iki tam ədəd a və K.",
+      "outputSpec": "2 sətir: a &lt;&lt; K, a &gt;&gt; K.",
+      "exampleInput": "20 1",
+      "exampleOutput": "40\n10",
+      "approach": "Sola sürüşdürmə (<b>&lt;&lt;</b>) ədədi 2^K-ya vurmaqla, sağa sürüşdürmə (<b>&gt;&gt;</b>) isə 2^K-ya tam bölməklə eynidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long a, k;\n    cin >> a >> k;\n\n    cout << (a << k) << \"\\n\";\n    cout << (a >> k) << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 71,
       "subgroupLabel": null,
-      "title": "5 ədədini 2 bit sola sürüşdürmək",
-      "difficulty": "easy",
+      "title": "10 ədədinin 1-ci bitinin dəyəri",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "indeks"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sola sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "5 2",
-      "exampleOutput": "20",
-      "approach": "C++-da <b><<</b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n << k) << \"\\n\";\n}"
+      "statement": "Tam ədəd n və indeks i verilib. n-in ikilik yazılışında i-ci bitin (0-əsaslı, sağdan) dəyərini (0 və ya 1) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və i.",
+      "outputSpec": "i-ci bitin dəyəri (0 və ya 1).",
+      "exampleInput": "10 1",
+      "exampleOutput": "1",
+      "approach": "n-i i bit sağa sürüşdürüb (<b>n&gt;&gt;i</b>), sonra 1 ilə AND edərək (<b>&amp;1</b>) YALNIZ o biti \"təcrid edirik\" — bu, digər bütün bitləri sıfırlayır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, i;\n    cin >> n >> i;\n\n    long long bit = (n >> i) & 1;\n\n    cout << bit << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 72,
       "subgroupLabel": null,
-      "title": "20 ədədini 1 bit sağa sürüşdürmək",
-      "difficulty": "easy",
+      "title": "10 ədədinin 0-ci bitinin dəyəri",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "indeks"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sağa sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "20 1",
-      "exampleOutput": "10",
-      "approach": "C++-da <b>>></b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n >> k) << \"\\n\";\n}"
+      "statement": "Tam ədəd n və indeks i verilib. n-in ikilik yazılışında i-ci bitin (0-əsaslı, sağdan) dəyərini (0 və ya 1) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və i.",
+      "outputSpec": "i-ci bitin dəyəri (0 və ya 1).",
+      "exampleInput": "10 0",
+      "exampleOutput": "0",
+      "approach": "n-i i bit sağa sürüşdürüb (<b>n&gt;&gt;i</b>), sonra 1 ilə AND edərək (<b>&amp;1</b>) YALNIZ o biti \"təcrid edirik\" — bu, digər bütün bitləri sıfırlayır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, i;\n    cin >> n >> i;\n\n    long long bit = (n >> i) & 1;\n\n    cout << bit << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 73,
       "subgroupLabel": null,
-      "title": "3 ədədini 4 bit sola sürüşdürmək",
-      "difficulty": "easy",
+      "title": "13 ədədinin 2-ci bitinin dəyəri",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "indeks"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sola sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "3 4",
-      "exampleOutput": "48",
-      "approach": "C++-da <b><<</b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n << k) << \"\\n\";\n}"
+      "statement": "Tam ədəd n və indeks i verilib. n-in ikilik yazılışında i-ci bitin (0-əsaslı, sağdan) dəyərini (0 və ya 1) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və i.",
+      "outputSpec": "i-ci bitin dəyəri (0 və ya 1).",
+      "exampleInput": "13 2",
+      "exampleOutput": "1",
+      "approach": "n-i i bit sağa sürüşdürüb (<b>n&gt;&gt;i</b>), sonra 1 ilə AND edərək (<b>&amp;1</b>) YALNIZ o biti \"təcrid edirik\" — bu, digər bütün bitləri sıfırlayır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, i;\n    cin >> n >> i;\n\n    long long bit = (n >> i) & 1;\n\n    cout << bit << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 74,
       "subgroupLabel": null,
-      "title": "64 ədədini 3 bit sağa sürüşdürmək",
-      "difficulty": "easy",
+      "title": "255 ədədinin 7-ci bitinin dəyəri",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "indeks"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sağa sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "64 3",
-      "exampleOutput": "8",
-      "approach": "C++-da <b>>></b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n >> k) << \"\\n\";\n}"
+      "statement": "Tam ədəd n və indeks i verilib. n-in ikilik yazılışında i-ci bitin (0-əsaslı, sağdan) dəyərini (0 və ya 1) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və i.",
+      "outputSpec": "i-ci bitin dəyəri (0 və ya 1).",
+      "exampleInput": "255 7",
+      "exampleOutput": "1",
+      "approach": "n-i i bit sağa sürüşdürüb (<b>n&gt;&gt;i</b>), sonra 1 ilə AND edərək (<b>&amp;1</b>) YALNIZ o biti \"təcrid edirik\" — bu, digər bütün bitləri sıfırlayır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, i;\n    cin >> n >> i;\n\n    long long bit = (n >> i) & 1;\n\n    cout << bit << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 75,
       "subgroupLabel": null,
-      "title": "7 ədədini 3 bit sola sürüşdürmək",
-      "difficulty": "easy",
+      "title": "8 ədədinin 3-ci bitinin dəyəri",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "indeks"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sola sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "7 3",
-      "exampleOutput": "56",
-      "approach": "C++-da <b><<</b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n << k) << \"\\n\";\n}"
+      "statement": "Tam ədəd n və indeks i verilib. n-in ikilik yazılışında i-ci bitin (0-əsaslı, sağdan) dəyərini (0 və ya 1) tapın.",
+      "inputSpec": "Bir sətirdə iki tam ədəd n və i.",
+      "outputSpec": "i-ci bitin dəyəri (0 və ya 1).",
+      "exampleInput": "8 3",
+      "exampleOutput": "1",
+      "approach": "n-i i bit sağa sürüşdürüb (<b>n&gt;&gt;i</b>), sonra 1 ilə AND edərək (<b>&amp;1</b>) YALNIZ o biti \"təcrid edirik\" — bu, digər bütün bitləri sıfırlayır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n, i;\n    cin >> n >> i;\n\n    long long bit = (n >> i) & 1;\n\n    cout << bit << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 76,
       "subgroupLabel": null,
-      "title": "100 ədədini 2 bit sağa sürüşdürmək",
-      "difficulty": "easy",
+      "title": "5 ədədin XOR-u",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "XOR"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sağa sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "100 2",
-      "exampleOutput": "25",
-      "approach": "C++-da <b>>></b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n >> k) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd verilib. Onların hamısının XOR-unu (ardıcıl ^ əməliyyatı) tapın.",
+      "inputSpec": "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Bütün ədədlərin XOR nəticəsi.",
+      "exampleInput": "5\n1 2 3 2 1",
+      "exampleOutput": "3",
+      "approach": "XOR-un maraqlı xüsusiyyəti: <b>a^a=0</b> — eyni ədəd İKİ dəfə gələndə bir-birini \"ləğv edir\". Bütün ədədləri ardıcıl XOR etdikdə cüt sayda təkrarlananlar yox olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    long long res = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        res ^= x;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 77,
       "subgroupLabel": null,
-      "title": "1 ədədini 5 bit sola sürüşdürmək",
-      "difficulty": "easy",
+      "title": "3 ədədin XOR-u",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "XOR"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sola sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "1 5",
-      "exampleOutput": "32",
-      "approach": "C++-da <b><<</b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n << k) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd verilib. Onların hamısının XOR-unu (ardıcıl ^ əməliyyatı) tapın.",
+      "inputSpec": "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Bütün ədədlərin XOR nəticəsi.",
+      "exampleInput": "3\n5 5 5",
+      "exampleOutput": "5",
+      "approach": "XOR-un maraqlı xüsusiyyəti: <b>a^a=0</b> — eyni ədəd İKİ dəfə gələndə bir-birini \"ləğv edir\". Bütün ədədləri ardıcıl XOR etdikdə cüt sayda təkrarlananlar yox olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    long long res = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        res ^= x;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 78,
       "subgroupLabel": null,
-      "title": "255 ədədini 4 bit sağa sürüşdürmək",
-      "difficulty": "easy",
+      "title": "4 ədədin XOR-u",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "XOR"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sağa sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "255 4",
-      "exampleOutput": "15",
-      "approach": "C++-da <b>>></b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n >> k) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd verilib. Onların hamısının XOR-unu (ardıcıl ^ əməliyyatı) tapın.",
+      "inputSpec": "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Bütün ədədlərin XOR nəticəsi.",
+      "exampleInput": "4\n7 7 3 3",
+      "exampleOutput": "0",
+      "approach": "XOR-un maraqlı xüsusiyyəti: <b>a^a=0</b> — eyni ədəd İKİ dəfə gələndə bir-birini \"ləğv edir\". Bütün ədədləri ardıcıl XOR etdikdə cüt sayda təkrarlananlar yox olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    long long res = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        res ^= x;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 79,
       "subgroupLabel": null,
-      "title": "9 ədədini 2 bit sola sürüşdürmək",
-      "difficulty": "easy",
+      "title": "6 ədədin XOR-u",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "XOR"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sola sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "9 2",
-      "exampleOutput": "36",
-      "approach": "C++-da <b><<</b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n << k) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd verilib. Onların hamısının XOR-unu (ardıcıl ^ əməliyyatı) tapın.",
+      "inputSpec": "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Bütün ədədlərin XOR nəticəsi.",
+      "exampleInput": "6\n1 1 2 2 3 4",
+      "exampleOutput": "7",
+      "approach": "XOR-un maraqlı xüsusiyyəti: <b>a^a=0</b> — eyni ədəd İKİ dəfə gələndə bir-birini \"ləğv edir\". Bütün ədədləri ardıcıl XOR etdikdə cüt sayda təkrarlananlar yox olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    long long res = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        res ^= x;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 80,
       "subgroupLabel": null,
-      "title": "50 ədədini 1 bit sağa sürüşdürmək",
-      "difficulty": "easy",
+      "title": "7 ədədin XOR-u",
+      "difficulty": "mid",
       "tags": [
-        "bit əməliyyatları",
-        "sürüşmə",
-        "<<",
-        ">>"
+        "bit",
+        "XOR"
       ],
-      "statement": "Tam ədəd N verilib. N-i K bit sağa sürüşdürüb nəticəni tapın.",
-      "inputSpec": "Bir sətirdə iki tam ədəd N və K (0 ≤ N ≤ 10^9, 0 ≤ K ≤ 30).",
-      "outputSpec": "Sürüşdürmə nəticəsi.",
-      "exampleInput": "50 1",
-      "exampleOutput": "25",
-      "approach": "C++-da <b>>></b> operatoru sürüşmə əməliyyatını yerinə yetirir — sola sürüşmə hər bitin 2 dəfə vurulmasına, sağa sürüşmə isə 2-yə bölünməsinə bərabərdir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n, k; cin >> n >> k;\n    cout << (n >> k) << \"\\n\";\n}"
+      "statement": "N ədəd tam ədəd verilib. Onların hamısının XOR-unu (ardıcıl ^ əməliyyatı) tapın.",
+      "inputSpec": "Birinci sətirdə N, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Bütün ədədlərin XOR nəticəsi.",
+      "exampleInput": "7\n10 20 10 30 20 5 5",
+      "exampleOutput": "30",
+      "approach": "XOR-un maraqlı xüsusiyyəti: <b>a^a=0</b> — eyni ədəd İKİ dəfə gələndə bir-birini \"ləğv edir\". Bütün ədədləri ardıcıl XOR etdikdə cüt sayda təkrarlananlar yox olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    int n;\n    cin >> n;\n\n    long long res = 0;\n    for (int i = 0; i < n; i++) {\n        long long x;\n        cin >> x;\n        res ^= x;\n    }\n\n    cout << res << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 81,
       "subgroupLabel": null,
-      "title": "10 ədədinin ikilik (2-lik) görünüşü",
+      "title": "13 ədədinin ikilik say sisteminə çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "10",
-      "exampleOutput": "1010",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu ikilik say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in ikilik yazılışı.",
+      "exampleInput": "13",
+      "exampleOutput": "1101",
+      "approach": "Hər addımda n-i 2-yə bölüb qalığı (0 və ya 1) alırıq — bu, ikilik rəqəmi SONDAN başlayaraq verir, ona görə sətrin ƏVVƏLİNƏ əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string bin = \"\";\n    while (n > 0) {\n        bin = char('0' + n % 2) + bin;\n        n /= 2;\n    }\n\n    cout << bin << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 82,
       "subgroupLabel": null,
-      "title": "42 ədədinin ikilik (2-lik) görünüşü",
+      "title": "25 ədədinin ikilik say sisteminə çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "42",
-      "exampleOutput": "101010",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu ikilik say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in ikilik yazılışı.",
+      "exampleInput": "25",
+      "exampleOutput": "11001",
+      "approach": "Hər addımda n-i 2-yə bölüb qalığı (0 və ya 1) alırıq — bu, ikilik rəqəmi SONDAN başlayaraq verir, ona görə sətrin ƏVVƏLİNƏ əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string bin = \"\";\n    while (n > 0) {\n        bin = char('0' + n % 2) + bin;\n        n /= 2;\n    }\n\n    cout << bin << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 83,
       "subgroupLabel": null,
-      "title": "100 ədədinin ikilik (2-lik) görünüşü",
+      "title": "100 ədədinin ikilik say sisteminə çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu ikilik say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in ikilik yazılışı.",
       "exampleInput": "100",
       "exampleOutput": "1100100",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "approach": "Hər addımda n-i 2-yə bölüb qalığı (0 və ya 1) alırıq — bu, ikilik rəqəmi SONDAN başlayaraq verir, ona görə sətrin ƏVVƏLİNƏ əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string bin = \"\";\n    while (n > 0) {\n        bin = char('0' + n % 2) + bin;\n        n /= 2;\n    }\n\n    cout << bin << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 84,
       "subgroupLabel": null,
-      "title": "255 ədədinin ikilik (2-lik) görünüşü",
+      "title": "1 ədədinin ikilik say sisteminə çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "255",
-      "exampleOutput": "11111111",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu ikilik say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in ikilik yazılışı.",
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Hər addımda n-i 2-yə bölüb qalığı (0 və ya 1) alırıq — bu, ikilik rəqəmi SONDAN başlayaraq verir, ona görə sətrin ƏVVƏLİNƏ əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string bin = \"\";\n    while (n > 0) {\n        bin = char('0' + n % 2) + bin;\n        n /= 2;\n    }\n\n    cout << bin << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 85,
       "subgroupLabel": null,
-      "title": "1 ədədinin ikilik (2-lik) görünüşü",
+      "title": "255 ədədinin ikilik say sisteminə çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "1",
-      "exampleOutput": "1",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu ikilik say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in ikilik yazılışı.",
+      "exampleInput": "255",
+      "exampleOutput": "11111111",
+      "approach": "Hər addımda n-i 2-yə bölüb qalığı (0 və ya 1) alırıq — bu, ikilik rəqəmi SONDAN başlayaraq verir, ona görə sətrin ƏVVƏLİNƏ əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string bin = \"\";\n    while (n > 0) {\n        bin = char('0' + n % 2) + bin;\n        n /= 2;\n    }\n\n    cout << bin << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 86,
       "subgroupLabel": null,
-      "title": "1024 ədədinin ikilik (2-lik) görünüşü",
+      "title": "\"1101\" ikilik ədədinin onluğa çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "1024",
-      "exampleOutput": "10000000000",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "İkilik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0 və 1 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "1101",
+      "exampleOutput": "13",
+      "approach": "Soldan sağa gedərək hər addımda indiki dəyəri 2-yə vurub yeni rəqəmi əlavə edirik (\"Horner sxemi\") — bu, say sistemi çevrilməsinin ümumi üsuludur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 2 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 87,
       "subgroupLabel": null,
-      "title": "37 ədədinin ikilik (2-lik) görünüşü",
+      "title": "\"11001\" ikilik ədədinin onluğa çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "37",
-      "exampleOutput": "100101",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "İkilik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0 və 1 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "11001",
+      "exampleOutput": "25",
+      "approach": "Soldan sağa gedərək hər addımda indiki dəyəri 2-yə vurub yeni rəqəmi əlavə edirik (\"Horner sxemi\") — bu, say sistemi çevrilməsinin ümumi üsuludur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 2 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 88,
       "subgroupLabel": null,
-      "title": "999 ədədinin ikilik (2-lik) görünüşü",
+      "title": "\"1100100\" ikilik ədədinin onluğa çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "999",
-      "exampleOutput": "1111100111",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "İkilik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0 və 1 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "1100100",
+      "exampleOutput": "100",
+      "approach": "Soldan sağa gedərək hər addımda indiki dəyəri 2-yə vurub yeni rəqəmi əlavə edirik (\"Horner sxemi\") — bu, say sistemi çevrilməsinin ümumi üsuludur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 2 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 89,
       "subgroupLabel": null,
-      "title": "512 ədədinin ikilik (2-lik) görünüşü",
+      "title": "\"1\" ikilik ədədinin onluğa çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "512",
-      "exampleOutput": "1000000000",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "İkilik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0 və 1 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Soldan sağa gedərək hər addımda indiki dəyəri 2-yə vurub yeni rəqəmi əlavə edirik (\"Horner sxemi\") — bu, say sistemi çevrilməsinin ümumi üsuludur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 2 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 90,
       "subgroupLabel": null,
-      "title": "63 ədədinin ikilik (2-lik) görünüşü",
+      "title": "\"11111111\" ikilik ədədinin onluğa çevrilməsi",
       "difficulty": "easy",
       "tags": [
-        "say sistemləri",
-        "2-lik",
-        "while"
+        "say sistemi",
+        "ikilik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun ikilik (2-lik) say sistemindəki görünüşünü tapın.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in ikilik görünüşü (aparıcı sıfırlar olmadan).",
-      "exampleInput": "63",
-      "exampleOutput": "111111",
-      "approach": "N sıfır olana qədər 2-yə bölünür, hər addımda qalıq (0 və ya 1) yığılır. Qalıqlar <b>sondan başlanğıca</b> alındığı üçün nəticə tərsinə (başa əlavə edərək) qurulur.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    string binary = \"\";\n    long long temp = n;\n    while (temp > 0){\n        binary = char('0' + temp % 2) + binary;\n        temp /= 2;\n    }\n    cout << binary << \"\\n\";\n}"
+      "statement": "İkilik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0 və 1 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "11111111",
+      "exampleOutput": "255",
+      "approach": "Soldan sağa gedərək hər addımda indiki dəyəri 2-yə vurub yeni rəqəmi əlavə edirik (\"Horner sxemi\") — bu, say sistemi çevrilməsinin ümumi üsuludur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 2 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 91,
       "subgroupLabel": null,
-      "title": "255 ədədinin 16-lıq (hex) görünüşü",
+      "title": "8 ədədinin sekkizlik say sisteminə çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "255",
-      "exampleOutput": "ff",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu sekkizlik (8-lik) say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in sekkizlik yazılışı.",
+      "exampleInput": "8",
+      "exampleOutput": "10",
+      "approach": "İkiliyə çevirmə ilə eyni məntiq — sadəcə 2 əvəzinə 8-ə bölürük. Hər addımda 8-ə bölmədən qalan rəqəm (0-7 arası) sekkizlik ədədin bir rəqəmidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string oct8 = \"\";\n    while (n > 0) {\n        oct8 = char('0' + n % 8) + oct8;\n        n /= 8;\n    }\n\n    cout << oct8 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 92,
       "subgroupLabel": null,
-      "title": "42 ədədinin 16-lıq (hex) görünüşü",
+      "title": "64 ədədinin sekkizlik say sisteminə çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "42",
-      "exampleOutput": "2a",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu sekkizlik (8-lik) say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in sekkizlik yazılışı.",
+      "exampleInput": "64",
+      "exampleOutput": "100",
+      "approach": "İkiliyə çevirmə ilə eyni məntiq — sadəcə 2 əvəzinə 8-ə bölürük. Hər addımda 8-ə bölmədən qalan rəqəm (0-7 arası) sekkizlik ədədin bir rəqəmidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string oct8 = \"\";\n    while (n > 0) {\n        oct8 = char('0' + n % 8) + oct8;\n        n /= 8;\n    }\n\n    cout << oct8 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 93,
       "subgroupLabel": null,
-      "title": "4096 ədədinin 16-lıq (hex) görünüşü",
+      "title": "100 ədədinin sekkizlik say sisteminə çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "4096",
-      "exampleOutput": "1000",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu sekkizlik (8-lik) say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in sekkizlik yazılışı.",
+      "exampleInput": "100",
+      "exampleOutput": "144",
+      "approach": "İkiliyə çevirmə ilə eyni məntiq — sadəcə 2 əvəzinə 8-ə bölürük. Hər addımda 8-ə bölmədən qalan rəqəm (0-7 arası) sekkizlik ədədin bir rəqəmidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string oct8 = \"\";\n    while (n > 0) {\n        oct8 = char('0' + n % 8) + oct8;\n        n /= 8;\n    }\n\n    cout << oct8 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 94,
       "subgroupLabel": null,
-      "title": "10 ədədinin 16-lıq (hex) görünüşü",
+      "title": "255 ədədinin sekkizlik say sisteminə çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "10",
-      "exampleOutput": "a",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu sekkizlik (8-lik) say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in sekkizlik yazılışı.",
+      "exampleInput": "255",
+      "exampleOutput": "377",
+      "approach": "İkiliyə çevirmə ilə eyni məntiq — sadəcə 2 əvəzinə 8-ə bölürük. Hər addımda 8-ə bölmədən qalan rəqəm (0-7 arası) sekkizlik ədədin bir rəqəmidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string oct8 = \"\";\n    while (n > 0) {\n        oct8 = char('0' + n % 8) + oct8;\n        n /= 8;\n    }\n\n    cout << oct8 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 95,
       "subgroupLabel": null,
-      "title": "999 ədədinin 16-lıq (hex) görünüşü",
+      "title": "15 ədədinin sekkizlik say sisteminə çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "999",
-      "exampleOutput": "3e7",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Tam ədəd (onluq say sistemində) verilib. Onu sekkizlik (8-lik) say sisteminə çevirin.",
+      "inputSpec": "Bir tam ədəd n (0 ≤ n ≤ 10^9).",
+      "outputSpec": "n-in sekkizlik yazılışı.",
+      "exampleInput": "15",
+      "exampleOutput": "17",
+      "approach": "İkiliyə çevirmə ilə eyni məntiq — sadəcə 2 əvəzinə 8-ə bölürük. Hər addımda 8-ə bölmədən qalan rəqəm (0-7 arası) sekkizlik ədədin bir rəqəmidir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    long long n;\n    cin >> n;\n\n    if (n == 0) { cout << 0 << \"\\n\"; return 0; }\n\n    string oct8 = \"\";\n    while (n > 0) {\n        oct8 = char('0' + n % 8) + oct8;\n        n /= 8;\n    }\n\n    cout << oct8 << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 96,
       "subgroupLabel": null,
-      "title": "65535 ədədinin 16-lıq (hex) görünüşü",
+      "title": "\"10\" sekkizlik ədədinin onluğa çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "65535",
-      "exampleOutput": "ffff",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Sekkizlik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0-7 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "10",
+      "exampleOutput": "8",
+      "approach": "Horner sxemi, bu dəfə 8 əsası ilə: soldan sağa hər addımda indiki dəyəri 8-ə vurub yeni rəqəmi əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 8 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 97,
       "subgroupLabel": null,
-      "title": "16 ədədinin 16-lıq (hex) görünüşü",
+      "title": "\"100\" sekkizlik ədədinin onluğa çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "16",
-      "exampleOutput": "10",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Sekkizlik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0-7 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "100",
+      "exampleOutput": "64",
+      "approach": "Horner sxemi, bu dəfə 8 əsası ilə: soldan sağa hər addımda indiki dəyəri 8-ə vurub yeni rəqəmi əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 8 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 98,
       "subgroupLabel": null,
-      "title": "305441741 ədədinin 16-lıq (hex) görünüşü",
+      "title": "\"144\" sekkizlik ədədinin onluğa çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "305441741",
-      "exampleOutput": "1234abcd",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Sekkizlik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0-7 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "144",
+      "exampleOutput": "100",
+      "approach": "Horner sxemi, bu dəfə 8 əsası ilə: soldan sağa hər addımda indiki dəyəri 8-ə vurub yeni rəqəmi əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 8 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 99,
       "subgroupLabel": null,
-      "title": "4095 ədədinin 16-lıq (hex) görünüşü",
+      "title": "\"377\" sekkizlik ədədinin onluğa çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "4095",
-      "exampleOutput": "fff",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Sekkizlik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0-7 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "377",
+      "exampleOutput": "255",
+      "approach": "Horner sxemi, bu dəfə 8 əsası ilə: soldan sağa hər addımda indiki dəyəri 8-ə vurub yeni rəqəmi əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 8 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week3",
       "orderIndex": 100,
       "subgroupLabel": null,
-      "title": "100 ədədinin 16-lıq (hex) görünüşü",
+      "title": "\"17\" sekkizlik ədədinin onluğa çevrilməsi",
       "difficulty": "mid",
       "tags": [
-        "say sistemləri",
-        "16-lıq",
-        "hex"
+        "say sistemi",
+        "sekkizlik"
       ],
-      "statement": "10-luq say sistemində tam ədəd N verilib. Onun 16-lıq (hex) say sistemindəki görünüşünü kiçik hərflərlə çap edin.",
-      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 10^9).",
-      "outputSpec": "N-in 16-lıq görünüşü (kiçik hərflərlə, məs. a, b, c).",
-      "exampleInput": "100",
-      "exampleOutput": "64",
-      "approach": "C++-un <b>&lt;iostream&gt;</b> axınında <b>hex</b> manipulyatoru istifadə olunaraq ədəd birbaşa 16-lıq formatda çap edilə bilər — bu, əl ilə qalıq hesablamaqdan daha sadədir.",
-      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    long long n; cin >> n;\n    cout << hex << n << \"\\n\";\n}"
+      "statement": "Sekkizlik say sistemində yazılmış ədəd (sətir kimi) verilib. Onu onluq say sisteminə çevirin.",
+      "inputSpec": "Bir sətir — yalnız 0-7 rəqəmlərindən ibarət.",
+      "outputSpec": "Onluq qarşılığı.",
+      "exampleInput": "17",
+      "exampleOutput": "15",
+      "approach": "Horner sxemi, bu dəfə 8 əsası ilə: soldan sağa hər addımda indiki dəyəri 8-ə vurub yeni rəqəmi əlavə edirik.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main(){\n    string s;\n    cin >> s;\n\n    long long n = 0;\n    for (char c : s) {\n        n = n * 8 + (c - '0');\n    }\n\n    cout << n << \"\\n\";\n}"
     },
     {
       "topicSlug": "week4",
