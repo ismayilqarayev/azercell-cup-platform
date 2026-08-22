@@ -143,6 +143,18 @@
   .python-app iframe{
     flex:1; width:100%; border:none; background:var(--blueprint-deep);
   }
+  /* "Yarış fokus rejimi" — 🏆 Yarışlar kartı ilə daxil olan şagird YALNIZ
+     yarış məzmununu görsün deyə, bütün digər naviqasiyanı (Hazırlıq Planı,
+     Mövzu testləri və s.) tamamilə gizlədir. main-app flex(row) olduğu
+     üçün sidebar-ı gizlətmək frame-wrap-ı avtomatik tam enə genişləndirir. */
+  .main-app.yarish-focus .tabbar{ display:none; }
+  .yarish-focus-exit{
+    position:fixed; top:16px; right:16px; z-index:50;
+    font-family:var(--mono); font-size:12px; padding:8px 14px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:8px; cursor:pointer; display:none;
+  }
+  .main-app.yarish-focus .yarish-focus-exit{ display:block; }
   .tabbar{
     display:flex; flex-direction:column; gap:6px; padding:22px 14px;
     border-bottom:none; border-right:1px solid var(--grid-line-strong);
@@ -300,6 +312,81 @@
     color:var(--ink); cursor:pointer;
   }
   .user-role-select:disabled{ opacity:0.4; cursor:default; }
+
+  /* ---------- Yarış (Contest) bölməsi ---------- */
+  .contest-form{
+    display:flex; flex-direction:column; gap:10px; max-width:520px;
+    padding:18px; margin-bottom:26px; background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+  }
+  .contest-form-row{ display:flex; gap:10px; }
+  .contest-form-row .auth-input{ flex:1; }
+  .contest-textarea{
+    font-family:var(--sans); font-size:13.5px; padding:10px 12px; width:100%; min-height:70px;
+    background:var(--blueprint-deep); border:1px solid var(--grid-line-strong); border-radius:8px;
+    color:var(--ink); outline:none; resize:vertical; box-sizing:border-box;
+  }
+  .contest-textarea:focus{ border-color:var(--gold); }
+  .contest-card{
+    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:16px 18px; margin-bottom:12px; cursor:pointer; transition:border-color 0.15s ease;
+  }
+  .contest-card:hover{ border-color:var(--gold); }
+  .contest-card-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .contest-card-title{ font-size:15.5px; color:var(--ink); font-weight:600; }
+  .contest-card-meta{ font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-top:6px; }
+  .contest-status-badge{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:4px 10px; border-radius:20px; border:1px solid var(--grid-line-strong); white-space:nowrap;
+  }
+  .contest-status-badge.upcoming{ border-color:var(--bronze); color:var(--bronze); }
+  .contest-status-badge.active{ border-color:var(--green); color:var(--green); }
+  .contest-status-badge.ended{ border-color:var(--ink-soft); color:var(--ink-soft); }
+  .contest-back-btn{
+    font-family:var(--mono); font-size:12px; color:var(--gold-bright); background:none; border:none;
+    cursor:pointer; padding:0 0 16px; display:block;
+  }
+  .contest-back-btn:hover{ text-decoration:underline; }
+  .contest-countdown{
+    font-family:var(--mono); font-size:13px; color:var(--gold-bright); margin:4px 0 18px;
+  }
+  .contest-problem-card{
+    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:16px 18px; margin-bottom:14px;
+  }
+  .contest-problem-head{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; gap:10px; }
+  .contest-problem-title{ font-size:14.5px; color:var(--ink); font-weight:600; }
+  .contest-problem-points{ font-family:var(--mono); font-size:11.5px; color:var(--bronze); }
+  .contest-solved-badge{ font-family:var(--mono); font-size:11px; color:var(--green); margin-left:8px; }
+  .contest-io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+  .contest-io-box{ background:var(--blueprint-deep); border:1px solid var(--grid-line); border-radius:6px; padding:8px 10px; }
+  .contest-io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--ink-soft); text-transform:uppercase; margin-bottom:4px; }
+  .contest-io-box pre{ margin:0; font-family:var(--mono); font-size:12px; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+  .contest-submit-btn, .contest-action-btn{
+    font-family:var(--mono); font-size:12.5px; font-weight:600; padding:9px 18px;
+    background:var(--gold-bright); color:var(--blueprint-deep); border:none; border-radius:8px; cursor:pointer;
+  }
+  .contest-submit-btn:disabled{ opacity:0.4; cursor:default; }
+  .contest-action-btn.secondary{ background:none; border:1px solid var(--grid-line-strong); color:var(--ink); }
+  .contest-verdict{
+    margin-top:12px; padding:10px 12px; border-radius:8px; font-family:var(--mono); font-size:12.5px;
+    display:none;
+  }
+  .contest-verdict.show{ display:block; }
+  .contest-verdict.accepted{ background:rgba(57,255,110,0.1); border:1px solid var(--green); color:var(--green); }
+  .contest-verdict.rejected{ background:rgba(255,59,59,0.1); border:1px solid var(--alert); color:var(--alert); }
+  .contest-verdict.pending{ background:var(--paper); border:1px solid var(--grid-line-strong); color:var(--ink-soft); }
+  .contest-leaderboard-rank{ font-family:var(--mono); font-weight:700; color:var(--gold-bright); }
+  .contest-manage-list{ margin-bottom:24px; }
+  .contest-manage-item{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px;
+    padding:12px 16px; margin-bottom:8px; cursor:pointer;
+  }
+  .contest-manage-item:hover{ border-color:var(--gold); }
+  .contest-testcase-row{
+    display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--grid-line);
+  }
+  .contest-testcase-row .contest-io-box{ flex:1; }
   .loading{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     color:var(--ink-soft); font-family:var(--mono); font-size:12px; letter-spacing:1px;
@@ -355,6 +442,10 @@
             <button type="button" class="lang-btn" onclick="selectRole('teacher')">
               <span class="lang-name">🧑‍🏫 Müəllim</span>
               <span class="lang-desc">Mövcud müəllim hesabı ilə daxil ol</span>
+            </button>
+            <button type="button" class="lang-btn" onclick="selectRoleForYarish()">
+              <span class="lang-name">🏆 Yarışlar</span>
+              <span class="lang-desc">Daxil ol və birbaşa yarışlara qoşul</span>
             </button>
           </div>
           <p class="admin-entry"><a href="#" onclick="selectRole('admin'); return false;">Admin girişi</a></p>
@@ -440,6 +531,7 @@
   </div>
 
   <div class="main-app" id="mainApp">
+  <button type="button" class="yarish-focus-exit" onclick="exitYarishFocusMode()">← Əsas menyu</button>
   <div class="tabbar" role="tablist">
     <button class="tab-btn active" id="btn-prep" role="tab" aria-selected="true" onclick="showTab(&#39;prep&#39;)"><span class="tab-label">Hazırlıq Planı</span></button>
     <div class="tab-group-label">Test Vərəqləri</div>
@@ -451,9 +543,11 @@
     <div class="tab-group-label">Əlavə Alətlər</div>
     <button class="tab-btn" id="btn-algo" role="tab" aria-selected="false" onclick="showTab(&#39;algo&#39;)"><span class="tab-label">Alqoritm Simulyasiyası</span></button>
     <button class="tab-btn" id="btn-scheme" role="tab" aria-selected="false" onclick="showTab(&#39;scheme&#39;)"><span class="tab-label">Məsələ Həll Sxemi</span></button>
+    <button class="tab-btn" id="btn-yarish" role="tab" aria-selected="false" onclick="showTab(&#39;yarish&#39;)"><span class="tab-label">🏆 Yarışlar</span></button>
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
     <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
+    <button class="tab-btn" id="btn-yarish-manage" role="tab" aria-selected="false" onclick="showTab(&#39;yarish-manage&#39;)" style="display:none"><span class="tab-label">Yarış idarəetməsi</span></button>
     <div class="tab-group-label" id="adminGroupLabel" style="display:none">Admin</div>
     <button class="tab-btn" id="btn-users" role="tab" aria-selected="false" onclick="showTab(&#39;users&#39;)" style="display:none"><span class="tab-label">İstifadəçilər</span></button>
     <button class="tab-btn" id="btn-approvals" role="tab" aria-selected="false" onclick="showTab(&#39;approvals&#39;)" style="display:none"><span class="tab-label">Müəllim təsdiqləri</span></button>
@@ -502,6 +596,20 @@
         <h2 class="teacher-panel-title">İstifadəçilər</h2>
         <p class="teacher-panel-sub">Bütün şagird, müəllim və admin hesablarını idarə et: profil redaktəsi, rol dəyişimi, aktiv/deaktiv, parol sıfırlama, silmə.</p>
         <div id="usersPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-yarish">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">🏆 Yarışlar</h2>
+        <p class="teacher-panel-sub">Azercell Cup tərzi, vaxt-məhdudlaşdırılmış yarışlar — qoşul, kod göndər, reytinq cədvəlində yerini gör.</p>
+        <div id="yarishPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-yarish-manage">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">Yarış idarəetməsi</h2>
+        <p class="teacher-panel-sub">Yeni yarış yarat, məsələ və (gizli daxil) test halları əlavə et.</p>
+        <div id="yarishManagePanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
 
@@ -574,6 +682,23 @@ function selectRole(role){
   document.getElementById('studentAuth').style.display = role === 'student' ? 'block' : 'none';
   document.getElementById('teacherAuth').style.display = role === 'teacher' ? 'block' : 'none';
   document.getElementById('adminAuth').style.display = role === 'admin' ? 'block' : 'none';
+}
+
+// "🏆 Yarışlar" kartına kliklənəndə: şagird giriş/qeydiyyat formasını açır,
+// AMMA bir bayraq (pendingYarishRedirect) qaldırır ki, giriş uğurlu olan
+// kimi (bax: updateAuthUI) dil seçimi ekranını KEÇİB birbaşa "Yarışlar"
+// tabına düşsün — beləliklə "daxil ol" ilə "yarışları gör" arasında əlavə klik olmur.
+let pendingYarishRedirect = false;
+function selectRoleForYarish(){
+  pendingYarishRedirect = true;
+  selectRole('student');
+}
+
+// Yarış fokus rejimindən çıxır — sidebar-ı (bütün tabları) geri gətirir və
+// adi "Hazırlıq Planı" görünüşünə keçir. Bu, LOGOUT DEYİL — sessiya davam edir.
+function exitYarishFocusMode(){
+  document.getElementById('mainApp').classList.remove('yarish-focus');
+  showTab('prep');
 }
 
 function backToRoleSelect(){
@@ -752,6 +877,7 @@ function updateAuthUI(){
   document.getElementById('teacherGroupLabel').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-teacher').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-topics').style.display = (isAdmin || isTeacher) ? '' : 'none';
+  document.getElementById('btn-yarish-manage').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('adminGroupLabel').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-approvals').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-users').style.display = isAdmin ? '' : 'none';
@@ -782,6 +908,17 @@ function updateAuthUI(){
       // olanda köhnə admin paneli görünə bilər (bax: showTab funksiyası, o,
       // yalnız çağırılanda tab-panellərin "active" class-ını yeniləyir).
       showTab(isTeacher ? 'teacher' : 'prep');
+      // "🏆 Yarışlar" kartından gəlmişdisə (bax: selectRoleForYarish), dil
+      // seçimi ekranını da avtomatik keçib birbaşa Yarışlar tabına salırıq —
+      // yarış C++ (Azercell Cup) qatının bir hissəsi olduğu üçün "cpp" seçilir.
+      if (pendingYarishRedirect && !isTeacher) {
+        pendingYarishRedirect = false;
+        // "Fokus rejimi" — sidebar-dakı bütün digər tabları (Hazırlıq Planı,
+        // Mövzu testləri və s.) gizlədib YALNIZ yarış məzmununu göstərir
+        // (bax: .main-app.yarish-focus CSS qaydası, exitYarishFocusMode()).
+        document.getElementById('mainApp').classList.add('yarish-focus');
+        chooseLanguage('cpp', 'yarish');
+      }
     }
   } else {
     authGate.style.display = 'block';
@@ -813,7 +950,16 @@ function handleLogout(){
 renderAuthMode();
 updateAuthUI();
 
-function chooseLanguage(lang){
+// afterTab (istəyə bağlı) — dil seçimi bitib mainApp göstərildikdən SONRA
+// açılacaq tab adı. DİQQƏT: showTab(...) və chooseLanguage(...) İKİSİ DƏ
+// runLoadingThen-i (bax: aşağı) çağırır, O İSƏ BÜTÜN çağırışlar arasında
+// TEK bir paylaşılan taymer (loadingTimer) istifadə edir — əgər showTab
+// və chooseLanguage AYRI-AYRI, ARDICIL çağırılsaydı, ikincinin timer-i
+// birincinin gözlədiyi callback-i LƏĞV EDƏRDİ (heç vaxt işə düşməzdi).
+// Ona görə showTab burada "afterTab" kimi, chooseLanguage-in ÖZ
+// callback-inin İÇİNDƏ (yəni onun runLoadingThen-i artıq bitəndən SONRA,
+// iç-içə/ardıcıl) çağırılır — paralel yox, ardıcıl olduğu üçün təhlükəsizdir.
+function chooseLanguage(lang, afterTab){
   document.getElementById('langSelect').classList.add('hide');
   runLoadingThen(() => {
     if (lang === 'cpp'){
@@ -823,6 +969,7 @@ function chooseLanguage(lang){
       document.getElementById('pythonApp').classList.add('show');
       document.getElementById('mainApp').classList.remove('show');
     }
+    if (afterTab) showTab(afterTab);
   });
 }
 function backToLangSelect(){
@@ -903,8 +1050,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', approvals:'frame-approvals', users:'frame-users'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', approvals:'btn-approvals', users:'btn-users'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', approvals:'frame-approvals', users:'frame-users', yarish:'frame-yarish', 'yarish-manage':'frame-yarish-manage'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', approvals:'btn-approvals', users:'btn-users', yarish:'btn-yarish', 'yarish-manage':'btn-yarish-manage'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -918,6 +1065,8 @@ function showTab(name){
     if (name === 'topics') loadTopicsPanel();
     if (name === 'approvals') loadPendingTeachers();
     if (name === 'users') loadUsersPanel();
+    if (name === 'yarish') loadYarishPanel();
+    if (name === 'yarish-manage') loadYarishManagePanel();
   });
 }
 
@@ -1027,6 +1176,509 @@ async function toggleTopicPublished(id, published){
     loadTopicsPanel();
   } catch (err) {
     alert('Mövzunun statusunu dəyişmək mümkün olmadı.');
+  }
+}
+
+/* ============================================================================
+   "Yarışlar" (Contest) bölməsi — şagird tərəfi (qatılma, göndərmə, reytinq)
+   və müəllim/admin tərəfi (yarış/məsələ/test halı idarəetməsi).
+   ============================================================================ */
+
+// Server tarixləri bəzən millisaniyədən dəqiq (nanosaniyə) dəqiqliklə gəlir —
+// JS-in Date-i yalnız millisaniyəyə qədər dəstəklədiyi üçün, "Invalid Date"
+// almamaq üçün kəsr hissəni 3 rəqəmə qədər kəsirik.
+function safeParseDate(iso){
+  if (!iso) return null;
+  const trimmed = iso.replace(/(\.\d{3})\d+(Z)?$/, '$1$2');
+  return new Date(trimmed);
+}
+
+function formatYarishDateTime(iso){
+  const d = safeParseDate(iso);
+  if (!d) return '—';
+  return d.toLocaleString('az-AZ', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+// Millisaniyəni "Ngün Ns:Nd:Ns" formatına çevirir (mənfi olarsa "0s" qaytarır).
+function formatYarishDuration(ms){
+  if (ms <= 0) return '0s';
+  const totalSec = Math.floor(ms / 1000);
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+  let out = '';
+  if (days > 0) out += days + 'g ';
+  out += String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+  return out;
+}
+
+// datetime-local input dəyərini ("YYYY-MM-DDTHH:mm", lokal vaxt) backend-in
+// gözlədiyi ISO Instant sətrinə (UTC) çevirir.
+function datetimeLocalToIso(value){
+  if (!value) return null;
+  return new Date(value).toISOString();
+}
+
+// Backend-dən gələn ISO Instant sətrini datetime-local input-un gözlədiyi
+// "YYYY-MM-DDTHH:mm" (lokal vaxt) formatına çevirir — redaktə formunu
+// mövcud dəyərlərlə əvvəlcədən doldurmaq üçün.
+function isoToDatetimeLocalValue(iso){
+  const d = safeParseDate(iso);
+  if (!d) return '';
+  const pad = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+    + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function yarishStatusBadge(status){
+  const map = { UPCOMING: ['upcoming', 'Gələcək'], ACTIVE: ['active', 'Canlı'], ENDED: ['ended', 'Bitib'] };
+  const [cls, label] = map[status] || ['ended', status];
+  return '<span class="contest-status-badge ' + cls + '">' + label + '</span>';
+}
+
+// ---------- Şagird tərəfi ----------
+
+// Cari açıq yarış görünüşünün vaxt sayğacı/reytinq yeniləmə taymerləri —
+// panel dəyişəndə (siyahıya qayıdanda, başqa yarış açanda) TƏMİZLƏNMƏLİDİR,
+// əks halda arxa planda "ölü" taymerlər yığılıb qalar.
+let yarishCountdownTimer = null;
+let yarishLeaderboardTimer = null;
+
+function clearYarishTimers(){
+  if (yarishCountdownTimer) { clearTimeout(yarishCountdownTimer); yarishCountdownTimer = null; }
+  if (yarishLeaderboardTimer) { clearTimeout(yarishLeaderboardTimer); yarishLeaderboardTimer = null; }
+}
+
+async function loadYarishPanel(){
+  clearYarishTimers();
+  const body = document.getElementById('yarishPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/contests');
+    if (!res.ok) throw new Error('fetch failed');
+    const contests = await res.json();
+    if (!contests.length) {
+      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir yarış elan edilməyib.</div>';
+      return;
+    }
+    const cards = contests.map(c => (
+      '<div class="contest-card" onclick="openYarishDetail(' + c.id + ')">'
+      + '<div class="contest-card-top"><div class="contest-card-title">' + escapeHtml(c.title) + '</div>' + yarishStatusBadge(c.status) + '</div>'
+      + '<div class="contest-card-meta">' + formatYarishDateTime(c.startTime) + ' → ' + formatYarishDateTime(c.endTime) + ' · ' + c.problemCount + ' məsələ</div>'
+      + '</div>'
+    )).join('');
+    body.innerHTML = cards;
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Yarış siyahısını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+async function openYarishDetail(contestId){
+  clearYarishTimers();
+  const body = document.getElementById('yarishPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/contests/' + contestId);
+    if (!res.ok) throw new Error('fetch failed');
+    const detail = await res.json();
+    renderYarishDetail(detail);
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Yarış detallarını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderYarishDetail(detail){
+  const body = document.getElementById('yarishPanelBody');
+  const user = AzcupAuth.getUser();
+  const isStudent = !!user && user.role === 'STUDENT';
+
+  let joinHtml = '';
+  if (isStudent && !detail.joined && detail.status !== 'ENDED') {
+    joinHtml = '<button type="button" class="contest-action-btn" onclick="joinYarish(' + detail.id + ')">Yarışa qoşul</button>';
+  } else if (isStudent && detail.joined) {
+    joinHtml = '<span class="contest-solved-badge">✓ Qoşulmusunuz</span>';
+  }
+
+  let countdownHtml = '<div class="contest-countdown" id="yarishCountdown"></div>';
+
+  let problemsHtml = '';
+  if (detail.status === 'UPCOMING' && isStudent) {
+    problemsHtml = '<div class="teacher-panel-empty">Məsələlər yarış başlayanda görünəcək.</div>';
+  } else if (!detail.problems.length) {
+    problemsHtml = '<div class="teacher-panel-empty">Bu yarışa hələ məsələ əlavə olunmayıb.</div>';
+  } else {
+    problemsHtml = detail.problems.map(p => renderYarishProblemCard(p, detail)).join('');
+  }
+
+  body.innerHTML =
+    '<button type="button" class="contest-back-btn" onclick="loadYarishPanel()">← Yarışlara qayıt</button>'
+    + '<div class="contest-card-top"><h3 style="margin:0;color:var(--ink);">' + escapeHtml(detail.title) + '</h3>' + yarishStatusBadge(detail.status) + '</div>'
+    + (detail.description ? '<p class="teacher-panel-sub" style="margin-top:8px;">' + escapeHtml(detail.description) + '</p>' : '')
+    + countdownHtml
+    + '<p style="margin:8px 0 20px;">' + joinHtml + '</p>'
+    + '<div class="section-divider" style="margin:20px 0;border-top:1px solid var(--grid-line-strong);"></div>'
+    + problemsHtml
+    + '<h3 style="color:var(--ink);margin-top:28px;">Reytinq Cədvəli</h3>'
+    + '<div id="yarishLeaderboard"><div class="teacher-panel-loading">Yüklənir...</div></div>';
+
+  startYarishCountdown(detail);
+  loadYarishLeaderboard(detail.id, detail.status);
+}
+
+function startYarishCountdown(detail){
+  const el = document.getElementById('yarishCountdown');
+  if (!el) return;
+  function tick(){
+    const now = new Date();
+    let target, prefix;
+    if (detail.status === 'UPCOMING') {
+      target = safeParseDate(detail.startTime);
+      prefix = 'Başlamasına: ';
+    } else if (detail.status === 'ACTIVE') {
+      target = safeParseDate(detail.endTime);
+      prefix = 'Bitməsinə: ';
+    } else {
+      el.textContent = 'Yarış bitib.';
+      return;
+    }
+    const remaining = target.getTime() - now.getTime();
+    if (remaining <= 0) {
+      // Vaxt bitdi (UPCOMING -> ACTIVE, ya da ACTIVE -> ENDED keçidi) —
+      // detalları TƏZƏDƏN yükləyib statusu server-dən doğru öyrənirik.
+      openYarishDetail(detail.id);
+      return;
+    }
+    el.textContent = prefix + formatYarishDuration(remaining);
+    yarishCountdownTimer = setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+function renderYarishProblemCard(p, detail){
+  const solvedBadge = p.solved ? '<span class="contest-solved-badge">✓ Həll edilib</span>' : '';
+  const samples = p.sampleTestCases.map(tc => (
+    '<div class="contest-io-grid">'
+    + '<div class="contest-io-box"><div class="lbl">Giriş</div><pre>' + escapeHtml(tc.input) + '</pre></div>'
+    + '<div class="contest-io-box"><div class="lbl">Çıxış</div><pre>' + escapeHtml(tc.expectedOutput) + '</pre></div>'
+    + '</div>'
+  )).join('');
+
+  const user = AzcupAuth.getUser();
+  const canSubmit = !!user && user.role === 'STUDENT' && detail.joined && detail.status === 'ACTIVE';
+  let submitHtml = '';
+  if (canSubmit) {
+    submitHtml =
+      '<textarea class="contest-textarea" id="yarishCode-' + p.id + '" spellcheck="false" placeholder="#include <bits/stdc++.h>&#10;using namespace std;&#10;int main(){&#10;    &#10;    return 0;&#10;}"></textarea>'
+      + '<div style="margin-top:10px;"><button type="button" class="contest-submit-btn" id="yarishSubmitBtn-' + p.id + '" onclick="submitYarishCode(' + p.id + ')">Kodu göndər</button></div>'
+      + '<div class="contest-verdict" id="yarishVerdict-' + p.id + '"></div>';
+  } else if (!!user && user.role === 'STUDENT' && detail.status === 'ACTIVE') {
+    submitHtml = '<p class="teacher-panel-sub">Kod göndərmək üçün əvvəlcə yarışa qoşulun.</p>';
+  }
+
+  return (
+    '<div class="contest-problem-card">'
+    + '<div class="contest-problem-head" onclick="toggleYarishProblemBody(' + p.id + ')">'
+    + '<span class="contest-problem-title">' + escapeHtml(p.title) + solvedBadge + '</span>'
+    + '<span class="contest-problem-points">' + p.points + ' bal</span>'
+    + '</div>'
+    + '<div class="contest-problem-body" id="yarishProblemBody-' + p.id + '" style="display:none;margin-top:14px;">'
+    + '<p>' + escapeHtml(p.statement) + '</p>'
+    + (p.inputSpec ? '<p class="teacher-panel-sub"><b>Giriş:</b> ' + escapeHtml(p.inputSpec) + '</p>' : '')
+    + (p.outputSpec ? '<p class="teacher-panel-sub"><b>Çıxış:</b> ' + escapeHtml(p.outputSpec) + '</p>' : '')
+    + samples
+    + submitHtml
+    + '</div>'
+    + '</div>'
+  );
+}
+
+function toggleYarishProblemBody(problemId){
+  const el = document.getElementById('yarishProblemBody-' + problemId);
+  if (!el) return;
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+
+async function joinYarish(contestId){
+  try {
+    const res = await azcupApiFetch('/api/contests/' + contestId + '/join', { method: 'POST' });
+    if (!res.ok) throw new Error('join failed');
+    openYarishDetail(contestId);
+  } catch (err) {
+    alert('Yarışa qoşulmaq mümkün olmadı.');
+  }
+}
+
+async function submitYarishCode(contestProblemId){
+  const textarea = document.getElementById('yarishCode-' + contestProblemId);
+  const btn = document.getElementById('yarishSubmitBtn-' + contestProblemId);
+  const verdictEl = document.getElementById('yarishVerdict-' + contestProblemId);
+  const sourceCode = textarea.value;
+  if (!sourceCode.trim()) {
+    alert('Əvvəlcə kod yazın.');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Yoxlanılır...';
+  verdictEl.className = 'contest-verdict show pending';
+  verdictEl.textContent = 'Kod compile edilib yoxlanılır...';
+  try {
+    const res = await azcupApiFetch('/api/contests/problems/' + contestProblemId + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    if (!res.ok) throw new Error('submit failed');
+    const result = await res.json();
+    const accepted = result.status === 'ACCEPTED';
+    verdictEl.className = 'contest-verdict show ' + (accepted ? 'accepted' : 'rejected');
+    let text = result.status + ' — ' + result.passedTestCases + '/' + result.totalTestCases + ' test keçdi.';
+    if (accepted) {
+      text += result.pointsAwarded > 0 ? (' +' + result.pointsAwarded + ' bal!') : ' (bal artıq qazanılıb)';
+    } else if (result.stderr) {
+      text += '\n' + result.stderr;
+    }
+    verdictEl.textContent = text;
+    if (accepted) {
+      // Bal/reytinq dəyişdiyi üçün bütün detalları TƏZƏDƏN yükləyirik.
+      openYarishDetail(window.__yarishCurrentContestId);
+    }
+  } catch (err) {
+    verdictEl.className = 'contest-verdict show rejected';
+    verdictEl.textContent = 'Göndərmə zamanı xəta baş verdi.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Kodu göndər';
+  }
+}
+
+async function loadYarishLeaderboard(contestId, status){
+  window.__yarishCurrentContestId = contestId;
+  const el = document.getElementById('yarishLeaderboard');
+  if (!el) return;
+  try {
+    const res = await azcupApiFetch('/api/contests/' + contestId + '/leaderboard');
+    if (!res.ok) throw new Error('fetch failed');
+    const entries = await res.json();
+    if (!entries.length) {
+      el.innerHTML = '<div class="teacher-panel-empty">Hələ heç kim qoşulmayıb.</div>';
+    } else {
+      const rows = entries.map(e => (
+        '<tr><td class="contest-leaderboard-rank">#' + e.rank + '</td><td>' + escapeHtml(e.fullName) + '</td>'
+        + '<td>' + e.totalPoints + '</td><td>' + e.solvedCount + '</td></tr>'
+      )).join('');
+      el.innerHTML = '<table class="teacher-table"><thead><tr><th>Yer</th><th>Ad</th><th>Bal</th><th>Həll</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+  } catch (err) {
+    el.innerHTML = '<div class="teacher-panel-error">Reytinq cədvəlini yükləmək mümkün olmadı.</div>';
+  }
+  // Yarış CANLI ikən reytinq cədvəli hər 15 saniyədən bir avtomatik yenilənir.
+  if (status === 'ACTIVE') {
+    yarishLeaderboardTimer = setTimeout(() => loadYarishLeaderboard(contestId, status), 15000);
+  }
+}
+
+// ---------- Müəllim/Admin idarəetmə tərəfi ----------
+
+let yarishManageContestsCache = [];
+let yarishManageCurrentContestId = null;
+
+async function loadYarishManagePanel(){
+  yarishManageCurrentContestId = null;
+  const body = document.getElementById('yarishManagePanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests');
+    if (!res.ok) throw new Error('fetch failed');
+    yarishManageContestsCache = await res.json();
+    renderYarishManageList();
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Yarış siyahısını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderYarishManageList(){
+  const body = document.getElementById('yarishManagePanelBody');
+  const items = yarishManageContestsCache.map(c => (
+    '<div class="contest-manage-item" onclick="openYarishManageDetail(' + c.id + ')">'
+    + '<div><div class="contest-card-title">' + escapeHtml(c.title) + '</div>'
+    + '<div class="contest-card-meta">' + formatYarishDateTime(c.startTime) + ' → ' + formatYarishDateTime(c.endTime) + ' · ' + c.problemCount + ' məsələ</div></div>'
+    + yarishStatusBadge(c.status)
+    + '</div>'
+  )).join('');
+
+  body.innerHTML =
+    '<div class="contest-form">'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:15px;">Yeni yarış</h3>'
+    + '<input class="auth-input" id="newContestTitle" placeholder="Başlıq">'
+    + '<textarea class="contest-textarea" id="newContestDesc" placeholder="Təsvir (istəyə bağlı)"></textarea>'
+    + '<div class="contest-form-row">'
+    + '<div><label class="teacher-panel-sub">Başlama</label><input class="auth-input" type="datetime-local" id="newContestStart"></div>'
+    + '<div><label class="teacher-panel-sub">Bitmə</label><input class="auth-input" type="datetime-local" id="newContestEnd"></div>'
+    + '</div>'
+    + '<button type="button" class="contest-action-btn" onclick="submitCreateContest()">Yarış yarat</button>'
+    + '</div>'
+    + '<div class="contest-manage-list">' + (items || '<div class="teacher-panel-empty">Hələ heç bir yarış yoxdur.</div>') + '</div>';
+}
+
+async function submitCreateContest(){
+  const title = document.getElementById('newContestTitle').value.trim();
+  const description = document.getElementById('newContestDesc').value.trim();
+  const startTime = datetimeLocalToIso(document.getElementById('newContestStart').value);
+  const endTime = datetimeLocalToIso(document.getElementById('newContestEnd').value);
+  if (!title || !startTime || !endTime) {
+    alert('Başlıq, başlama və bitmə vaxtı mütləqdir.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests', {
+      method: 'POST',
+      body: JSON.stringify({ title, description, startTime, endTime }),
+    });
+    if (!res.ok) throw new Error('create failed');
+    loadYarishManagePanel();
+  } catch (err) {
+    alert('Yarış yaratmaq mümkün olmadı.');
+  }
+}
+
+async function deleteYarishManageContest(contestId){
+  if (!confirm('Bu yarışı silmək istədiyinizə əminsiniz? (Məsələsi olan yarışlar silinə bilməz.)')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadYarishManagePanel();
+  } catch (err) {
+    alert('Yarışı silmək mümkün olmadı — əvvəlcə onun məsələlərini silin.');
+  }
+}
+
+async function openYarishManageDetail(contestId){
+  yarishManageCurrentContestId = contestId;
+  const body = document.getElementById('yarishManagePanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId);
+    if (!res.ok) throw new Error('fetch failed');
+    const detail = await res.json();
+    renderYarishManageDetail(detail);
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Yarış detallarını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderYarishManageDetail(detail){
+  const body = document.getElementById('yarishManagePanelBody');
+  const problemsHtml = detail.problems.map(p => renderYarishManageProblem(p, detail.id)).join('');
+  body.innerHTML =
+    '<button type="button" class="contest-back-btn" onclick="loadYarishManagePanel()">← Siyahıya qayıt</button>'
+    + '<div class="contest-card-top"><h3 style="margin:0;color:var(--ink);">' + escapeHtml(detail.title) + '</h3>' + yarishStatusBadge(detail.status) + '</div>'
+    + '<p class="teacher-panel-sub">' + formatYarishDateTime(detail.startTime) + ' → ' + formatYarishDateTime(detail.endTime) + '</p>'
+    + '<button type="button" class="contest-action-btn secondary" onclick="deleteYarishManageContest(' + detail.id + ')" style="margin-bottom:20px;">Yarışı sil</button>'
+    + '<h3 style="color:var(--ink);">Məsələlər</h3>'
+    + problemsHtml
+    + '<div class="contest-form">'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:14px;">Yeni məsələ əlavə et</h3>'
+    + '<input class="auth-input" id="newProblemOrder-' + detail.id + '" type="number" value="' + detail.problems.length + '" placeholder="Sıra">'
+    + '<input class="auth-input" id="newProblemTitle-' + detail.id + '" placeholder="Başlıq">'
+    + '<textarea class="contest-textarea" id="newProblemStatement-' + detail.id + '" placeholder="Məsələ mətni"></textarea>'
+    + '<input class="auth-input" id="newProblemInputSpec-' + detail.id + '" placeholder="Giriş formatı (istəyə bağlı)">'
+    + '<input class="auth-input" id="newProblemOutputSpec-' + detail.id + '" placeholder="Çıxış formatı (istəyə bağlı)">'
+    + '<input class="auth-input" id="newProblemPoints-' + detail.id + '" type="number" value="100" placeholder="Bal">'
+    + '<button type="button" class="contest-action-btn" onclick="submitAddProblem(' + detail.id + ')">Məsələ əlavə et</button>'
+    + '</div>';
+}
+
+function renderYarishManageProblem(p, contestId){
+  const testCasesHtml = p.testCases.map(tc => (
+    '<div class="contest-testcase-row">'
+    + '<div class="contest-io-box"><div class="lbl">Giriş' + (tc.hidden ? ' (gizli)' : ' (nümunə)') + '</div><pre>' + escapeHtml(tc.input) + '</pre></div>'
+    + '<div class="contest-io-box"><div class="lbl">Gözlənilən çıxış</div><pre>' + escapeHtml(tc.expectedOutput) + '</pre></div>'
+    + '<button type="button" class="approval-btn reject" onclick="deleteYarishManageTestCase(' + contestId + ',' + p.id + ',' + tc.id + ')">Sil</button>'
+    + '</div>'
+  )).join('');
+
+  return (
+    '<div class="contest-problem-card">'
+    + '<div class="contest-problem-head"><span class="contest-problem-title">' + escapeHtml(p.title) + '</span>'
+    + '<span class="contest-problem-points">' + p.points + ' bal</span></div>'
+    + '<p class="teacher-panel-sub">' + escapeHtml(p.statement) + '</p>'
+    + '<button type="button" class="approval-btn reject" onclick="deleteYarishManageProblem(' + contestId + ',' + p.id + ')">Məsələni sil</button>'
+    + '<div style="margin-top:12px;">' + (testCasesHtml || '<p class="teacher-panel-sub">Hələ test halı yoxdur.</p>') + '</div>'
+    + '<div class="contest-form" style="margin-top:10px;max-width:100%;">'
+    + '<h4 style="margin:0;color:var(--ink);font-size:13px;">Yeni test halı</h4>'
+    + '<input class="auth-input" id="newTcOrder-' + p.id + '" type="number" value="' + p.testCases.length + '" placeholder="Sıra">'
+    + '<textarea class="contest-textarea" id="newTcInput-' + p.id + '" placeholder="Giriş"></textarea>'
+    + '<textarea class="contest-textarea" id="newTcOutput-' + p.id + '" placeholder="Gözlənilən çıxış"></textarea>'
+    + '<label class="teacher-panel-sub"><input type="checkbox" id="newTcHidden-' + p.id + '" checked> Gizli (şagirdə göstərilməsin)</label>'
+    + '<button type="button" class="contest-action-btn" onclick="submitAddTestCase(' + contestId + ',' + p.id + ')">Test halı əlavə et</button>'
+    + '</div>'
+    + '</div>'
+  );
+}
+
+async function submitAddProblem(contestId){
+  const orderIndex = parseInt(document.getElementById('newProblemOrder-' + contestId).value, 10) || 0;
+  const title = document.getElementById('newProblemTitle-' + contestId).value.trim();
+  const statement = document.getElementById('newProblemStatement-' + contestId).value.trim();
+  const inputSpec = document.getElementById('newProblemInputSpec-' + contestId).value.trim();
+  const outputSpec = document.getElementById('newProblemOutputSpec-' + contestId).value.trim();
+  const points = parseInt(document.getElementById('newProblemPoints-' + contestId).value, 10) || 100;
+  if (!title || !statement) {
+    alert('Başlıq və məsələ mətni mütləqdir.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId + '/problems', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex, title, statement, inputSpec, outputSpec, points }),
+    });
+    if (!res.ok) throw new Error('add failed');
+    openYarishManageDetail(contestId);
+  } catch (err) {
+    alert('Məsələ əlavə etmək mümkün olmadı.');
+  }
+}
+
+async function deleteYarishManageProblem(contestId, problemId){
+  if (!confirm('Bu məsələni (bütün test halları ilə birlikdə) silmək istədiyinizə əminsiniz?')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId + '/problems/' + problemId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    openYarishManageDetail(contestId);
+  } catch (err) {
+    alert('Məsələni silmək mümkün olmadı.');
+  }
+}
+
+async function submitAddTestCase(contestId, problemId){
+  const orderIndex = parseInt(document.getElementById('newTcOrder-' + problemId).value, 10) || 0;
+  const input = document.getElementById('newTcInput-' + problemId).value;
+  const expectedOutput = document.getElementById('newTcOutput-' + problemId).value.trim();
+  const hidden = document.getElementById('newTcHidden-' + problemId).checked;
+  if (!expectedOutput) {
+    alert('Gözlənilən çıxış mütləqdir.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId + '/problems/' + problemId + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex, input, expectedOutput, hidden }),
+    });
+    if (!res.ok) throw new Error('add failed');
+    openYarishManageDetail(contestId);
+  } catch (err) {
+    alert('Test halı əlavə etmək mümkün olmadı.');
+  }
+}
+
+async function deleteYarishManageTestCase(contestId, problemId, testCaseId){
+  if (!confirm('Bu test halını silmək istədiyinizə əminsiniz?')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/contests/' + contestId + '/problems/' + problemId + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    openYarishManageDetail(contestId);
+  } catch (err) {
+    alert('Test halını silmək mümkün olmadı.');
   }
 }
 

@@ -154,6 +154,76 @@ public class JudgeService {
         }
     }
 
+    /**
+     * Bir kodu, verilmiş TEST HALLARI SİYAHISINA qarşı yoxlayır — yarış
+     * (contest) məsələləri üçün istifadə olunur, çünki onların bir neçə
+     * (bəziləri gizli) test halı var. {@link #judge} metodundan fərqli
+     * olaraq, burada TEK nümunə əvəzinə hər test halı SIRAYLA icra olunur.
+     * <p>
+     * Kompilyasiya YALNIZ BİR DƏFƏ aparılır (bütün testlər üçün eyni
+     * binar işlədilir), sonra HƏR test halı üçün ayrıca icra edilir.
+     * İLK uğursuz test halında dövr DAYANDIRILIR (short-circuit) — bu, həm
+     * lazımsız hesablamanın qarşısını alır, həm də şagirdə göstəriləcək
+     * "ilk uğursuz test hansıdır" məlumatını təbii şəkildə verir.
+     */
+    public MultiJudgeResult judgeMultiple(String sourceCode, List<TestCaseInput> testCases) {
+        if (sourceCode == null || sourceCode.isBlank()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Kod boş ola bilməz");
+        }
+        if (sourceCode.length() > maxSourceLength) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Kod çox uzundur (maksimum " + maxSourceLength + " simvol)");
+        }
+        int totalTestCases = testCases.size();
+
+        Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
+        try {
+            Files.createDirectories(workDir);
+            Path sourceFile = workDir.resolve("main.cpp");
+            Files.writeString(sourceFile, sourceCode, StandardCharsets.UTF_8);
+            Path binary = workDir.resolve("main.exe");
+
+            CompileOutcome compileOutcome = compile(sourceFile, binary, workDir);
+            if (!compileOutcome.isSuccess()) {
+                return new MultiJudgeResult(
+                    SubmissionStatus.COMPILE_ERROR, 0, totalTestCases, null, "", compileOutcome.getStderr(), 0
+                );
+            }
+
+            long totalElapsed = 0;
+            // passedCount test halının SIRA NÖMRƏSİNDƏN (orderIndex) ASILI
+            // OLMAYARAQ, indiyə qədər neçəsinin keçdiyini əl ilə sayır —
+            // orderIndex-in mütləq 0-dan başlayan, arasız ardıcıllıq
+            // olacağını fərz etməmək üçün.
+            int passedCount = 0;
+            for (TestCaseInput testCase : testCases) {
+                JudgeResult caseResult = runAgainstInput(binary, workDir, testCase.getInput(), testCase.getExpectedOutput());
+                totalElapsed += caseResult.getExecutionTimeMs();
+                if (caseResult.getStatus() != SubmissionStatus.ACCEPTED) {
+                    // Bu test halı uğursuz oldu — dövrü burada dayandırırıq
+                    // (qalan testləri işə salmağa ehtiyac yoxdur, artıq
+                    // nəticə "həll olunmadı"dır).
+                    return new MultiJudgeResult(
+                        caseResult.getStatus(),
+                        passedCount,
+                        totalTestCases,
+                        testCase.getOrderIndex(),
+                        caseResult.getStdout(),
+                        caseResult.getStderr(),
+                        totalElapsed
+                    );
+                }
+                passedCount++;
+            }
+            // Dövr sonuna qədər çatdıqsa, BÜTÜN test halları keçilib.
+            return new MultiJudgeResult(SubmissionStatus.ACCEPTED, totalTestCases, totalTestCases, null, "", "", totalElapsed);
+        } catch (IOException e) {
+            log.error("Judge I/O error", e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Yoxlama zamanı server xətası baş verdi");
+        } finally {
+            deleteRecursively(workDir);
+        }
+    }
+
     // compile() metodunun nəticəsini daşıyan kiçik köməkçi tip.
     private static final class CompileOutcome {
 

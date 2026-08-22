@@ -98,4 +98,56 @@ class JudgeServiceTest {
         JudgeResult result = newService().judge(source, problem("", "22"));
         assertThat(result.getStatus()).isEqualTo(SubmissionStatus.ACCEPTED);
     }
+
+    // judgeMultiple: bütün test halları keçilirsə ACCEPTED, passedTestCases
+    // totalTestCases-a bərabər olmalı, firstFailedTestCaseOrder null qalmalıdır.
+    @Test
+    void judgeMultipleAcceptsWhenAllTestCasesPass() {
+        String source = """
+            #include <bits/stdc++.h>
+            using namespace std;
+            int main(){ long long a,b; cin>>a>>b; cout<<a+b<<"\\n"; }
+            """;
+        MultiJudgeResult result = newService().judgeMultiple(source, java.util.List.of(
+            new TestCaseInput(0, "2 3", "5"),
+            new TestCaseInput(1, "10 20", "30")
+        ));
+        assertThat(result.getStatus()).isEqualTo(SubmissionStatus.ACCEPTED);
+        assertThat(result.getPassedTestCases()).isEqualTo(2);
+        assertThat(result.getTotalTestCases()).isEqualTo(2);
+        assertThat(result.getFirstFailedTestCaseOrder()).isNull();
+    }
+
+    // judgeMultiple: ikinci test halı uğursuz olduqda, dövr ORADA
+    // DAYANMALI (short-circuit) — passedTestCases 1 olmalı (yalnız birinci
+    // test keçib), firstFailedTestCaseOrder ikinci testin sırasını (1) göstərməlidir.
+    @Test
+    void judgeMultipleStopsAtFirstFailingTestCase() {
+        String source = """
+            #include <bits/stdc++.h>
+            using namespace std;
+            int main(){ long long a,b; cin>>a>>b; cout<<a+b<<"\\n"; }
+            """;
+        MultiJudgeResult result = newService().judgeMultiple(source, java.util.List.of(
+            new TestCaseInput(0, "2 3", "5"),
+            new TestCaseInput(1, "10 20", "999")  // yanlış gözlənilən nəticə — bu test uğursuz olacaq
+        ));
+        assertThat(result.getStatus()).isEqualTo(SubmissionStatus.WRONG_ANSWER);
+        assertThat(result.getPassedTestCases()).isEqualTo(1);
+        assertThat(result.getTotalTestCases()).isEqualTo(2);
+        assertThat(result.getFirstFailedTestCaseOrder()).isEqualTo(1);
+    }
+
+    // judgeMultiple: kompilyasiya xətası olduqda, heç bir test icra
+    // OLUNMADAN COMPILE_ERROR qaytarılmalıdır.
+    @Test
+    void judgeMultipleReportsCompileError() {
+        String source = "int main( { this is not valid c++ }";
+        MultiJudgeResult result = newService().judgeMultiple(source, java.util.List.of(
+            new TestCaseInput(0, "2 3", "5")
+        ));
+        assertThat(result.getStatus()).isEqualTo(SubmissionStatus.COMPILE_ERROR);
+        assertThat(result.getPassedTestCases()).isEqualTo(0);
+        assertThat(result.getStderr()).isNotBlank();
+    }
 }
