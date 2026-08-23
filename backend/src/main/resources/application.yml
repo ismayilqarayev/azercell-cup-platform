@@ -1,10 +1,10 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/azcup
-    username: azcup
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:azcup}
+    username: ${DB_USERNAME:azcup}
     password: ${DB_PASSWORD:azcup}
   jpa:
     hibernate:

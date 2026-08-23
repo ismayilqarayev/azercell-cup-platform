@@ -1,0 +1,40 @@
+databases:
+  - name: azcup-db
+    plan: free
+    databaseName: azcup
+    user: azcup
+
+services:
+  - type: web
+    name: azcup-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: azcup-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: azcup-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: azcup-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: azcup-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: azcup-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
