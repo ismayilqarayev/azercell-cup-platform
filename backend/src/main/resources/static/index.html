@@ -213,6 +213,18 @@
     font-family:var(--mono); font-size:10.5px; letter-spacing:0.3px; color:var(--ink-soft);
     line-height:1.4;
   }
+  .tech-stack{
+    margin-top:16px; padding-top:16px; border-top:1px solid var(--grid-line-strong);
+    text-align:center;
+  }
+  .tech-stack-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--ink-soft);
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .tech-stack-icons{
+    display:flex; gap:20px; justify-content:center; align-items:center;
+  }
+  .tech-stack-icons svg{ width:26px; height:26px; }
   .live-indicator{
     display:flex; align-items:center; gap:7px; margin-left:0; margin-top:8px;
     padding:4px; align-self:flex-start;
@@ -525,6 +537,24 @@
         <div class="landing-profile-text">
           <div class="landing-profile-name">Ismayil Garayev</div>
           <div class="landing-profile-role">Kompüter üzrə mütəxəssis</div>
+        </div>
+      </div>
+
+      <div class="tech-stack">
+        <div class="tech-stack-label">İstifadə olunan texnologiyalar</div>
+        <div class="tech-stack-icons">
+          <img src="/assets/java-logo.gif" alt="Java" title="Java" style="height:26px;width:auto;border-radius:3px;">
+
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" title="Visual Studio Code">
+            <path d="M21.0016 3.11679C21.0016 2.23783 20.0175 2.23782 19.5801 2.34769C20.1924 1.86426 20.9105 1.98147 21.1656 2.12796L27.079 5.02747C27.6424 5.30375 27.9998 5.8786 27.9998 6.50857V25.5831C27.9998 26.2215 27.6329 26.8025 27.058 27.0743L21.4937 29.7054C21.1109 29.8701 20.2799 30.2767 19.5801 29.7053C20.4549 29.8702 20.9287 29.2476 21.0016 28.8264V3.11679Z" fill="#2B9FED"/>
+            <path d="M19.6512 2.3319C20.1154 2.24017 21.0018 2.28271 21.0018 3.11685V9.68254L3.07359 23.2453C2.76022 23.4824 2.3192 23.443 2.05229 23.1542L0.204532 21.1548C-0.0849358 20.8416 -0.0646824 20.3513 0.249624 20.0633L19.5802 2.34775L19.6512 2.3319Z" fill="#0F6DAD"/>
+            <path d="M21.0018 22.3708L3.07359 8.80801C2.76022 8.57094 2.3192 8.61028 2.05229 8.8991L0.204532 10.8985C-0.0849358 11.2117 -0.0646824 11.702 0.249624 11.9901L19.5802 29.7056C20.455 29.8704 20.9289 29.2478 21.0018 28.8266V22.3708Z" fill="#1173C5"/>
+          </svg>
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" title="Docker">
+            <path d="M15.608 28.84h2.42v2.474h1.224c.565 0 1.146-.101 1.681-.282 6.098 4.086 13.98 3.9 17.5-4.99-.685 1.338-2.117 1.752-3.517 1.678-2.096 5.219-6.657 7.69-12.187 7.69-2.858 0-5.48-1.069-6.972-3.604-.505-1.116-.672-2.338-.559-3.56l.035-.365h2.069V28.84h2.42v-2.42h4.84V24h2.903v4.84" fill="#1793D1"/>
+            <path d="M13.108 24.403h2.097v2.098h-2.097v-2.098zM15.528 24.403h2.097v2.098h-2.097v-2.098zM3.428 26.824h2.098v2.097H3.428v-2.097zM5.848 26.824h2.098v2.097H5.848v-2.097zM8.268 26.824h2.098v2.097H8.268v-2.097zM10.688 26.824h2.097v2.097h-2.097v-2.097zM13.108 26.824h2.097v2.097h-2.097v-2.097zM15.528 26.824h2.097v2.097h-2.097v-2.097zM3.428 29.243h2.098v2.098H3.428v-2.098zM5.848 29.243h2.098v2.098H5.848v-2.098zM8.268 29.243h2.097v2.098H8.268v-2.098zM10.688 29.243h2.097v2.098h-2.097v-2.098zM13.108 29.243h2.097v2.098h-2.097v-2.098zM15.528 29.243h2.097v2.098h-2.097v-2.098z" fill="#1793D1"/>
+            <path d="M23.449 29.755c.162-1.261-.782-2.252-1.367-2.722-.674.78-.78 2.823.279 3.684-.59.524-1.835 1-3.109 1H3.598c-.185 2.664.694 6.792 3.677 8.663 2.66 1.669 6.999 1.826 10.75.394 4.407-1.68 8.196-4.958 10.437-9.212-1.163.09-2.312-.288-3.003-.786l-2.01-1.021z" fill="#1793D1"/>
+          </svg>
         </div>
       </div>
     </div>
