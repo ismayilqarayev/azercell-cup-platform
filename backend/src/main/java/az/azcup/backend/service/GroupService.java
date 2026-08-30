@@ -9,6 +9,7 @@ import az.azcup.backend.entity.User;
 import az.azcup.backend.exception.ConflictException;
 import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
+import az.azcup.backend.repository.AssignmentRepository;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
 import az.azcup.backend.repository.SubmissionRepository;
@@ -34,18 +35,22 @@ public class GroupService {
     // Hər şagirdin ümumi həll etdiyi problem sayını hesablamaq üçün
     // (irəliləyiş cədvəlində istifadə olunur).
     private final SubmissionRepository submissionRepository;
+    // Qrup silinəndə ona aid tapşırıqları da təmizləmək üçün.
+    private final AssignmentRepository assignmentRepository;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public GroupService(
         GroupRepository groupRepository,
         GroupMemberRepository groupMemberRepository,
         UserRepository userRepository,
-        SubmissionRepository submissionRepository
+        SubmissionRepository submissionRepository,
+        AssignmentRepository assignmentRepository
     ) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
+        this.assignmentRepository = assignmentRepository;
     }
 
     // Bir müəllimin sahib olduğu bütün qrupların siyahısı ("Qruplarım" ekranı).
@@ -83,11 +88,15 @@ public class GroupService {
         return toDto(groupRepository.save(group));
     }
 
-    // Qrupu (və bütün üzvlük sətirlərini) silir — yalnız sahib müəllim və ya ADMIN edə bilər.
+    // Qrupu (və bütün üzvlük sətirlərini, həmçinin ona aid tapşırıqları) silir
+    // — yalnız sahib müəllim və ya ADMIN edə bilər. Tapşırıqlar/üzvlər əvvəlcə
+    // əl ilə silinir — FK ON DELETE CASCADE təyin olunmadığı üçün, əks halda
+    // constraint xətası baş verərdi (bax: GroupService/ContestAdminService-dəki eyni naxış).
     @Transactional
     public void deleteGroup(Long groupId, User requester) {
         Group group = getGroupOrThrow(groupId);
         requireOwnership(group, requester);
+        assignmentRepository.deleteByGroup(group);
         groupMemberRepository.deleteByGroup(group);
         groupRepository.delete(group);
     }

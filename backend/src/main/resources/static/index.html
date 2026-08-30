@@ -580,6 +580,7 @@
     <button class="tab-btn" id="btn-algo" role="tab" aria-selected="false" onclick="showTab(&#39;algo&#39;)"><span class="tab-label">Alqoritm Simulyasiyası</span></button>
     <button class="tab-btn" id="btn-scheme" role="tab" aria-selected="false" onclick="showTab(&#39;scheme&#39;)"><span class="tab-label">Məsələ Həll Sxemi</span></button>
     <button class="tab-btn" id="btn-yarish" role="tab" aria-selected="false" onclick="showTab(&#39;yarish&#39;)"><span class="tab-label">🏆 Yarışlar</span></button>
+    <button class="tab-btn" id="btn-assignments" role="tab" aria-selected="false" onclick="showTab(&#39;assignments&#39;)"><span class="tab-label">📋 Tapşırıqlarım</span></button>
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
     <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
@@ -656,6 +657,13 @@
         <h2 class="teacher-panel-title">🏆 Yarışlar</h2>
         <p class="teacher-panel-sub">Azercell Cup tərzi, vaxt-məhdudlaşdırılmış yarışlar — qoşul, kod göndər, reytinq cədvəlində yerini gör.</p>
         <div id="yarishPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-assignments">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">📋 Tapşırıqlarım</h2>
+        <p class="teacher-panel-sub">Müəllimlərinin qrup(lar)ına verdiyi tapşırıqlar və irəliləyişin.</p>
+        <div id="assignmentsPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
     <div class="teacher-panel" id="frame-yarish-manage">
@@ -1105,8 +1113,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', 'yarish-manage':'frame-yarish-manage'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', 'yarish-manage':'btn-yarish-manage'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', assignments:'frame-assignments', 'yarish-manage':'frame-yarish-manage'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', assignments:'btn-assignments', 'yarish-manage':'btn-yarish-manage'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -1123,6 +1131,7 @@ function showTab(name){
     if (name === 'users') loadUsersPanel();
     if (name === 'allgroups') loadAllGroupsPanel();
     if (name === 'yarish') loadYarishPanel();
+    if (name === 'assignments') loadAssignmentsPanel();
     if (name === 'yarish-manage') loadYarishManagePanel();
   });
 }
@@ -1303,23 +1312,27 @@ async function openGroupDetail(groupId){
   const body = document.getElementById('myGroupsPanelBody');
   body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
   try {
-    const [groupsRes, membersRes] = await Promise.all([
+    const [groupsRes, membersRes, topicsRes, assignmentsRes] = await Promise.all([
       azcupApiFetch('/api/teacher/groups'),
       azcupApiFetch('/api/teacher/groups/' + groupId + '/students'),
+      azcupApiFetch('/api/teacher/topics'),
+      azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments'),
     ]);
-    if (!groupsRes.ok || !membersRes.ok) throw new Error('fetch failed');
+    if (!groupsRes.ok || !membersRes.ok || !topicsRes.ok || !assignmentsRes.ok) throw new Error('fetch failed');
     const groups = await groupsRes.json();
     const group = groups.find(g => g.id === groupId);
     const members = await membersRes.json();
+    const topics = await topicsRes.json();
+    const assignments = await assignmentsRes.json();
     if (!group) throw new Error('group not found');
     currentGroupName = group.name;
-    renderGroupDetail(group, members);
+    renderGroupDetail(group, members, topics, assignments);
   } catch (err) {
     body.innerHTML = '<div class="teacher-panel-error">Qrup detallarını yükləmək mümkün olmadı.</div>';
   }
 }
 
-function renderGroupDetail(group, members){
+function renderGroupDetail(group, members, topics, assignments){
   const body = document.getElementById('myGroupsPanelBody');
   const rows = members.map(m => (
     '<tr><td>' + escapeHtml(m.fullName) + '<span class="user-email">' + escapeHtml(m.email) + '</span></td>'
@@ -1329,6 +1342,24 @@ function renderGroupDetail(group, members){
   const table = members.length
     ? '<table class="teacher-table"><thead><tr><th>Şagird</th><th>Həll edilmiş</th><th>Əməliyyat</th></tr></thead><tbody>' + rows + '</tbody></table>'
     : '<div class="teacher-panel-empty">Bu qrupda hələ şagird yoxdur.</div>';
+
+  const topicOptions = topics.map(t => '<option value="' + escapeHtml(t.slug) + '">' + escapeHtml(t.title) + '</option>').join('');
+
+  const now = Date.now();
+  const assignmentRows = assignments.map(a => {
+    const dueMs = new Date(a.dueAt).getTime();
+    const overdueBadge = dueMs < now
+      ? '<span class="user-badge inactive">Son tarix keçib</span>'
+      : '<span class="user-badge active">Aktiv</span>';
+    return '<tr onclick="openGradebook(' + group.id + ', ' + a.id + ')" style="cursor:pointer;">'
+      + '<td>' + escapeHtml(a.title) + '<span class="user-email">' + escapeHtml(a.topicTitle) + '</span></td>'
+      + '<td>' + formatYarishDateTime(a.dueAt) + '</td>'
+      + '<td>' + overdueBadge + '</td>'
+      + '<td class="approval-actions"><button type="button" class="approval-btn reject" onclick="event.stopPropagation();deleteAssignmentConfirm(' + group.id + ',' + a.id + ')">Sil</button></td></tr>';
+  }).join('');
+  const assignmentsTable = assignments.length
+    ? '<table class="teacher-table"><thead><tr><th>Tapşırıq</th><th>Son tarix</th><th>Status</th><th>Əməliyyat</th></tr></thead><tbody>' + assignmentRows + '</tbody></table>'
+    : '<div class="teacher-panel-empty">Bu qrupa hələ tapşırıq verilməyib.</div>';
 
   body.innerHTML =
     '<button type="button" class="back-to-select" onclick="loadMyGroupsPanel()" style="margin-bottom:16px;">← Qruplara qayıt</button>'
@@ -1342,7 +1373,17 @@ function renderGroupDetail(group, members){
     + '<div style="margin-top:20px;display:flex;gap:10px;">'
     + '<button type="button" class="approval-btn" onclick="renameGroupPrompt()">Adını dəyiş</button>'
     + '<button type="button" class="approval-btn reject" onclick="deleteGroupConfirm()">Qrupu sil</button>'
-    + '</div>';
+    + '</div>'
+    + '<h3 style="margin:32px 0 4px;color:var(--ink);font-size:16px;">Tapşırıqlar</h3>'
+    + '<p class="teacher-panel-sub">Bir mövzunu bütün qrupa, son tarixlə təyin et — jurnala baxmaq üçün sətirə klikləyin.</p>'
+    + '<div class="contest-form" style="margin-bottom:20px;">'
+    + '<input class="auth-input" id="newAssignmentTitle" placeholder="Tapşırığın başlığı (məs. Mövzu 3 — bazar ertəsinə qədər)">'
+    + '<select class="auth-input" id="newAssignmentTopic">' + topicOptions + '</select>'
+    + '<input class="auth-input" type="datetime-local" id="newAssignmentDue">'
+    + '<textarea class="contest-textarea" id="newAssignmentDesc" placeholder="Qeyd (istəyə bağlı)"></textarea>'
+    + '<button type="button" class="contest-action-btn" onclick="submitCreateAssignment(' + group.id + ')">Tapşırıq ver</button>'
+    + '</div>'
+    + assignmentsTable;
 }
 
 async function submitAddGroupMember(groupId){
@@ -1406,6 +1447,120 @@ async function deleteGroupConfirm(){
     loadMyGroupsPanel();
   } catch (err) {
     alert('Qrupu silmək mümkün olmadı.');
+  }
+}
+
+/* ---------- Tapşırıq (Assignment) və sinif jurnalı (Gradebook) ---------- */
+
+async function submitCreateAssignment(groupId){
+  const title = document.getElementById('newAssignmentTitle').value.trim();
+  const topicSlug = document.getElementById('newAssignmentTopic').value;
+  const dueValue = document.getElementById('newAssignmentDue').value;
+  const description = document.getElementById('newAssignmentDesc').value.trim();
+  if (!title || !topicSlug || !dueValue) {
+    alert('Başlıq, mövzu və son tarix mütləqdir.');
+    return;
+  }
+  const dueAt = datetimeLocalToIso(dueValue);
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments', {
+      method: 'POST',
+      body: JSON.stringify({ title, description, topicSlug, dueAt }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Tapşırıq yaratmaq mümkün olmadı.');
+      return;
+    }
+    openGroupDetail(groupId);
+  } catch (err) {
+    alert('Tapşırıq yaratmaq mümkün olmadı.');
+  }
+}
+
+async function deleteAssignmentConfirm(groupId, assignmentId){
+  if (!confirm('Bu tapşırığı silmək istəyirsən? Şagirdlərin təqdimatlarına toxunulmayacaq, sadəcə tapşırıq silinəcək.')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    openGroupDetail(groupId);
+  } catch (err) {
+    alert('Tapşırığı silmək mümkün olmadı.');
+  }
+}
+
+// Bir tapşırığın sinif jurnalını (gradebook) açır — qrupun hər üzvünün bu
+// mövzudakı irəliləyişini göstərir.
+async function openGradebook(groupId, assignmentId){
+  const body = document.getElementById('myGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const [assignmentsRes, gradebookRes] = await Promise.all([
+      azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments'),
+      azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/gradebook'),
+    ]);
+    if (!assignmentsRes.ok || !gradebookRes.ok) throw new Error('fetch failed');
+    const assignments = await assignmentsRes.json();
+    const assignment = assignments.find(a => a.id === assignmentId);
+    const rows = await gradebookRes.json();
+    if (!assignment) throw new Error('assignment not found');
+    renderGradebook(groupId, assignment, rows);
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Jurnalı yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderGradebook(groupId, assignment, rows){
+  const body = document.getElementById('myGroupsPanelBody');
+  const tableRows = rows.map(r => {
+    const pct = assignment.totalProblems > 0 ? Math.round((r.solvedCount / assignment.totalProblems) * 100) : 0;
+    const statusBadge = r.overdue
+      ? '<span class="user-badge inactive">Gecikib</span>'
+      : (r.solvedCount >= assignment.totalProblems
+        ? '<span class="user-badge active">Bitirib</span>'
+        : '<span class="user-badge active">Davam edir</span>');
+    return '<tr><td>' + escapeHtml(r.fullName) + '<span class="user-email">' + escapeHtml(r.email) + '</span></td>'
+      + '<td>' + r.solvedCount + ' / ' + r.totalCount + ' (' + pct + '%)</td>'
+      + '<td>' + statusBadge + '</td></tr>';
+  }).join('');
+  const table = rows.length
+    ? '<table class="teacher-table"><thead><tr><th>Şagird</th><th>İrəliləyiş</th><th>Status</th></tr></thead><tbody>' + tableRows + '</tbody></table>'
+    : '<div class="teacher-panel-empty">Bu qrupda hələ şagird yoxdur.</div>';
+
+  body.innerHTML =
+    '<button type="button" class="back-to-select" onclick="openGroupDetail(' + groupId + ')" style="margin-bottom:16px;">← Qrupa qayıt</button>'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(assignment.title) + '</h3>'
+    + '<p class="teacher-panel-sub">' + escapeHtml(assignment.topicTitle) + ' · Son tarix: ' + formatYarishDateTime(assignment.dueAt) + '</p>'
+    + table;
+}
+
+/* ---------- Şagird tərəfi: "Tapşırıqlarım" ---------- */
+async function loadAssignmentsPanel(){
+  const body = document.getElementById('assignmentsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/me/assignments');
+    if (!res.ok) throw new Error('fetch failed');
+    const assignments = await res.json();
+    if (!assignments.length) {
+      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir tapşırıq verilməyib.</div>';
+      return;
+    }
+    const cards = assignments.map(a => {
+      const pct = a.totalCount > 0 ? Math.round((a.solvedCount / a.totalCount) * 100) : 0;
+      const statusBadge = a.overdue
+        ? '<span class="contest-status-badge ended">Gecikib</span>'
+        : (a.solvedCount >= a.totalCount ? '<span class="contest-status-badge active">Bitirilib</span>' : '<span class="contest-status-badge upcoming">Davam edir</span>');
+      return '<div class="contest-card">'
+        + '<div class="contest-card-top"><div class="contest-card-title">' + escapeHtml(a.title) + '</div>' + statusBadge + '</div>'
+        + '<div class="contest-card-meta">' + escapeHtml(a.groupName) + ' · ' + escapeHtml(a.topicTitle) + ' · Son tarix: ' + formatYarishDateTime(a.dueAt) + '</div>'
+        + '<div class="contest-card-meta">İrəliləyiş: ' + a.solvedCount + ' / ' + a.totalCount + ' (' + pct + '%)</div>'
+        + (a.description ? '<div class="teacher-panel-sub" style="margin-top:8px;">' + escapeHtml(a.description) + '</div>' : '')
+        + '</div>';
+    }).join('');
+    body.innerHTML = cards;
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Tapşırıqları yükləmək mümkün olmadı.</div>';
   }
 }
 

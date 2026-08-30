@@ -12,6 +12,11 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     // Bir qrupun bütün üzvlərini (şagirdlərini) qaytarır — irəliləyiş cədvəli üçün.
     List<GroupMember> findByGroupOrderByJoinedAtAsc(Group group);
 
+    // Bir şagirdin ÜZVÜ olduğu bütün qrupları qaytarır (əks istiqamət) —
+    // şagirdin "Tapşırıqlarım" görünüşündə hansı qruplara aid tapşırıqları
+    // görəcəyini müəyyən etmək üçün istifadə olunur (bax: AssignmentService.listForStudent).
+    List<GroupMember> findByStudent(User student);
+
     // Eyni şagirdin eyni qrupa artıq əlavə olunub-olunmadığını yoxlamaq üçün
     // (təkrar əlavəni bloklamaq məqsədilə).
     boolean existsByGroupAndStudent(Group group, User student);

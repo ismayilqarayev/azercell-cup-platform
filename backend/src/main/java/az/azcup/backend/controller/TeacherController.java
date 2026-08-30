@@ -3,11 +3,15 @@ package az.azcup.backend.controller;
 import az.azcup.backend.dto.admin.AdminTopicDto;
 import az.azcup.backend.dto.admin.PublishUpdateRequest;
 import az.azcup.backend.dto.teacher.AddGroupMemberRequest;
+import az.azcup.backend.dto.teacher.AssignmentDto;
+import az.azcup.backend.dto.teacher.AssignmentUpsertRequest;
+import az.azcup.backend.dto.teacher.GradebookRowDto;
 import az.azcup.backend.dto.teacher.GroupCreateRequest;
 import az.azcup.backend.dto.teacher.GroupDto;
 import az.azcup.backend.dto.teacher.GroupMemberDto;
 import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.AdminService;
+import az.azcup.backend.service.AssignmentService;
 import az.azcup.backend.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -41,11 +45,14 @@ public class TeacherController {
     private final AdminService adminService;
     // Qrup CRUD-u və üzvlük idarəetməsi məntiqi GroupService-dədir.
     private final GroupService groupService;
+    // Tapşırıq CRUD-u və sinif jurnalı (gradebook) məntiqi AssignmentService-dədir.
+    private final AssignmentService assignmentService;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
-    public TeacherController(AdminService adminService, GroupService groupService) {
+    public TeacherController(AdminService adminService, GroupService groupService, AssignmentService assignmentService) {
         this.adminService = adminService;
         this.groupService = groupService;
+        this.assignmentService = assignmentService;
     }
 
     // Müəllim panelində idarəetmə üçün bütün mövzuların (dərc statusundan asılı olmayaraq) siyahısını qaytarır.
@@ -124,5 +131,59 @@ public class TeacherController {
     ) {
         groupService.removeStudent(id, principal.getUser(), membershipId);
         return ResponseEntity.noContent().build();
+    }
+
+    // ---------- Tapşırıq (Assignment) idarəetməsi ----------
+
+    // Qrupun bütün tapşırıqlarının siyahısı.
+    @GetMapping("/groups/{groupId}/assignments")
+    public List<AssignmentDto> listAssignments(
+        @PathVariable Long groupId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.listForGroup(groupId, principal.getUser());
+    }
+
+    // Yeni tapşırıq yaradır.
+    @PostMapping("/groups/{groupId}/assignments")
+    public ResponseEntity<AssignmentDto> createAssignment(
+        @PathVariable Long groupId,
+        @Valid @RequestBody AssignmentUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        AssignmentDto created = assignmentService.create(groupId, principal.getUser(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    // Mövcud tapşırığı yeniləyir.
+    @PutMapping("/groups/{groupId}/assignments/{assignmentId}")
+    public AssignmentDto updateAssignment(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @Valid @RequestBody AssignmentUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.update(groupId, assignmentId, principal.getUser(), request);
+    }
+
+    // Tapşırığı silir.
+    @DeleteMapping("/groups/{groupId}/assignments/{assignmentId}")
+    public ResponseEntity<Void> deleteAssignment(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        assignmentService.delete(groupId, assignmentId, principal.getUser());
+        return ResponseEntity.noContent().build();
+    }
+
+    // Bir tapşırığın sinif jurnalı (gradebook) — qrupun hər üzvünün irəliləyişi.
+    @GetMapping("/groups/{groupId}/assignments/{assignmentId}/gradebook")
+    public List<GradebookRowDto> getGradebook(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.getGradebook(groupId, assignmentId, principal.getUser());
     }
 }
