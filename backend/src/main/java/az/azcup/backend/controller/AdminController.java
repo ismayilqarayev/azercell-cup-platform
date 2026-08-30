@@ -11,8 +11,10 @@ import az.azcup.backend.dto.admin.RoleUpdateRequest;
 import az.azcup.backend.dto.admin.StatusUpdateRequest;
 import az.azcup.backend.dto.admin.TopicUpsertRequest;
 import az.azcup.backend.dto.admin.UserProfileUpdateRequest;
+import az.azcup.backend.dto.teacher.GroupDto;
 import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.AdminService;
+import az.azcup.backend.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +40,13 @@ public class AdminController {
 
     // Bütün faktiki admin əməliyyatlarını (CRUD, istifadəçi idarəetməsi) yerinə yetirən servis.
     private final AdminService adminService;
+    // Bütün müəllim qruplarının overview siyahısı üçün.
+    private final GroupService groupService;
 
-    // Spring tərəfindən inject olunan AdminService-i sahəyə təyin edir.
-    public AdminController(AdminService adminService) {
+    // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
+    public AdminController(AdminService adminService, GroupService groupService) {
         this.adminService = adminService;
+        this.groupService = groupService;
     }
 
     // ---------- Mövzu (Topic) CRUD ----------
@@ -179,5 +184,14 @@ public class AdminController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal principal) {
         adminService.deleteUser(id, principal.getUser().getId());
         return ResponseEntity.noContent().build();
+    }
+
+    // ---------- Qrup (Group) overview ----------
+
+    // Bütün müəllimlərin bütün qruplarının siyahısı — sahiblikdən asılı
+    // olmayaraq, admin nəzarəti üçün (hansı müəllimdə neçə qrup/şagird var).
+    @GetMapping("/groups")
+    public List<GroupDto> listAllGroups() {
+        return groupService.listAllGroups();
     }
 }

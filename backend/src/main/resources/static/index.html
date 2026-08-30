@@ -571,10 +571,12 @@
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
     <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
+    <button class="tab-btn" id="btn-mygroups" role="tab" aria-selected="false" onclick="showTab(&#39;mygroups&#39;)" style="display:none"><span class="tab-label">Qruplarım</span></button>
     <button class="tab-btn" id="btn-yarish-manage" role="tab" aria-selected="false" onclick="showTab(&#39;yarish-manage&#39;)" style="display:none"><span class="tab-label">Yarış idarəetməsi</span></button>
     <div class="tab-group-label" id="adminGroupLabel" style="display:none">Admin</div>
     <button class="tab-btn" id="btn-users" role="tab" aria-selected="false" onclick="showTab(&#39;users&#39;)" style="display:none"><span class="tab-label">İstifadəçilər</span></button>
     <button class="tab-btn" id="btn-approvals" role="tab" aria-selected="false" onclick="showTab(&#39;approvals&#39;)" style="display:none"><span class="tab-label">Müəllim təsdiqləri</span></button>
+    <button class="tab-btn" id="btn-allgroups" role="tab" aria-selected="false" onclick="showTab(&#39;allgroups&#39;)" style="display:none"><span class="tab-label">Bütün qruplar</span></button>
     <button type="button" class="back-to-select" onclick="backToLangSelect()">← Dil seçiminə qayıt</button>
     <div class="tabbar-user">
       <span class="tabbar-user-name" id="tabbarUserName"></span>
@@ -608,6 +610,14 @@
       </div>
     </div>
 
+    <div class="teacher-panel" id="frame-mygroups">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">Qruplarım</h2>
+        <p class="teacher-panel-sub">Şagirdlərini qruplara böl (məs. "10-A sinfi") və hər qrupun irəliləyişini ayrıca izlə.</p>
+        <div id="myGroupsPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+
     <div class="teacher-panel" id="frame-approvals">
       <div class="teacher-panel-inner">
         <h2 class="teacher-panel-title">Müəllim təsdiqləri</h2>
@@ -620,6 +630,13 @@
         <h2 class="teacher-panel-title">İstifadəçilər</h2>
         <p class="teacher-panel-sub">Bütün şagird, müəllim və admin hesablarını idarə et: profil redaktəsi, rol dəyişimi, aktiv/deaktiv, parol sıfırlama, silmə.</p>
         <div id="usersPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-allgroups">
+      <div class="teacher-panel-inner">
+        <h2 class="teacher-panel-title">Bütün qruplar</h2>
+        <p class="teacher-panel-sub">Bütün müəllimlərin yaratdığı qruplara ümumi baxış (nəzarət məqsədilə, salt oxunur).</p>
+        <div id="allGroupsPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
     <div class="teacher-panel" id="frame-yarish">
@@ -901,10 +918,12 @@ function updateAuthUI(){
   document.getElementById('teacherGroupLabel').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-teacher').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-topics').style.display = (isAdmin || isTeacher) ? '' : 'none';
+  document.getElementById('btn-mygroups').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('btn-yarish-manage').style.display = (isAdmin || isTeacher) ? '' : 'none';
   document.getElementById('adminGroupLabel').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-approvals').style.display = isAdmin ? '' : 'none';
   document.getElementById('btn-users').style.display = isAdmin ? '' : 'none';
+  document.getElementById('btn-allgroups').style.display = isAdmin ? '' : 'none';
   if (user) {
     authGate.style.display = 'none';
     document.getElementById('welcomeName').textContent = 'Salam, ' + user.fullName + ' 👋';
@@ -1074,8 +1093,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', approvals:'frame-approvals', users:'frame-users', yarish:'frame-yarish', 'yarish-manage':'frame-yarish-manage'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', approvals:'btn-approvals', users:'btn-users', yarish:'btn-yarish', 'yarish-manage':'btn-yarish-manage'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', 'yarish-manage':'frame-yarish-manage'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', 'yarish-manage':'btn-yarish-manage'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -1087,8 +1106,10 @@ function showTab(name){
     });
     if (name === 'teacher') loadTeacherPanel();
     if (name === 'topics') loadTopicsPanel();
+    if (name === 'mygroups') loadMyGroupsPanel();
     if (name === 'approvals') loadPendingTeachers();
     if (name === 'users') loadUsersPanel();
+    if (name === 'allgroups') loadAllGroupsPanel();
     if (name === 'yarish') loadYarishPanel();
     if (name === 'yarish-manage') loadYarishManagePanel();
   });
@@ -1200,6 +1221,201 @@ async function toggleTopicPublished(id, published){
     loadTopicsPanel();
   } catch (err) {
     alert('Mövzunun statusunu dəyişmək mümkün olmadı.');
+  }
+}
+
+/* ---------- "Qruplarım" müəllim paneli: şagird qrupları ---------- */
+// Hazırda açıq olan qrupun ID-si/adı — "Adını dəyiş"/"Sil" düymələri bunu
+// istifadə edir ki, qrup adını onclick atributu daxilində JS sətri kimi
+// yazmaq (və dırnaq işarələrindən qaynaqlanan sınma riski) lazım gəlməsin.
+let currentGroupDetailId = null;
+let currentGroupName = '';
+
+async function loadMyGroupsPanel(){
+  currentGroupDetailId = null;
+  const body = document.getElementById('myGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups');
+    if (!res.ok) throw new Error('fetch failed');
+    const groups = await res.json();
+    renderMyGroupsList(groups);
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Qrup siyahısını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderMyGroupsList(groups){
+  const body = document.getElementById('myGroupsPanelBody');
+  const items = groups.map(g => (
+    '<div class="contest-card" onclick="openGroupDetail(' + g.id + ')">'
+    + '<div class="contest-card-top"><div class="contest-card-title">' + escapeHtml(g.name) + '</div>'
+    + '<span class="user-badge active">' + g.memberCount + ' şagird</span></div>'
+    + '<div class="contest-card-meta">Yaradılıb: ' + (g.createdAt ? new Date(g.createdAt).toLocaleDateString('az-AZ') : '—') + '</div>'
+    + '</div>'
+  )).join('');
+  body.innerHTML =
+    '<div class="contest-form">'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:15px;">Yeni qrup</h3>'
+    + '<input class="auth-input" id="newGroupName" placeholder="Qrupun adı (məs. 10-A sinfi)">'
+    + '<button type="button" class="contest-action-btn" onclick="submitCreateGroup()">Qrup yarat</button>'
+    + '</div>'
+    + '<div class="contest-manage-list">' + (items || '<div class="teacher-panel-empty">Hələ heç bir qrup yaratmamısan.</div>') + '</div>';
+}
+
+async function submitCreateGroup(){
+  const input = document.getElementById('newGroupName');
+  const name = input.value.trim();
+  if (!name) {
+    alert('Qrupun adını daxil et.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups', { method: 'POST', body: JSON.stringify({ name }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Qrup yaratmaq mümkün olmadı.');
+      return;
+    }
+    loadMyGroupsPanel();
+  } catch (err) {
+    alert('Qrup yaratmaq mümkün olmadı.');
+  }
+}
+
+// Bir qrupun detalını (üzv siyahısı + irəliləyişi) açır. Qrupun adını
+// siyahıdan deyil, ayrıca sorğu ilə yenidən çəkirik ki, "Adını dəyiş"dən
+// sonra açılan görünüş həmişə ən güncəl adı göstərsin.
+async function openGroupDetail(groupId){
+  currentGroupDetailId = groupId;
+  const body = document.getElementById('myGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const [groupsRes, membersRes] = await Promise.all([
+      azcupApiFetch('/api/teacher/groups'),
+      azcupApiFetch('/api/teacher/groups/' + groupId + '/students'),
+    ]);
+    if (!groupsRes.ok || !membersRes.ok) throw new Error('fetch failed');
+    const groups = await groupsRes.json();
+    const group = groups.find(g => g.id === groupId);
+    const members = await membersRes.json();
+    if (!group) throw new Error('group not found');
+    currentGroupName = group.name;
+    renderGroupDetail(group, members);
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Qrup detallarını yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderGroupDetail(group, members){
+  const body = document.getElementById('myGroupsPanelBody');
+  const rows = members.map(m => (
+    '<tr><td>' + escapeHtml(m.fullName) + '<span class="user-email">' + escapeHtml(m.email) + '</span></td>'
+    + '<td class="teacher-solved">' + m.totalSolved + '</td>'
+    + '<td class="approval-actions"><button type="button" class="approval-btn reject" onclick="removeGroupMember(' + group.id + ', ' + m.membershipId + ')">Çıxar</button></td></tr>'
+  )).join('');
+  const table = members.length
+    ? '<table class="teacher-table"><thead><tr><th>Şagird</th><th>Həll edilmiş</th><th>Əməliyyat</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    : '<div class="teacher-panel-empty">Bu qrupda hələ şagird yoxdur.</div>';
+
+  body.innerHTML =
+    '<button type="button" class="back-to-select" onclick="loadMyGroupsPanel()" style="margin-bottom:16px;">← Qruplara qayıt</button>'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(group.name) + '</h3>'
+    + '<p class="teacher-panel-sub">' + members.length + ' şagird</p>'
+    + '<div class="contest-form" style="margin-bottom:20px;">'
+    + '<input class="auth-input" id="newMemberEmail" type="email" placeholder="Şagirdin e-poçtu">'
+    + '<button type="button" class="contest-action-btn" onclick="submitAddGroupMember(' + group.id + ')">Şagird əlavə et</button>'
+    + '</div>'
+    + table
+    + '<div style="margin-top:20px;display:flex;gap:10px;">'
+    + '<button type="button" class="approval-btn" onclick="renameGroupPrompt()">Adını dəyiş</button>'
+    + '<button type="button" class="approval-btn reject" onclick="deleteGroupConfirm()">Qrupu sil</button>'
+    + '</div>';
+}
+
+async function submitAddGroupMember(groupId){
+  const input = document.getElementById('newMemberEmail');
+  const email = input.value.trim();
+  if (!email) {
+    alert('Şagirdin e-poçtunu daxil et.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/students', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Şagird əlavə etmək mümkün olmadı.');
+      return;
+    }
+    openGroupDetail(groupId);
+  } catch (err) {
+    alert('Şagird əlavə etmək mümkün olmadı.');
+  }
+}
+
+async function removeGroupMember(groupId, membershipId){
+  if (!confirm('Bu şagirdi qrupdan çıxarmaq istəyirsən?')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/students/' + membershipId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('remove failed');
+    openGroupDetail(groupId);
+  } catch (err) {
+    alert('Şagirdi çıxarmaq mümkün olmadı.');
+  }
+}
+
+async function renameGroupPrompt(){
+  const name = prompt('Qrupun yeni adı:', currentGroupName);
+  if (!name || !name.trim() || name.trim() === currentGroupName) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + currentGroupDetailId, {
+      method: 'PUT',
+      body: JSON.stringify({ name: name.trim() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Adını dəyişmək mümkün olmadı.');
+      return;
+    }
+    openGroupDetail(currentGroupDetailId);
+  } catch (err) {
+    alert('Adını dəyişmək mümkün olmadı.');
+  }
+}
+
+async function deleteGroupConfirm(){
+  if (!confirm('Bu qrupu silmək istəyirsən? Şagirdlərin hesabına toxunulmayacaq, sadəcə qrup silinəcək.')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + currentGroupDetailId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadMyGroupsPanel();
+  } catch (err) {
+    alert('Qrupu silmək mümkün olmadı.');
+  }
+}
+
+/* ---------- "Bütün qruplar" admin overview (salt oxunur) ---------- */
+async function loadAllGroupsPanel(){
+  const body = document.getElementById('allGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/admin/groups');
+    if (!res.ok) throw new Error('fetch failed');
+    const groups = await res.json();
+    if (!groups.length) {
+      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir qrup yaradılmayıb.</div>';
+      return;
+    }
+    const rows = groups.map(g => (
+      '<tr><td>' + escapeHtml(g.name) + '</td><td>' + escapeHtml(g.teacherName) + '</td><td>' + g.memberCount + '</td>'
+      + '<td>' + (g.createdAt ? new Date(g.createdAt).toLocaleDateString('az-AZ') : '—') + '</td></tr>'
+    )).join('');
+    body.innerHTML = '<table class="teacher-table"><thead><tr><th>Qrup</th><th>Müəllim</th><th>Şagird sayı</th><th>Yaradılıb</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Qrup siyahısını yükləmək mümkün olmadı.</div>';
   }
 }
 
