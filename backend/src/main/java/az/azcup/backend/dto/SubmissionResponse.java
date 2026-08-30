@@ -18,6 +18,13 @@ public class SubmissionResponse {
     private final String sourceCode;
     // Yoxlamanın nəticə statusu.
     private final SubmissionStatus status;
+    // Neçə test halının uğurla keçildiyi (nümunə + əlavə gizli testlər).
+    private final int passedTestCases;
+    // Cəmi neçə test halının yoxlandığı.
+    private final int totalTestCases;
+    // İlk uğursuz test halının sırası — hamısı keçilibsə null. Testin
+    // özünün məzmunu (girişi/çıxışı) BURADA YOXDUR, yalnız nömrəsi.
+    private final Integer firstFailedTestCaseOrder;
     // Proqramın stdout çıxışı.
     private final String stdout;
     // Proqramın stderr (xəta) çıxışı.
@@ -33,6 +40,9 @@ public class SubmissionResponse {
         Long problemId,
         String sourceCode,
         SubmissionStatus status,
+        int passedTestCases,
+        int totalTestCases,
+        Integer firstFailedTestCaseOrder,
         String stdout,
         String stderr,
         Long executionTimeMs,
@@ -42,6 +52,9 @@ public class SubmissionResponse {
         this.problemId = problemId;
         this.sourceCode = sourceCode;
         this.status = status;
+        this.passedTestCases = passedTestCases;
+        this.totalTestCases = totalTestCases;
+        this.firstFailedTestCaseOrder = firstFailedTestCaseOrder;
         this.stdout = stdout;
         this.stderr = stderr;
         this.executionTimeMs = executionTimeMs;
@@ -66,6 +79,21 @@ public class SubmissionResponse {
     // status sahəsinin dəyərini qaytarır.
     public SubmissionStatus getStatus() {
         return status;
+    }
+
+    // passedTestCases sahəsinin dəyərini qaytarır.
+    public int getPassedTestCases() {
+        return passedTestCases;
+    }
+
+    // totalTestCases sahəsinin dəyərini qaytarır.
+    public int getTotalTestCases() {
+        return totalTestCases;
+    }
+
+    // firstFailedTestCaseOrder sahəsinin dəyərini qaytarır.
+    public Integer getFirstFailedTestCaseOrder() {
+        return firstFailedTestCaseOrder;
     }
 
     // stdout sahəsinin dəyərini qaytarır.
@@ -102,6 +130,9 @@ public class SubmissionResponse {
             && Objects.equals(problemId, that.problemId)
             && Objects.equals(sourceCode, that.sourceCode)
             && status == that.status
+            && passedTestCases == that.passedTestCases
+            && totalTestCases == that.totalTestCases
+            && Objects.equals(firstFailedTestCaseOrder, that.firstFailedTestCaseOrder)
             && Objects.equals(stdout, that.stdout)
             && Objects.equals(stderr, that.stderr)
             && Objects.equals(executionTimeMs, that.executionTimeMs)
@@ -113,7 +144,10 @@ public class SubmissionResponse {
     // bütün sahələrin hash-lərini birləşdirir.
     @Override
     public int hashCode() {
-        return Objects.hash(id, problemId, sourceCode, status, stdout, stderr, executionTimeMs, submittedAt);
+        return Objects.hash(
+            id, problemId, sourceCode, status, passedTestCases, totalTestCases,
+            firstFailedTestCaseOrder, stdout, stderr, executionTimeMs, submittedAt
+        );
     }
 
     // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
@@ -124,6 +158,9 @@ public class SubmissionResponse {
             ", problemId=" + problemId +
             ", sourceCode='" + sourceCode + '\'' +
             ", status=" + status +
+            ", passedTestCases=" + passedTestCases +
+            ", totalTestCases=" + totalTestCases +
+            ", firstFailedTestCaseOrder=" + firstFailedTestCaseOrder +
             ", stdout='" + stdout + '\'' +
             ", stderr='" + stderr + '\'' +
             ", executionTimeMs=" + executionTimeMs +

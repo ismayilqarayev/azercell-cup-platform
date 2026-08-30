@@ -6,6 +6,8 @@ import az.azcup.backend.dto.admin.AdminUserDetailDto;
 import az.azcup.backend.dto.admin.AdminUserDto;
 import az.azcup.backend.dto.admin.PasswordResetRequest;
 import az.azcup.backend.dto.admin.PasswordResetResponse;
+import az.azcup.backend.dto.admin.ProblemTestCaseDto;
+import az.azcup.backend.dto.admin.ProblemTestCaseUpsertRequest;
 import az.azcup.backend.dto.admin.ProblemUpsertRequest;
 import az.azcup.backend.dto.admin.RoleUpdateRequest;
 import az.azcup.backend.dto.admin.StatusUpdateRequest;
@@ -88,6 +90,40 @@ public class AdminController {
     @DeleteMapping("/problems/{id}")
     public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
         adminService.deleteProblem(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ---------- Problemin əlavə (gizli) test halları CRUD ----------
+
+    // Bir problemin bütün əlavə test hallarının siyahısı.
+    @GetMapping("/problems/{problemId}/test-cases")
+    public List<ProblemTestCaseDto> listTestCases(@PathVariable Long problemId) {
+        return adminService.listTestCases(problemId);
+    }
+
+    // Yeni əlavə test halı yaradır və 201 CREATED statusu ilə qaytarır.
+    @PostMapping("/problems/{problemId}/test-cases")
+    public ResponseEntity<ProblemTestCaseDto> addTestCase(
+        @PathVariable Long problemId,
+        @Valid @RequestBody ProblemTestCaseUpsertRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminService.addTestCase(problemId, request));
+    }
+
+    // Mövcud əlavə test halını yeniləyir.
+    @PutMapping("/problems/{problemId}/test-cases/{testCaseId}")
+    public ProblemTestCaseDto updateTestCase(
+        @PathVariable Long problemId,
+        @PathVariable Long testCaseId,
+        @Valid @RequestBody ProblemTestCaseUpsertRequest request
+    ) {
+        return adminService.updateTestCase(problemId, testCaseId, request);
+    }
+
+    // Bir əlavə test halını silir və 204 NO_CONTENT qaytarır.
+    @DeleteMapping("/problems/{problemId}/test-cases/{testCaseId}")
+    public ResponseEntity<Void> deleteTestCase(@PathVariable Long problemId, @PathVariable Long testCaseId) {
+        adminService.deleteTestCase(problemId, testCaseId);
         return ResponseEntity.noContent().build();
     }
 

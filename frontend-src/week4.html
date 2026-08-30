@@ -72,20 +72,33 @@
   .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
 
   .problem{
-    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:16px;
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
     box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
   }
-  .problem-head{ display:flex; align-items:flex-start; gap:14px; padding:16px 18px; }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(255,255,255,0.03); }
   .problem-num{
     font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
     padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
   }
-  .problem-main{ flex:1; min-width:0; }
-  .problem-main h3{ margin:0 0 6px; font-size:16px; }
-  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; margin-bottom:8px; }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
   .difficulty.easy{ color:var(--green-text); }
   .difficulty.mid{ color:var(--bronze-text); }
-  .problem-body{ padding:0 18px 16px; display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
   .problem-left{ min-width:0; }
   .problem-right{ position:sticky; top:16px; }
   @media (max-width: 900px){
@@ -109,6 +122,38 @@
   .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
   .reveal-btn .arrow{ display:inline-block; }
 
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
   .solution-inner{
     background:var(--well); border-left:3px solid var(--green); border-radius:3px;
     padding:12px 14px; margin:10px 0;
@@ -126,10 +171,20 @@
     border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
   }
   .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
   .code-input{
     width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
     background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
-    border-radius:4px; padding:10px 12px; resize:vertical; outline:none; box-sizing:border-box;
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
   }
   .code-input:focus{ border-color:var(--gold); }
   .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
@@ -2915,53 +2970,69 @@ const solutionLinks = [
 const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
 
 const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
 problems.forEach((p, i) => {
   const el = document.createElement('div');
   el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
   el.innerHTML = `
-    <div class="problem-head">
+    <div class="problem-head" onclick="toggleProblem(${i})">
       <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
       <div class="problem-main">
         <h3>${p.title}</h3>
         <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
         <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
-        <div class="problem-body">
-          <div class="problem-left">
-            <p>${p.statement}</p>
-            <div class="io-grid">
-              <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
-              <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
-            </div>
-            <div class="io-grid">
-              <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
-              <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
-            </div>
-            <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-            <div class="solution-inner approach-block">
-              <p class="sub-label">Yanaşma</p>
-              <p class="approach">${p.approach}</p>
-            </div>
-            <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
-              <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
-            </button>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
           </div>
-          <div class="problem-right">
-            <div class="submit-panel">
-              <p class="sub-label">Kodunu göndər</p>
-              <textarea class="code-input" id="code-${i}" spellcheck="false">${escapeHtml(STARTER_CPP)}</textarea>
-              <div class="submit-row">
-                <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
-                <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
-                <span class="submit-hint" id="hint-${i}"></span>
-              </div>
-              <div class="history-list" id="history-${i}"></div>
-              <div class="verdict" id="verdict-${i}">
-                <span class="verdict-badge" id="badge-${i}"></span>
-                <div class="io-grid">
-                  <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
-                  <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
-                </div>
-              </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
             </div>
           </div>
         </div>
@@ -2969,7 +3040,128 @@ problems.forEach((p, i) => {
     </div>
   `;
   container.appendChild(el);
+  syncGutter(i);
 });
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Əlavə etmək mümkün olmadı.');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!confirm('Bu gizli testi silmək istəyirsən?')) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
 
 let pendingRevealUrl = null;
 
@@ -3034,7 +3226,17 @@ async function submitCode(i){
     const badgeEl = document.getElementById('badge-' + i);
     verdictEl.classList.add('show');
     badgeEl.className = 'verdict-badge ' + data.status;
-    badgeEl.textContent = VERDICT_LABELS[data.status] || data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
     document.getElementById('stdout-' + i).textContent = data.stdout || '';
     document.getElementById('stderr-' + i).textContent = data.stderr || '';
     if (data.status === 'ACCEPTED'){

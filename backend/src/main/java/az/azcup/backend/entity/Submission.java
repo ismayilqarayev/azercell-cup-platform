@@ -50,6 +50,22 @@ public class Submission {
     @Column(nullable = false)
     private SubmissionStatus status;
 
+    // Neçə test halının uğurla keçildiyi (nümunə + əlavə gizli testlər
+    // birlikdə) — bax: ContestSubmission-dakı eyni sahə. Əlavə gizli test
+    // olmayan problemlərdə (əksəriyyəti) bu ya 0, ya da 1 olur.
+    @Column(nullable = false)
+    private int passedTestCases = 0;
+
+    // Cəmi neçə test halının yoxlandığı (1 = yalnız nümunə, daha çox =
+    // admin əlavə gizli testlər əlavə edibsə).
+    @Column(nullable = false)
+    private int totalTestCases = 0;
+
+    // İlk uğursuz test halının sırası — bütün testlər keçilibsə (və ya
+    // COMPILE_ERROR olduqda) null qalır. Şagirdə YALNIZ bu NÖMRƏ göstərilir,
+    // testin özünün girişi/çıxışı HEÇ VAXT açılmır (gizli qalır).
+    private Integer firstFailedTestCaseOrder;
+
     // Kompilyasiya uğursuz olarsa stdout boş qala bilər — ona görə nullable.
     @Lob
     private String stdout;
@@ -122,6 +138,36 @@ public class Submission {
     // status sahəsinə yeni dəyər təyin edir.
     public void setStatus(SubmissionStatus status) {
         this.status = status;
+    }
+
+    // passedTestCases sahəsinin dəyərini qaytarır.
+    public int getPassedTestCases() {
+        return passedTestCases;
+    }
+
+    // passedTestCases sahəsinə yeni dəyər təyin edir.
+    public void setPassedTestCases(int passedTestCases) {
+        this.passedTestCases = passedTestCases;
+    }
+
+    // totalTestCases sahəsinin dəyərini qaytarır.
+    public int getTotalTestCases() {
+        return totalTestCases;
+    }
+
+    // totalTestCases sahəsinə yeni dəyər təyin edir.
+    public void setTotalTestCases(int totalTestCases) {
+        this.totalTestCases = totalTestCases;
+    }
+
+    // firstFailedTestCaseOrder sahəsinin dəyərini qaytarır.
+    public Integer getFirstFailedTestCaseOrder() {
+        return firstFailedTestCaseOrder;
+    }
+
+    // firstFailedTestCaseOrder sahəsinə yeni dəyər təyin edir.
+    public void setFirstFailedTestCaseOrder(Integer firstFailedTestCaseOrder) {
+        this.firstFailedTestCaseOrder = firstFailedTestCaseOrder;
     }
 
     // stdout sahəsinin dəyərini qaytarır.

@@ -4,16 +4,20 @@ import az.azcup.backend.dto.admin.AdminProblemDto;
 import az.azcup.backend.dto.admin.AdminTopicDto;
 import az.azcup.backend.dto.admin.AdminUserDetailDto;
 import az.azcup.backend.dto.admin.AdminUserDto;
+import az.azcup.backend.dto.admin.ProblemTestCaseDto;
+import az.azcup.backend.dto.admin.ProblemTestCaseUpsertRequest;
 import az.azcup.backend.dto.admin.ProblemUpsertRequest;
 import az.azcup.backend.dto.admin.TopicUpsertRequest;
 import az.azcup.backend.dto.admin.UserProfileUpdateRequest;
 import az.azcup.backend.entity.Problem;
+import az.azcup.backend.entity.ProblemTestCase;
 import az.azcup.backend.entity.Role;
 import az.azcup.backend.entity.Topic;
 import az.azcup.backend.entity.User;
 import az.azcup.backend.exception.ConflictException;
 import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.repository.ProblemRepository;
+import az.azcup.backend.repository.ProblemTestCaseRepository;
 import az.azcup.backend.repository.SubmissionRepository;
 import az.azcup.backend.repository.TopicRepository;
 import az.azcup.backend.repository.UserRepository;
@@ -41,6 +45,8 @@ public class AdminService {
     private final TopicRepository topicRepository;
     // Problemlərin CRUD əməliyyatları üçün.
     private final ProblemRepository problemRepository;
+    // Problemlərin əlavə (gizli) test hallarının CRUD əməliyyatları üçün.
+    private final ProblemTestCaseRepository problemTestCaseRepository;
     // İstifadəçilərin oxunması/yazılması üçün.
     private final UserRepository userRepository;
     // İstifadəçinin həll etdiyi problem sayını hesablamaq üçün.
@@ -58,12 +64,14 @@ public class AdminService {
     public AdminService(
         TopicRepository topicRepository,
         ProblemRepository problemRepository,
+        ProblemTestCaseRepository problemTestCaseRepository,
         UserRepository userRepository,
         SubmissionRepository submissionRepository,
         PasswordEncoder passwordEncoder
     ) {
         this.topicRepository = topicRepository;
         this.problemRepository = problemRepository;
+        this.problemTestCaseRepository = problemTestCaseRepository;
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
         this.passwordEncoder = passwordEncoder;
@@ -243,10 +251,83 @@ public class AdminService {
     // Problemi ID-yə görə silir.
     @Transactional
     public void deleteProblem(Long id) {
-        if (!problemRepository.existsById(id)) {
-            throw new NotFoundException("Məsələ tapılmadı: " + id);
+        Problem problem = problemRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Məsələ tapılmadı: " + id));
+        // Əlavə test halları əvvəlcə əl ilə silinir — FK ON DELETE CASCADE
+        // təyin olunmadığı üçün, əks halda constraint xətası baş verərdi
+        // (bax: ContestAdminService.deleteProblem, eyni naxış).
+        problemTestCaseRepository.deleteByProblem(problem);
+        problemRepository.delete(problem);
+    }
+
+    // ---------- Problemin əlavə (gizli) test halları CRUD-u ----------
+
+    // Bir problemin bütün əlavə test hallarının siyahısı (admin panelindəki
+    // məsələ redaktə formunda göstərilir).
+    @Transactional(readOnly = true)
+    public List<ProblemTestCaseDto> listTestCases(Long problemId) {
+        Problem problem = getProblemEntity(problemId);
+        List<ProblemTestCaseDto> result = new ArrayList<>();
+        for (ProblemTestCase tc : problemTestCaseRepository.findByProblemOrderByOrderIndexAsc(problem)) {
+            result.add(toTestCaseDto(tc));
         }
-        problemRepository.deleteById(id);
+        return result;
+    }
+
+    // Bir problemə yeni əlavə test halı əlavə edir.
+    @Transactional
+    public ProblemTestCaseDto addTestCase(Long problemId, ProblemTestCaseUpsertRequest req) {
+        Problem problem = getProblemEntity(problemId);
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setProblem(problem);
+        applyTestCaseUpsert(testCase, req);
+        problemTestCaseRepository.save(testCase);
+        return toTestCaseDto(testCase);
+    }
+
+    // Mövcud əlavə test halını yeniləyir.
+    @Transactional
+    public ProblemTestCaseDto updateTestCase(Long problemId, Long testCaseId, ProblemTestCaseUpsertRequest req) {
+        Problem problem = getProblemEntity(problemId);
+        ProblemTestCase testCase = problemTestCaseRepository.findById(testCaseId)
+            .filter(tc -> tc.getProblem().getId().equals(problem.getId()))
+            .orElseThrow(() -> new NotFoundException("Test halı tapılmadı: " + testCaseId));
+        applyTestCaseUpsert(testCase, req);
+        problemTestCaseRepository.save(testCase);
+        return toTestCaseDto(testCase);
+    }
+
+    // Bir əlavə test halını silir.
+    @Transactional
+    public void deleteTestCase(Long problemId, Long testCaseId) {
+        Problem problem = getProblemEntity(problemId);
+        ProblemTestCase testCase = problemTestCaseRepository.findById(testCaseId)
+            .filter(tc -> tc.getProblem().getId().equals(problem.getId()))
+            .orElseThrow(() -> new NotFoundException("Test halı tapılmadı: " + testCaseId));
+        problemTestCaseRepository.delete(testCase);
+    }
+
+    // ID ilə xam Problem entity-sini tapır, tapılmazsa 404 atır.
+    private Problem getProblemEntity(Long problemId) {
+        return problemRepository.findById(problemId)
+            .orElseThrow(() -> new NotFoundException("Məsələ tapılmadı: " + problemId));
+    }
+
+    // ProblemTestCaseUpsertRequest-dəki sahələri ProblemTestCase entity-sinə köçürür.
+    private void applyTestCaseUpsert(ProblemTestCase testCase, ProblemTestCaseUpsertRequest req) {
+        testCase.setOrderIndex(req.getOrderIndex());
+        // input boş göndərilə bilər (bəzi məsələlərdə giriş yoxdur) — null-u boş sətirə çeviririk.
+        if (req.getInput() != null) {
+            testCase.setInput(req.getInput());
+        } else {
+            testCase.setInput("");
+        }
+        testCase.setExpectedOutput(req.getExpectedOutput());
+    }
+
+    // ProblemTestCase entity-sini ProblemTestCaseDto-ya çevirir.
+    private ProblemTestCaseDto toTestCaseDto(ProblemTestCase testCase) {
+        return new ProblemTestCaseDto(testCase.getId(), testCase.getOrderIndex(), testCase.getInput(), testCase.getExpectedOutput());
     }
 
     // Entity -> DTO çevirmə köməkçiləri. Java-nın overload dəstəyi
