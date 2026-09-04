@@ -308,6 +308,86 @@
   .approval-btn:disabled{ opacity:0.35; cursor:default; }
   .approval-btn:disabled:hover{ background:var(--paper); }
   .users-panel-inner{ max-width:1180px; }
+  .live-panel-inner{ max-width:1180px; }
+  .live-role-picker{ display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; }
+  .live-role-card{
+    flex:1; min-width:240px; background:var(--paper); border:1px solid var(--grid-line-strong);
+    border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:10px;
+  }
+  .live-role-card h3{ margin:0; font-size:15px; color:var(--ink); }
+  .live-role-card p{ margin:0; font-size:12.5px; color:var(--ink-soft); }
+  .live-code-input{
+    font-family:var(--mono); font-size:16px; letter-spacing:3px; text-transform:uppercase;
+    background:var(--blueprint-deep); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:6px; padding:8px 10px; outline:none; text-align:center;
+  }
+  .live-code-input:focus{ border-color:var(--gold); }
+  .live-submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease; align-self:flex-start;
+  }
+  .live-submit-btn:hover{ background:var(--gold); }
+  .live-submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .live-submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .live-code-share{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-family:var(--mono);
+    font-size:14px; color:var(--ink-soft); margin-bottom:16px;
+  }
+  .live-code-share b{ color:var(--gold); font-size:20px; letter-spacing:3px; }
+  .live-leave-btn{
+    font-family:var(--mono); font-size:11px; padding:6px 12px; border-radius:20px; cursor:pointer;
+    background:transparent; border:1px solid var(--alert); color:var(--alert); margin-left:auto;
+  }
+  .live-leave-btn:hover{ background:rgba(255,59,59,0.1); }
+  .live-copy-btn{
+    font-family:var(--mono); font-size:11px; padding:6px 12px; border-radius:20px; cursor:pointer;
+    background:transparent; border:1px solid var(--grid-line-strong); color:var(--ink);
+  }
+  .live-copy-btn:hover{ border-color:var(--gold); color:var(--gold); }
+  .live-panels{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:900px){ .live-panels{ grid-template-columns:1fr; } }
+  .live-panel-title{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.5px; color:var(--ink); margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .live-readonly-badge{
+    font-size:10px; color:var(--ink-soft); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:2px 8px; font-weight:400;
+  }
+  .live-editor{ position:relative; }
+  .live-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none;
+  }
+  .live-editor:focus-within .live-gutter{ border-color:var(--gold); }
+  .live-textarea{
+    width:100%; min-height:260px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--blueprint-deep); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .live-textarea:focus{ border-color:var(--gold); }
+  .live-textarea[readonly]{ color:var(--ink-soft); }
+  .live-run-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .live-run-output{ margin-top:8px; }
+  .live-run-status{
+    display:inline-block; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:0.3px;
+    padding:4px 10px; border-radius:14px; margin-bottom:6px;
+  }
+  .live-run-status.ACCEPTED{ background:rgba(57,255,110,0.14); color:var(--green); border:1px solid rgba(57,255,110,0.4); }
+  .live-run-status.COMPILE_ERROR{ background:rgba(255,122,0,0.14); color:var(--bronze); border:1px solid rgba(255,122,0,0.4); }
+  .live-run-status.RUNTIME_ERROR{ background:rgba(255,59,59,0.14); color:var(--alert); border:1px solid rgba(255,59,59,0.4); }
+  .live-run-status.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.14); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .live-run-out{
+    font-family:var(--mono); font-size:11.5px; white-space:pre-wrap; word-break:break-word;
+    background:var(--paper); border:1px solid var(--grid-line); border-radius:4px; padding:8px 10px;
+    margin:0 0 6px; max-height:160px; overflow:auto; color:var(--ink);
+  }
+  .live-run-out.live-run-err{ color:#e08080; }
   .user-actions{ display:flex; gap:6px; flex-wrap:wrap; }
   .user-email{ color:var(--ink-soft); font-size:11.5px; display:block; margin-top:2px; }
   .user-badge{
@@ -581,6 +661,7 @@
     <button class="tab-btn" id="btn-scheme" role="tab" aria-selected="false" onclick="showTab(&#39;scheme&#39;)"><span class="tab-label">Məsələ Həll Sxemi</span></button>
     <button class="tab-btn" id="btn-yarish" role="tab" aria-selected="false" onclick="showTab(&#39;yarish&#39;)"><span class="tab-label">🏆 Yarışlar</span></button>
     <button class="tab-btn" id="btn-assignments" role="tab" aria-selected="false" onclick="showTab(&#39;assignments&#39;)"><span class="tab-label">📋 Tapşırıqlarım</span></button>
+    <button class="tab-btn" id="btn-live" role="tab" aria-selected="false" onclick="showTab(&#39;live&#39;)"><span class="tab-label">🎥 Canlı Dərs</span></button>
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
     <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
@@ -664,6 +745,13 @@
         <h2 class="teacher-panel-title">📋 Tapşırıqlarım</h2>
         <p class="teacher-panel-sub">Müəllimlərinin qrup(lar)ına verdiyi tapşırıqlar və irəliləyişin.</p>
         <div id="assignmentsPanelBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-live">
+      <div class="teacher-panel-inner live-panel-inner">
+        <h2 class="teacher-panel-title">🎥 Canlı Dərs</h2>
+        <p class="teacher-panel-sub">Onlayn dərs zamanı iki tərəfli canlı kod paneli — müəllim və şagird eyni anda yazır, bir-birinin kodunu görür və hər ikisi öz panelindəki kodu icra edə bilər.</p>
+        <div id="liveSessionBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
     <div class="teacher-panel" id="frame-yarish-manage">
@@ -1005,6 +1093,9 @@ function refreshIframeData(){
 }
 
 function handleLogout(){
+  pauseLiveSessionPolling();
+  liveCode = null;
+  liveRole = null;
   AzcupAuth.clearSession();
   backToLangSelect();
   updateAuthUI();
@@ -1113,8 +1204,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', assignments:'frame-assignments', 'yarish-manage':'frame-yarish-manage'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', assignments:'btn-assignments', 'yarish-manage':'btn-yarish-manage'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', assignments:'frame-assignments', live:'frame-live', 'yarish-manage':'frame-yarish-manage'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', assignments:'btn-assignments', live:'btn-live', 'yarish-manage':'btn-yarish-manage'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -1133,6 +1224,7 @@ function showTab(name){
     if (name === 'yarish') loadYarishPanel();
     if (name === 'assignments') loadAssignmentsPanel();
     if (name === 'yarish-manage') loadYarishManagePanel();
+    if (name === 'live') { loadLivePanel(); } else { pauseLiveSessionPolling(); }
   });
 }
 
@@ -1561,6 +1653,234 @@ async function loadAssignmentsPanel(){
     body.innerHTML = cards;
   } catch (err) {
     body.innerHTML = '<div class="teacher-panel-error">Tapşırıqları yükləmək mümkün olmadı.</div>';
+  }
+}
+
+/* ============================================================================
+   CANLI DƏRS (Live Session) — onlayn dərs zamanı müəllim/şagird arasında
+   iki tərəfli kod güzgüləməsi. Backend: LiveSessionController (bax:
+   /api/live/sessions/**). Mexanizm sadə "polling"dir (hər 1.5 saniyədə bir
+   GET) — WebSocket YOX, bir dərs kontekstində bu gecikmə hiss olunmur.
+   liveOwnCode HEÇ VAXT poll cavabı ilə üstünə yazılmır (yalnız liveOtherCode
+   yenilənir) — əks halda yazan tərəfin kursoru/hərfi itərdi.
+   ============================================================================ */
+let liveCode = null;
+let liveRole = null; // 'teacher' | 'student'
+let livePollTimer = null;
+let liveSendDebounce = null;
+// Panel tabdan çıxılıb-qayıdanda (renderLiveActive yenidən DOM qurduqda)
+// "sizin panel" mətninin itməməsi üçün ayrıca saxlanılır (server-in son
+// bildiyi dəyər PUT debounce-ı gözlədiyi üçün hələ köhnə ola bilər).
+let liveOwnValue = '';
+
+function loadLivePanel(){
+  if (liveCode) { renderLiveActive(); resumeLiveSessionPolling(); return; }
+  const body = document.getElementById('liveSessionBody');
+  const user = AzcupAuth.getUser();
+  const canTeach = !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+  body.innerHTML = '<div class="live-role-picker">'
+    + (canTeach ? (
+      '<div class="live-role-card">'
+      + '<h3>Sessiya başlat</h3>'
+      + '<p>Şagirdinə söz ilə deyəcəyin qısa kod yaradılacaq. Kodu bildikdən sonra o da qoşula bilər.</p>'
+      + '<button type="button" class="live-submit-btn" id="liveStartBtn" onclick="startLiveSession()">Yeni sessiya başlat</button>'
+      + '<span class="live-submit-hint" id="liveStartHint"></span>'
+      + '</div>'
+    ) : '')
+    + '<div class="live-role-card">'
+    + '<h3>Koda qoşul</h3>'
+    + '<p>Müəllimin sənə dediyi 6 simvollu kodu daxil et.</p>'
+    + '<input type="text" class="live-code-input" id="liveJoinCodeInput" maxlength="6" placeholder="MƏS: 9Q2QEN">'
+    + '<button type="button" class="live-submit-btn" id="liveJoinBtn" onclick="joinLiveSession()">Qoşul</button>'
+    + '<span class="live-submit-hint" id="liveJoinHint"></span>'
+    + '</div>'
+    + '</div>';
+}
+
+async function startLiveSession(){
+  const btn = document.getElementById('liveStartBtn');
+  const hint = document.getElementById('liveStartHint');
+  btn.disabled = true;
+  hint.textContent = 'Yaradılır...';
+  try {
+    const res = await azcupApiFetch('/api/live/sessions', { method: 'POST' });
+    if (!res.ok) { hint.textContent = 'Sessiya yaradıla bilmədi.'; btn.disabled = false; return; }
+    const data = await res.json();
+    enterLiveSession(data.code, 'teacher');
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+    btn.disabled = false;
+  }
+}
+
+async function joinLiveSession(){
+  const input = document.getElementById('liveJoinCodeInput');
+  const hint = document.getElementById('liveJoinHint');
+  const code = (input.value || '').trim().toUpperCase();
+  hint.textContent = '';
+  if (!code) { hint.textContent = 'Kodu daxil et.'; return; }
+  const user = AzcupAuth.getUser();
+  const role = (user && (user.role === 'TEACHER' || user.role === 'ADMIN')) ? 'teacher' : 'student';
+  hint.textContent = 'Yoxlanılır...';
+  try {
+    const res = await azcupApiFetch('/api/live/sessions/' + encodeURIComponent(code));
+    if (!res.ok) { hint.textContent = 'Bu kodla sessiya tapılmadı.'; return; }
+    enterLiveSession(code, role);
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  }
+}
+
+function enterLiveSession(code, role){
+  liveCode = code;
+  liveRole = role;
+  renderLiveActive();
+  resumeLiveSessionPolling();
+}
+
+function leaveLiveSession(){
+  pauseLiveSessionPolling();
+  liveCode = null;
+  liveRole = null;
+  liveOwnValue = '';
+  loadLivePanel();
+}
+
+function resumeLiveSessionPolling(){
+  if (!liveCode || livePollTimer) return;
+  pollLiveSession();
+  livePollTimer = setInterval(pollLiveSession, 1500);
+}
+
+function pauseLiveSessionPolling(){
+  if (livePollTimer) { clearInterval(livePollTimer); livePollTimer = null; }
+}
+
+function copyLiveCode(){
+  if (!liveCode) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(liveCode).catch(() => {});
+}
+
+function renderLiveActive(){
+  const body = document.getElementById('liveSessionBody');
+  const ownLabel = liveRole === 'teacher' ? 'Sizin panel (Müəllim)' : 'Sizin panel (Şagird)';
+  const otherLabel = liveRole === 'teacher' ? 'Şagirdin paneli' : 'Müəllimin paneli';
+  body.innerHTML = ''
+    + '<div class="live-code-share">Sessiya kodu: <b>' + escapeHtml(liveCode) + '</b>'
+    + '<button type="button" class="live-copy-btn" onclick="copyLiveCode()">Kopyala</button>'
+    + '<button type="button" class="live-leave-btn" onclick="leaveLiveSession()">Sessiyadan çıx</button>'
+    + '</div>'
+    + '<div class="live-panels">'
+    + '<div class="live-panel">'
+    + '<div class="live-panel-title">' + ownLabel + '</div>'
+    + '<div class="live-editor">'
+    + '<div class="live-gutter" id="liveOwnGutter">1</div>'
+    + '<textarea class="live-textarea" id="liveOwnCode" spellcheck="false" wrap="off" placeholder="Buraya C++ kodunu yaz..." oninput="onLiveOwnInput()" onscroll="syncLiveGutterScroll(&#39;own&#39;)"></textarea>'
+    + '</div>'
+    + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;own&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOwnRunHint"></span></div>'
+    + '<div class="live-run-output" id="liveOwnRunOutput" style="display:none;">'
+    + '<div class="live-run-status" id="liveOwnRunStatus"></div>'
+    + '<pre class="live-run-out" id="liveOwnRunStdout"></pre>'
+    + '<pre class="live-run-out live-run-err" id="liveOwnRunStderr"></pre>'
+    + '</div>'
+    + '</div>'
+    + '<div class="live-panel">'
+    + '<div class="live-panel-title">' + otherLabel + '<span class="live-readonly-badge">yalnız oxumaq üçün</span></div>'
+    + '<div class="live-editor">'
+    + '<div class="live-gutter" id="liveOtherGutter">1</div>'
+    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveGutterScroll(&#39;other&#39;)"></textarea>'
+    + '</div>'
+    + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;other&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOtherRunHint"></span></div>'
+    + '<div class="live-run-output" id="liveOtherRunOutput" style="display:none;">'
+    + '<div class="live-run-status" id="liveOtherRunStatus"></div>'
+    + '<pre class="live-run-out" id="liveOtherRunStdout"></pre>'
+    + '<pre class="live-run-out live-run-err" id="liveOtherRunStderr"></pre>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
+  document.getElementById('liveOwnCode').value = liveOwnValue;
+  syncLiveGutter('own');
+  syncLiveGutter('other');
+}
+
+function onLiveOwnInput(){
+  liveOwnValue = document.getElementById('liveOwnCode').value;
+  syncLiveGutter('own');
+  clearTimeout(liveSendDebounce);
+  liveSendDebounce = setTimeout(sendLiveOwnCode, 500);
+}
+
+async function sendLiveOwnCode(){
+  if (!liveCode) return;
+  const ta = document.getElementById('liveOwnCode');
+  if (!ta) return;
+  const path = '/api/live/sessions/' + encodeURIComponent(liveCode) + '/' + (liveRole === 'teacher' ? 'teacher' : 'student');
+  try {
+    await azcupApiFetch(path, { method: 'PUT', body: JSON.stringify({ sourceCode: ta.value }) });
+  } catch (e) { /* növbəti poll/yazı cəhdi ilə özünü düzəldəcək */ }
+}
+
+async function pollLiveSession(){
+  if (!liveCode) return;
+  try {
+    const res = await azcupApiFetch('/api/live/sessions/' + encodeURIComponent(liveCode));
+    if (!res.ok) { leaveLiveSession(); return; }
+    const data = await res.json();
+    const otherEl = document.getElementById('liveOtherCode');
+    if (!otherEl) return;
+    const otherVal = liveRole === 'teacher' ? data.studentCode : data.teacherCode;
+    if (document.activeElement !== otherEl && otherEl.value !== otherVal) {
+      otherEl.value = otherVal;
+      syncLiveGutter('other');
+    }
+  } catch (e) { /* keçici şəbəkə xətası — növbəti poll-da yenidən cəhd olunacaq */ }
+}
+
+function syncLiveGutter(which){
+  const ta = document.getElementById(which === 'own' ? 'liveOwnCode' : 'liveOtherCode');
+  const gutter = document.getElementById(which === 'own' ? 'liveOwnGutter' : 'liveOtherGutter');
+  if (!ta || !gutter) return;
+  const lines = ta.value.split('\n').length;
+  let text = '';
+  for (let i = 1; i <= lines; i++) text += i + '\n';
+  gutter.textContent = text;
+}
+
+function syncLiveGutterScroll(which){
+  const ta = document.getElementById(which === 'own' ? 'liveOwnCode' : 'liveOtherCode');
+  const gutter = document.getElementById(which === 'own' ? 'liveOwnGutter' : 'liveOtherGutter');
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+const LIVE_RUN_STATUS_LABELS = {
+  ACCEPTED: '✓ İCRA OLUNDU',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function runLiveCode(which){
+  const taId = which === 'own' ? 'liveOwnCode' : 'liveOtherCode';
+  const hintEl = document.getElementById(which === 'own' ? 'liveOwnRunHint' : 'liveOtherRunHint');
+  const sourceCode = document.getElementById(taId).value;
+  hintEl.textContent = '';
+  if (!sourceCode.trim()) { hintEl.textContent = 'Kod boşdur.'; return; }
+  hintEl.textContent = 'Kompilyasiya edilir və icra olunur...';
+  try {
+    const res = await azcupApiFetch('/api/run', { method: 'POST', body: JSON.stringify({ sourceCode, stdin: '' }) });
+    const data = await res.json();
+    if (!res.ok) { hintEl.textContent = data.message || 'İcra uğursuz oldu.'; return; }
+    hintEl.textContent = '';
+    const outEl = document.getElementById(which === 'own' ? 'liveOwnRunOutput' : 'liveOtherRunOutput');
+    const statusEl = document.getElementById(which === 'own' ? 'liveOwnRunStatus' : 'liveOtherRunStatus');
+    outEl.style.display = 'block';
+    statusEl.className = 'live-run-status ' + data.status;
+    statusEl.textContent = (LIVE_RUN_STATUS_LABELS[data.status] || data.status) + ' · ' + data.executionTimeMs + ' ms';
+    document.getElementById(which === 'own' ? 'liveOwnRunStdout' : 'liveOtherRunStdout').textContent = data.stdout || '';
+    document.getElementById(which === 'own' ? 'liveOwnRunStderr' : 'liveOtherRunStderr').textContent = data.stderr || '';
+  } catch (e) {
+    hintEl.textContent = 'Serverə qoşulmaq mümkün olmadı.';
   }
 }
 
