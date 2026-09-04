@@ -873,85 +873,137 @@ const weeks = [
     topicCodes:[
       {topic:"Dəyişənlər və tiplər: int, long long, double, char, string, bool",
        code:
-`int a = 5;                 // adi tam ədəd (~2 milyarda qədər)
-long long big = 10000000000; // böyük ədədlər üçün (~9*10^18-ə qədər)
-double pi = 3.14159;        // kəsr ədəd
-char c = 'A';                // tək simvol
-string s = "salam";          // mətn
-bool isReady = true;         // doğru/yanlış`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int a = 5;                    // adi tam ədəd (~2 milyarda qədər)
+    long long big = 10000000000;  // böyük ədədlər üçün (~9*10^18-ə qədər)
+    double pi = 3.14159;          // kəsr ədəd
+    char c = 'A';                 // tək simvol
+    string s = "salam";           // mətn
+    bool isReady = true;          // doğru/yanlış
+
+    cout << a << " " << big << " " << pi << " " << c << " " << s << " " << isReady << "\\n";
+}`},
       {topic:"Sabitlər (const) və avtomatik tip çıxarımı (auto)",
        code:
-`const int MOD = 1000000007;   // dəyəri dəyişməyəcək sabit
-auto x = 5;                   // auto -> int kimi tanınır
-auto y = 3.14;                 // auto -> double kimi tanınır
-auto s = string("salam");      // auto -> string kimi tanınır`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    const int MOD = 1000000007;   // dəyəri dəyişməyəcək sabit
+    auto x = 5;                   // auto -> int kimi tanınır
+    auto y = 3.14;                // auto -> double kimi tanınır
+    auto s = string("salam");     // auto -> string kimi tanınır
+
+    cout << MOD << " " << x << " " << y << " " << s << "\\n";
+}`},
       {topic:"Aritmetik, müqayisə və məntiq operatorları",
        code:
-`int a = 7, b = 2;
-cout << a + b << " " << a - b << " " << a * b << "\\n";
-cout << a / b << " " << a % b << "\\n";   // bölmə və qalıq
-bool cond = (a > b) && (b != 0);           // müqayisə + məntiq`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int a = 7, b = 2;
+    cout << a + b << " " << a - b << " " << a * b << "\\n";
+    cout << a / b << " " << a % b << "\\n";   // bölmə və qalıq
+    bool cond = (a > b) && (b != 0);          // müqayisə + məntiq
+    cout << cond << "\\n";
+}`},
       {topic:"Şərt operatorları: if / else if / else, switch-case",
        code:
-`int score = 85;
-if (score >= 90) cout << "A\\n";
-else if (score >= 70) cout << "B\\n";
-else cout << "C\\n";
+`#include <bits/stdc++.h>
+using namespace std;
 
-int day = 2;
-switch (day)
-{
-    case 1: cout << "Bazar ertəsi\\n"; break;
-    case 2: cout << "Çərşənbə axşamı\\n"; break;
-    default: cout << "Digər gün\\n";
+int main(){
+    int score = 85;
+    if (score >= 90) cout << "A\\n";
+    else if (score >= 70) cout << "B\\n";
+    else cout << "C\\n";
+
+    int day = 2;
+    switch (day)
+    {
+        case 1: cout << "Bazar ertəsi\\n"; break;
+        case 2: cout << "Çərşənbə axşamı\\n"; break;
+        default: cout << "Digər gün\\n";
+    }
 }`},
       {topic:"Dövrlər: for, while, do-while və onların fərqləri",
        code:
-`for (int i = 0; i < 5; i++) cout << i << " ";
-cout << "\\n";
+`#include <bits/stdc++.h>
+using namespace std;
 
-int i = 0;
-while (i < 5)
-{
-    cout << i << " ";
-    i++;
-}
-cout << "\\n";
+int main(){
+    for (int i = 0; i < 5; i++) cout << i << " ";
+    cout << "\\n";
 
-int j = 0;
-do
-{
-    cout << j << " ";
-    j++;
-} while (j < 5); // ən azı 1 dəfə işləyir`},
+    int i = 0;
+    while (i < 5)
+    {
+        cout << i << " ";
+        i++;
+    }
+    cout << "\\n";
+
+    int j = 0;
+    do
+    {
+        cout << j << " ";
+        j++;
+    } while (j < 5); // ən azı 1 dəfə işləyir
+    cout << "\\n";
+}`},
       {topic:"break və continue ilə dövr axınına nəzarət",
        code:
-`for (int i = 1; i <= 10; i++)
-{
-    if (i == 5) continue;   // 5-i ötür, dövrü davam etdir
-    if (i == 8) break;      // 8-də dövrü tamamilə dayandır
-    cout << i << " ";
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    for (int i = 1; i <= 10; i++)
+    {
+        if (i == 5) continue;   // 5-i ötür, dövrü davam etdir
+        if (i == 8) break;      // 8-də dövrü tamamilə dayandır
+        cout << i << " ";
+    }
+    cout << "\\n";
 }`},
       {topic:"Tip çevrilmələri: implicit (avtomatik) və explicit (static_cast) çevrilmə",
        code:
-`int a = 7, b = 2;
-double res1 = a / b;                  // 3  -> hələ int bölməsi, sonra double-a çevrilir
-double res2 = (double)a / b;          // 3.5 -> explicit çevrilmə düzgün nəticə verir
-double res3 = static_cast<double>(a) / b; // 3.5 -> müasir C++ üsulu (tövsiyə olunur)
+`#include <bits/stdc++.h>
+using namespace std;
 
-int truncated = (int)3.99;            // 3 -> kəsr hissə atılır, yuvarlaqlaşdırma YOXDUR`},
+int main(){
+    int a = 7, b = 2;
+    double res1 = a / b;                       // 3   -> hələ int bölməsi, sonra double-a çevrilir
+    double res2 = (double)a / b;                // 3.5 -> explicit çevrilmə düzgün nəticə verir
+    double res3 = static_cast<double>(a) / b;   // 3.5 -> müasir C++ üsulu (tövsiyə olunur)
+
+    int truncated = (int)3.99;                  // 3 -> kəsr hissə atılır, yuvarlaqlaşdırma YOXDUR
+
+    cout << res1 << " " << res2 << " " << res3 << " " << truncated << "\\n";
+}`},
       {topic:"Şərti (ternary) operator: cond ? a : b",
        code:
-`int a = 7, b = 2;
-int maxVal = (a > b) ? a : b;         // if/else-in qısa forması
-cout << maxVal << "\\n";              // 7
+`#include <bits/stdc++.h>
+using namespace std;
 
-// cüt/tək yoxlamasını bir sətirdə yazmaq
-string parity = (a % 2 == 0) ? "cüt" : "tək";
-cout << parity << "\\n";`},
+int main(){
+    int a = 7, b = 2;
+    int maxVal = (a > b) ? a : b;          // if/else-in qısa forması
+    cout << maxVal << "\\n";               // 7
+
+    // cüt/tək yoxlamasını bir sətirdə yazmaq
+    string parity = (a % 2 == 0) ? "cüt" : "tək";
+    cout << parity << "\\n";
+}`},
       {topic:"Dəyişənlərin əhatə dairəsi (scope): qlobal vs lokal dəyişənlər",
        code:
-`int globalCounter = 0;   // qlobal dəyişən — bütün funksiyalardan görünür
+`#include <bits/stdc++.h>
+using namespace std;
+
+int globalCounter = 0;   // qlobal dəyişən — bütün funksiyalardan görünür
 
 void increment()
 {
@@ -996,14 +1048,26 @@ int main()
     topicCodes:[
       {topic:"Massiv və vector konteyneri: elan etmək, ölçü vermək, elementlərə müraciət",
        code:
-`int arr[5] = {1, 2, 3, 4, 5};      // statik massiv
-vector<int> v(5, 0);               // 5 elementli, hamısı 0
-v.push_back(10);                   // sona element əlavə et
-v[0] = 99;                          // indekslə müraciət
-cout << "Ölçü: " << v.size() << "\\n";`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int arr[5] = {1, 2, 3, 4, 5};      // statik massiv
+    vector<int> v(5, 0);               // 5 elementli, hamısı 0
+    v.push_back(10);                   // sona element əlavə et
+    v[0] = 99;                          // indekslə müraciət
+    cout << "Ölçü: " << v.size() << "\\n";
+    for (int x : arr) cout << x << " ";
+    cout << "\\n";
+    for (int x : v) cout << x << " ";
+    cout << "\\n";
+}`},
       {topic:"Funksiyalar: parametr ötürmə (dəyər üzrə vs referans üzrə &)",
        code:
-`// orijinalı dəyişmir
+`#include <bits/stdc++.h>
+using namespace std;
+
+// orijinalı dəyişmir
 void byValue(int x)
 {
     x += 10;
@@ -1015,12 +1079,17 @@ void byReference(int &x)
     x += 10;
 }
 
-int n = 5;
-byValue(n);      cout << n << "\\n";   // 5
-byReference(n);  cout << n << "\\n";   // 15`},
+int main(){
+    int n = 5;
+    byValue(n);      cout << n << "\\n";   // 5
+    byReference(n);  cout << n << "\\n";   // 15
+}`},
       {topic:"Sürətli giriş-çıxış: ios::sync_with_stdio(false); cin.tie(nullptr)",
        code:
-`int main()
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main()
 {
     ios::sync_with_stdio(false);  // C və C++ I/O-nu ayırır, sürətlənir
     cin.tie(nullptr);             // cin/cout-un avtomatik sinxronunu ləğv edir
@@ -1030,34 +1099,51 @@ byReference(n);  cout << n << "\\n";   // 15`},
 }`},
       {topic:"cin/cout formatlaşdırma və çoxsətrli giriş oxumaq",
        code:
-`double x = 3.14159;
-cout << fixed << setprecision(2) << x << "\\n"; // 3.14
+`#include <bits/stdc++.h>
+using namespace std;
 
-int n;
-cin >> n;
-vector<int> a(n);
-for (int i = 0; i < n; i++) cin >> a[i];   // çoxsətrli/çoxsaylı giriş
+int main(){
+    double x = 3.14159;
+    cout << fixed << setprecision(2) << x << "\\n"; // 3.14
 
-string line;
-getline(cin, line);   // bütün sətri (boşluqlarla birgə) oxumaq`},
+    int n = 0;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];   // çoxsətrli/çoxsaylı giriş
+    for (int i = 0; i < n; i++) cout << a[i] << " ";
+    cout << "\\n";
+
+    cin.ignore();          // cin >> -dan qalan "\\n" simvolunu udur (getline-dan əvvəl vacibdir)
+    string line;
+    getline(cin, line);    // bütün sətri (boşluqlarla birgə) oxumaq
+    cout << line << "\\n";
+}`},
       {topic:"İki ölçülü massiv/vector (matris): elan, giriş oxumaq, gəzmək",
        code:
-`int n = 3, m = 4;
-vector<vector<int>> grid(n, vector<int>(m, 0));  // n sətir, m sütun, hamısı 0
+`#include <bits/stdc++.h>
+using namespace std;
 
-for (int i = 0; i < n; i++)
-    for (int j = 0; j < m; j++)
-        cin >> grid[i][j];                        // matrisi oxumaq
+int main(){
+    int n = 3, m = 4;
+    vector<vector<int>> grid(n, vector<int>(m, 0));  // n sətir, m sütun, hamısı 0
 
-for (int i = 0; i < n; i++)
-{
-    for (int j = 0; j < m; j++)
-        cout << grid[i][j] << " ";
-    cout << "\\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> grid[i][j];                        // matrisi oxumaq
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+            cout << grid[i][j] << " ";
+        cout << "\\n";
+    }
 }`},
       {topic:"Öz məlumat tipini yaratmaq: struct və pair",
        code:
-`struct Student
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Student
 {
     string name;
     int score;
@@ -1074,20 +1160,26 @@ int main()
 
     vector<Student> students;
     students.push_back({"Nərmin", 95});
+    cout << students[0].name << " " << students[0].score << "\\n";
 }`},
       {topic:"String funksiyaları geniş: substr, find, append, ölçünü dəyişmək",
        code:
-`string s = "Azercell Cup";
+`#include <bits/stdc++.h>
+using namespace std;
 
-cout << s.length() << "\\n";           // 12 -> uzunluq
-cout << s.substr(0, 8) << "\\n";       // "Azercell" -> 0-cı indeksdən 8 simvol
-cout << s.find("Cup") << "\\n";        // 9 -> "Cup" harada başlayır
+int main(){
+    string s = "Azercell Cup";
 
-s += " 2026";                          // sona əlavə etmək (append)
-cout << s << "\\n";                    // "Azercell Cup 2026"
+    cout << s.length() << "\\n";           // 12 -> uzunluq
+    cout << s.substr(0, 8) << "\\n";       // "Azercell" -> 0-cı indeksdən 8 simvol
+    cout << s.find("Cup") << "\\n";        // 9 -> "Cup" harada başlayır
 
-s.resize(8);                           // ölçünü 8-ə endirir -> "Azercell"
-cout << s << "\\n";`},
+    s += " 2026";                          // sona əlavə etmək (append)
+    cout << s << "\\n";                    // "Azercell Cup 2026"
+
+    s.resize(8);                           // ölçünü 8-ə endirir -> "Azercell"
+    cout << s << "\\n";
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1122,16 +1214,24 @@ int main()
     topicCodes:[
       {topic:"Bölünmə, qalıq (%) və onların praktik istifadəsi",
        code:
-`int a = 17, b = 5;
-cout << a / b << "\\n";   // 3  -> tam bölmə
-cout << a % b << "\\n";   // 2  -> qalıq
+`#include <bits/stdc++.h>
+using namespace std;
 
-// cüt/tək yoxlaması qalıqla aparılır
-if (a % 2 == 0) cout << "cütdür\\n";
-else cout << "tәkdir\\n";`},
+int main(){
+    int a = 17, b = 5;
+    cout << a / b << "\\n";   // 3  -> tam bölmə
+    cout << a % b << "\\n";   // 2  -> qalıq
+
+    // cüt/tək yoxlaması qalıqla aparılır
+    if (a % 2 == 0) cout << "cütdür\\n";
+    else cout << "təkdir\\n";
+}`},
       {topic:"ƏBOB (GCD) və ƏKOB (LCM) — Evklid alqoritmi",
        code:
-`long long gcd(long long a, long long b){
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long gcd(long long a, long long b){
     while (b){ a %= b; swap(a, b); }
     return a;
 }
@@ -1146,7 +1246,10 @@ int main(){
 }`},
       {topic:"Sadə ədədlər: yoxlama üsulu və Eratosfen ələyi",
        code:
-`bool isPrime(int n){
+`#include <bits/stdc++.h>
+using namespace std;
+
+bool isPrime(int n){
     if (n < 2) return false;
     for (int i = 2; i * i <= n; i++)
         if (n % i == 0) return false;
@@ -1154,6 +1257,8 @@ int main(){
 }
 
 int main(){
+    cout << isPrime(17) << " " << isPrime(18) << "\\n"; // 1 0
+
     const int N = 100;
     vector<bool> isComposite(N + 1, false);
     for (int i = 2; i * i <= N; i++)
@@ -1161,36 +1266,49 @@ int main(){
             for (int j = i * i; j <= N; j += i)
                 isComposite[j] = true;
     // isComposite[i] == false  ->  i sadə ədəddir
+    for (int i = 2; i <= 30; i++)
+        if (!isComposite[i]) cout << i << " ";
+    cout << "\\n";
 }`},
       {topic:"Bit əməliyyatları əsasları: AND (&), OR (|), XOR (^), NOT (~), sürüşmə (<<, >>)",
        code:
-`int a = 6;   // ikilikdə: 110
-int b = 3;   // ikilikdə: 011
+`#include <bits/stdc++.h>
+using namespace std;
 
-cout << (a & b) << "\\n";   // 2  -> AND: 010
-cout << (a | b) << "\\n";   // 7  -> OR:  111
-cout << (a ^ b) << "\\n";   // 5  -> XOR: 101 (fərqli bitlər 1 olur)
-cout << (~a) << "\\n";      // -7 -> NOT: bütün bitləri tərsinə çevirir
+int main(){
+    int a = 6;   // ikilikdə: 110
+    int b = 3;   // ikilikdə: 011
 
-cout << (a << 1) << "\\n";  // 12 -> sola sürüşmə = 2-yə vurmaq
-cout << (a >> 1) << "\\n";  // 3  -> sağa sürüşmə = 2-yə bölmək`},
+    cout << (a & b) << "\\n";   // 2  -> AND: 010
+    cout << (a | b) << "\\n";   // 7  -> OR:  111
+    cout << (a ^ b) << "\\n";   // 5  -> XOR: 101 (fərqli bitlər 1 olur)
+    cout << (~a) << "\\n";      // -7 -> NOT: bütün bitləri tərsinə çevirir
+
+    cout << (a << 1) << "\\n";  // 12 -> sola sürüşmə = 2-yə vurmaq
+    cout << (a >> 1) << "\\n";  // 3  -> sağa sürüşmə = 2-yə bölmək
+}`},
       {topic:"Say sistemləri: 10-luq, 2-lik və 16-lıq say sistemləri arasında çevrilmə",
        code:
-`int n = 42;
+`#include <bits/stdc++.h>
+using namespace std;
 
-// 10-luqdan 2-liyə: qalıqları yazıb tərsinə oxumaq
-string binary = "";
-int temp = n;
-while (temp > 0){
-    binary = char('0' + temp % 2) + binary;
-    temp /= 2;
-}
-cout << "2-lik: " << binary << "\\n";   // 101010
+int main(){
+    int n = 42;
 
-// C++-da hazır alətlərlə çap etmək
-cout << hex << n << "\\n";              // 16-lıq: 2a
-cout << oct << n << "\\n";              // 8-lik: 52
-cout << dec << n << "\\n";              // geri 10-luğa qaytarır`},
+    // 10-luqdan 2-liyə: qalıqları yazıb tərsinə oxumaq
+    string binary = "";
+    int temp = n;
+    while (temp > 0){
+        binary = char('0' + temp % 2) + binary;
+        temp /= 2;
+    }
+    cout << "2-lik: " << binary << "\\n";   // 101010
+
+    // C++-da hazır alətlərlə çap etmək
+    cout << hex << n << "\\n";              // 16-lıq: 2a
+    cout << oct << n << "\\n";              // 8-lik: 52
+    cout << dec << n << "\\n";              // geri 10-luğa qaytarır
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1225,27 +1343,40 @@ int main(){
     topicCodes:[
       {topic:"Ədədin rəqəmlərinə ayrılması, rəqəmlər cəmi",
        code:
-`int n = 4827;
-int sum = 0;
-while (n > 0){
-    int digit = n % 10;   // sonuncu rəqəmi ayır
-    sum += digit;
-    n /= 10;              // sonuncu rəqəmi at
-}
-cout << "Rəqəmlər cəmi: " << sum << "\\n"; // 21`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 4827;
+    int sum = 0;
+    while (n > 0){
+        int digit = n % 10;   // sonuncu rəqəmi ayır
+        sum += digit;
+        n /= 10;              // sonuncu rəqəmi at
+    }
+    cout << "Rəqəmlər cəmi: " << sum << "\\n"; // 21
+}`},
       {topic:"Modul aritmetika: (a+b)%m, (a*b)%m qaydaları",
        code:
-`const int MOD = 1000000007;
-long long a = 999999999, b = 999999999;
+`#include <bits/stdc++.h>
+using namespace std;
 
-// toplama və vurmadan sonra dərhal mod almaq daşmanın qarşısını alır
-long long sum  = (a % MOD + b % MOD) % MOD;
-long long prod = (a % MOD) * (b % MOD) % MOD;
+int main(){
+    const int MOD = 1000000007;
+    long long a = 999999999, b = 999999999;
 
-cout << sum << " " << prod << "\\n";`},
+    // toplama və vurmadan sonra dərhal mod almaq daşmanın qarşısını alır
+    long long sum  = (a % MOD + b % MOD) % MOD;
+    long long prod = (a % MOD) * (b % MOD) % MOD;
+
+    cout << sum << " " << prod << "\\n";
+}`},
       {topic:"Dərəcəyə yüksəltmə (sürətli qüvvət) məntiqi",
        code:
-`long long power(long long base, long long exp, long long mod){
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long power(long long base, long long exp, long long mod){
     long long result = 1;
     base %= mod;
     while (exp > 0){
@@ -1261,7 +1392,10 @@ int main(){
 }`},
       {topic:"Faktorial, kombinatorika əsasları (n!, C(n,k) fikri)",
        code:
-`long long fact(int n){
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long fact(int n){
     long long res = 1;
     for (int i = 2; i <= n; i++) res *= i;
     return res;
@@ -1278,32 +1412,44 @@ int main(){
 }`},
       {topic:"Tam ədəd daşması (overflow) və long long-un vacibliyi",
        code:
-`int a = 2000000000;
-int b = 2000000000;
-cout << a + b << "\\n";              // SƏHV: int daşır (overflow)
+`#include <bits/stdc++.h>
+using namespace std;
 
-long long la = a, lb = b;
-cout << la + lb << "\\n";            // DÜZGÜN: 4000000000
+int main(){
+    int a = 2000000000;
+    int b = 2000000000;
+    cout << a + b << "\\n";              // SƏHV: int daşır (overflow)
 
-// vurma zamanı daşma daha tez baş verir — diqqətli olun
-long long product = (long long)a * b;`},
+    long long la = a, lb = b;
+    cout << la + lb << "\\n";            // DÜZGÜN: 4000000000
+
+    // vurma zamanı daşma daha tez baş verir — diqqətli olun
+    long long product = (long long)a * b;
+    cout << product << "\\n";
+}`},
       {topic:"Ədədin bütün bölənlərinin tapılması və sayının hesablanması",
        code:
-`int n = 36;
-vector<int> divisors;
+`#include <bits/stdc++.h>
+using namespace std;
 
-// yalnız √n-ə qədər gəzmək kifayətdir — hər cütü (i, n/i) bir dəfə tapırıq
-for (int i = 1; i * i <= n; i++)
-{
-    if (n % i == 0)
+int main(){
+    int n = 36;
+    vector<int> divisors;
+
+    // yalnız √n-ə qədər gəzmək kifayətdir — hər cütü (i, n/i) bir dəfə tapırıq
+    for (int i = 1; i * i <= n; i++)
     {
-        divisors.push_back(i);
-        if (i != n / i) divisors.push_back(n / i);  // iki fərqli bölən
+        if (n % i == 0)
+        {
+            divisors.push_back(i);
+            if (i != n / i) divisors.push_back(n / i);  // iki fərqli bölən
+        }
     }
-}
 
-cout << "Bölənlərin sayı: " << divisors.size() << "\\n";  // 9
-for (int d : divisors) cout << d << " ";                  // 1 2 3 4 6 9 12 18 36`},
+    cout << "Bölənlərin sayı: " << divisors.size() << "\\n";  // 9
+    for (int d : divisors) cout << d << " ";                  // 1 2 3 4 6 9 12 18 36
+    cout << "\\n";
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1332,38 +1478,56 @@ int main(){
     topicCodes:[
       {topic:"Sətir emalı: substring, reverse, uzunluq, simvollara müraciət",
        code:
-`string s = "salam dunya";
+`#include <bits/stdc++.h>
+using namespace std;
 
-cout << s.length() << "\\n";        // 11 -> uzunluq
-cout << s[0] << "\\n";               // 's' -> ilk simvol
-cout << s.substr(6, 5) << "\\n";     // "dunya" -> 6-dan 5 simvol
+int main(){
+    string s = "salam dunya";
 
-reverse(s.begin(), s.end());        // sətri tərsinə çevirir
-cout << s << "\\n";`},
+    cout << s.length() << "\\n";        // 11 -> uzunluq
+    cout << s[0] << "\\n";               // 's' -> ilk simvol
+    cout << s.substr(6, 5) << "\\n";     // "dunya" -> 6-dan 5 simvol
+
+    reverse(s.begin(), s.end());        // sətri tərsinə çevirir
+    cout << s << "\\n";
+}`},
       {topic:"Sətirlərin müqayisəsi və birləşdirilməsi (concatenation)",
        code:
-`string a = "Baku", b = "Azercell";
+`#include <bits/stdc++.h>
+using namespace std;
 
-string full = a + " - " + b;        // birləşdirmə (+)
-cout << full << "\\n";
+int main(){
+    string a = "Baku", b = "Azercell";
 
-if (a == "Baku") cout << "beraberdir\\n";
-if (a < b) cout << "a lugat sirasi ile b-den ondedir\\n"; // '<' əlifba sırası ilə müqayisə edir`},
+    string full = a + " - " + b;        // birləşdirmə (+)
+    cout << full << "\\n";
+
+    if (a == "Baku") cout << "bərabərdir\\n";
+    if (a < b) cout << "a lüğət sırası ilə b-dən öndədir\\n"; // '<' əlifba sırası ilə müqayisə edir
+}`},
       {topic:"Sətri sözlərə bölmək (split məntiqi, stringstream)",
        code:
-`#include <sstream>
-string line = "12 7 45 3";
-stringstream ss(line);
+`#include <bits/stdc++.h>
+using namespace std;
 
-int x;
-vector<int> nums;
-while (ss >> x)               // hər çağırışda növbəti ədədi oxuyur
-    nums.push_back(x);
+int main(){
+    string line = "12 7 45 3";
+    stringstream ss(line);
 
-for (int v : nums) cout << v << " ";  // 12 7 45 3`},
+    int x;
+    vector<int> nums;
+    while (ss >> x)               // hər çağırışda növbəti ədədi oxuyur
+        nums.push_back(x);
+
+    for (int v : nums) cout << v << " ";  // 12 7 45 3
+    cout << "\\n";
+}`},
       {topic:"İki göstərici (two pointers) metodu: eyni istiqamətdə və əks istiqamətdə",
        code:
-`// Əks istiqamətdə: massivin palindrom olub-olmadığını yoxlamaq
+`#include <bits/stdc++.h>
+using namespace std;
+
+// Əks istiqamətdə: massivin palindrom olub-olmadığını yoxlamaq
 bool isPalindrome(vector<int>& a){
     int left = 0, right = a.size() - 1;
     while (left < right){
@@ -1371,6 +1535,11 @@ bool isPalindrome(vector<int>& a){
         left++; right--;      // bir-birinə tərəf yaxınlaşırlar
     }
     return true;
+}
+
+int main(){
+    vector<int> a = {1, 2, 3, 2, 1};
+    cout << (isPalindrome(a) ? "Palindromdur" : "Palindrom deyil") << "\\n";
 }`},
     ],
     code:
@@ -1402,43 +1571,61 @@ int main(){
     topicCodes:[
       {topic:"Prefiks cəmi (prefix sum) ilə aralıq sorğularını sürətləndirmək",
        code:
-`vector<int> a = {2, 5, 1, 3, 4, 7};
-int n = a.size();
+`#include <bits/stdc++.h>
+using namespace std;
 
-vector<long long> prefix(n + 1, 0);
-for (int i = 0; i < n; i++)
-    prefix[i + 1] = prefix[i] + a[i];   // prefix[i] = a[0]+...+a[i-1]
+int main(){
+    vector<int> a = {2, 5, 1, 3, 4, 7};
+    int n = a.size();
 
-int l = 1, r = 4;
-cout << "Cəm: " << prefix[r] - prefix[l] << "\\n"; // O(1)-də aralıq cəmi`},
+    vector<long long> prefix(n + 1, 0);
+    for (int i = 0; i < n; i++)
+        prefix[i + 1] = prefix[i] + a[i];   // prefix[i] = a[0]+...+a[i-1]
+
+    int l = 1, r = 4;
+    cout << "Cəm: " << prefix[r] - prefix[l] << "\\n"; // O(1)-də aralıq cəmi
+}`},
       {topic:"Sürüşən pəncərə (sliding window) texnikasının əsasları",
        code:
-`vector<int> a = {2, 1, 5, 1, 3, 2};
-int k = 3;   // pəncərə ölçüsü
+`#include <bits/stdc++.h>
+using namespace std;
 
-long long windowSum = 0;
-for (int i = 0; i < k; i++) windowSum += a[i];
-long long best = windowSum;
+int main(){
+    vector<int> a = {2, 1, 5, 1, 3, 2};
+    int k = 3;   // pəncərə ölçüsü
 
-for (int i = k; i < (int)a.size(); i++){
-    windowSum += a[i] - a[i - k];   // biri girir, biri çıxır -> O(1)
-    best = max(best, windowSum);
-}
-cout << "Maksimum " << k << " uzunluqlu pəncərə cəmi: " << best << "\\n";`},
+    long long windowSum = 0;
+    for (int i = 0; i < k; i++) windowSum += a[i];
+    long long best = windowSum;
+
+    for (int i = k; i < (int)a.size(); i++){
+        windowSum += a[i] - a[i - k];   // biri girir, biri çıxır -> O(1)
+        best = max(best, windowSum);
+    }
+    cout << "Maksimum " << k << " uzunluqlu pəncərə cəmi: " << best << "\\n";
+}`},
       {topic:"Massivdə maksimum/minimum alt-massiv axtarışı",
        code:
-`// Kadane alqoritmi: maksimum cəmli ardıcıl alt-massiv
-vector<int> a = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+`#include <bits/stdc++.h>
+using namespace std;
 
-long long best = a[0], cur = a[0];
-for (int i = 1; i < (int)a.size(); i++){
-    cur = max((long long)a[i], cur + a[i]);  // ya yeni başla, ya davam et
-    best = max(best, cur);
-}
-cout << "Maksimum alt-massiv cəmi: " << best << "\\n"; // 6`},
+int main(){
+    // Kadane alqoritmi: maksimum cəmli ardıcıl alt-massiv
+    vector<int> a = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+
+    long long best = a[0], cur = a[0];
+    for (int i = 1; i < (int)a.size(); i++){
+        cur = max((long long)a[i], cur + a[i]);  // ya yeni başla, ya davam et
+        best = max(best, cur);
+    }
+    cout << "Maksimum alt-massiv cəmi: " << best << "\\n"; // 6
+}`},
       {topic:"Vaxt mürəkkəbliyini brute-force ilə optimallaşdırılmış həll arasında müqayisə etmək",
        code:
-`// Brute-force: bütün alt-massivləri yoxlamaq -> O(n^2)
+`#include <bits/stdc++.h>
+using namespace std;
+
+// Brute-force: bütün alt-massivləri yoxlamaq -> O(n^2)
 int bruteForce(vector<int>& a){
     int n = a.size(), best = a[0];
     for (int i = 0; i < n; i++){
@@ -1447,8 +1634,13 @@ int bruteForce(vector<int>& a){
     }
     return best;
 }
-// Prefiks cəmi / sliding window ilə eyni nəticə O(n)-də alınır
-// -> n böyük olduqda (məs. 10^5) O(n^2) vaxt limitini keçir, O(n) keçir`},
+
+int main(){
+    vector<int> a = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+    cout << "Brute-force nəticə: " << bruteForce(a) << "\\n"; // 6
+    // Prefiks cəmi / sliding window ilə eyni nəticə O(n)-də alınır
+    // -> n böyük olduqda (məs. 10^5) O(n^2) vaxt limitini keçir, O(n) keçir
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1487,44 +1679,105 @@ int main(){
     topicCodes:[
       {topic:"Standart sort() funksiyası: artan/azalan sıralama",
        code:
-`vector<int> a = {9, 2, 7, 4, 1, 5};
-sort(a.begin(), a.end());                  // artan: 1 2 4 5 7 9
-sort(a.begin(), a.end(), greater<int>());  // azalan: 9 7 5 4 2 1`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {9, 2, 7, 4, 1, 5};
+    sort(a.begin(), a.end());                  // artan: 1 2 4 5 7 9
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+
+    sort(a.begin(), a.end(), greater<int>());  // azalan: 9 7 5 4 2 1
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}`},
       {topic:"Öz comparator-un yazılması (lambda ilə xüsusi sıralama qaydası)",
        code:
-`vector<pair<int,string>> people = {{25,"Ali"},{19,"Aygun"},{30,"Vusal"}};
-sort(people.begin(), people.end(),
-     [](auto &a, auto &b){ return a.first < b.first; }); // yaşa görə artan`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<pair<int,string>> people = {{25,"Ali"},{19,"Aygun"},{30,"Vusal"}};
+    sort(people.begin(), people.end(),
+         [](auto &a, auto &b){ return a.first < b.first; }); // yaşa görə artan
+
+    for (auto &p : people) cout << p.second << "(" << p.first << ") ";
+    cout << "\\n";
+}`},
       {topic:"Sabit-nöqtəli (stable) çeşidləmə anlayışı",
        code:
-`vector<pair<int,char>> a = {{2,'a'},{1,'b'},{2,'c'},{1,'d'}};
-stable_sort(a.begin(), a.end(),
-    [](auto &x, auto &y){ return x.first < y.first; });
-// bərabər açarlı elementlərin orijinal sırası qorunur: (1,b)(1,d)(2,a)(2,c)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<pair<int,char>> a = {{2,'a'},{1,'b'},{2,'c'},{1,'d'}};
+    stable_sort(a.begin(), a.end(),
+        [](auto &x, auto &y){ return x.first < y.first; });
+    // bərabər açarlı elementlərin orijinal sırası qorunur: (1,b)(1,d)(2,a)(2,c)
+    for (auto &p : a) cout << "(" << p.first << "," << p.second << ") ";
+    cout << "\\n";
+}`},
       {topic:"Sıralı massivdə binar axtarış (binary_search)",
        code:
-`vector<int> a = {1, 2, 4, 5, 7, 9};
-bool found = binary_search(a.begin(), a.end(), 5); // true, O(log n)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {1, 2, 4, 5, 7, 9};
+    bool found = binary_search(a.begin(), a.end(), 5); // true, O(log n)
+    cout << found << "\\n";
+}`},
       {topic:"lower_bound və upper_bound funksiyalarının işləmə məntiqi",
        code:
-`vector<int> a = {1, 2, 4, 4, 4, 7, 9};
-auto lo = lower_bound(a.begin(), a.end(), 4); // ilk 4-ün mövqeyi
-auto hi = upper_bound(a.begin(), a.end(), 4); // 4-dən böyük ilk elementin mövqeyi
-cout << "4-lər sayı: " << (hi - lo) << "\\n";  // 3`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {1, 2, 4, 4, 4, 7, 9};
+    auto lo = lower_bound(a.begin(), a.end(), 4); // ilk 4-ün mövqeyi
+    auto hi = upper_bound(a.begin(), a.end(), 4); // 4-dən böyük ilk elementin mövqeyi
+    cout << "4-lər sayı: " << (hi - lo) << "\\n";  // 3
+}`},
       {topic:"'Cavab üzərində' binar axtarış: monoton şərt tapmaq",
        code:
-`// Məs: "minimum sürəti tap ki, bütün tapşırıqlar T vaxtında bitsin"
-int lo = 1, hi = 1000000, ans = -1;
-while (lo <= hi){
-    int mid = lo + (hi - lo) / 2;
-    if (isEnough(mid)){ ans = mid; hi = mid - 1; } // şərt monoton olmalıdır
-    else lo = mid + 1;
+`#include <bits/stdc++.h>
+using namespace std;
+
+// Məs: "minimum sürəti tap ki, bütün tapşırıqlar T vaxtında bitsin"
+vector<int> tasks = {5, 8, 3, 12};
+int T = 10;
+
+bool isEnough(int speed){
+    long long time = 0;
+    for (int t : tasks) time += (t + speed - 1) / speed; // ceil(t / speed)
+    return time <= T;
+}
+
+int main(){
+    int lo = 1, hi = 1000000, ans = -1;
+    while (lo <= hi){
+        int mid = lo + (hi - lo) / 2;
+        if (isEnough(mid)){ ans = mid; hi = mid - 1; } // şərt monoton olmalıdır
+        else lo = mid + 1;
+    }
+    cout << "Minimum sürət: " << ans << "\\n";
 }`},
       {topic:"Sıralamanın həll strategiyasına necə təsir etdiyi (məs. greedy ilə əlaqə)",
        code:
-`// Fəaliyyət seçimi kimi çox greedy məsələ əvvəlcə sıralama tələb edir
-sort(intervals.begin(), intervals.end(),
-     [](auto &a, auto &b){ return a.second < b.second; }); // bitmə vaxtına görə`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<pair<int,int>> intervals = {{1,4},{3,5},{0,6},{5,7},{8,9}};
+
+    // Fəaliyyət seçimi kimi çox greedy məsələ əvvəlcə sıralama tələb edir
+    sort(intervals.begin(), intervals.end(),
+         [](auto &a, auto &b){ return a.second < b.second; }); // bitmə vaxtına görə
+
+    for (auto &p : intervals) cout << "(" << p.first << "," << p.second << ") ";
+    cout << "\\n";
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1559,7 +1812,10 @@ int main(){
     topicCodes:[
       {topic:"Rekursiv funksiya anlayışı: baza şərti və rekursiv addım",
        code:
-`long long factorial(int n){
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long factorial(int n){
     if (n <= 1) return 1;         // baza şərti
     return n * factorial(n - 1);  // rekursiv addım
 }
@@ -1569,13 +1825,21 @@ int main(){
 }`},
       {topic:"Rekursiya zamanı stack-in necə işlədiyini başa düşmək",
        code:
-`// factorial(3) çağırışının stack-də izi:
-// factorial(3) -> factorial(2) -> factorial(1) [baza, 1 qaytarır]
-// geri qayıdış: 2*1=2, sonra 3*2=6
-// Hər çağırış öz "stack frame"-ini yaradır, baza şərtinə çatanda geri sarınmağa başlayır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // factorial(3) çağırışının stack-də izi:
+    // factorial(3) -> factorial(2) -> factorial(1) [baza, 1 qaytarır]
+    // geri qayıdış: 2*1=2, sonra 3*2=6
+    // Hər çağırış öz "stack frame"-ini yaradır, baza şərtinə çatanda geri sarınmağa başlayır.
+}`},
       {topic:"Faktorial, Fibonacci kimi klassik rekursiv nümunələr",
        code:
-`long long fib(int n){
+`#include <bits/stdc++.h>
+using namespace std;
+
+long long fib(int n){
     if (n <= 1) return n;              // baza şərti
     return fib(n - 1) + fib(n - 2);    // rekursiv addım
 }
@@ -1586,10 +1850,15 @@ int main(){
 }`},
       {topic:"Rekursiyanın effektivliyini qiymətləndirmək (nə vaxt yavaş işləyir)",
        code:
-`// Sadə rekursiv fib(n) hər çağırışı 2 yeni çağırışa bölür -> O(2^n)
-// n=40 üçün belə praktik olaraq çox yavaş işləyir.
-// Həll: memoization (yadda saxlama) və ya tabulation istifadə etmək
-// (bu, Ay 4-də DP mövzusunda ətraflı öyrəniləcək)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Sadə rekursiv fib(n) hər çağırışı 2 yeni çağırışa bölür -> O(2^n)
+    // n=40 üçün belə praktik olaraq çox yavaş işləyir.
+    // Həll: memoization (yadda saxlama) və ya tabulation istifadə etmək
+    // (bu, Ay 4-də DP mövzusunda ətraflı öyrəniləcək)
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1614,17 +1883,33 @@ int main(){
     topicCodes:[
       {topic:"Backtracking məntiqi: seçim et → irəli get → geri qayıt",
        code:
-`void backtrack(int step){
-    if (/* baza şərti */ false){ /* nəticəni qeyd et */ return; }
-    for (int secim = 0; secim < 2; secim++){
-        // et(secim);        -> seçimi et
-        backtrack(step + 1); // irəli get
-        // geriQaytar(secim); -> geri qayıt (backtrack)
+`#include <bits/stdc++.h>
+using namespace std;
+
+const int N = 3; // neçə addım (uzunluq) generasiya olunacaq
+string current = "";
+
+void backtrack(int step){
+    if (step == N){                 // baza şərti: N addıma çatdıq
+        cout << current << "\\n";   // nəticəni çap et
+        return;
     }
+    for (int secim = 0; secim <= 1; secim++){
+        current += char('0' + secim); // seçimi et (irəli get)
+        backtrack(step + 1);          // irəli get
+        current.pop_back();           // geri qayıt (backtrack)
+    }
+}
+
+int main(){
+    backtrack(0);
 }`},
       {topic:"Bütün alt-çoxluqların (subset) generasiyası",
        code:
-`vector<int> current;
+`#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> current;
 int n;
 
 void generate(int index){
@@ -1637,20 +1922,35 @@ void generate(int index){
     current.push_back(index + 1);
     generate(index + 1);              // index-ci elementi daxil et
     current.pop_back();               // backtrack: geri qaytar
+}
+
+int main(){
+    n = 3;
+    generate(0);
 }`},
       {topic:"Bütün permutasiyaların (sıralamaların) generasiyası",
        code:
-`vector<int> a = {1, 2, 3};
-sort(a.begin(), a.end());
-do {
-    for (int v : a) cout << v << " ";
-    cout << "\\n";
-} while (next_permutation(a.begin(), a.end()));`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {1, 2, 3};
+    sort(a.begin(), a.end());
+    do {
+        for (int v : a) cout << v << " ";
+        cout << "\\n";
+    } while (next_permutation(a.begin(), a.end()));
+}`},
       {topic:"Kiçik ölçülü perebor (brute-force) məsələlərində backtracking-in tətbiqi",
        code:
-`// n <= 10-12 olan tapşırıqlarda backtracking adətən kifayət edir.
-// n böyükdürsə (məs. 10^5), backtracking vaxt limitini keçəcək —
-// belə halda DP/greedy kimi alternativ axtarılmalıdır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // n <= 10-12 olan tapşırıqlarda backtracking adətən kifayət edir.
+    // n böyükdürsə (məs. 10^5), backtracking vaxt limitini keçəcək —
+    // belə halda DP/greedy kimi alternativ axtarılmalıdır.
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1694,60 +1994,113 @@ int main(){
     topicCodes:[
       {topic:"map/set: açar-dəyər saxlama, avtomatik sıralama, sürətli axtarış",
        code:
-`map<string, int> age;
-age["Tom"] = 12;
-age["Alice"] = 13;
-if (age.count("Tom")) cout << age["Tom"] << "\\n";
+`#include <bits/stdc++.h>
+using namespace std;
 
-set<int> s = {5, 3, 5, 1, 3};   // {1, 3, 5} -> avtomatik sıralı, unikal`},
+int main(){
+    map<string, int> age;
+    age["Tom"] = 12;
+    age["Alice"] = 13;
+    if (age.count("Tom")) cout << age["Tom"] << "\\n";
+
+    set<int> s = {5, 3, 5, 1, 3};   // {1, 3, 5} -> avtomatik sıralı, unikal
+    for (int x : s) cout << x << " ";
+    cout << "\\n";
+}`},
       {topic:"unordered_map/unordered_set: orta halda daha sürətli axtarış",
        code:
-`unordered_map<string,int> fast;
-fast["Ali"] = 12;                 // orta halda O(1) axtarış (sıra qorunmur)
+`#include <bits/stdc++.h>
+using namespace std;
 
-unordered_set<int> us = {5, 3, 1}; // sıralama yoxdur, amma daha sürətlidir`},
+int main(){
+    unordered_map<string,int> fast;
+    fast["Ali"] = 12;                 // orta halda O(1) axtarış (sıra qorunmur)
+    cout << fast["Ali"] << "\\n";
+
+    unordered_set<int> us = {5, 3, 1}; // sıralama yoxdur, amma daha sürətlidir
+    for (int x : us) cout << x << " ";
+    cout << "\\n";
+}`},
       {topic:"Stack (LIFO): mötərizə yoxlaması, geri qayıtma məntiqi",
        code:
-`string s = "(()())";
-stack<char> st;
-bool ok = true;
-for (char c : s){
-    if (c == '(') st.push(c);
-    else { if (st.empty()) ok = false; else st.pop(); }
-}
-ok = ok && st.empty();
-cout << (ok ? "Düzgün" : "Səhv") << "\\n";`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    string s = "(()())";
+    stack<char> st;
+    bool ok = true;
+    for (char c : s){
+        if (c == '(') st.push(c);
+        else { if (st.empty()) ok = false; else st.pop(); }
+    }
+    ok = ok && st.empty();
+    cout << (ok ? "Düzgün" : "Səhv") << "\\n";
+}`},
       {topic:"Queue (FIFO): BFS-də istifadə, sıra prinsipi",
        code:
-`queue<int> q;
-q.push(1); q.push(2); q.push(3);
-cout << q.front() << "\\n"; // 1 -> ilk giren ilk çıxır
-q.pop();`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    queue<int> q;
+    q.push(1); q.push(2); q.push(3);
+    cout << q.front() << "\\n"; // 1 -> ilk giren ilk çıxır
+    q.pop();
+    cout << q.front() << "\\n"; // 2
+}`},
       {topic:"priority_queue (heap): ən böyük/ən kiçik elementi tez tapmaq",
        code:
-`priority_queue<int> pq;             // max-heap (default)
-pq.push(3); pq.push(1); pq.push(5);
-cout << pq.top() << "\\n";           // 5 -> ən böyük dərhal əldə olunur
+`#include <bits/stdc++.h>
+using namespace std;
 
-priority_queue<int, vector<int>, greater<int>> minPq; // min-heap`},
+int main(){
+    priority_queue<int> pq;             // max-heap (default)
+    pq.push(3); pq.push(1); pq.push(5);
+    cout << pq.top() << "\\n";           // 5 -> ən böyük dərhal əldə olunur
+
+    priority_queue<int, vector<int>, greater<int>> minPq; // min-heap
+    minPq.push(3); minPq.push(1); minPq.push(5);
+    cout << minPq.top() << "\\n";        // 1 -> ən kiçik dərhal əldə olunur
+}`},
       {topic:"deque: hər iki tərəfdən əlavə/silmə əməliyyatları",
        code:
-`deque<int> dq;
-dq.push_back(1); dq.push_front(0);
-dq.push_back(2);
-cout << dq.front() << " " << dq.back() << "\\n"; // 0 2`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    deque<int> dq;
+    dq.push_back(1); dq.push_front(0);
+    dq.push_back(2);
+    cout << dq.front() << " " << dq.back() << "\\n"; // 0 2
+}`},
       {topic:"Sadə linked-list məntiqi və massivdən fərqi",
        code:
-`struct Node{ int val; Node* next; };
-// massivdən fərqli olaraq elementlər ardıcıl yaddaşda deyil,
-// hər node növbətinin ünvanını saxlayır -> ortadan əlavə/silmə O(1)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Node{ int val; Node* next; };
+
+int main(){
+    // massivdən fərqli olaraq elementlər ardıcıl yaddaşda deyil,
+    // hər node növbətinin ünvanını saxlayır -> ortadan əlavə/silmə O(1)
+    Node a{1, nullptr};
+    Node b{2, nullptr};
+    a.next = &b;
+    cout << a.val << " -> " << a.next->val << "\\n";
+}`},
       {topic:"Hansı məsələdə hansı strukturun seçilməsi lazım olduğunu müəyyənləşdirmək",
        code:
-`// Sürətli axtarış + sıralı saxlama lazımdır -> set/map
-// Sadəcə sürətli axtarış (sıra vacib deyil) -> unordered_map/set
-// LIFO lazımdır (son gələn ilk çıxsın) -> stack
-// FIFO lazımdır (BFS və s.) -> queue
-// Ən böyük/kiçiyi davamlı tez tapmaq lazımdır -> priority_queue`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Sürətli axtarış + sıralı saxlama lazımdır -> set/map
+    // Sadəcə sürətli axtarış (sıra vacib deyil) -> unordered_map/set
+    // LIFO lazımdır (son gələn ilk çıxsın) -> stack
+    // FIFO lazımdır (BFS və s.) -> queue
+    // Ən böyük/kiçiyi davamlı tez tapmaq lazımdır -> priority_queue
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1785,44 +2138,92 @@ int main(){
     topicCodes:[
       {topic:"Greedy (acgöz) yanaşmanın əsas fikri: hər addımda lokal optimal seçim",
        code:
-`// Hər addımda "indiki ən yaxşı görünən" seçimi et, geri qayıtma (backtrack) yoxdur.
-// Bu yanaşma sürətlidir, amma hər məsələdə düzgün nəticə vermir.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Hər addımda "indiki ən yaxşı görünən" seçimi et, geri qayıtma (backtrack) yoxdur.
+    // Bu yanaşma sürətlidir, amma hər məsələdə düzgün nəticə vermir.
+}`},
       {topic:"Greedy nə vaxt düzgün nəticə verir, nə vaxt yanlış ola bilər",
        code:
-`// Sikkələr: {1, 3, 4}, məbləğ = 6
-// Greedy (ən böyükdən): 4 + 1 + 1 = 3 sikkə
-// Optimal: 3 + 3 = 2 sikkə  -> greedy bu sistemdə YANLIŞ nəticə verdi`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Sikkələr: {1, 3, 4}, məbləğ = 6
+    // Greedy (ən böyükdən): 4 + 1 + 1 = 3 sikkə
+    // Optimal: 3 + 3 = 2 sikkə  -> greedy bu sistemdə YANLIŞ nəticə verdi
+    vector<int> coins = {4, 3, 1};
+    int amount = 6, remaining = amount, greedyCount = 0;
+    for (int c : coins)
+        while (remaining >= c){ remaining -= c; greedyCount++; }
+    cout << "Greedy sikkə sayı: " << greedyCount << "\\n";   // 3
+    cout << "Optimal sikkə sayı: 2 (3+3)" << "\\n";
+}`},
       {topic:"Klassik nümunə: maksimum sayda kəsişməyən interval seçimi",
        code:
-`vector<pair<int,int>> intervals = {{1,3},{2,4},{3,5},{6,8}};
+`#include <bits/stdc++.h>
+using namespace std;
 
-sort(intervals.begin(), intervals.end(),
-     [](auto &a, auto &b){ return a.second < b.second; });
+int main(){
+    vector<pair<int,int>> intervals = {{1,3},{2,4},{3,5},{6,8}};
 
-int count = 0, lastEnd = INT_MIN;
-for (auto &[start, end] : intervals){
-    if (start >= lastEnd){ count++; lastEnd = end; }
-}
-cout << "Maksimum interval sayı: " << count << "\\n";`},
+    sort(intervals.begin(), intervals.end(),
+         [](auto &a, auto &b){ return a.second < b.second; });
+
+    int count = 0, lastEnd = INT_MIN;
+    for (auto &[start, end] : intervals){
+        if (start >= lastEnd){ count++; lastEnd = end; }
+    }
+    cout << "Maksimum interval sayı: " << count << "\\n";
+}`},
       {topic:"Sikkə problemi və greedy-nin bütün sikkə sistemlərində işləməməsi",
        code:
-`vector<int> coins = {1, 5, 10, 25};   // bu sistemdə greedy düzgün işləyir
-int amount = 63, count = 0;
-sort(coins.rbegin(), coins.rend());
-for (int c : coins){ count += amount / c; amount %= c; }
-cout << "Minimum sikkə: " << count << "\\n";`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> coins = {1, 5, 10, 25};   // bu sistemdə greedy düzgün işləyir
+    int amount = 63, count = 0;
+    sort(coins.rbegin(), coins.rend());
+    for (int c : coins){ count += amount / c; amount %= c; }
+    cout << "Minimum sikkə: " << count << "\\n";
+}`},
       {topic:"Fəaliyyət seçimi (activity selection) məsələləri",
        code:
-`// Fəaliyyət seçimi: bitmə vaxtına görə sırala, uyğun gələni seç
-// (yuxarıdakı interval seçimi kodu ilə eyni məntiq — fərq yalnız kontekstdədir)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Fəaliyyət seçimi: bitmə vaxtına görə sırala, uyğun gələni seç
+    // (yuxarıdakı interval seçimi kodu ilə eyni məntiq — fərq yalnız kontekstdədir)
+}`},
       {topic:"Greedy həllin düzgünlüyünü necə əsaslandırmaq (sadə sübut fikri)",
        code:
-`// Sübut ideyası (exchange argument): fərz et optimal həll fərqli seçim edib.
-// Göstər ki, greedy seçimi ilə əvəz etsək, nəticə pisləşmir -> greedy optimaldır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Sübut ideyası (exchange argument): fərz et optimal həll fərqli seçim edib.
+    // Göstər ki, greedy seçimi ilə əvəz etsək, nəticə pisləşmir -> greedy optimaldır.
+}`},
       {topic:"Greedy ilə sıralamanın (sort) birgə istifadəsi",
        code:
-`sort(items.begin(), items.end(),
-     [](auto &a, auto &b){ return a.value > b.value; }); // əvvəlcə ən dəyərlini sırala`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+struct Item{ string name; int value; };
+
+int main(){
+    vector<Item> items = {{"A", 40}, {"B", 10}, {"C", 25}};
+
+    sort(items.begin(), items.end(),
+         [](auto &a, auto &b){ return a.value > b.value; }); // əvvəlcə ən dəyərlini sırala
+
+    for (auto &it : items) cout << it.name << "(" << it.value << ") ";
+    cout << "\\n";
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1855,33 +2256,64 @@ int main(){
     topicCodes:[
       {topic:"Dinamik proqramlaşdırmanın əsas fikri: təkrarlanan alt-məsələlər",
        code:
-`// Eyni alt-məsələ dəfələrlə hesablanırsa (fib(5) fib(4)-ü, fib(3)-ü bir neçə dəfə çağırır),
-// nəticəni bir dəfə hesablayıb yadda saxlamaq DP-nin əsasıdır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Eyni alt-məsələ dəfələrlə hesablanırsa (fib(5) fib(4)-ü, fib(3)-ü bir neçə dəfə çağırır),
+    // nəticəni bir dəfə hesablayıb yadda saxlamaq DP-nin əsasıdır.
+}`},
       {topic:"Fibonacci və pilləkən (staircase) problemi ilə giriş",
        code:
-`vector<long long> ways(n + 1);
-ways[0] = 1; ways[1] = 1;
-for (int i = 2; i <= n; i++)
-    ways[i] = ways[i - 1] + ways[i - 2]; // 1 və ya 2 pillə atmaqla çatma üsulları`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 6;
+    vector<long long> ways(n + 1);
+    ways[0] = 1; ways[1] = 1;
+    for (int i = 2; i <= n; i++)
+        ways[i] = ways[i - 1] + ways[i - 2]; // 1 və ya 2 pillə atmaqla çatma üsulları
+    cout << "Üsul sayı: " << ways[n] << "\\n";
+}`},
       {topic:"Memoization (yuxarıdan-aşağı) yanaşması",
        code:
-`vector<long long> memo(50, -1);
+`#include <bits/stdc++.h>
+using namespace std;
+
+vector<long long> memo(50, -1);
 long long fib(int n){
     if (n <= 1) return n;
     if (memo[n] != -1) return memo[n];       // artıq hesablanıb
     return memo[n] = fib(n - 1) + fib(n - 2); // hesabla və yadda saxla
+}
+
+int main(){
+    cout << fib(30) << "\\n"; // 832040
 }`},
       {topic:"Tabulation (aşağıdan-yuxarı) yanaşması",
        code:
-`vector<long long> dp(n + 1);
-dp[0] = 0; dp[1] = 1;
-for (int i = 2; i <= n; i++)
-    dp[i] = dp[i - 1] + dp[i - 2];   // cədvəl aşağıdan yuxarı ardıcıl doldurulur`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 30;
+    vector<long long> dp(n + 1);
+    dp[0] = 0; dp[1] = 1;
+    for (int i = 2; i <= n; i++)
+        dp[i] = dp[i - 1] + dp[i - 2];   // cədvəl aşağıdan yuxarı ardıcıl doldurulur
+    cout << dp[n] << "\\n"; // 832040
+}`},
       {topic:"Memoization və tabulation arasındakı fərq və nə vaxt hansını seçmək",
        code:
-`// Memoization: rekursiv, yalnız lazım olan alt-hallar hesablanır
-// Tabulation: dövrlə, bütün cədvəl ardıcıl doldurulur, adətən daha sürətli
-// (rekursiya çağırış xərci yoxdur, stack daşma riski yoxdur)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Memoization: rekursiv, yalnız lazım olan alt-hallar hesablanır
+    // Tabulation: dövrlə, bütün cədvəl ardıcıl doldurulur, adətən daha sürətli
+    // (rekursiya çağırış xərci yoxdur, stack daşma riski yoxdur)
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1914,26 +2346,41 @@ int main(){
     topicCodes:[
       {topic:"Sadə çanta (0/1 knapsack) məsələsinin DP ilə həlli",
        code:
-`int n = 3, capacity = 5;
-vector<int> weight = {2, 3, 4};
-vector<int> value  = {3, 4, 5};
+`#include <bits/stdc++.h>
+using namespace std;
 
-// dp[w] = capacity w ilə əldə edilə bilən maksimum dəyər
-vector<int> dp(capacity + 1, 0);
-for (int i = 0; i < n; i++)
-    for (int w = capacity; w >= weight[i]; w--)   // geriyə doğru -> hər əşya 1 dəfə
-        dp[w] = max(dp[w], dp[w - weight[i]] + value[i]);
+int main(){
+    int n = 3, capacity = 5;
+    vector<int> weight = {2, 3, 4};
+    vector<int> value  = {3, 4, 5};
 
-cout << "Maksimum dəyər: " << dp[capacity] << "\\n";`},
+    // dp[w] = capacity w ilə əldə edilə bilən maksimum dəyər
+    vector<int> dp(capacity + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int w = capacity; w >= weight[i]; w--)   // geriyə doğru -> hər əşya 1 dəfə
+            dp[w] = max(dp[w], dp[w - weight[i]] + value[i]);
+
+    cout << "Maksimum dəyər: " << dp[capacity] << "\\n";
+}`},
       {topic:"DP cədvəlinin (dp massivinin) mənasını düzgün müəyyən etmək",
        code:
-`// dp[w] = "tutum tam olaraq w olduqda əldə edilə bilən maksimum dəyər"
-// Bu mənanı əvvəlcədən yazmaq, keçid düsturunu tapmağı asanlaşdırır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // dp[w] = "tutum tam olaraq w olduqda əldə edilə bilən maksimum dəyər"
+    // Bu mənanı əvvəlcədən yazmaq, keçid düsturunu tapmağı asanlaşdırır.
+}`},
       {topic:"DP-də keçid (transition) düsturunu tapmaq vərdişi",
        code:
-`// Sual: i-ci əşyanı götürməklə/götürməməklə dp necə dəyişir?
-// dp[w] = max( dp[w]                         /* götürmə */,
-//              dp[w - weight[i]] + value[i]  /* götür   */ );`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Sual: i-ci əşyanı götürməklə/götürməməklə dp necə dəyişir?
+    // dp[w] = max( dp[w]                         /* götürmə */,
+    //              dp[w - weight[i]] + value[i]  /* götür   */ );
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -1961,31 +2408,65 @@ int main(){
     topicCodes:[
       {topic:"Qrafın təsviri: qonşuluq siyahısı (adjacency list)",
        code:
-`int n = 4;
-vector<vector<int>> adj(n);
-adj[0].push_back(1); adj[1].push_back(0); // 0-1 kənarı (yönəlməmiş)
-adj[1].push_back(2); adj[2].push_back(1);`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 4;
+    vector<vector<int>> adj(n);
+    adj[0].push_back(1); adj[1].push_back(0); // 0-1 kənarı (yönəlməmiş)
+    adj[1].push_back(2); adj[2].push_back(1);
+
+    for (int i = 0; i < n; i++){
+        cout << i << ": ";
+        for (int v : adj[i]) cout << v << " ";
+        cout << "\\n";
+    }
+}`},
       {topic:"Sadə qraf gəzintisi: BFS (enlik üzrə axtarış)",
        code:
-`vector<bool> visited(n, false);
-queue<int> q;
-q.push(0); visited[0] = true;
+`#include <bits/stdc++.h>
+using namespace std;
 
-while (!q.empty()){
-    int cur = q.front(); q.pop();
-    cout << cur << " ";
-    for (int next : adj[cur])
-        if (!visited[next]){ visited[next] = true; q.push(next); }
+int main(){
+    int n = 5;
+    vector<vector<int>> adj(n);
+    auto addEdge = [&](int u, int v){ adj[u].push_back(v); adj[v].push_back(u); };
+    addEdge(0,1); addEdge(0,2); addEdge(1,3); addEdge(2,3); addEdge(3,4);
+
+    vector<bool> visited(n, false);
+    queue<int> q;
+    q.push(0); visited[0] = true;
+
+    while (!q.empty()){
+        int cur = q.front(); q.pop();
+        cout << cur << " ";
+        for (int next : adj[cur])
+            if (!visited[next]){ visited[next] = true; q.push(next); }
+    }
+    cout << "\\n";
 }`},
       {topic:"BFS ilə minimum məsafə (kənar sayı) hesablamaq",
        code:
-`vector<int> dist(n, -1);
-dist[0] = 0;
-queue<int> q; q.push(0);
-while (!q.empty()){
-    int cur = q.front(); q.pop();
-    for (int next : adj[cur])
-        if (dist[next] == -1){ dist[next] = dist[cur] + 1; q.push(next); }
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int n = 5;
+    vector<vector<int>> adj(n);
+    auto addEdge = [&](int u, int v){ adj[u].push_back(v); adj[v].push_back(u); };
+    addEdge(0,1); addEdge(0,2); addEdge(1,3); addEdge(2,3); addEdge(3,4);
+
+    vector<int> dist(n, -1);
+    dist[0] = 0;
+    queue<int> q; q.push(0);
+    while (!q.empty()){
+        int cur = q.front(); q.pop();
+        for (int next : adj[cur])
+            if (dist[next] == -1){ dist[next] = dist[cur] + 1; q.push(next); }
+    }
+    for (int i = 0; i < n; i++) cout << "dist[" << i << "]=" << dist[i] << " ";
+    cout << "\\n";
 }`},
     ],
     code:
@@ -2028,7 +2509,10 @@ int main(){
     topicCodes:[
       {topic:"Sadə qraf gəzintisi: DFS (dərinlik üzrə axtarış)",
        code:
-`vector<vector<int>> adj;
+`#include <bits/stdc++.h>
+using namespace std;
+
+vector<vector<int>> adj;
 vector<bool> visited;
 
 void dfs(int cur){
@@ -2037,33 +2521,64 @@ void dfs(int cur){
     for (int next : adj[cur])
         if (!visited[next])
             dfs(next);   // əvvəlcə sona qədər dərinliyə gedir
+}
+
+int main(){
+    int n = 5;
+    adj.assign(n, {});
+    auto addEdge = [&](int u, int v){ adj[u].push_back(v); adj[v].push_back(u); };
+    addEdge(0,1); addEdge(0,2); addEdge(1,3); addEdge(2,3); addEdge(3,4);
+
+    visited.assign(n, false);
+    dfs(0);
+    cout << "\\n";
 }`},
       {topic:"Bağlantı komponentlərinin tapılması",
        code:
-`int n = 6;
-vector<vector<int>> adj(n);
-adj[0] = {1}; adj[1] = {0};
-adj[2] = {3}; adj[3] = {2};
-// 4 və 5 heç kimlə bağlı deyil
+`#include <bits/stdc++.h>
+using namespace std;
 
-vector<bool> visited(n, false);
-int components = 0;
-for (int i = 0; i < n; i++){
-    if (!visited[i]){
-        components++;
-        // burada dfs(i) və ya bfs(i) çağırılır
-        visited[i] = true;
-    }
+void dfs(int cur, vector<vector<int>>& adj, vector<bool>& visited){
+    visited[cur] = true;
+    for (int next : adj[cur])
+        if (!visited[next]) dfs(next, adj, visited);
 }
-cout << "Komponent sayı: " << components << "\\n";`},
+
+int main(){
+    int n = 6;
+    vector<vector<int>> adj(n);
+    adj[0] = {1}; adj[1] = {0};
+    adj[2] = {3}; adj[3] = {2};
+    // 4 və 5 heç kimlə bağlı deyil
+
+    vector<bool> visited(n, false);
+    int components = 0;
+    for (int i = 0; i < n; i++){
+        if (!visited[i]){
+            components++;
+            dfs(i, adj, visited);   // bütün komponenti gəzib işarələyir
+        }
+    }
+    cout << "Komponent sayı: " << components << "\\n"; // 4
+}`},
       {topic:"Ziyarət olunmuş təpələri qeyd etmək (visited massivi)",
        code:
-`// visited[i] = true olduqda təpə artıq gəzilib, təkrar əlavə edilmir.
-// Unudulsa -> sonsuz dövr və ya eyni təpənin dəfələrlə hesablanması riski yaranır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // visited[i] = true olduqda təpə artıq gəzilib, təkrar əlavə edilmir.
+    // Unudulsa -> sonsuz dövr və ya eyni təpənin dəfələrlə hesablanması riski yaranır.
+}`},
       {topic:"Yönəlmiş və yönəlməmiş qraf anlayışı arasındakı fərq",
        code:
-`// Yönəlməmiş: adj[a].push_back(b); adj[b].push_back(a);  (iki tərəfli əlaqə)
-// Yönəlmiş:   adj[a].push_back(b);                         (yalnız a -> b istiqaməti)`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Yönəlməmiş: adj[a].push_back(b); adj[b].push_back(a);  (iki tərəfli əlaqə)
+    // Yönəlmiş:   adj[a].push_back(b);                         (yalnız a -> b istiqaməti)
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
@@ -2108,43 +2623,84 @@ int main(){
     topicCodes:[
       {topic:"Sərhəd halları (edge cases): boş giriş, tək elementli massiv",
        code:
-`vector<int> a = {};
-if (a.empty()) cout << "Diqqət: massiv boşdur\\n";
+`#include <bits/stdc++.h>
+using namespace std;
 
-vector<int> b = {5};
-cout << "Tək elementdə maksimum: " << b[0] << "\\n";`},
+int main(){
+    vector<int> a = {};
+    if (a.empty()) cout << "Diqqət: massiv boşdur\\n";
+
+    vector<int> b = {5};
+    cout << "Tək elementdə maksimum: " << b[0] << "\\n";
+}`},
       {topic:"Mənfi ədədlər və sıfırla bağlı xüsusi hallar",
        code:
-`int x = -5;
-cout << x % 3 << "\\n"; // C++-da mənfi ədədin qalığı da mənfi ola bilər! (-2)
-// düzgün qeyri-mənfi qalıq üçün: ((x % 3) + 3) % 3`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int x = -5;
+    cout << x % 3 << "\\n"; // C++-da mənfi ədədin qalığı da mənfi ola bilər! (-2)
+    // düzgün qeyri-mənfi qalıq üçün: ((x % 3) + 3) % 3
+    cout << ((x % 3) + 3) % 3 << "\\n"; // 1
+}`},
       {topic:"Təkrarlanan dəyərlər olan giriş məlumatları",
        code:
-`vector<int> a = {2, 2, 3, 2};
-set<int> unique(a.begin(), a.end()); // təkrarları avtomatik silir: {2, 3}
-cout << "Unikal say: " << unique.size() << "\\n";`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    vector<int> a = {2, 2, 3, 2};
+    set<int> uniq(a.begin(), a.end()); // təkrarları avtomatik silir: {2, 3}
+    cout << "Unikal say: " << uniq.size() << "\\n";
+}`},
       {topic:"Öz testini yazmaq və gözlənilən nəticə ilə müqayisə etmək vərdişi",
        code:
-`// Kiçik, əl ilə hesabladığın nümunə üzərində kodu işə sal,
-// nəticəni gözlədiyinlə müqayisə et — məs. n=1, n=0 kimi sadə hallar.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Kiçik, əl ilə hesabladığın nümunə üzərində kodu işə sal,
+    // nəticəni gözlədiyinlə müqayisə et — məs. n=1, n=0 kimi sadə hallar.
+}`},
       {topic:"Vaxt limitini keçməmək üçün mürəkkəbliyi (Big-O) qiymətləndirmək",
        code:
-`// n <= 10^5 -> O(n log n) təhlükəsizdir
-// n <= 10^3 -> O(n^2) təhlükəsizdir
-// n <= 20   -> O(2^n) (backtracking) təhlükəsizdir`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // n <= 10^5 -> O(n log n) təhlükəsizdir
+    // n <= 10^3 -> O(n^2) təhlükəsizdir
+    // n <= 20   -> O(2^n) (backtracking) təhlükəsizdir
+}`},
       {topic:"int daşması (overflow) və onun qarşısını almaq",
        code:
-`int a = 100000, b = 100000;
-cout << a * b << "\\n";              // SƏHV: int-də daşır
-cout << (long long)a * b << "\\n";   // DÜZGÜN`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    int a = 100000, b = 100000;
+    cout << a * b << "\\n";              // SƏHV: int-də daşır
+    cout << (long long)a * b << "\\n";   // DÜZGÜN
+}`},
       {topic:"Kodun addım-addım əl ilə izlənməsi (debug məntiqi)",
        code:
-`// Hər dəyişənin dəyərini kağız üzərində sətir-sətir izlə,
-// xüsusilə dövr və şərtlərdə "indi bura neçə dəfə gəlir?" sualını ver.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // Hər dəyişənin dəyərini kağız üzərində sətir-sətir izlə,
+    // xüsusilə dövr və şərtlərdə "indi bura neçə dəfə gəlir?" sualını ver.
+}`},
       {topic:"Səhv çıxışları tapmaq üçün kiçik test nümunələri qurmaq",
        code:
-`// n=0, n=1, bütün elementlər eyni, artan/azalan sıralı massiv
-// kimi kiçik "xarakterik" testlər qurmaq səhvləri tez üzə çıxarır.`},
+`#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    // n=0, n=1, bütün elementlər eyni, artan/azalan sıralı massiv
+    // kimi kiçik "xarakterik" testlər qurmaq səhvləri tez üzə çıxarır.
+}`},
     ],
     code:
 `#include <bits/stdc++.h>
