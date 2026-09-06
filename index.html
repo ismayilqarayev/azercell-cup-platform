@@ -400,7 +400,23 @@
   .ghc-file{ color:var(--ink); padding:4px 6px; border-radius:4px; cursor:pointer; }
   .ghc-file:hover{ background:rgba(255,255,255,0.04); }
   .ghc-file.active{ background:rgba(0,229,255,0.12); color:var(--gold); }
-  .ghc-viewer .live-textarea{ min-height:460px; }
+  /* Monokai rəng sxemi — bax: highlightGhcCppLine (JS). */
+  .ghc-code-block{
+    background:#272822; border:1px solid var(--grid-line-strong); border-radius:6px;
+    font-family:var(--mono); font-size:12.5px; line-height:1.6; overflow:auto;
+    min-height:460px; max-height:560px; padding:10px 0;
+  }
+  .ghc-code-line{ display:flex; padding:0 14px; white-space:pre; }
+  .ghc-code-line .ghc-line-no{
+    flex:0 0 40px; text-align:right; padding-right:14px; color:#75715e; user-select:none;
+  }
+  .ghc-code-line code{ color:#f8f8f2; white-space:pre; }
+  .ghc-cmt{ color:#75715e; font-style:italic; }
+  .ghc-str{ color:#e6db74; }
+  .ghc-pp{ color:#f92672; }
+  .ghc-num{ color:#ae81ff; }
+  .ghc-kw{ color:#f92672; }
+  .ghc-tp{ color:#66d9ef; font-style:italic; }
   .user-actions{ display:flex; gap:6px; flex-wrap:wrap; }
   .user-email{ color:var(--ink-soft); font-size:11.5px; display:block; margin-top:2px; }
   .user-badge{
@@ -1916,6 +1932,7 @@ async function runLiveCode(which){
    ============================================================================ */
 let ghcTree = null;
 let ghcSelectedPath = null;
+let ghcCurrentContent = '';
 
 async function loadGithubCodesPanel(){
   const body = document.getElementById('githubCodesBody');
@@ -1948,10 +1965,7 @@ function renderGhcPanel(){
     + '<div class="ghc-tree" id="ghcTreeEl"></div>'
     + '<div class="ghc-viewer">'
     + '<div class="live-panel-title" id="ghcFilePath">Sol tərəfdən fayl seç</div>'
-    + '<div class="live-editor">'
-    + '<div class="live-gutter" id="ghcGutter">&nbsp;</div>'
-    + '<textarea class="live-textarea" id="ghcCodeArea" readonly spellcheck="false" wrap="off" placeholder="Fayl seçdikdə kodu burada görəcəksən..."></textarea>'
-    + '</div>'
+    + '<div class="ghc-code-block" id="ghcCodeBlock"><div class="teacher-panel-loading" style="padding:0 12px;">Fayl seçdikdə kodu burada görəcəksən...</div></div>'
     + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="copyGhcCode()">Kopyala</button><span class="submit-hint" id="ghcCopyHint"></span></div>'
     + '</div>'
     + '</div>';
@@ -1995,30 +2009,80 @@ function selectGhcFile(encodedPath){
   const node = findGhcNode(ghcTree.root, path);
   if (!node) return;
   ghcSelectedPath = path;
+  ghcCurrentContent = node.content || '';
   document.getElementById('ghcFilePath').textContent = node.path;
-  const ta = document.getElementById('ghcCodeArea');
-  ta.value = node.content || '';
-  const lines = ta.value.split('\n').length;
-  let gutterText = '';
-  for (let i = 1; i <= lines; i++) gutterText += i + '\n';
-  document.getElementById('ghcGutter').textContent = gutterText;
+  renderGhcCodeBlock(ghcCurrentContent);
   document.getElementById('ghcTreeEl').innerHTML = renderGhcNode(ghcTree.root, 0);
+}
+
+// Seçilmiş faylın kodunu Monokai rəngləri ilə, sətir nömrələri ilə çəkir
+// (bax: highlightGhcCppLine) — salt oxumaq üçün olduğundan textarea yox,
+// birbaşa <pre>-bənzər <div>/<code> strukturu istifadə olunur.
+function renderGhcCodeBlock(code){
+  let lines = code.split('\n');
+  // Faylın sonundakı tək boş sətri (adi trailing newline) göstərməyək.
+  if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop();
+  const rows = lines.map((line, idx) =>
+    '<div class="ghc-code-line"><span class="ghc-line-no">' + (idx + 1) + '</span><code>' + highlightGhcCppLine(line) + '</code></div>'
+  ).join('');
+  document.getElementById('ghcCodeBlock').innerHTML = rows || '<div class="teacher-panel-loading" style="padding:0 12px;">Boş fayl.</div>';
+}
+
+/* ============================================================================
+   Sadə C++ sintaksis-vurğulama — Monokai rəng sxemi. Eyni token-əsaslı
+   yanaşma prep.html-dəki highlightCppLine ilə (bax: frontend-src/prep.html),
+   sadəcə buradakı .ghc-* CSS klassları Monokai rənglərinə uyğundur (bax:
+   <style>-dəki .ghc-cmt/.ghc-str/.ghc-pp/.ghc-num/.ghc-kw/.ghc-tp qaydaları).
+   Sıra ƏHƏMİYYƏTLİDİR — əvvəl gələn şablon (məs. şərh) sonrakılardan üstündür.
+   ============================================================================ */
+const GHC_TOKEN_PATTERNS = [
+  ['ghc-cmt', /\/\/.*$/],
+  ['ghc-str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['ghc-pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['ghc-num', /\b\d+(?:\.\d+)?\b/],
+  ['ghc-kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|template|typename|typedef|cin|cout|endl|true|false|nullptr)\b/],
+  ['ghc-tp', /\b(?:int|long|double|float|char|bool|string|vector|map|unordered_map|unordered_set|set|queue|stack|pair|size_t|short|unsigned)\b/],
+];
+
+function highlightGhcCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(GHC_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < GHC_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += '<span class="' + GHC_TOKEN_PATTERNS[i][0] + '">' + m[i + 1] + '</span>';
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
 }
 
 async function copyGhcCode(){
   const hint = document.getElementById('ghcCopyHint');
-  const ta = document.getElementById('ghcCodeArea');
-  if (!ta.value) { hint.textContent = 'Əvvəlcə fayl seç.'; return; }
+  if (!ghcCurrentContent) { hint.textContent = 'Əvvəlcə fayl seç.'; return; }
   try {
     if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('clipboard API yoxdur');
-    await navigator.clipboard.writeText(ta.value);
+    await navigator.clipboard.writeText(ghcCurrentContent);
     hint.textContent = 'Kopyalandı!';
     setTimeout(() => { hint.textContent = ''; }, 2000);
   } catch (e) {
     // Clipboard icazəsi olmayanda (brauzer/mühit məhdudiyyəti) ehtiyat
-    // variant: mətni seçirik ki, istifadəçi özü Ctrl+C ilə kopyalaya bilsin.
-    ta.focus();
-    ta.select();
+    // variant: görünən kod blokunu seçirik ki, istifadəçi özü Ctrl+C ilə
+    // kopyalaya bilsin.
+    const block = document.getElementById('ghcCodeBlock');
+    if (block && window.getSelection) {
+      const range = document.createRange();
+      range.selectNodeContents(block);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
     hint.textContent = 'Mətn seçildi — Ctrl+C ilə kopyala.';
   }
 }
