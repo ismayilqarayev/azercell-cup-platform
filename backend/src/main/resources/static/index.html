@@ -388,6 +388,19 @@
     margin:0 0 6px; max-height:160px; overflow:auto; color:var(--ink);
   }
   .live-run-out.live-run-err{ color:#e08080; }
+  .ghc-toolbar{ display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .ghc-layout{ display:grid; grid-template-columns:260px 1fr; gap:20px; align-items:start; }
+  @media (max-width:900px){ .ghc-layout{ grid-template-columns:1fr; } }
+  .ghc-tree{
+    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:10px; font-family:var(--mono); font-size:12.5px; max-height:560px; overflow:auto;
+    white-space:nowrap;
+  }
+  .ghc-dir{ color:var(--ink-soft); padding:4px 6px; }
+  .ghc-file{ color:var(--ink); padding:4px 6px; border-radius:4px; cursor:pointer; }
+  .ghc-file:hover{ background:rgba(255,255,255,0.04); }
+  .ghc-file.active{ background:rgba(0,229,255,0.12); color:var(--gold); }
+  .ghc-viewer .live-textarea{ min-height:460px; }
   .user-actions{ display:flex; gap:6px; flex-wrap:wrap; }
   .user-email{ color:var(--ink-soft); font-size:11.5px; display:block; margin-top:2px; }
   .user-badge{
@@ -662,6 +675,7 @@
     <button class="tab-btn" id="btn-yarish" role="tab" aria-selected="false" onclick="showTab(&#39;yarish&#39;)"><span class="tab-label">🏆 Yarışlar</span></button>
     <button class="tab-btn" id="btn-assignments" role="tab" aria-selected="false" onclick="showTab(&#39;assignments&#39;)"><span class="tab-label">📋 Tapşırıqlarım</span></button>
     <button class="tab-btn" id="btn-live" role="tab" aria-selected="false" onclick="showTab(&#39;live&#39;)"><span class="tab-label">🎥 Canlı Dərs</span></button>
+    <button class="tab-btn" id="btn-githubcodes" role="tab" aria-selected="false" onclick="showTab(&#39;githubcodes&#39;)"><span class="tab-label">💻 Kod Arxivi</span></button>
     <div class="tab-group-label" id="teacherGroupLabel" style="display:none">Müəllim</div>
     <button class="tab-btn" id="btn-teacher" role="tab" aria-selected="false" onclick="showTab(&#39;teacher&#39;)" style="display:none"><span class="tab-label">Şagirdlər</span></button>
     <button class="tab-btn" id="btn-topics" role="tab" aria-selected="false" onclick="showTab(&#39;topics&#39;)" style="display:none"><span class="tab-label">Dərs proqramı</span></button>
@@ -752,6 +766,13 @@
         <h2 class="teacher-panel-title">🎥 Canlı Dərs</h2>
         <p class="teacher-panel-sub">Onlayn dərs zamanı iki tərəfli canlı kod paneli — müəllim və şagird eyni anda yazır, bir-birinin kodunu görür və hər ikisi öz panelindəki kodu icra edə bilər.</p>
         <div id="liveSessionBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
+      </div>
+    </div>
+    <div class="teacher-panel" id="frame-githubcodes">
+      <div class="teacher-panel-inner live-panel-inner">
+        <h2 class="teacher-panel-title">💻 Kod Arxivi</h2>
+        <p class="teacher-panel-sub">Müəllimin öz GitHub repo-sundakı (ismayilqarayev/eolymp, cpp/kodlar) kod nümunələri — arxa planda avtomatik sinxronlaşır, müəllim yeni kod yazıb GitHub-a push edən kimi bir neçə dəqiqə içində burada görünür.</p>
+        <div id="githubCodesBody"><div class="teacher-panel-loading">Yüklənir...</div></div>
       </div>
     </div>
     <div class="teacher-panel" id="frame-yarish-manage">
@@ -1204,8 +1225,8 @@ function runLoadingThen(callback){
 }
 
 function showTab(name){
-  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', assignments:'frame-assignments', live:'frame-live', 'yarish-manage':'frame-yarish-manage'};
-  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', assignments:'btn-assignments', live:'btn-live', 'yarish-manage':'btn-yarish-manage'};
+  const frames = {prep:'frame-prep', week1:'frame-week1', week2:'frame-week2', week3:'frame-week3', week4:'frame-week4', week5:'frame-week5', algo:'frame-algo', scheme:'frame-scheme', teacher:'frame-teacher', topics:'frame-topics', mygroups:'frame-mygroups', approvals:'frame-approvals', users:'frame-users', allgroups:'frame-allgroups', yarish:'frame-yarish', assignments:'frame-assignments', live:'frame-live', githubcodes:'frame-githubcodes', 'yarish-manage':'frame-yarish-manage'};
+  const btns = {prep:'btn-prep', week1:'btn-week1', week2:'btn-week2', week3:'btn-week3', week4:'btn-week4', week5:'btn-week5', algo:'btn-algo', scheme:'btn-scheme', teacher:'btn-teacher', topics:'btn-topics', mygroups:'btn-mygroups', approvals:'btn-approvals', users:'btn-users', allgroups:'btn-allgroups', yarish:'btn-yarish', assignments:'btn-assignments', live:'btn-live', githubcodes:'btn-githubcodes', 'yarish-manage':'btn-yarish-manage'};
   Object.keys(btns).forEach(key => {
     const isActive = key === name;
     document.getElementById(btns[key]).classList.toggle('active', isActive);
@@ -1225,6 +1246,7 @@ function showTab(name){
     if (name === 'assignments') loadAssignmentsPanel();
     if (name === 'yarish-manage') loadYarishManagePanel();
     if (name === 'live') { loadLivePanel(); } else { pauseLiveSessionPolling(); }
+    if (name === 'githubcodes') loadGithubCodesPanel();
   });
 }
 
@@ -1882,6 +1904,139 @@ async function runLiveCode(which){
   } catch (e) {
     hintEl.textContent = 'Serverə qoşulmaq mümkün olmadı.';
   }
+}
+
+/* ============================================================================
+   KOD ARXİVİ — müəllimin öz GitHub repo-sunda (ismayilqarayev/eolymp,
+   cpp/kodlar) saxladığı kod nümunələrini göstərir. Backend (bax:
+   GithubCodeSyncService) arxa planda hər 5 dəqiqədən bir GitHub-dan
+   sinxronlaşdırır — müəllim sadəcə Visual Studio Code-da yazıb GitHub-a
+   push edir, platformada HEÇ NƏ dəyişdirmədən bir neçə dəqiqəyə şagirdlərə
+   görünür.
+   ============================================================================ */
+let ghcTree = null;
+let ghcSelectedPath = null;
+
+async function loadGithubCodesPanel(){
+  const body = document.getElementById('githubCodesBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/github-codes');
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if (!data || !data.root) {
+      body.innerHTML = '<div class="teacher-panel-loading">Hələ GitHub-dan sinxronlaşdırılmayıb, bir azdan yenidən yoxla...</div>';
+      return;
+    }
+    ghcTree = data;
+    renderGhcPanel();
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">GitHub kod arxivini yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function renderGhcPanel(){
+  const body = document.getElementById('githubCodesBody');
+  const syncedAt = ghcTree.lastSyncedAt ? new Date(ghcTree.lastSyncedAt).toLocaleString('az-AZ') : '—';
+  body.innerHTML = ''
+    + '<div class="ghc-toolbar">'
+    + '<span class="submit-hint">Son sinxron: ' + escapeHtml(syncedAt) + '</span>'
+    + '<button type="button" class="live-copy-btn" onclick="refreshGithubCodes()" id="ghcRefreshBtn">Yenilə</button>'
+    + '<a class="live-copy-btn" href="' + escapeHtml(ghcTree.repoUrl) + '" target="_blank" rel="noopener">GitHub-da aç</a>'
+    + '</div>'
+    + '<div class="ghc-layout">'
+    + '<div class="ghc-tree" id="ghcTreeEl"></div>'
+    + '<div class="ghc-viewer">'
+    + '<div class="live-panel-title" id="ghcFilePath">Sol tərəfdən fayl seç</div>'
+    + '<div class="live-editor">'
+    + '<div class="live-gutter" id="ghcGutter">&nbsp;</div>'
+    + '<textarea class="live-textarea" id="ghcCodeArea" readonly spellcheck="false" wrap="off" placeholder="Fayl seçdikdə kodu burada görəcəksən..."></textarea>'
+    + '</div>'
+    + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="copyGhcCode()">Kopyala</button><span class="submit-hint" id="ghcCopyHint"></span></div>'
+    + '</div>'
+    + '</div>';
+  document.getElementById('ghcTreeEl').innerHTML = renderGhcNode(ghcTree.root, 0);
+  if (ghcSelectedPath && findGhcNode(ghcTree.root, ghcSelectedPath)) {
+    selectGhcFile(encodeURIComponent(ghcSelectedPath));
+  }
+}
+
+// Kök qovluğun (depth==0) özünün adını göstərmirik, sadəcə içindəkiləri —
+// depth==1 ən üst səviyyə (heç bir çəkinti), hər alt-qovluq +16px çəkinti.
+function renderGhcNode(node, depth){
+  if (depth === 0) {
+    let html = '';
+    for (const child of node.children) html += renderGhcNode(child, 1);
+    return html;
+  }
+  const indent = 'padding-left:' + ((depth - 1) * 16) + 'px;';
+  if (node.type === 'dir') {
+    let html = '<div class="ghc-dir" style="' + indent + '">📁 ' + escapeHtml(node.name) + '</div>';
+    for (const child of node.children) html += renderGhcNode(child, depth + 1);
+    return html;
+  }
+  const activeClass = node.path === ghcSelectedPath ? ' active' : '';
+  return '<div class="ghc-file' + activeClass + '" style="' + indent + '" onclick="selectGhcFile(&#39;' + encodeURIComponent(node.path) + '&#39;)">📄 ' + escapeHtml(node.name) + '</div>';
+}
+
+function findGhcNode(node, path){
+  if (node.path === path) return node;
+  if (node.children) {
+    for (const child of node.children) {
+      const found = findGhcNode(child, path);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function selectGhcFile(encodedPath){
+  const path = decodeURIComponent(encodedPath);
+  const node = findGhcNode(ghcTree.root, path);
+  if (!node) return;
+  ghcSelectedPath = path;
+  document.getElementById('ghcFilePath').textContent = node.path;
+  const ta = document.getElementById('ghcCodeArea');
+  ta.value = node.content || '';
+  const lines = ta.value.split('\n').length;
+  let gutterText = '';
+  for (let i = 1; i <= lines; i++) gutterText += i + '\n';
+  document.getElementById('ghcGutter').textContent = gutterText;
+  document.getElementById('ghcTreeEl').innerHTML = renderGhcNode(ghcTree.root, 0);
+}
+
+async function copyGhcCode(){
+  const hint = document.getElementById('ghcCopyHint');
+  const ta = document.getElementById('ghcCodeArea');
+  if (!ta.value) { hint.textContent = 'Əvvəlcə fayl seç.'; return; }
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('clipboard API yoxdur');
+    await navigator.clipboard.writeText(ta.value);
+    hint.textContent = 'Kopyalandı!';
+    setTimeout(() => { hint.textContent = ''; }, 2000);
+  } catch (e) {
+    // Clipboard icazəsi olmayanda (brauzer/mühit məhdudiyyəti) ehtiyat
+    // variant: mətni seçirik ki, istifadəçi özü Ctrl+C ilə kopyalaya bilsin.
+    ta.focus();
+    ta.select();
+    hint.textContent = 'Mətn seçildi — Ctrl+C ilə kopyala.';
+  }
+}
+
+async function refreshGithubCodes(){
+  const btn = document.getElementById('ghcRefreshBtn');
+  if (btn) btn.disabled = true;
+  try {
+    const res = await azcupApiFetch('/api/github-codes/refresh', { method: 'POST' });
+    if (res.status === 429) {
+      alert('Bir azdan yenidən cəhd et (çox tez-tez yeniləmə istəyi göndərildi).');
+    } else if (res.ok) {
+      const data = await res.json();
+      ghcTree = data;
+      renderGhcPanel();
+    }
+  } catch (e) { /* səssizcə uğursuz olur, istifadəçi yenidən klikləyə bilər */ }
+  if (btn) btn.disabled = false;
 }
 
 /* ---------- "Bütün qruplar" admin overview (salt oxunur) ---------- */
