@@ -417,7 +417,7 @@
      klik olunanda altında həmin sətrin izahını göstərən panel açılır.
      ========================================================================== */
   .code-block{
-    background:var(--well);
+    background:#272822; /* Monokai fonu */
     font-family:var(--mono);
     border-radius:3px;
     overflow-x:auto; /* Uzun kod sətirləri konteynerdən çıxanda üfüqi scroll çıxarır */
@@ -443,7 +443,7 @@
     width:16px;
     text-align:right;
     font-size:11px;
-    color:#4d7188;
+    color:#75715e; /* Monokai */
     user-select:none;
   }
   /* Sətrin solundakı kiçik ox (▸) — izah paneli açıq olanda 90° çevrilir (▾) */
@@ -460,18 +460,19 @@
     font-family:var(--mono);
     font-size:12.5px;
     line-height:1.6;
-    color:#cfe3ee;
+    color:#f8f8f2; /* Monokai ön plan rəngi */
     white-space:pre;
   }
-  /* Sintaksis vurğulama (syntax highlighting) rəngləri — JS-dəki
-     highlightCppLine funksiyası tərəfindən əlavə olunan <span> class-larına
-     uyğun gəlir: cmt=şərh, kw=açar söz, tp=tip, str=mətn sabiti, num=ədəd, pp=preprosessor */
-  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
-  .code-block .kw{ color:#f2c14e; font-weight:600; }
-  .code-block .tp{ color:#8fd0a8; }
-  .code-block .str{ color:#e0b96b; }
-  .code-block .num{ color:#c9a0dc; }
-  .code-block .pp{ color:#e0708a; }
+  /* Sintaksis vurğulama (syntax highlighting) rəngləri — Monokai sxemi.
+     JS-dəki highlightCppLine funksiyası tərəfindən əlavə olunan <span>
+     class-larına uyğun gəlir: cmt=şərh, kw=açar söz, tp=tip, str=mətn
+     sabiti, num=ədəd, pp=preprosessor */
+  .code-block .cmt{ color:#75715e; font-style:italic; }
+  .code-block .kw{ color:#f92672; }
+  .code-block .tp{ color:#66d9ef; font-style:italic; }
+  .code-block .str{ color:#e6db74; }
+  .code-block .num{ color:#ae81ff; }
+  .code-block .pp{ color:#f92672; }
 
   /* Kod sətrinə klikləndikdə açılan "izah paneli". Qapalı vəziyyətdə
      max-height:0 və opacity:0 ilə tam gizlədilir; JS tərəfindən 'open'
