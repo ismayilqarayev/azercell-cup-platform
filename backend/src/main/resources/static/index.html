@@ -355,6 +355,18 @@
     font-size:10px; color:var(--ink-soft); border:1px solid var(--grid-line-strong); border-radius:10px;
     padding:2px 8px; font-weight:400;
   }
+  .live-student-count{
+    font-size:10px; color:var(--ink-soft); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:2px 8px; font-weight:400;
+  }
+  .live-student-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .live-student-empty{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .live-student-chip{
+    font-family:var(--mono); font-size:11px; padding:5px 10px; border-radius:14px; cursor:pointer;
+    background:transparent; border:1px solid var(--grid-line-strong); color:var(--ink-soft);
+  }
+  .live-student-chip:hover{ border-color:var(--gold); color:var(--ink); }
+  .live-student-chip.active{ background:rgba(255,193,7,0.14); border-color:var(--gold); color:var(--gold); }
   .live-editor{ position:relative; }
   .live-gutter{
     position:absolute; top:0; left:0; bottom:0; width:34px;
@@ -1133,6 +1145,8 @@ function handleLogout(){
   pauseLiveSessionPolling();
   liveCode = null;
   liveRole = null;
+  liveStudents = [];
+  liveSelectedStudentId = null;
   AzcupAuth.clearSession();
   backToLangSelect();
   updateAuthUI();
@@ -1710,6 +1724,10 @@ let liveSendDebounce = null;
 // "sizin panel" mətninin itməməsi üçün ayrıca saxlanılır (server-in son
 // bildiyi dəyər PUT debounce-ı gözlədiyi üçün hələ köhnə ola bilər).
 let liveOwnValue = '';
+// Müəllim tərəfi üçün: server-dən son alınan şagird siyahısı və müəllimin
+// hazırda hansı şagirdin panelinə baxdığı (chip seçimi).
+let liveStudents = [];
+let liveSelectedStudentId = null;
 
 function loadLivePanel(){
   if (liveCode) { renderLiveActive(); resumeLiveSessionPolling(); return; }
@@ -1781,6 +1799,8 @@ function leaveLiveSession(){
   liveCode = null;
   liveRole = null;
   liveOwnValue = '';
+  liveStudents = [];
+  liveSelectedStudentId = null;
   loadLivePanel();
 }
 
@@ -1802,7 +1822,6 @@ function copyLiveCode(){
 function renderLiveActive(){
   const body = document.getElementById('liveSessionBody');
   const ownLabel = liveRole === 'teacher' ? 'Sizin panel (Müəllim)' : 'Sizin panel (Şagird)';
-  const otherLabel = liveRole === 'teacher' ? 'Şagirdin paneli' : 'Müəllimin paneli';
   body.innerHTML = ''
     + '<div class="live-code-share">Sessiya kodu: <b>' + escapeHtml(liveCode) + '</b>'
     + '<button type="button" class="live-copy-btn" onclick="copyLiveCode()">Kopyala</button>'
@@ -1822,8 +1841,19 @@ function renderLiveActive(){
     + '<pre class="live-run-out live-run-err" id="liveOwnRunStderr"></pre>'
     + '</div>'
     + '</div>'
-    + '<div class="live-panel">'
-    + '<div class="live-panel-title">' + otherLabel + '<span class="live-readonly-badge">yalnız oxumaq üçün</span></div>'
+    + (liveRole === 'teacher' ? renderTeacherOtherPanelHtml() : renderStudentOtherPanelHtml())
+    + '</div>';
+  document.getElementById('liveOwnCode').value = liveOwnValue;
+  syncLiveGutter('own');
+  syncLiveGutter('other');
+  if (liveRole === 'teacher') renderLiveStudentList();
+}
+
+// Şagird tərəfinin "digər panel"i — sadəcə müəllimin kodunu güzgüləyir
+// (yalnız BİR mənbə olduğu üçün seçim/siyahıya ehtiyac yoxdur).
+function renderStudentOtherPanelHtml(){
+  return '<div class="live-panel">'
+    + '<div class="live-panel-title">Müəllimin paneli<span class="live-readonly-badge">yalnız oxumaq üçün</span></div>'
     + '<div class="live-editor">'
     + '<div class="live-gutter" id="liveOtherGutter">1</div>'
     + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveGutterScroll(&#39;other&#39;)"></textarea>'
@@ -1834,11 +1864,70 @@ function renderLiveActive(){
     + '<pre class="live-run-out" id="liveOtherRunStdout"></pre>'
     + '<pre class="live-run-out live-run-err" id="liveOtherRunStderr"></pre>'
     + '</div>'
+    + '</div>';
+}
+
+// Müəllim tərəfinin "digər panel"i — bir NEÇƏ şagird eyni anda qoşula
+// bildiyi üçün üstdə chip siyahısı (bax: renderLiveStudentList), altda isə
+// seçilmiş şagirdin kodunu göstərən yalnız-oxu paneli var.
+function renderTeacherOtherPanelHtml(){
+  return '<div class="live-panel">'
+    + '<div class="live-panel-title">Şagirdlərin paneli<span class="live-student-count" id="liveStudentCount"></span></div>'
+    + '<div class="live-student-list" id="liveStudentList"></div>'
+    + '<div class="live-editor">'
+    + '<div class="live-gutter" id="liveOtherGutter">1</div>'
+    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveGutterScroll(&#39;other&#39;)" placeholder="Şagird qoşulanda burada görünəcək..."></textarea>'
+    + '</div>'
+    + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;other&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOtherRunHint"></span></div>'
+    + '<div class="live-run-output" id="liveOtherRunOutput" style="display:none;">'
+    + '<div class="live-run-status" id="liveOtherRunStatus"></div>'
+    + '<pre class="live-run-out" id="liveOtherRunStdout"></pre>'
+    + '<pre class="live-run-out live-run-err" id="liveOtherRunStderr"></pre>'
     + '</div>'
     + '</div>';
-  document.getElementById('liveOwnCode').value = liveOwnValue;
-  syncLiveGutter('own');
-  syncLiveGutter('other');
+}
+
+// Müəllimə görünən şagird chip-lərini liveStudents-dən yenidən qurur —
+// hər poll-da çağırılır ki, yeni qoşulan/ayrılan şagirdlər əks olunsun.
+// Seçilmiş şagird artıq siyahıda yoxdursa (sessiyadan çıxıbsa), ilk şagirdə keçir.
+function renderLiveStudentList(){
+  const listEl = document.getElementById('liveStudentList');
+  const countEl = document.getElementById('liveStudentCount');
+  if (!listEl) return;
+  if (countEl) countEl.textContent = liveStudents.length + ' şagird';
+  if (!liveStudents.length) {
+    liveSelectedStudentId = null;
+    listEl.innerHTML = '<span class="live-student-empty">Hələ heç bir şagird qoşulmayıb...</span>';
+    updateSelectedStudentPanel();
+    return;
+  }
+  if (liveSelectedStudentId == null || !liveStudents.some(s => s.studentId === liveSelectedStudentId)) {
+    liveSelectedStudentId = liveStudents[0].studentId;
+  }
+  listEl.innerHTML = liveStudents.map(s =>
+    '<button type="button" class="live-student-chip' + (s.studentId === liveSelectedStudentId ? ' active' : '') + '" onclick="selectLiveStudent(' + s.studentId + ')">' + escapeHtml(s.studentName) + '</button>'
+  ).join('');
+  updateSelectedStudentPanel();
+}
+
+// Müəllim başqa bir şagirdin chip-ini seçəndə çağırılır.
+function selectLiveStudent(studentId){
+  liveSelectedStudentId = studentId;
+  renderLiveStudentList();
+}
+
+// Hazırda seçilmiş şagirdin kodunu #liveOtherCode-a yerləşdirir — yazan
+// tərəf olmadığı üçün (readonly panel) activeElement yoxlamasına ehtiyac yoxdur,
+// amma digər poll-larla eyni nümunəyə uyğun olsun deyə saxlanılıb.
+function updateSelectedStudentPanel(){
+  const otherEl = document.getElementById('liveOtherCode');
+  if (!otherEl) return;
+  const student = liveStudents.find(s => s.studentId === liveSelectedStudentId);
+  const val = student ? student.sourceCode : '';
+  if (otherEl.value !== val) {
+    otherEl.value = val;
+    syncLiveGutter('other');
+  }
 }
 
 function onLiveOwnInput(){
@@ -1864,11 +1953,15 @@ async function pollLiveSession(){
     const res = await azcupApiFetch('/api/live/sessions/' + encodeURIComponent(liveCode));
     if (!res.ok) { leaveLiveSession(); return; }
     const data = await res.json();
+    if (liveRole === 'teacher') {
+      liveStudents = data.students || [];
+      renderLiveStudentList();
+      return;
+    }
     const otherEl = document.getElementById('liveOtherCode');
     if (!otherEl) return;
-    const otherVal = liveRole === 'teacher' ? data.studentCode : data.teacherCode;
-    if (document.activeElement !== otherEl && otherEl.value !== otherVal) {
-      otherEl.value = otherVal;
+    if (document.activeElement !== otherEl && otherEl.value !== data.teacherCode) {
+      otherEl.value = data.teacherCode;
       syncLiveGutter('other');
     }
   } catch (e) { /* keçici şəbəkə xətası — növbəti poll-da yenidən cəhd olunacaq */ }

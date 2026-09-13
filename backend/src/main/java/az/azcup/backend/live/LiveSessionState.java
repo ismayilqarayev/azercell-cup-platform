@@ -1,6 +1,8 @@
 package az.azcup.backend.live;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 // Bir canlı dərs sessiyasının YADDAŞDA (verilənlər bazasında YOX) saxlanılan
 // vəziyyəti — bax: LiveSessionService. Bu, bilərəkdən JPA entity DEYİL:
@@ -15,8 +17,10 @@ public class LiveSessionState {
     // Müəllim panelindəki hazırkı kod mətni.
     private String teacherCode = "";
 
-    // Şagird panelindəki hazırkı kod mətni.
-    private String studentCode = "";
+    // Sessiyaya qoşulan HƏR şagirdin öz kodu — açar onun istifadəçi ID-sidir.
+    // LinkedHashMap seçilib ki, müəllimin görəcəyi siyahıda şagirdlər QOŞULMA
+    // sırası ilə qalsın (hər poll-da təsadüfi sıralanmasın).
+    private final Map<Long, StudentEntry> students = new LinkedHashMap<>();
 
     // Son dəfə hər hansı tərəfin kodu yenilədiyi vaxt — köhnəlmiş
     // sessiyaları avtomatik təmizləmək üçün istifadə olunur (bax:
@@ -50,18 +54,48 @@ public class LiveSessionState {
         this.teacherCode = teacherCode;
     }
 
-    // studentCode sahəsinin dəyərini qaytarır.
-    public String getStudentCode() {
-        return studentCode;
+    // Bir şagirdin kodunu yeniləyir — həmin şagird hələ siyahıda yoxdursa
+    // (sessiyaya İLK dəfə yazırsa), avtomatik əlavə olunur.
+    public void setStudentCode(Long studentId, String studentName, String sourceCode) {
+        StudentEntry entry = students.computeIfAbsent(studentId, id -> new StudentEntry(studentName));
+        entry.setStudentName(studentName); // adı hər zaman ən son (JWT-dəki) dəyərə uyğunlaşdırır
+        entry.setSourceCode(sourceCode);
     }
 
-    // studentCode sahəsinə yeni dəyər təyin edir.
-    public void setStudentCode(String studentCode) {
-        this.studentCode = studentCode;
+    // Bütün qoşulmuş şagirdlərin xəritəsini qaytarır (id -> ad+kod).
+    public Map<Long, StudentEntry> getStudents() {
+        return students;
     }
 
     // lastActivity sahəsinin dəyərini qaytarır.
     public Instant getLastActivity() {
         return lastActivity;
+    }
+
+    // Bir şagirdin adı və hazırkı kodu — students xəritəsinin dəyəri.
+    public static class StudentEntry {
+
+        private String studentName;
+        private String sourceCode = "";
+
+        public StudentEntry(String studentName) {
+            this.studentName = studentName;
+        }
+
+        public String getStudentName() {
+            return studentName;
+        }
+
+        public void setStudentName(String studentName) {
+            this.studentName = studentName;
+        }
+
+        public String getSourceCode() {
+            return sourceCode;
+        }
+
+        public void setSourceCode(String sourceCode) {
+            this.sourceCode = sourceCode;
+        }
     }
 }

@@ -3,10 +3,12 @@ package az.azcup.backend.controller;
 import az.azcup.backend.dto.live.LiveCodeUpdateRequest;
 import az.azcup.backend.dto.live.LiveSessionDto;
 import az.azcup.backend.dto.live.LiveSessionStateDto;
+import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.LiveSessionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,10 +55,17 @@ public class LiveSessionController {
         return liveSessionService.updateTeacherCode(code, request.getSourceCode());
     }
 
-    // Şagird panelinin kodunu yeniləyir.
+    // Şagirdin öz panelindəki kodunu yeniləyir — şagirdin kimliyi JWT-dən
+    // (principal) götürülür, sorğu gövdəsindən YOX, ona görə şagird başqa
+    // şagirdin adına yaza bilməz.
     @PutMapping("/{code}/student")
     @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
-    public LiveSessionStateDto updateStudentCode(@PathVariable String code, @RequestBody LiveCodeUpdateRequest request) {
-        return liveSessionService.updateStudentCode(code, request.getSourceCode());
+    public LiveSessionStateDto updateStudentCode(
+            @PathVariable String code,
+            @RequestBody LiveCodeUpdateRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return liveSessionService.updateStudentCode(
+                code, principal.getUser().getId(), principal.getUser().getFullName(), request.getSourceCode());
     }
 }

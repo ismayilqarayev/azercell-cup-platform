@@ -1,29 +1,28 @@
 package az.azcup.backend.dto.live;
 
 import java.time.Instant;
-import java.util.Objects;
+import java.util.List;
 
 // Bir canlı dərs sessiyasının hazırkı vəziyyəti — həm kod yeniləyəndə, həm
-// də "GET /api/live/sessions/{code}" ilə (poll edərək) qaytarılır. Frontend
-// HƏR İKİ tərəfi alır, amma yalnız QARŞI tərəfin mətnini güzgü panelinə yazır
-// (öz redaktə etdiyi paneli poll cavabı ilə ÜSTÜNƏ YAZMIR — əks halda kursor
-// mövqeyi/yazılan hərf itərdi).
+// də "GET /api/live/sessions/{code}" ilə (poll edərək) qaytarılır.
+//
+// Müəllim tərəfi: teacherCode ÖZ paneli, students SİYAHISI hər şagirdin
+// ayrı-ayrı kodunu göstərir (bax: LiveStudentCodeDto) — beləliklə eyni anda
+// bir neçə şagird yaza bilir, müəllim onların HAMISINI görə bilir.
+// Şagird tərəfi: yalnız teacherCode-a baxır (müəllimin panelini güzgüləyir),
+// students siyahısındakı BAŞQA şagirdlərin koduna əhəmiyyət vermir.
 public class LiveSessionStateDto {
 
-    // Sessiyanı tanıdan qısa kod.
     private final String code;
-    // Müəllim panelindəki hazırkı kod mətni.
     private final String teacherCode;
-    // Şagird panelindəki hazırkı kod mətni.
-    private final String studentCode;
-    // Son dəfə hər hansı tərəfin kodu yenilədiyi vaxt.
+    private final List<LiveStudentCodeDto> students;
     private final Instant lastActivity;
 
     // Bütün sahələri birbaşa təyin edən əsas (və yeganə) konstruktor.
-    public LiveSessionStateDto(String code, String teacherCode, String studentCode, Instant lastActivity) {
+    public LiveSessionStateDto(String code, String teacherCode, List<LiveStudentCodeDto> students, Instant lastActivity) {
         this.code = code;
         this.teacherCode = teacherCode;
-        this.studentCode = studentCode;
+        this.students = students;
         this.lastActivity = lastActivity;
     }
 
@@ -37,48 +36,13 @@ public class LiveSessionStateDto {
         return teacherCode;
     }
 
-    // studentCode sahəsinin dəyərini qaytarır.
-    public String getStudentCode() {
-        return studentCode;
+    // students sahəsinin dəyərini qaytarır.
+    public List<LiveStudentCodeDto> getStudents() {
+        return students;
     }
 
     // lastActivity sahəsinin dəyərini qaytarır.
     public Instant getLastActivity() {
         return lastActivity;
-    }
-
-    // İki LiveSessionStateDto obyektinin bütün sahələr üzrə məzmunca eyni olub-olmadığını yoxlayır.
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        LiveSessionStateDto that = (LiveSessionStateDto) o;
-        return Objects.equals(code, that.code)
-            && Objects.equals(teacherCode, that.teacherCode)
-            && Objects.equals(studentCode, that.studentCode)
-            && Objects.equals(lastActivity, that.lastActivity);
-    }
-
-    // equals() ilə uyğun hash kodu yaradır (Object müqaviləsinə görə equals()
-    // true olan obyektlərin hashCode()-u da eyni olmalıdır) — Objects.hash(...)
-    // bütün sahələrin hash-lərini birləşdirir.
-    @Override
-    public int hashCode() {
-        return Objects.hash(code, teacherCode, studentCode, lastActivity);
-    }
-
-    // Debug/log məqsədləri üçün obyektin bütün sahələrini ehtiva edən mətn təsvirini yaradır.
-    @Override
-    public String toString() {
-        return "LiveSessionStateDto{" +
-            "code='" + code + '\'' +
-            ", teacherCode='" + teacherCode + '\'' +
-            ", studentCode='" + studentCode + '\'' +
-            ", lastActivity=" + lastActivity +
-            '}';
     }
 }
