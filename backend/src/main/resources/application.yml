@@ -3,7 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:azcup}
+    # sslmode default "prefer" — lokal Postgres SSL tələb etmir, sadəcə mövcud
+    # olsa istifadə edir; Render/Neon üçün DB_SSLMODE=require təyin olunur
+    # (bax: render.yaml) ki, Neon-un tələb etdiyi SSL bağlantısı təmin olunsun.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:azcup}?sslmode=${DB_SSLMODE:prefer}
     username: ${DB_USERNAME:azcup}
     password: ${DB_PASSWORD:azcup}
   jpa:

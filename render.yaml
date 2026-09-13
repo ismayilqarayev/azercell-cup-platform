@@ -1,9 +1,3 @@
-databases:
-  - name: azcup-db
-    plan: free
-    databaseName: azcup
-    user: azcup
-
 services:
   - type: web
     name: azcup-backend
@@ -12,26 +6,21 @@ services:
     dockerContext: ./backend
     plan: free
     envVars:
+      # Verilənlər bazası Render-in öz (30 gündən sonra bitən pulsuz) Postgres-i
+      # ƏVƏZİNƏ Neon-da saxlanılır — dəyərlər Render dashboard-unda əl ilə
+      # təyin olunmalıdır (bax: DEPLOY.md və ya söhbətdəki izah).
       - key: DB_HOST
-        fromDatabase:
-          name: azcup-db
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: azcup-db
-          property: port
+        sync: false
       - key: DB_NAME
-        fromDatabase:
-          name: azcup-db
-          property: database
+        sync: false
       - key: DB_USERNAME
-        fromDatabase:
-          name: azcup-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: azcup-db
-          property: password
+        sync: false
+      - key: DB_SSLMODE
+        value: require
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
