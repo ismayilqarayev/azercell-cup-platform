@@ -6,6 +6,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,14 @@ public class GithubCodeSyncService {
         .connectTimeout(Duration.ofSeconds(10))
         .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Autentifikasiyasız GitHub API sorğuları saatda cəmi 60-la
+    // məhdudlaşır və bu limit Render-in paylaşılan çıxış IP-si üzərindən
+    // BÜTÜN müştərilər arasında bölüşülür — asanlıqla tükənib sinxronu
+    // uzun müddət 403 ilə dayandıra bilər. Token verilibsə (env: GITHUB_TOKEN,
+    // public repo üçün əlavə scope tələb etmir) limit 5000-ə çıxır.
+    @Value("${GITHUB_TOKEN:}")
+    private String githubToken;
 
     // volatile — planlaşdırılmış (@Scheduled) thread yeniləyir, HTTP request
     // thread-ləri oxuyur; volatile hər ikisinin ən son dəyəri görməsini təmin edir.
@@ -104,11 +113,12 @@ public class GithubCodeSyncService {
     // qovluq/fayl ağacını qurur.
     private GithubCodeTreeResponse fetchFromGithub() throws Exception {
         String treeUrl = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/git/trees/" + BRANCH + "?recursive=1";
-        HttpRequest treeRequest = HttpRequest.newBuilder(URI.create(treeUrl))
+        HttpRequest.Builder treeRequestBuilder = HttpRequest.newBuilder(URI.create(treeUrl))
             .header("Accept", "application/vnd.github+json")
             .timeout(Duration.ofSeconds(15))
-            .GET()
-            .build();
+            .GET();
+        withAuth(treeRequestBuilder);
+        HttpRequest treeRequest = treeRequestBuilder.build();
         HttpResponse<String> treeResponse = httpClient.send(treeRequest, HttpResponse.BodyHandlers.ofString());
         if (treeResponse.statusCode() != 200) {
             throw new IllegalStateException("GitHub tree API " + treeResponse.statusCode() + " qaytardı");
@@ -137,10 +147,11 @@ public class GithubCodeSyncService {
 
     private String fetchRawContent(String relativePath) throws Exception {
         String rawUrl = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + BASE_PATH + "/" + relativePath;
-        HttpRequest request = HttpRequest.newBuilder(URI.create(rawUrl))
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(rawUrl))
             .timeout(Duration.ofSeconds(15))
-            .GET()
-            .build();
+            .GET();
+        withAuth(requestBuilder);
+        HttpRequest request = requestBuilder.build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
             throw new IllegalStateException("Raw content " + response.statusCode() + " (" + relativePath + ")");
@@ -180,6 +191,12 @@ public class GithubCodeSyncService {
             if (isLast) {
                 current.content = content;
             }
+        }
+    }
+
+    private void withAuth(HttpRequest.Builder builder) {
+        if (githubToken != null && !githubToken.isBlank()) {
+            builder.header("Authorization", "Bearer " + githubToken);
         }
     }
 
