@@ -367,23 +367,39 @@
   }
   .live-student-chip:hover{ border-color:var(--gold); color:var(--ink); }
   .live-student-chip.active{ background:rgba(255,193,7,0.14); border-color:var(--gold); color:var(--gold); }
-  .live-editor{ position:relative; }
+  .live-editor{ position:relative; border-radius:4px; transition:box-shadow 0.15s ease; }
+  .live-editor:focus-within{ box-shadow:0 0 0 1px var(--gold), 0 0 16px rgba(0,229,255,0.15); }
   .live-gutter{
     position:absolute; top:0; left:0; bottom:0; width:34px;
-    background:rgba(255,255,255,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    background:rgba(0,0,0,0.15); border:1px solid var(--grid-line-strong); border-right:none;
     border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
-    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
-    white-space:pre; user-select:none; pointer-events:none;
+    color:#75715e; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; z-index:3;
   }
   .live-editor:focus-within .live-gutter{ border-color:var(--gold); }
-  .live-textarea{
-    width:100%; min-height:260px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
-    background:var(--blueprint-deep); color:var(--ink); border:1px solid var(--grid-line-strong);
-    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
-    white-space:pre; overflow:auto;
+  /* Monokai fonundakı Kod Arxivi rəngləməsi ilə eyni — canlı yazarkən
+     dərhal rəngli görünsün deyə textarea-nın altında overlay kimi işləyir
+     (bax: renderLiveHighlight). Textarea-nın öz mətni şəffafdır, görünən
+     rəngli mətn bu <pre>-dəndir; scroll/ölçü hər ikisində sinxronlaşdırılır. */
+  .live-highlight{
+    position:absolute; top:0; left:0; right:0; bottom:0; margin:0; z-index:1;
+    font-family:var(--mono); font-size:12.5px; line-height:1.5; color:#f8f8f2;
+    background:#272822; border:1px solid var(--grid-line-strong); border-radius:4px;
+    padding:10px 12px 10px 44px; white-space:pre; overflow:hidden; pointer-events:none; box-sizing:border-box;
   }
-  .live-textarea:focus{ border-color:var(--gold); }
-  .live-textarea[readonly]{ color:var(--ink-soft); }
+  .live-editor:focus-within .live-highlight{ border-color:var(--gold); }
+  .live-active-line{
+    position:absolute; left:34px; right:0; height:18.75px; z-index:2;
+    background:rgba(255,255,255,0.045); pointer-events:none; transition:top 0.06s ease;
+  }
+  .live-textarea{
+    position:relative; z-index:4; width:100%; min-height:260px; font-family:var(--mono);
+    font-size:12.5px; line-height:1.5; background:transparent; color:transparent; caret-color:#f8f8f2;
+    border:1px solid transparent; border-radius:4px; padding:10px 12px 10px 44px; resize:vertical;
+    outline:none; box-sizing:border-box; white-space:pre; overflow:auto;
+  }
+  .live-textarea::selection{ background:rgba(0,229,255,0.25); }
+  .live-textarea[readonly]{ caret-color:transparent; }
   .live-run-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
   .live-run-output{ margin-top:8px; }
   .live-run-status{
@@ -1832,7 +1848,9 @@ function renderLiveActive(){
     + '<div class="live-panel-title">' + ownLabel + '</div>'
     + '<div class="live-editor">'
     + '<div class="live-gutter" id="liveOwnGutter">1</div>'
-    + '<textarea class="live-textarea" id="liveOwnCode" spellcheck="false" wrap="off" placeholder="Buraya C++ kodunu yaz..." oninput="onLiveOwnInput()" onscroll="syncLiveGutterScroll(&#39;own&#39;)"></textarea>'
+    + '<div class="live-active-line" id="liveOwnActiveLine"></div>'
+    + '<pre class="live-highlight" id="liveOwnHighlight" aria-hidden="true"></pre>'
+    + '<textarea class="live-textarea" id="liveOwnCode" spellcheck="false" wrap="off" placeholder="Buraya C++ kodunu yaz..." oninput="onLiveOwnInput()" onscroll="syncLiveEditorScroll(&#39;own&#39;)" onclick="syncLiveEditor(&#39;own&#39;)" onkeyup="onLiveOwnKeyup(event)" onkeydown="onLiveOwnKeydown(event)"></textarea>'
     + '</div>'
     + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;own&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOwnRunHint"></span></div>'
     + '<div class="live-run-output" id="liveOwnRunOutput" style="display:none;">'
@@ -1844,8 +1862,8 @@ function renderLiveActive(){
     + (liveRole === 'teacher' ? renderTeacherOtherPanelHtml() : renderStudentOtherPanelHtml())
     + '</div>';
   document.getElementById('liveOwnCode').value = liveOwnValue;
-  syncLiveGutter('own');
-  syncLiveGutter('other');
+  syncLiveEditor('own');
+  syncLiveEditor('other');
   if (liveRole === 'teacher') renderLiveStudentList();
 }
 
@@ -1856,7 +1874,8 @@ function renderStudentOtherPanelHtml(){
     + '<div class="live-panel-title">Müəllimin paneli<span class="live-readonly-badge">yalnız oxumaq üçün</span></div>'
     + '<div class="live-editor">'
     + '<div class="live-gutter" id="liveOtherGutter">1</div>'
-    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveGutterScroll(&#39;other&#39;)"></textarea>'
+    + '<pre class="live-highlight" id="liveOtherHighlight" aria-hidden="true"></pre>'
+    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveEditorScroll(&#39;other&#39;)"></textarea>'
     + '</div>'
     + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;other&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOtherRunHint"></span></div>'
     + '<div class="live-run-output" id="liveOtherRunOutput" style="display:none;">'
@@ -1876,7 +1895,8 @@ function renderTeacherOtherPanelHtml(){
     + '<div class="live-student-list" id="liveStudentList"></div>'
     + '<div class="live-editor">'
     + '<div class="live-gutter" id="liveOtherGutter">1</div>'
-    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveGutterScroll(&#39;other&#39;)" placeholder="Şagird qoşulanda burada görünəcək..."></textarea>'
+    + '<pre class="live-highlight" id="liveOtherHighlight" aria-hidden="true"></pre>'
+    + '<textarea class="live-textarea" id="liveOtherCode" spellcheck="false" wrap="off" readonly onscroll="syncLiveEditorScroll(&#39;other&#39;)" placeholder="Şagird qoşulanda burada görünəcək..."></textarea>'
     + '</div>'
     + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;other&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOtherRunHint"></span></div>'
     + '<div class="live-run-output" id="liveOtherRunOutput" style="display:none;">'
@@ -1926,15 +1946,22 @@ function updateSelectedStudentPanel(){
   const val = student ? student.sourceCode : '';
   if (otherEl.value !== val) {
     otherEl.value = val;
-    syncLiveGutter('other');
+    syncLiveEditor('other');
   }
 }
 
 function onLiveOwnInput(){
   liveOwnValue = document.getElementById('liveOwnCode').value;
-  syncLiveGutter('own');
+  syncLiveEditor('own');
   clearTimeout(liveSendDebounce);
   liveSendDebounce = setTimeout(sendLiveOwnCode, 500);
+}
+
+// Ox düymələri/klik ilə kursor sətir dəyişəndə də aktiv-sətir vurğusu
+// yenilənsin deyə (mətn özü dəyişmir, ona görə tam renderi lazım deyil,
+// sadəcə aktiv sətir zolağını yeniləmək kifayətdir).
+function onLiveOwnKeyup(e){
+  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) syncLiveActiveLine('own');
 }
 
 async function sendLiveOwnCode(){
@@ -1962,26 +1989,96 @@ async function pollLiveSession(){
     if (!otherEl) return;
     if (document.activeElement !== otherEl && otherEl.value !== data.teacherCode) {
       otherEl.value = data.teacherCode;
-      syncLiveGutter('other');
+      syncLiveEditor('other');
     }
   } catch (e) { /* keçici şəbəkə xətası — növbəti poll-da yenidən cəhd olunacaq */ }
 }
 
-function syncLiveGutter(which){
+// Sətir nömrələri, Monokai rəngli overlay (bax: highlightGhcCppLine, artıq
+// Kod Arxivi üçün mövcuddur — burada eyni tokenizer təkrar istifadə olunur)
+// və aktiv-sətir zolağı — hər üçü mətn dəyişəndə birlikdə yenilənir.
+function syncLiveEditor(which){
   const ta = document.getElementById(which === 'own' ? 'liveOwnCode' : 'liveOtherCode');
   const gutter = document.getElementById(which === 'own' ? 'liveOwnGutter' : 'liveOtherGutter');
+  const hl = document.getElementById(which === 'own' ? 'liveOwnHighlight' : 'liveOtherHighlight');
   if (!ta || !gutter) return;
-  const lines = ta.value.split('\n').length;
-  let text = '';
-  for (let i = 1; i <= lines; i++) text += i + '\n';
-  gutter.textContent = text;
+  const lines = ta.value.split('\n');
+  let gutterText = '';
+  for (let i = 1; i <= lines.length; i++) gutterText += i + '\n';
+  gutter.textContent = gutterText;
+  if (hl) hl.innerHTML = lines.map(highlightGhcCppLine).join('\n');
+  syncLiveActiveLine(which);
 }
 
-function syncLiveGutterScroll(which){
+const LIVE_LINE_HEIGHT = 18.75; // .live-textarea/.live-highlight line-height (12.5px * 1.5) ilə eyni olmalıdır
+
+// Kursorun olduğu sətrə uyğun #live*ActiveLine zolağını yerləşdirir —
+// yalnız redaktə edilə bilən (own) panelin aktiv-sətir elementi var,
+// readonly "digər panel"də bu vurğu yoxdur.
+function syncLiveActiveLine(which){
+  if (which !== 'own') return;
+  const ta = document.getElementById('liveOwnCode');
+  const activeLineEl = document.getElementById('liveOwnActiveLine');
+  if (!ta || !activeLineEl) return;
+  const pos = ta.selectionStart;
+  const lineIdx = ta.value.slice(0, pos).split('\n').length - 1;
+  activeLineEl.style.top = (10 + lineIdx * LIVE_LINE_HEIGHT) + 'px';
+}
+
+function syncLiveEditorScroll(which){
   const ta = document.getElementById(which === 'own' ? 'liveOwnCode' : 'liveOtherCode');
   const gutter = document.getElementById(which === 'own' ? 'liveOwnGutter' : 'liveOtherGutter');
+  const hl = document.getElementById(which === 'own' ? 'liveOwnHighlight' : 'liveOtherHighlight');
   if (!ta || !gutter) return;
   gutter.scrollTop = ta.scrollTop;
+  if (hl) { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; }
+}
+
+// VS Code-a bənzər kiçik rahatlıqlar: Tab → 4 boşluq, mötərizə/dırnaq
+// avtomatik bağlanması, Enter-də əvvəlki sətrin indentini qorumaq (və
+// "{" sonrası əlavə 4 boşluq). Yalnız redaktə edilə bilən (own) panel üçün.
+const LIVE_BRACKET_PAIRS = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+
+function onLiveOwnKeydown(e){
+  const ta = document.getElementById('liveOwnCode');
+  if (!ta) return;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    ta.value = ta.value.slice(0, start) + '    ' + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + 4;
+    onLiveOwnInput();
+    return;
+  }
+  if (e.key === 'Enter') {
+    const lineStart = ta.value.lastIndexOf('\n', start - 1) + 1;
+    const currentLine = ta.value.slice(lineStart, start);
+    const indentMatch = currentLine.match(/^\s*/);
+    let indent = indentMatch ? indentMatch[0] : '';
+    if (/[{([]\s*$/.test(currentLine)) indent += '    ';
+    e.preventDefault();
+    const insert = '\n' + indent;
+    ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + insert.length;
+    onLiveOwnInput();
+    return;
+  }
+  if (LIVE_BRACKET_PAIRS[e.key] && start === end) {
+    const closer = LIVE_BRACKET_PAIRS[e.key];
+    const charAfter = ta.value[end];
+    // Qapanan dırnaq/mötərizənin üstünə yazanda ikiqat əlavə etməmək üçün:
+    // növbəti simvol artıq həmin qapayıcıdırsa, sadəcə üstündən keç.
+    if ((e.key === '"' || e.key === "'") && charAfter === e.key) {
+      e.preventDefault();
+      ta.selectionStart = ta.selectionEnd = start + 1;
+      return;
+    }
+    e.preventDefault();
+    ta.value = ta.value.slice(0, start) + e.key + closer + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + 1;
+    onLiveOwnInput();
+  }
 }
 
 const LIVE_RUN_STATUS_LABELS = {
