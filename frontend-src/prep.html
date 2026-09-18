@@ -31,23 +31,23 @@
      üzərində qızıl/bürünc vurğular, planlaşdırma sənədi hissi yaratmaq üçün.
      ========================================================================== */
   :root{
-    --blueprint-deep:   #0B0F19; /* Ən tünd fon rəngi — səhifənin əsas arxa planı */
+    --blueprint-deep:   #F6F6FB; /* Ən tünd fon rəngi — səhifənin əsas arxa planı */
     --blueprint-mid:    #EDEEF2; /* Bir az açıq tünd mavi (hazırda ehtiyat rəng) */
-    --grid-line:        rgba(255, 255, 255, 0.08); /* Blueprint effekti üçün incə xətlər — kiçik şəbəkə (16px) */
-    --grid-line-strong: rgba(255, 255, 255, 0.16); /* Eyni şəbəkənin qalın/görünən xətləri — böyük şəbəkə (96px) */
-    --paper:            #141824; /* "Kağız" rəngi — açıq fonlu kart/blok elementləri (məs. mövzu kartları) üçün */
-    --paper-warm:       #1B2030; /* Kağızın isti (yaşılımtıl) variantı — cədvəl başlıqları və s. üçün */
-    --well: #05070C;
-    --ink:              #F2F4F8; /* Açıq fon üzərində əsas mətn rəngi (tünd, oxunaqlı) */
-    --ink-soft:         #8B93A8; /* İkinci dərəcəli, az vurğulu mətn üçün yumşaq rəng */
-    --gold:             #00E5FF; /* Əsas vurğu rəngi — çərçivələr, xətlər, teqlər */
-    --gold-bright:      #4DFFFF; /* Qızılın parlaq forması — başlıqlar, önə çıxan mətnlər üçün */
-    --on-accent: #0B0F19;
-    --bronze:           #FF7A00; /* İkinci dərəcəli vurğu rəngi — kiçik başlıqlar (h4), teqlər */
-    --bronze-text:      #FF9E45;
-    --green:            #39FF6E;
-    --green-text:       #39FF6E;
-    --alert:            #FF3B3B; /* Xəbərdarlıq/hover zamanı diqqət çəkən rəng */
+    --grid-line:        rgba(18, 19, 26, 0.10); /* Blueprint effekti üçün incə xətlər — kiçik şəbəkə (16px) */
+    --grid-line-strong: rgba(18, 19, 26, 0.20); /* Eyni şəbəkənin qalın/görünən xətləri — böyük şəbəkə (96px) */
+    --paper:            #FFFFFF; /* "Kağız" rəngi — açıq fonlu kart/blok elementləri (məs. mövzu kartları) üçün */
+    --paper-warm:       #F1F0EC; /* Kağızın isti (yaşılımtıl) variantı — cədvəl başlıqları və s. üçün */
+    --well: #E9EBF2;
+    --ink:              #12131A; /* Açıq fon üzərində əsas mətn rəngi (tünd, oxunaqlı) */
+    --ink-soft:         #5B6472; /* İkinci dərəcəli, az vurğulu mətn üçün yumşaq rəng */
+    --gold:             #0B7A93; /* Əsas vurğu rəngi — çərçivələr, xətlər, teqlər */
+    --gold-bright:      #26D2FF; /* Qızılın parlaq forması — başlıqlar, önə çıxan mətnlər üçün */
+    --on-accent: #001529;
+    --bronze:           #B85C00; /* İkinci dərəcəli vurğu rəngi — kiçik başlıqlar (h4), teqlər */
+    --bronze-text:      #B85C00;
+    --green:            #0E8F72;
+    --green-text:       #0E8F72;
+    --alert:            #E0303F; /* Xəbərdarlıq/hover zamanı diqqət çəkən rəng */
     --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace; /* Kod və texniki yazılar üçün mono şrift */
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; /* Adi mətn üçün oxunaqlı şrift */
   }
@@ -261,7 +261,7 @@
     font-family:var(--mono); font-size:18px; line-height:1; background:transparent;
     border:none; color:var(--ink-soft); cursor:pointer; padding:4px 8px; border-radius:4px;
   }
-  .code-modal-close:hover{ color:var(--ink); background:rgba(255,255,255,0.06); }
+  .code-modal-close:hover{ color:var(--ink); background:rgba(18,19,26,0.06); }
   .roadmap-layout{ display:flex; gap:22px; align-items:flex-start; }
   .roadmap-nav{
     width:220px; flex-shrink:0; position:sticky; top:20px;
@@ -275,7 +275,7 @@
     transition:background 0.15s ease, color 0.15s ease; line-height:1.4;
   }
   .roadmap-nav-item .rn-num{ color:var(--gold-bright); font-weight:600; margin-right:4px; }
-  .roadmap-nav-item:hover{ background:rgba(255,255,255,0.04); color:var(--ink); }
+  .roadmap-nav-item:hover{ background:rgba(18,19,26,0.04); color:var(--ink); }
   .roadmap-nav-item.current{
     background:var(--gold); color:var(--on-accent); font-weight:600; border-color:var(--bronze);
   }
@@ -436,8 +436,8 @@
     transition:background 0.15s ease;
     white-space:pre; /* Kodun boşluq/indent formatını olduğu kimi saxlayır */
   }
-  .code-line:hover{ background:rgba(255,255,255,0.05); } /* Siçan üzərinə gələndə yüngül işıqlanma */
-  .code-line.active{ background:rgba(255,255,255,0.08); } /* İzah paneli açıq olan sətir daha güclü işıqlanır */
+  .code-line:hover{ background:rgba(18,19,26,0.05); } /* Siçan üzərinə gələndə yüngül işıqlanma */
+  .code-line.active{ background:rgba(18,19,26,0.08); } /* İzah paneli açıq olan sətir daha güclü işıqlanır */
   .code-line .line-no{
     flex-shrink:0;
     width:16px;
@@ -490,7 +490,7 @@
     margin:4px 14px 8px;
   }
   .code-explain-inner{
-    background:rgba(255,255,255,0.04);
+    background:rgba(18,19,26,0.04);
     border-left:2px solid var(--gold-bright);
     border-radius:2px;
     padding:8px 12px;
@@ -642,11 +642,11 @@
     font-family:var(--mono);
     font-size:10.5px;
     font-weight:700;
-    background:rgba(255,59,59,0.15);
+    background:rgba(224,48,63,0.15);
     color:#FF6B6B;
     padding:3px 8px;
     border-radius:20px;
-    border:1px solid rgba(255,59,59,0.4);
+    border:1px solid rgba(224,48,63,0.4);
   }
   .hard-start-banner{
     display:flex;
@@ -654,9 +654,9 @@
     gap:8px;
     margin:0 0 14px;
     padding:10px 14px;
-    background:rgba(255,59,59,0.10);
-    border:1px solid rgba(255,59,59,0.35);
-    border-left:4px solid #FF3B3B;
+    background:rgba(224,48,63,0.10);
+    border:1px solid rgba(224,48,63,0.35);
+    border-left:4px solid #E0303F;
     border-radius:2px;
     font-family:var(--mono);
     font-size:12px;
