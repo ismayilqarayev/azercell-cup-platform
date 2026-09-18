@@ -2055,9 +2055,20 @@ function onLiveOwnKeydown(e){
     const lineStart = ta.value.lastIndexOf('\n', start - 1) + 1;
     const currentLine = ta.value.slice(lineStart, start);
     const indentMatch = currentLine.match(/^\s*/);
-    let indent = indentMatch ? indentMatch[0] : '';
-    if (/[{([]\s*$/.test(currentLine)) indent += '    ';
+    const baseIndent = indentMatch ? indentMatch[0] : '';
+    const opensBlock = /[{([]\s*$/.test(currentLine);
     e.preventDefault();
+    // Kursor "{|}" arasındadırsa (boş blok) — bağlayan mötərizəni aşağı
+    // sətrə köçürür, kursoru isə arada, əlavə indentlə qoyur:
+    //   {|}  →  {\n    |\n}
+    if (start === end && opensBlock && /^\s*[)\]}]/.test(ta.value.slice(end))) {
+      const insert = '\n' + baseIndent + '    ' + '\n' + baseIndent;
+      ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+      ta.selectionStart = ta.selectionEnd = start + baseIndent.length + 5;
+      onLiveOwnInput();
+      return;
+    }
+    const indent = baseIndent + (opensBlock ? '    ' : '');
     const insert = '\n' + indent;
     ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
     ta.selectionStart = ta.selectionEnd = start + insert.length;
