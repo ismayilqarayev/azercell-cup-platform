@@ -208,6 +208,40 @@
     color:var(--ink);
   }
   .method-note p:last-child{ margin-bottom:0; } /* Son paraqrafın altında lazımsız boşluq olmasın */
+
+  /* ---------- Fəaliyyət xəritəsi (GitHub-un "contribution graph"ına bənzər) ----------
+     Eyni komponent (CSS + JS) index.html-də "Şagirdlər"/"Qruplarım" panellərində
+     də təkrarlanır (iframe/shell sərhədini keçə bilmədiyi üçün, bax: highlightCppLine
+     ilə eyni "hər iki tərəfdə öz nüsxəsi" konvensiyası). */
+  .activity-card{
+    background:var(--paper); border-radius:2px; padding:18px 22px 14px; margin-bottom:26px;
+  }
+  .activity-scroll{ overflow-x:auto; padding-bottom:2px; }
+  .activity-months{
+    display:grid; grid-auto-flow:column; grid-auto-columns:11px; gap:3px;
+    margin-left:26px; margin-bottom:4px; font-family:var(--mono); font-size:10px;
+    color:var(--ink-soft); height:13px; white-space:nowrap;
+  }
+  .activity-body{ display:flex; gap:5px; }
+  .activity-daylabels{
+    display:grid; grid-template-rows:repeat(7,11px); gap:3px; font-family:var(--mono);
+    font-size:9.5px; color:var(--ink-soft); line-height:11px; text-align:right; width:20px; flex-shrink:0;
+  }
+  .activity-grid{
+    display:grid; grid-auto-flow:column; grid-auto-columns:11px;
+    grid-template-rows:repeat(7,11px); gap:3px;
+  }
+  .activity-cell{ width:11px; height:11px; border-radius:2px; background:var(--grid-line-strong); }
+  .activity-cell[data-empty="1"]{ background:transparent; }
+  .activity-cell[data-level="1"]{ background:#C9EDE1; }
+  .activity-cell[data-level="2"]{ background:#8FD6C0; }
+  .activity-cell[data-level="3"]{ background:#4FBB9C; }
+  .activity-cell[data-level="4"]{ background:var(--green); }
+  .activity-legend{
+    display:flex; align-items:center; gap:5px; font-family:var(--mono); font-size:10px;
+    color:var(--ink-soft); margin-top:8px; justify-content:flex-end;
+  }
+  .activity-legend .activity-cell{ width:10px; height:10px; }
   .method-note b{ color:var(--bronze-text); } /* Qalın mətnlər (əsas terminlər) bürünc rənglə vurğulanır */
 
   /* ==========================================================================
@@ -750,6 +784,11 @@
       <div><div class="k">Dil</div><div class="v">C++</div></div>
       <div><div class="k">Hədəf</div><div class="v">Final + Medal</div></div>
     </div>
+  </div>
+
+  <div class="activity-card" id="myActivityCard" style="display:none;">
+    <div class="section-label">Sənin fəaliyyətin</div>
+    <div id="myActivityBody"><span class="teacher-panel-loading" style="font-family:var(--mono);font-size:11px;color:var(--ink-soft);">Yüklənir...</span></div>
   </div>
 
   <div class="section-label">Metodika izahı (müəllim üçün)</div>
@@ -3334,6 +3373,87 @@ async function loadProgress(){
   } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç, kartlar açıq qalır */ }
 }
 loadProgress();
+
+/* ============================================================================
+   FƏALİYYƏT XƏRİTƏSİ — GitHub-un "contribution graph"ına bənzər, son ~53
+   həftədəki gündəlik cəhd sayını rəngli xanalarla göstərir (bax: backend
+   GET /api/me/activity, SubmissionService.buildActivity). Yalnız giriş
+   etmiş istifadəçi üçün göstərilir — login-dən ƏVVƏL bu funksiya çağırılsa
+   belə (iframe login-dən qabaq yüklənir, bax: index.html-dəki loadIframe),
+   sadəcə sakitcə heç nə göstərmir; login bitəndən sonra refreshIframeData()
+   funksiyası bunu yenidən çağırır (bax: index.html).
+   ============================================================================ */
+async function loadMyActivity(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  const card = document.getElementById('myActivityCard');
+  if (!user || !card) return;
+  card.style.display = '';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/me/activity');
+    if (!res.ok) throw new Error('fetch failed');
+    const days = await res.json();
+    document.getElementById('myActivityBody').innerHTML = buildActivityHeatmapHtml(days);
+  } catch (e) {
+    document.getElementById('myActivityBody').innerHTML = '<span class="teacher-panel-error" style="font-family:var(--mono);font-size:11px;">Fəaliyyət xəritəsini yükləmək mümkün olmadı.</span>';
+  }
+}
+loadMyActivity();
+
+// Backend-dən gələn seyrək {date:"YYYY-MM-DD", count:N} siyahısını GitHub-vari
+// 7 sətir (B.e...B) × ~53 sütunluq rəngli xana şəbəkəsinə çevirir. Sütunlar
+// HƏFTƏ, sətirlər HƏFTƏNİN GÜNÜdür (bazar ertəsi=0 sətri) — ilk sütun tam
+// olmaya bilər (aralığın əvvəlindən əvvəlki günlər şəffaf "boş" xana kimi
+// dolur ki, xanalar düzgün sətirdə qalsın).
+function buildActivityHeatmapHtml(days){
+  const counts = {};
+  (days || []).forEach(function(d){ counts[d.date] = d.count; });
+  const MS_DAY = 86400000;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const totalDays = 371;
+  const rangeStart = new Date(today.getTime() - (totalDays - 1) * MS_DAY);
+  const startDow = (rangeStart.getDay() + 6) % 7; // 0=Bazar ertəsi
+  const gridStart = new Date(rangeStart.getTime() - startDow * MS_DAY);
+  const monthNames = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'];
+  let cellsHtml = '';
+  let monthsHtml = '';
+  let lastMonth = -1;
+  let col = -1;
+  for (let cur = new Date(gridStart); cur <= today; cur = new Date(cur.getTime() + MS_DAY)) {
+    const row = (cur.getDay() + 6) % 7;
+    if (row === 0) col++;
+    if (cur.getDate() === 1 || (col === 0 && row === 0)) {
+      const m = cur.getMonth();
+      if (m !== lastMonth) {
+        monthsHtml += '<div style="grid-column:' + (col + 1) + '">' + monthNames[m] + '</div>';
+        lastMonth = m;
+      }
+    }
+    if (cur < rangeStart) {
+      cellsHtml += '<div class="activity-cell" data-empty="1"></div>';
+      continue;
+    }
+    const key = cur.getFullYear() + '-' + String(cur.getMonth() + 1).padStart(2, '0') + '-' + String(cur.getDate()).padStart(2, '0');
+    const count = counts[key] || 0;
+    let level = 0;
+    if (count >= 8) level = 4;
+    else if (count >= 5) level = 3;
+    else if (count >= 3) level = 2;
+    else if (count >= 1) level = 1;
+    const dateLabel = cur.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' });
+    const title = count ? (count + ' cəhd — ' + dateLabel) : ('Cəhd yoxdur — ' + dateLabel);
+    cellsHtml += '<div class="activity-cell" data-level="' + level + '" title="' + escapeHtml(title) + '"></div>';
+  }
+  return '<div class="activity-scroll">'
+    + '<div class="activity-months">' + monthsHtml + '</div>'
+    + '<div class="activity-body">'
+    + '<div class="activity-daylabels"><div>B.e</div><div></div><div>Çər</div><div></div><div>Cü</div><div></div><div></div></div>'
+    + '<div class="activity-grid">' + cellsHtml + '</div>'
+    + '</div></div>'
+    + '<div class="activity-legend">Az'
+    + '<div class="activity-cell" data-level="0"></div><div class="activity-cell" data-level="1"></div>'
+    + '<div class="activity-cell" data-level="2"></div><div class="activity-cell" data-level="3"></div>'
+    + '<div class="activity-cell" data-level="4"></div>Çox</div>';
+}
 
 // Kart bağlıdırsa (hələ müəllim tərəfindən açıq elan olunmayıb) klik
 // heç nə etmir — açılıb-bağlanma yalnız açıq mövzular üçün işləyir.

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
@@ -51,6 +52,13 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
         WHERE s.user = :user AND s.status = az.azcup.backend.entity.SubmissionStatus.ACCEPTED
         """)
     long countDistinctSolvedProblems(@Param("user") User user);
+
+    // Fəaliyyət xəritəsi (bax: SubmissionService.buildActivity) üçün — bu
+    // istifadəçinin son N gündə etdiyi BÜTÜN cəhdlərin (nəticəsindən asılı
+    // olmayaraq) vaxt möhürləri. Günə görə qruplaşdırma DB səviyyəsində yox,
+    // Java tərəfində (yerli saat qurşağı ilə) aparılır — bax: buildActivity.
+    @Query("SELECT s.submittedAt FROM Submission s WHERE s.user = :user AND s.submittedAt >= :since")
+    List<Instant> submittedAtsForUserSince(@Param("user") User user, @Param("since") Instant since);
 
     // Spring Data "interface-based projection" — yuxarıdakı @Query-nin SELECT
     // siyahısındakı sütun adlarına (topicId, solvedCount) uyğun get-metodları.

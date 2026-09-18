@@ -1,5 +1,6 @@
 package az.azcup.backend.controller;
 
+import az.azcup.backend.dto.ActivityDayDto;
 import az.azcup.backend.dto.ProgressDto;
 import az.azcup.backend.dto.StudentAssignmentDto;
 import az.azcup.backend.dto.SubmissionRequest;
@@ -56,6 +57,13 @@ public class SubmissionController {
     @GetMapping("/api/me/progress")
     public List<ProgressDto> progress(@AuthenticationPrincipal UserPrincipal principal) {
         return submissionService.progress(principal.getUser());
+    }
+
+    // Şagirdin öz fəaliyyət xəritəsi (GitHub-un "contribution graph"ına
+    // bənzər gündəlik cəhd sayğacı) — bax: SubmissionService.activity.
+    @GetMapping("/api/me/activity")
+    public List<ActivityDayDto> activity(@AuthenticationPrincipal UserPrincipal principal) {
+        return submissionService.activity(principal.getUser());
     }
 
     // Şagirdin ÜZVÜ olduğu bütün qruplardakı tapşırıqları, öz irəliləyişi ilə

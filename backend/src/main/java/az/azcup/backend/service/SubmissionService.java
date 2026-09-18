@@ -1,5 +1,6 @@
 package az.azcup.backend.service;
 
+import az.azcup.backend.dto.ActivityDayDto;
 import az.azcup.backend.dto.ProgressDto;
 import az.azcup.backend.dto.SubmissionResponse;
 import az.azcup.backend.entity.Problem;
@@ -8,6 +9,7 @@ import az.azcup.backend.entity.Role;
 import az.azcup.backend.entity.Submission;
 import az.azcup.backend.entity.Topic;
 import az.azcup.backend.entity.User;
+import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.judge.JudgeService;
 import az.azcup.backend.judge.MultiJudgeResult;
 import az.azcup.backend.judge.TestCaseInput;
@@ -15,13 +17,19 @@ import az.azcup.backend.repository.ProblemRepository;
 import az.azcup.backend.repository.ProblemTestCaseRepository;
 import az.azcup.backend.repository.SubmissionRepository;
 import az.azcup.backend.repository.TopicRepository;
+import az.azcup.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 // Şagirdin kod göndərməsini idarə edir: yoxlatdırır (JudgeService), nəticəni
 // bazaya yazır və irəliləyiş statistikasını hesablayır.
@@ -41,6 +49,15 @@ public class SubmissionService {
     private final ProblemTestCaseRepository problemTestCaseRepository;
     // Kodu compile edib icra etmək üçün mərkəzi yoxlayıcı servis.
     private final JudgeService judgeService;
+    // Müəllimin fəaliyyət xəritəsinə baxdığı şagirdi ID-sinə görə tapmaq üçün.
+    private final UserRepository userRepository;
+
+    // Fəaliyyət xəritəsi neçə günü (GitHub-dakı kimi ~ son 53 həftə) əhatə edir.
+    private static final int ACTIVITY_DAYS = 371;
+    // Günlər BU saat qurşağına görə qruplaşdırılır ki, gecə saatlarındakı
+    // cəhdlər səhv olaraq "növbəti günə" düşməsin (istifadəçilərin əksəriyyəti Azərbaycandadır).
+    private static final ZoneId ACTIVITY_ZONE = ZoneId.of("Asia/Baku");
+    private static final DateTimeFormatter ACTIVITY_DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public SubmissionService(
@@ -49,7 +66,8 @@ public class SubmissionService {
         TopicRepository topicRepository,
         ProblemRepository problemRepository,
         ProblemTestCaseRepository problemTestCaseRepository,
-        JudgeService judgeService
+        JudgeService judgeService,
+        UserRepository userRepository
     ) {
         this.submissionRepository = submissionRepository;
         this.problemService = problemService;
@@ -57,6 +75,7 @@ public class SubmissionService {
         this.problemRepository = problemRepository;
         this.problemTestCaseRepository = problemTestCaseRepository;
         this.judgeService = judgeService;
+        this.userRepository = userRepository;
     }
 
     // Kodu qəbul edir, compile+icra etdirir və nəticəni (uğurlu da olsa,
@@ -148,6 +167,41 @@ public class SubmissionService {
                 problemRepository.countByTopic(t),
                 solvedByTopicId.getOrDefault(t.getId(), 0L)
             ));
+        }
+        return result;
+    }
+
+    // Şagirdin ÖZ fəaliyyət xəritəsi ("Hazırlıq Planı" landing-ində GitHub-un
+    // "contribution graph"ına bənzər gündəlik cəhd sayğacı).
+    @Transactional(readOnly = true)
+    public List<ActivityDayDto> activity(User user) {
+        return buildActivity(user);
+    }
+
+    // Müəllim/admin panelindən bir şagirdin fəaliyyət xəritəsi — istifadəçini
+    // ID-sinə görə tapır (sahiblik yoxlaması yoxdur, çünki eyni "Şagirdlər"
+    // siyahısı artıq istənilən TEACHER/ADMIN-ə açıqdır, bax: SecurityConfig).
+    @Transactional(readOnly = true)
+    public List<ActivityDayDto> activityForUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("İstifadəçi tapılmadı: " + userId));
+        return buildActivity(user);
+    }
+
+    // Son ACTIVITY_DAYS gündəki bütün cəhdləri yerli (Asia/Baku) təqvim
+    // gününə görə qruplaşdırıb sayır. Yalnız cəhd OLAN günlər qaytarılır —
+    // boş günləri 0 kimi doldurmaq frontend-in işidir (bax: ActivityDayDto).
+    // TreeMap istifadə olunur ki, nəticə tarixə görə sıralı gəlsin.
+    private List<ActivityDayDto> buildActivity(User user) {
+        Instant since = LocalDate.now(ACTIVITY_ZONE).minusDays(ACTIVITY_DAYS - 1L)
+            .atStartOfDay(ACTIVITY_ZONE).toInstant();
+        Map<String, Integer> countsByDate = new TreeMap<>();
+        for (Instant submittedAt : submissionRepository.submittedAtsForUserSince(user, since)) {
+            String day = ACTIVITY_DATE_FORMAT.format(submittedAt.atZone(ACTIVITY_ZONE).toLocalDate());
+            countsByDate.merge(day, 1, Integer::sum);
+        }
+        List<ActivityDayDto> result = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : countsByDate.entrySet()) {
+            result.add(new ActivityDayDto(entry.getKey(), entry.getValue()));
         }
         return result;
     }

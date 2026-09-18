@@ -1,5 +1,6 @@
 package az.azcup.backend.controller;
 
+import az.azcup.backend.dto.ActivityDayDto;
 import az.azcup.backend.dto.admin.AdminTopicDto;
 import az.azcup.backend.dto.admin.PublishUpdateRequest;
 import az.azcup.backend.dto.teacher.AddGroupMemberRequest;
@@ -13,6 +14,7 @@ import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.AdminService;
 import az.azcup.backend.service.AssignmentService;
 import az.azcup.backend.service.GroupService;
+import az.azcup.backend.service.SubmissionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +49,20 @@ public class TeacherController {
     private final GroupService groupService;
     // Tapşırıq CRUD-u və sinif jurnalı (gradebook) məntiqi AssignmentService-dədir.
     private final AssignmentService assignmentService;
+    // Şagirdin fəaliyyət xəritəsini (bax: /students/{id}/activity) gətirmək üçün.
+    private final SubmissionService submissionService;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
-    public TeacherController(AdminService adminService, GroupService groupService, AssignmentService assignmentService) {
+    public TeacherController(
+        AdminService adminService,
+        GroupService groupService,
+        AssignmentService assignmentService,
+        SubmissionService submissionService
+    ) {
         this.adminService = adminService;
         this.groupService = groupService;
         this.assignmentService = assignmentService;
+        this.submissionService = submissionService;
     }
 
     // Müəllim panelində idarəetmə üçün bütün mövzuların (dərc statusundan asılı olmayaraq) siyahısını qaytarır.
@@ -131,6 +141,15 @@ public class TeacherController {
     ) {
         groupService.removeStudent(id, principal.getUser(), membershipId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Bir şagirdin fəaliyyət xəritəsi ("Şagirdlər" panelində və qrup
+    // detalında hər üzvün yanında göstərilir) — bax: SubmissionService.activityForUser.
+    // Sahiblik yoxlaması yoxdur: "Şagirdlər" siyahısının özü artıq istənilən
+    // TEACHER/ADMIN-ə açıqdır (bax: SecurityConfig-dəki GET /api/admin/users qaydası).
+    @GetMapping("/students/{id}/activity")
+    public List<ActivityDayDto> studentActivity(@PathVariable Long id) {
+        return submissionService.activityForUser(id);
     }
 
     // ---------- Tapşırıq (Assignment) idarəetməsi ----------
