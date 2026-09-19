@@ -2,6 +2,7 @@ package az.azcup.backend.controller;
 
 import az.azcup.backend.dto.RunRequest;
 import az.azcup.backend.dto.RunResponse;
+import az.azcup.backend.dto.SyntaxCheckResponse;
 import az.azcup.backend.judge.JudgeResult;
 import az.azcup.backend.judge.JudgeService;
 import jakarta.validation.Valid;
@@ -31,5 +32,11 @@ public class RunController {
     public RunResponse run(@Valid @RequestBody RunRequest request) {
         JudgeResult result = judgeService.runFree(request.getSourceCode(), request.getStdin());
         return new RunResponse(result.getStatus(), result.getStdout(), result.getStderr(), result.getExecutionTimeMs());
+    }
+
+    // Kodu icra etmədən yalnız sintaksis səhvlərini tapır — canlı dərsdə səhv sətirləri qırmızı göstərmək üçün.
+    @PostMapping("/api/run/check")
+    public SyntaxCheckResponse check(@Valid @RequestBody RunRequest request) {
+        return judgeService.checkSyntax(request.getSourceCode());
     }
 }

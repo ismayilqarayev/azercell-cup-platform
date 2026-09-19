@@ -437,6 +437,15 @@
   }
   .live-textarea::selection{ background:rgba(38,210,255,0.25); }
   .live-textarea[readonly]{ caret-color:transparent; }
+  .live-err{
+    text-decoration:underline wavy #ff5555; text-decoration-skip-ink:none;
+    background:rgba(255,59,59,0.18);
+  }
+  .live-gut-err{ color:#ff5555; font-weight:700; }
+  .live-check-msg{ font-family:var(--mono); font-size:11.5px; line-height:1.5; margin-top:6px; }
+  .live-check-msg:empty{ display:none; }
+  .live-check-bad{ color:#ff6b6b; }
+  .live-check-ok{ color:var(--green); }
   .live-run-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
   .live-run-output{ margin-top:8px; }
   .live-run-status{
@@ -1201,6 +1210,7 @@ function handleLogout(){
   liveRole = null;
   liveStudents = [];
   liveSelectedStudentId = null;
+  resetLiveChecks();
   AzcupAuth.clearSession();
   backToLangSelect();
   updateAuthUI();
@@ -1945,6 +1955,7 @@ async function joinLiveSession(){
 function enterLiveSession(code, role){
   liveCode = code;
   liveRole = role;
+  resetLiveChecks();
   renderLiveActive();
   resumeLiveSessionPolling();
 }
@@ -1956,6 +1967,7 @@ function leaveLiveSession(){
   liveOwnValue = '';
   liveStudents = [];
   liveSelectedStudentId = null;
+  resetLiveChecks();
   loadLivePanel();
 }
 
@@ -1991,6 +2003,7 @@ function renderLiveActive(){
     + '<pre class="live-highlight" id="liveOwnHighlight" aria-hidden="true"></pre>'
     + '<textarea class="live-textarea" id="liveOwnCode" spellcheck="false" wrap="off" placeholder="Buraya C++ kodunu yaz..." oninput="onLiveOwnInput()" onscroll="syncLiveEditorScroll(&#39;own&#39;)" onclick="syncLiveEditor(&#39;own&#39;)" onkeyup="onLiveOwnKeyup(event)" onkeydown="onLiveOwnKeydown(event)"></textarea>'
     + '</div>'
+    + '<div class="live-check-msg" id="liveOwnCheckMsg"></div>'
     + '<div class="live-run-row"><button type="button" class="live-submit-btn" onclick="runLiveCode(&#39;own&#39;)">▶ İşə sal</button><span class="live-submit-hint" id="liveOwnRunHint"></span></div>'
     + '<div class="live-run-output" id="liveOwnRunOutput" style="display:none;">'
     + '<div class="live-run-status" id="liveOwnRunStatus"></div>'
@@ -2102,6 +2115,7 @@ function onLiveOwnInput(){
   syncLiveEditor('own');
   clearTimeout(liveSendDebounce);
   liveSendDebounce = setTimeout(sendLiveOwnCode, 150);
+  scheduleLiveChecks();
 }
 
 // Ox düymələri/klik ilə kursor sətir dəyişəndə də aktiv-sətir vurğusu
@@ -2164,11 +2178,164 @@ function syncLiveEditor(which){
   const hl = document.getElementById(which === 'own' ? 'liveOwnHighlight' : 'liveOtherHighlight');
   if (!ta || !gutter) return;
   const lines = ta.value.split('\n');
-  let gutterText = '';
-  for (let i = 1; i <= lines.length; i++) gutterText += i + '\n';
-  gutter.textContent = gutterText;
-  if (hl) hl.innerHTML = lines.map(highlightGhcCppLine).join('\n');
+  const errors = which === 'own' ? liveEffectiveErrors(ta.value, lines.length) : {};
+  let gutterHtml = '';
+  for (let i = 1; i <= lines.length; i++) gutterHtml += (errors[i] ? '<span class="live-gut-err">' + i + '</span>' : i) + '\n';
+  gutter.innerHTML = gutterHtml;
+  if (hl) hl.innerHTML = lines.map((l, i) => errors[i + 1] ? '<span class="live-err">' + highlightGhcCppLine(l) + '</span>' : highlightGhcCppLine(l)).join('\n');
+  if (which === 'own') renderLiveCheckMsg(errors, lines.length);
   syncLiveActiveLine(which);
+}
+
+/* ---- Səhv yoxlaması: yazan öz panelində səhvli sətirləri qırmızı görür ----
+   İki qat: (1) brauzerdə dərhal işləyən yüngül yoxlama (bağlanmamış mötərizə/dırnaq),
+   (2) serverdə g++ -fsyntax-only ilə həqiqi kompilyator yoxlaması (/api/run/check).
+   Yazmağı dayandırdıqdan sonra işə düşür; kompilyator nəticəsi mövcud olanda
+   həmin mətn üçün həlledicidir (yüngül yoxlamanı əvəz edir). */
+let liveLiteErrors = {};
+let liveCompilerResult = null; // { text, errors: {sətir: mesaj} }
+let liveLiteTimer = null;
+let liveCompilerTimer = null;
+let liveCheckInFlight = false;
+let liveCheckPending = false;
+
+function resetLiveChecks(){
+  clearTimeout(liveLiteTimer);
+  clearTimeout(liveCompilerTimer);
+  liveLiteErrors = {};
+  liveCompilerResult = null;
+  liveCheckPending = false;
+}
+
+function scheduleLiveChecks(){
+  clearTimeout(liveLiteTimer);
+  liveLiteTimer = setTimeout(runLiveLiteCheck, 400);
+  clearTimeout(liveCompilerTimer);
+  liveCompilerTimer = setTimeout(runLiveCompilerCheck, 1200);
+}
+
+function liveEffectiveErrors(text, lineCount){
+  if (!text.trim()) return {};
+  let errors;
+  if (liveCompilerResult && liveCompilerResult.text === text) {
+    errors = liveCompilerResult.errors;
+  } else {
+    errors = Object.assign({}, liveCompilerResult ? liveCompilerResult.errors : {}, liveLiteErrors);
+  }
+  const out = {};
+  for (const k of Object.keys(errors)) if (+k <= lineCount) out[k] = errors[k];
+  return out;
+}
+
+function runLiveLiteCheck(){
+  const ta = document.getElementById('liveOwnCode');
+  if (!ta) return;
+  liveLiteErrors = liteCheckCpp(ta.value);
+  syncLiveEditor('own');
+}
+
+// Sətir-sətir sadə skan: şərh/dırnaq daxilini atlayır, mötərizələri cütləşdirir.
+function liteCheckCpp(text){
+  const errors = {};
+  if (!text.trim() || /R"[^(\s]*\(/.test(text)) return errors; // raw string — dəqiq təhlil etmirik
+  const stack = [];
+  const pairs = { ')': '(', ']': '[', '}': '{' };
+  let line = 1, i = 0, inBlock = false;
+  const n = text.length;
+  const add = (ln, msg) => { if (!errors[ln] && Object.keys(errors).length < 5) errors[ln] = msg; };
+  while (i < n) {
+    const c = text[i];
+    if (c === '\n') { line++; i++; continue; }
+    if (inBlock) {
+      if (c === '*' && text[i + 1] === '/') { inBlock = false; i += 2; } else i++;
+      continue;
+    }
+    if (c === '/' && text[i + 1] === '/') { while (i < n && text[i] !== '\n') i++; continue; }
+    if (c === '/' && text[i + 1] === '*') { inBlock = true; i += 2; continue; }
+    if (c === '"') {
+      let j = i + 1;
+      while (j < n && text[j] !== '"' && text[j] !== '\n') j += text[j] === '\\' ? 2 : 1;
+      if (j >= n || text[j] === '\n') { add(line, 'Dırnaq (") bağlanmayıb'); i = j; continue; }
+      i = j + 1; continue;
+    }
+    if (c === "'") {
+      const m = /^'(?:\\.[^'\n]*|[^'\\\n])'/.exec(text.slice(i, i + 12));
+      i += m ? m[0].length : 1;
+      continue;
+    }
+    if (c === '(' || c === '[' || c === '{') stack.push({ ch: c, line });
+    else if (c === ')' || c === ']' || c === '}') {
+      if (stack.length && stack[stack.length - 1].ch === pairs[c]) stack.pop();
+      else add(line, "Artıq '" + c + "' — bağladığı mötərizə açılmayıb");
+    }
+    i++;
+  }
+  for (const s of stack) add(s.line, "'" + s.ch + "' bağlanmayıb");
+  return errors;
+}
+
+// g++ nöqtəli vergül çatışmayanda səhvi NÖVBƏTİ sətirdə göstərir — səhv əslində əvvəlki
+// sətirdədir, ona görə belə hallarda işarəni əvvəlki boş olmayan sətrə keçiririk.
+function liveErrorsFromCompiler(text, list){
+  const lines = text.split('\n');
+  const out = {};
+  for (const e of list || []) {
+    let ln = e.line;
+    const startsLine = lines[ln - 1] !== undefined && lines[ln - 1].slice(0, Math.max(0, e.column - 1)).trim() === '';
+    if (startsLine && /expected .*';'/.test(e.message)) {
+      let p = ln - 2;
+      while (p >= 0 && !lines[p].trim()) p--;
+      if (p >= 0) ln = p + 1;
+    }
+    if (!out[ln]) out[ln] = e.message;
+  }
+  return out;
+}
+
+async function runLiveCompilerCheck(){
+  if (!liveCode) return;
+  const ta = document.getElementById('liveOwnCode');
+  if (!ta) return;
+  const text = ta.value;
+  if (!text.trim()) { liveCompilerResult = null; syncLiveEditor('own'); return; }
+  if (liveCompilerResult && liveCompilerResult.text === text) return;
+  if (liveCheckInFlight) { liveCheckPending = true; return; }
+  liveCheckInFlight = true;
+  try {
+    const res = await azcupApiFetch('/api/run/check', { method: 'POST', body: JSON.stringify({ sourceCode: text }) });
+    if (res.ok) {
+      const data = await res.json();
+      // checked=false (server məşğul/g++ yoxdur) "səhv yoxdur" demək deyil — mövcud işarələr olduğu kimi qalır.
+      if (data.checked && liveCode) {
+        liveCompilerResult = { text, errors: liveErrorsFromCompiler(text, data.errors) };
+        syncLiveEditor('own');
+      }
+    }
+  } catch (e) { /* şəbəkə xətası — növbəti yazıdan sonra yenidən yoxlanacaq */ }
+  finally {
+    liveCheckInFlight = false;
+    if (liveCheckPending) { liveCheckPending = false; runLiveCompilerCheck(); }
+  }
+}
+
+function renderLiveCheckMsg(errors, lineCount){
+  const el = document.getElementById('liveOwnCheckMsg');
+  if (!el) return;
+  const keys = Object.keys(errors).map(Number).sort((a, b) => a - b);
+  if (keys.length) {
+    el.className = 'live-check-msg live-check-bad';
+    el.innerHTML = keys.slice(0, 3).map(k => 'Sətir ' + k + ': ' + escapeHtml(errors[k])).join('<br>')
+      + (keys.length > 3 ? '<br>… və daha ' + (keys.length - 3) + ' səhv' : '');
+    return;
+  }
+  const ta = document.getElementById('liveOwnCode');
+  if (ta && liveCompilerResult && liveCompilerResult.text === ta.value && ta.value.trim()) {
+    el.className = 'live-check-msg live-check-ok';
+    el.textContent = '✓ Sintaksis səhvi tapılmadı';
+  } else {
+    el.className = 'live-check-msg';
+    el.textContent = '';
+  }
 }
 
 const LIVE_LINE_HEIGHT = 18.75; // .live-textarea/.live-highlight line-height (12.5px * 1.5) ilə eyni olmalıdır

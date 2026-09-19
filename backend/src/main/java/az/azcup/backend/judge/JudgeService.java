@@ -1,5 +1,7 @@
 package az.azcup.backend.judge;
 
+import az.azcup.backend.dto.SyntaxCheckResponse;
+import az.azcup.backend.dto.SyntaxErrorDto;
 import az.azcup.backend.entity.Problem;
 import az.azcup.backend.entity.SubmissionStatus;
 import az.azcup.backend.exception.ApiException;
@@ -20,11 +22,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -151,6 +158,72 @@ public class JudgeService {
             throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "İcra zamanı server xətası baş verdi");
         } finally {
             deleteRecursively(workDir);
+        }
+    }
+
+    // g++ -fsyntax-only "main.cpp:SƏTİR:SÜTUN: error: MESAJ" formatında xəta yazır.
+    // Başlıq fayllarındakı xətalar (başqa fayl adı ilə) atlanır — yalnız şagirdin kodu maraqlıdır.
+    private static final Pattern SYNTAX_ERROR_LINE =
+        Pattern.compile("^main\\.cpp:(\\d+):(\\d+): (?:fatal )?error: (.*)$", Pattern.MULTILINE);
+    private static final int MAX_SYNTAX_ERRORS = 10;
+
+    // Canlı yazarkən tez-tez çağırıldığı üçün eyni anda yalnız bir neçə yoxlamaya
+    // icazə verilir — server məşğuldursa yoxlama sadəcə atlanır (checked=false).
+    private final Semaphore syntaxCheckSlots = new Semaphore(2);
+
+    /**
+     * Kodu yalnız sintaksis baxımından yoxlayır (-fsyntax-only: linkləmə və
+     * optimallaşdırma yoxdur, tam kompilyasiyadan xeyli yüngüldür). Canlı
+     * dərsdə səhv sətirləri qırmızı göstərmək üçün istifadə olunur.
+     */
+    public SyntaxCheckResponse checkSyntax(String sourceCode) {
+        SyntaxCheckResponse unchecked = new SyntaxCheckResponse(false, List.of());
+        if (sourceCode == null || sourceCode.isBlank()) {
+            return new SyntaxCheckResponse(true, List.of());
+        }
+        if (sourceCode.length() > maxSourceLength || !syntaxCheckSlots.tryAcquire()) {
+            return unchecked;
+        }
+        Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
+        try {
+            Files.createDirectories(workDir);
+            Files.writeString(workDir.resolve("main.cpp"), sourceCode, StandardCharsets.UTF_8);
+
+            ProcessBuilder pb = new ProcessBuilder(gppPath, "-fsyntax-only", "-std=c++17", "-fmax-errors=" + MAX_SYNTAX_ERRORS, "main.cpp");
+            pb.directory(workDir.toFile());
+            pb.environment().put("LC_ALL", "C"); // mesaj formatı yerli dildən asılı olmasın
+            Process process = pb.start();
+            CappedStreamReader stderrReader = CappedStreamReader.start(process.getErrorStream(), maxOutputBytes);
+            process.getOutputStream().close();
+            CappedStreamReader stdoutReader = CappedStreamReader.start(process.getInputStream(), maxOutputBytes);
+
+            if (!waitQuietly(process, compileTimeoutSeconds)) {
+                process.destroyForcibly();
+                return unchecked;
+            }
+            stdoutReader.join();
+            stderrReader.join();
+            if (process.exitValue() == 0) {
+                return new SyntaxCheckResponse(true, List.of());
+            }
+
+            List<SyntaxErrorDto> errors = new ArrayList<>();
+            Set<Integer> seenLines = new HashSet<>();
+            Matcher m = SYNTAX_ERROR_LINE.matcher(stderrReader.result());
+            while (m.find() && errors.size() < MAX_SYNTAX_ERRORS) {
+                int line = Integer.parseInt(m.group(1));
+                if (seenLines.add(line)) {
+                    errors.add(new SyntaxErrorDto(line, Integer.parseInt(m.group(2)), m.group(3).trim()));
+                }
+            }
+            return new SyntaxCheckResponse(true, errors);
+        } catch (IOException e) {
+            // g++ tapılmadı və ya fayl yazıla bilmədi — yoxlama sadəcə mümkün olmadı.
+            log.warn("Syntax check unavailable: {}", e.getMessage());
+            return unchecked;
+        } finally {
+            deleteRecursively(workDir);
+            syntaxCheckSlots.release();
         }
     }
 
