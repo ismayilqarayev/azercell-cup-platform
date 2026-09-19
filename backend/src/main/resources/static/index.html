@@ -1962,7 +1962,7 @@ function leaveLiveSession(){
 function resumeLiveSessionPolling(){
   if (!liveCode || livePollTimer) return;
   pollLiveSession();
-  livePollTimer = setInterval(pollLiveSession, 1500);
+  livePollTimer = setInterval(pollLiveSession, 600);
 }
 
 function pauseLiveSessionPolling(){
@@ -2056,17 +2056,25 @@ function renderLiveStudentList(){
   if (countEl) countEl.textContent = liveStudents.length + ' şagird';
   if (!liveStudents.length) {
     liveSelectedStudentId = null;
-    listEl.innerHTML = '<span class="live-student-empty">Hələ heç bir şagird qoşulmayıb...</span>';
+    setLiveStudentListHtml(listEl, '<span class="live-student-empty">Hələ heç bir şagird qoşulmayıb...</span>');
     updateSelectedStudentPanel();
     return;
   }
   if (liveSelectedStudentId == null || !liveStudents.some(s => s.studentId === liveSelectedStudentId)) {
     liveSelectedStudentId = liveStudents[0].studentId;
   }
-  listEl.innerHTML = liveStudents.map(s =>
+  setLiveStudentListHtml(listEl, liveStudents.map(s =>
     '<button type="button" class="live-student-chip' + (s.studentId === liveSelectedStudentId ? ' active' : '') + '" onclick="selectLiveStudent(' + s.studentId + ')">' + escapeHtml(s.studentName) + '</button>'
-  ).join('');
+  ).join(''));
   updateSelectedStudentPanel();
+}
+
+// Çip siyahısı yalnız həqiqətən dəyişəndə yenidən qurulur — poll tez-tez işlədiyi
+// üçün hər dəfə DOM-u əvəz etsək, klik (basma+buraxma arasında) düyməni itirə bilər.
+function setLiveStudentListHtml(listEl, html){
+  if (listEl.dataset.html === html) return;
+  listEl.dataset.html = html;
+  listEl.innerHTML = html;
 }
 
 // Müəllim başqa bir şagirdin chip-ini seçəndə çağırılır.
@@ -2093,7 +2101,7 @@ function onLiveOwnInput(){
   liveOwnValue = document.getElementById('liveOwnCode').value;
   syncLiveEditor('own');
   clearTimeout(liveSendDebounce);
-  liveSendDebounce = setTimeout(sendLiveOwnCode, 500);
+  liveSendDebounce = setTimeout(sendLiveOwnCode, 150);
 }
 
 // Ox düymələri/klik ilə kursor sətir dəyişəndə də aktiv-sətir vurğusu
@@ -2103,18 +2111,31 @@ function onLiveOwnKeyup(e){
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) syncLiveActiveLine('own');
 }
 
+// Göndərmə və poll sürətləndirildiyi üçün eyni anda yalnız BİR sorğu gedir:
+// əks halda gec çatan köhnə cavab/yazı yenisinin üstünə çıxıb mətni geri sala bilər.
+let liveSendInFlight = false;
+let liveSendPending = false;
+let livePollInFlight = false;
+
 async function sendLiveOwnCode(){
   if (!liveCode) return;
+  if (liveSendInFlight) { liveSendPending = true; return; }
   const ta = document.getElementById('liveOwnCode');
   if (!ta) return;
   const path = '/api/live/sessions/' + encodeURIComponent(liveCode) + '/' + (liveRole === 'teacher' ? 'teacher' : 'student');
+  liveSendInFlight = true;
   try {
     await azcupApiFetch(path, { method: 'PUT', body: JSON.stringify({ sourceCode: ta.value }) });
   } catch (e) { /* növbəti poll/yazı cəhdi ilə özünü düzəldəcək */ }
+  finally {
+    liveSendInFlight = false;
+    if (liveSendPending) { liveSendPending = false; sendLiveOwnCode(); }
+  }
 }
 
 async function pollLiveSession(){
-  if (!liveCode) return;
+  if (!liveCode || livePollInFlight) return;
+  livePollInFlight = true;
   try {
     const res = await azcupApiFetch('/api/live/sessions/' + encodeURIComponent(liveCode));
     if (!res.ok) { leaveLiveSession(); return; }
@@ -2131,6 +2152,7 @@ async function pollLiveSession(){
       syncLiveEditor('other');
     }
   } catch (e) { /* keçici şəbəkə xətası — növbəti poll-da yenidən cəhd olunacaq */ }
+  finally { livePollInFlight = false; }
 }
 
 // Sətir nömrələri, Monokai rəngli overlay (bax: highlightGhcCppLine, artıq
