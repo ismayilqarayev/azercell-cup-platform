@@ -20,6 +20,14 @@ public interface ExampleCompletionRepository extends JpaRepository<ExampleComple
     // Bir tapşırığın bütün nümunələri üzrə bütün tamamlanmalar (müəllim jurnalı üçün).
     List<ExampleCompletion> findByExample_Assignment(Assignment assignment);
 
+    // Şagirdin bir tapşırıqdakı bütün tamamlanmaları (müəllimin şagird təfərrüatı üçün).
+    List<ExampleCompletion> findByStudentAndExample_Assignment(User student, Assignment assignment);
+
+    // Fəaliyyət xəritəsi (heatmap) üçün: şagirdin verilən vaxtdan sonrakı tamamlanmaları.
+    List<ExampleCompletion> findByStudentAndCompletedAtAfter(User student, java.time.Instant since);
+
+    void deleteByExample(AssignmentExample example);
+
     void deleteByExample_Assignment(Assignment assignment);
 
     void deleteByExample_Assignment_Group(Group group);

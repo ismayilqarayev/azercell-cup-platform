@@ -12,6 +12,7 @@ import az.azcup.backend.dto.teacher.ExampleDto;
 import az.azcup.backend.dto.teacher.ExampleProgressRowDto;
 import az.azcup.backend.dto.teacher.ExampleUpsertRequest;
 import az.azcup.backend.dto.teacher.GradebookRowDto;
+import az.azcup.backend.dto.teacher.StudentExampleDetailDto;
 import az.azcup.backend.dto.teacher.GroupCreateRequest;
 import az.azcup.backend.dto.teacher.GroupDto;
 import az.azcup.backend.dto.teacher.GroupMemberDto;
@@ -245,6 +246,17 @@ public class TeacherController {
     ) {
         assignmentService.deleteExample(groupId, assignmentId, exampleId, principal.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    // Bir şagirdin bu tapşırığın hər nümunəsi üzrə irəliləyişi (tamamlanma vaxtı, cəhdlər, son yazdığı kod).
+    @GetMapping("/groups/{groupId}/assignments/{assignmentId}/students/{studentId}/examples")
+    public List<StudentExampleDetailDto> getStudentExampleDetails(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @PathVariable Long studentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.getStudentExampleDetails(groupId, assignmentId, studentId, principal.getUser());
     }
 
     // Müəllimin "şagird kimi bax" baxışı üçün: yazılanı nümunə ilə müqayisə edir, tamamlanma QEYD ETMİR.

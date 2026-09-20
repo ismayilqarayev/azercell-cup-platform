@@ -11,6 +11,7 @@ import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.repository.AssignmentExampleRepository;
 import az.azcup.backend.repository.AssignmentRepository;
+import az.azcup.backend.repository.ExampleAttemptRepository;
 import az.azcup.backend.repository.ExampleCompletionRepository;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
@@ -42,6 +43,7 @@ public class GroupService {
     // Tapşırıqların kod nümunələri və onların tamamlanma qeydləri də qrupla birgə silinməlidir.
     private final AssignmentExampleRepository assignmentExampleRepository;
     private final ExampleCompletionRepository exampleCompletionRepository;
+    private final ExampleAttemptRepository exampleAttemptRepository;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public GroupService(
@@ -51,8 +53,10 @@ public class GroupService {
         SubmissionRepository submissionRepository,
         AssignmentRepository assignmentRepository,
         AssignmentExampleRepository assignmentExampleRepository,
-        ExampleCompletionRepository exampleCompletionRepository
+        ExampleCompletionRepository exampleCompletionRepository,
+        ExampleAttemptRepository exampleAttemptRepository
     ) {
+        this.exampleAttemptRepository = exampleAttemptRepository;
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
@@ -105,6 +109,7 @@ public class GroupService {
     public void deleteGroup(Long groupId, User requester) {
         Group group = getGroupOrThrow(groupId);
         requireOwnership(group, requester);
+        exampleAttemptRepository.deleteByExample_Assignment_Group(group);
         exampleCompletionRepository.deleteByExample_Assignment_Group(group);
         assignmentExampleRepository.deleteByAssignment_Group(group);
         assignmentRepository.deleteByGroup(group);

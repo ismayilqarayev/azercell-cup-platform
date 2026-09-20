@@ -3,6 +3,7 @@ package az.azcup.backend.service;
 import az.azcup.backend.dto.ActivityDayDto;
 import az.azcup.backend.dto.ProgressDto;
 import az.azcup.backend.dto.SubmissionResponse;
+import az.azcup.backend.entity.ExampleCompletion;
 import az.azcup.backend.entity.Problem;
 import az.azcup.backend.entity.ProblemTestCase;
 import az.azcup.backend.entity.Role;
@@ -13,6 +14,7 @@ import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.judge.JudgeService;
 import az.azcup.backend.judge.MultiJudgeResult;
 import az.azcup.backend.judge.TestCaseInput;
+import az.azcup.backend.repository.ExampleCompletionRepository;
 import az.azcup.backend.repository.ProblemRepository;
 import az.azcup.backend.repository.ProblemTestCaseRepository;
 import az.azcup.backend.repository.SubmissionRepository;
@@ -51,6 +53,8 @@ public class SubmissionService {
     private final JudgeService judgeService;
     // Müəllimin fəaliyyət xəritəsinə baxdığı şagirdi ID-sinə görə tapmaq üçün.
     private final UserRepository userRepository;
+    // Tapşırıqlardakı kod nümunəsi tamamlanmaları da fəaliyyət xəritəsinə (heatmap) sayılır.
+    private final ExampleCompletionRepository exampleCompletionRepository;
 
     // Fəaliyyət xəritəsi neçə günü (GitHub-dakı kimi ~ son 53 həftə) əhatə edir.
     private static final int ACTIVITY_DAYS = 371;
@@ -67,8 +71,10 @@ public class SubmissionService {
         ProblemRepository problemRepository,
         ProblemTestCaseRepository problemTestCaseRepository,
         JudgeService judgeService,
-        UserRepository userRepository
+        UserRepository userRepository,
+        ExampleCompletionRepository exampleCompletionRepository
     ) {
+        this.exampleCompletionRepository = exampleCompletionRepository;
         this.submissionRepository = submissionRepository;
         this.problemService = problemService;
         this.topicRepository = topicRepository;
@@ -197,6 +203,10 @@ public class SubmissionService {
         Map<String, Integer> countsByDate = new TreeMap<>();
         for (Instant submittedAt : submissionRepository.submittedAtsForUserSince(user, since)) {
             String day = ACTIVITY_DATE_FORMAT.format(submittedAt.atZone(ACTIVITY_ZONE).toLocalDate());
+            countsByDate.merge(day, 1, Integer::sum);
+        }
+        for (ExampleCompletion completion : exampleCompletionRepository.findByStudentAndCompletedAtAfter(user, since)) {
+            String day = ACTIVITY_DATE_FORMAT.format(completion.getCompletedAt().atZone(ACTIVITY_ZONE).toLocalDate());
             countsByDate.merge(day, 1, Integer::sum);
         }
         List<ActivityDayDto> result = new ArrayList<>();

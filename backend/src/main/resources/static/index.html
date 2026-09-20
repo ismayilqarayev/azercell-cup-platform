@@ -1878,7 +1878,8 @@ function renderGradebook(groupId, assignment, rows, examples, exampleProgress){
     const ep = doneByStudent[r.studentId];
     return '<tr><td>' + escapeHtml(r.fullName) + '<span class="user-email">' + escapeHtml(r.email) + '</span></td>'
       + '<td>' + r.solvedCount + ' / ' + r.totalCount + ' (' + pct + '%)</td>'
-      + (hasExamples ? '<td>' + (ep ? ep.done + ' / ' + ep.total : '0 / ' + examples.length) + '</td>' : '')
+      + (hasExamples ? '<td>' + (ep ? ep.done + ' / ' + ep.total : '0 / ' + examples.length)
+        + ' <button type="button" class="contest-action-btn secondary" style="margin-left:8px;font-size:11px;padding:4px 10px;" onclick="openStudentExamples(' + groupId + ',' + assignment.id + ',' + r.studentId + ')">ətraflı</button></td>' : '')
       + '<td>' + statusBadge + '</td></tr>';
   }).join('');
   const table = rows.length
@@ -1894,6 +1895,7 @@ function renderGradebook(groupId, assignment, rows, examples, exampleProgress){
     + '</div>'
   ).join('');
   exAssignmentTitles[assignment.id] = assignment.title;
+  rows.forEach(r => { exStudentNames[r.studentId] = r.fullName; });
   const exampleSection =
     '<h3 style="margin:28px 0 4px;color:var(--ink);font-size:16px;">Kod nümunələri'
     + (hasExamples ? ' <button type="button" class="contest-action-btn secondary" style="margin-left:10px;font-size:11.5px;padding:6px 12px;" onclick="openExamplePreview(' + groupId + ',' + assignment.id + ')">👁 Şagird kimi bax</button>' : '')
@@ -1912,6 +1914,41 @@ function renderGradebook(groupId, assignment, rows, examples, exampleProgress){
     + '<p class="teacher-panel-sub">' + escapeHtml(assignment.topicTitle) + ' · Son tarix: ' + formatYarishDateTime(assignment.dueAt) + '</p>'
     + table
     + exampleSection;
+}
+
+const exStudentNames = {};
+
+// Bir şagirdin bu tapşırığın hər kod nümunəsi üzrə irəliləyişi: tamamlanma vaxtı, cəhd sayı,
+// ən yaxşı/son uyğunluq faizi və ən son yazdığı kod ("Şagirdin yazdığını görmək" üçün).
+async function openStudentExamples(groupId, assignmentId, studentId){
+  const body = document.getElementById('myGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/students/' + studentId + '/examples');
+    if (!res.ok) throw new Error('fetch failed');
+    const items = await res.json();
+    const rows = items.map(e => {
+      const badge = e.completed
+        ? '<span class="contest-status-badge active">Tamamlayıb</span>'
+        : (e.attempts > 0 ? '<span class="contest-status-badge upcoming">Cəhd edir</span>' : '<span class="contest-status-badge ended">Başlamayıb</span>');
+      const when = e.completed ? 'Tamamlandı: ' + formatYarishDateTime(e.completedAt)
+        : (e.lastAttemptAt ? 'Son cəhd: ' + formatYarishDateTime(e.lastAttemptAt) : '—');
+      const percents = e.attempts > 0 ? 'ən yaxşı ' + e.bestPercent + '% · son ' + e.lastPercent + '%' : '—';
+      const codeRow = e.lastTypedCode
+        ? '<tr><td colspan="5" style="padding-top:0;"><details><summary style="cursor:pointer;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);">Son yazdığı kodu göstər</summary><pre class="ex-manage-code">' + escapeHtml(e.lastTypedCode) + '</pre></details></td></tr>'
+        : '';
+      return '<tr><td>' + escapeHtml(e.title) + '</td><td>' + badge + '</td><td>' + e.attempts + '</td><td>' + percents + '</td><td>' + when + '</td></tr>' + codeRow;
+    }).join('');
+    body.innerHTML =
+      '<button type="button" class="back-to-select" onclick="openGradebook(' + groupId + ',' + assignmentId + ')" style="margin-bottom:16px;">← Jurnala qayıt</button>'
+      + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(exStudentNames[studentId] || 'Şagird') + ' — kod nümunələri</h3>'
+      + '<p class="teacher-panel-sub">' + escapeHtml(exAssignmentTitles[assignmentId] || '') + '</p>'
+      + (items.length
+        ? '<table class="teacher-table"><thead><tr><th>Nümunə</th><th>Status</th><th>Cəhd sayı</th><th>Uyğunluq</th><th>Vaxt</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        : '<div class="teacher-panel-empty">Bu tapşırıqda kod nümunəsi yoxdur.</div>');
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Şagirdin təfərrüatını yükləmək mümkün olmadı.</div>';
+  }
 }
 
 async function submitAddExample(groupId, assignmentId){

@@ -10,8 +10,10 @@ import az.azcup.backend.dto.teacher.ExampleDto;
 import az.azcup.backend.dto.teacher.ExampleProgressRowDto;
 import az.azcup.backend.dto.teacher.ExampleUpsertRequest;
 import az.azcup.backend.dto.teacher.GradebookRowDto;
+import az.azcup.backend.dto.teacher.StudentExampleDetailDto;
 import az.azcup.backend.entity.Assignment;
 import az.azcup.backend.entity.AssignmentExample;
+import az.azcup.backend.entity.ExampleAttempt;
 import az.azcup.backend.entity.ExampleCompletion;
 import az.azcup.backend.entity.Group;
 import az.azcup.backend.entity.GroupMember;
@@ -22,6 +24,7 @@ import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.repository.AssignmentExampleRepository;
 import az.azcup.backend.repository.AssignmentRepository;
+import az.azcup.backend.repository.ExampleAttemptRepository;
 import az.azcup.backend.repository.ExampleCompletionRepository;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
@@ -64,6 +67,8 @@ public class AssignmentService {
     // Tapşırığın kod nümunələri və şagirdlərin onları tamamlama qeydləri.
     private final AssignmentExampleRepository exampleRepository;
     private final ExampleCompletionRepository completionRepository;
+    // Şagirdin nümunələrdəki hər "Yoxla" cəhdi.
+    private final ExampleAttemptRepository attemptRepository;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public AssignmentService(
@@ -74,8 +79,10 @@ public class AssignmentService {
         ProblemRepository problemRepository,
         SubmissionRepository submissionRepository,
         AssignmentExampleRepository exampleRepository,
-        ExampleCompletionRepository completionRepository
+        ExampleCompletionRepository completionRepository,
+        ExampleAttemptRepository attemptRepository
     ) {
+        this.attemptRepository = attemptRepository;
         this.assignmentRepository = assignmentRepository;
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
@@ -132,6 +139,7 @@ public class AssignmentService {
         Group group = getGroupOrThrow(groupId);
         requireOwnership(group, requester);
         Assignment assignment = getAssignmentOrThrow(group, assignmentId);
+        attemptRepository.deleteByExample_Assignment(assignment);
         completionRepository.deleteByExample_Assignment(assignment);
         exampleRepository.deleteByAssignment(assignment);
         assignmentRepository.delete(assignment);
@@ -171,9 +179,8 @@ public class AssignmentService {
     public void deleteExample(Long groupId, Long assignmentId, Long exampleId, User requester) {
         Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
         AssignmentExample example = getExampleOrThrow(assignment, exampleId);
-        completionRepository.deleteAll(completionRepository.findByExample_Assignment(assignment).stream()
-            .filter(c -> c.getExample().getId().equals(example.getId()))
-            .toList());
+        attemptRepository.deleteByExample(example);
+        completionRepository.deleteByExample(example);
         exampleRepository.delete(example);
     }
 
@@ -219,6 +226,17 @@ public class AssignmentService {
         Assignment assignment = getAssignmentForMember(assignmentId, student);
         AssignmentExample example = getExampleOrThrow(assignment, exampleId);
         ExampleCheckResponse response = CodeTypingComparer.compare(example.getSourceCode(), typedCode);
+
+        // Hər cəhd qeyd olunur; kod yalnız ən son cəhddə saxlanılır (köhnələrdə təmizlənir).
+        attemptRepository.clearTypedCode(example, student);
+        ExampleAttempt attempt = new ExampleAttempt();
+        attempt.setExample(example);
+        attempt.setStudent(student);
+        attempt.setPercent(response.getPercent());
+        attempt.setMatched(response.isMatch());
+        attempt.setTypedCode(typedCode);
+        attemptRepository.save(attempt);
+
         if (response.isMatch() && !completionRepository.existsByExampleAndStudent(example, student)) {
             ExampleCompletion completion = new ExampleCompletion();
             completion.setExample(example);
@@ -226,6 +244,52 @@ public class AssignmentService {
             completionRepository.save(completion);
         }
         return response;
+    }
+
+    // Müəllimin bir şagirdin bu tapşırığın hər nümunəsi üzrə irəliləyişini (tamamlanma vaxtı, cəhd sayı,
+    // faizlər, ən son yazdığı kod) görməsi üçün. Şagird qrupun üzvü olmalıdır.
+    @Transactional(readOnly = true)
+    public List<StudentExampleDetailDto> getStudentExampleDetails(Long groupId, Long assignmentId, Long studentId, User requester) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        User student = null;
+        for (GroupMember member : groupMemberRepository.findByGroupOrderByJoinedAtAsc(assignment.getGroup())) {
+            if (member.getStudent().getId().equals(studentId)) {
+                student = member.getStudent();
+            }
+        }
+        if (student == null) {
+            throw new NotFoundException("Şagird bu qrupda tapılmadı: " + studentId);
+        }
+
+        Map<Long, ExampleCompletion> completions = new HashMap<>();
+        for (ExampleCompletion c : completionRepository.findByStudentAndExample_Assignment(student, assignment)) {
+            completions.put(c.getExample().getId(), c);
+        }
+        Map<Long, List<ExampleAttempt>> attemptsByExample = new HashMap<>();
+        for (ExampleAttempt a : attemptRepository.findByExample_AssignmentAndStudent(assignment, student)) {
+            attemptsByExample.computeIfAbsent(a.getExample().getId(), k -> new ArrayList<>()).add(a);
+        }
+
+        List<StudentExampleDetailDto> result = new ArrayList<>();
+        for (AssignmentExample e : exampleRepository.findByAssignmentOrderByIdAsc(assignment)) {
+            ExampleCompletion completion = completions.get(e.getId());
+            List<ExampleAttempt> attempts = attemptsByExample.getOrDefault(e.getId(), List.of());
+            ExampleAttempt last = null;
+            int best = 0;
+            for (ExampleAttempt a : attempts) {
+                best = Math.max(best, a.getPercent());
+                if (last == null || a.getId() > last.getId()) {
+                    last = a;
+                }
+            }
+            result.add(new StudentExampleDetailDto(
+                e.getId(), e.getTitle(),
+                completion != null, completion != null ? completion.getCompletedAt() : null,
+                attempts.size(), best, last != null ? last.getPercent() : 0,
+                last != null ? last.getAttemptedAt() : null, last != null ? last.getTypedCode() : null
+            ));
+        }
+        return result;
     }
 
     // Müəllimin "şagird kimi bax" baxışı: yazılanı nümunə ilə müqayisə edir, amma
