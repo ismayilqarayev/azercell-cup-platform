@@ -458,20 +458,10 @@
   .ex-chip:hover{ border-color:var(--gold); color:var(--ink); }
   .ex-chip.active{ background:rgba(255,193,7,0.14); border-color:var(--gold); color:var(--gold); }
   .ex-chip.done::after{ content:' ✓'; color:var(--green); font-weight:700; }
-  .ex-code{
-    background:#272822; color:#f8f8f2; border:1px solid var(--grid-line-strong); border-radius:4px;
-    padding:10px 0; font-family:var(--mono); font-size:12.5px; line-height:1.5;
-    min-height:420px; box-sizing:border-box; overflow:auto;
-  }
-  .ex-code-line{ display:flex; white-space:pre; min-height:18.75px; }
-  .ex-ln{ flex:0 0 34px; text-align:right; padding-right:8px; color:#75715e; user-select:none; }
-  .ex-code-text{ padding-left:10px; }
-  .ex-typed{
-    display:block; width:100%; min-height:420px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
-    background:#272822; color:#f8f8f2; caret-color:#f8f8f2; border:1px solid var(--grid-line-strong); border-radius:4px;
-    padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box; white-space:pre; overflow:auto;
-  }
-  .ex-typed:focus{ border-color:var(--gold); }
+  /* Nümunə paneli Kod Arxivi ilə eyni blokdur (.ghc-code-block); yalnız sətir hündürlüyü
+     sağdakı yazma redaktoru (.live-textarea, 12.5px*1.5) ilə eyni saxlanılır ki, sətirlər üst-üstə düşsün. */
+  .ghc-code-block.ex-ref{ line-height:1.5; min-height:460px; max-height:none; box-sizing:border-box; }
+  .live-textarea.ex-live{ min-height:460px; }
   .ex-manage-item{
     background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px;
     padding:10px 14px; margin-bottom:8px;
@@ -2079,8 +2069,8 @@ function renderExamplePractice(){
   const preview = exState.mode === 'preview';
   const cur = currentExample();
   const refLines = cur.sourceCode.split('\n');
-  const refHtml = refLines.map((l, i) =>
-    '<div class="ex-code-line"><span class="ex-ln">' + (i + 1) + '</span><span class="ex-code-text">' + highlightGhcCppLine(l) + '</span></div>'
+  const refHtml = refLines.map((line, idx) =>
+    '<div class="ghc-code-line"><span class="ghc-line-no">' + (idx + 1) + '</span><code>' + highlightGhcCppLine(line) + '</code></div>'
   ).join('');
   body.innerHTML =
     (preview
@@ -2091,16 +2081,18 @@ function renderExamplePractice(){
     + '<p class="teacher-panel-sub">Soldakı nümunəyə baxıb kodu sağda özün yaz. Yapışdırma bloklanıb.</p>'
     + '<div class="ex-chips" id="exChips"></div>'
     + '<div class="ex-panels">'
-    + '<div><div class="live-panel-title">Nümunə — baxıb yaz</div><div class="ex-code">' + refHtml + '</div></div>'
+    + '<div><div class="live-panel-title">Nümunə — baxıb yaz</div><div class="ghc-code-block ex-ref">' + refHtml + '</div></div>'
     + '<div><div class="live-panel-title">Sənin yazdığın</div>'
     + '<div class="live-editor"><div class="live-gutter" id="exGutter">1</div>'
-    + '<textarea class="ex-typed" id="exTyped" spellcheck="false" wrap="off" placeholder="Nümunəyə baxıb buraya yaz..." oninput="onExTyped()" onscroll="syncExGutterScroll()" onkeydown="onExKeydown(event)" onpaste="blockExPaste(event)" ondrop="blockExPaste(event)"></textarea></div>'
+    + '<div class="live-active-line" id="exActiveLine"></div>'
+    + '<pre class="live-highlight" id="exHighlight" aria-hidden="true"></pre>'
+    + '<textarea class="live-textarea ex-live" id="exTyped" spellcheck="false" wrap="off" placeholder="Nümunəyə baxıb buraya yaz..." oninput="onExTyped()" onscroll="syncExEditorScroll()" onclick="syncExActiveLine()" onkeyup="syncExActiveLine()" onkeydown="onExKeydown(event)" onpaste="blockExPaste(event)" ondrop="blockExPaste(event)"></textarea></div>'
     + '<div class="live-run-row"><button type="button" class="contest-action-btn" id="exCheckBtn" onclick="checkExample()">Yoxla</button><span class="live-submit-hint" id="exHint"></span></div>'
     + '<div class="contest-verdict" id="exVerdict"></div></div>'
     + '</div>';
   document.getElementById('exTyped').value = exTyped[cur.id] || '';
   renderExampleChips();
-  syncExGutter();
+  syncExEditor();
 }
 
 function renderExampleChips(){
@@ -2118,39 +2110,71 @@ function selectExample(id){
   renderExamplePractice();
 }
 
-function syncExGutter(){
+// Yazma redaktoru Canlı Dərsdəki ilə eyni texnikadır (bax: syncLiveEditor): mətn şəffaf textarea-dadır,
+// rəngli görünən mətn altındakı <pre>-dən gəlir (Kod Arxivi ilə eyni Monokai — highlightGhcCppLine),
+// sətir nömrələri və aktiv sətir zolağı hər dəyişiklikdə yenilənir. Yoxlamadan sonra nümunədən fərqli
+// sətirlər qırmızı dalğalı xətt və qırmızı sətir nömrəsi ilə işarələnir.
+function syncExEditor(){
   const ta = document.getElementById('exTyped');
   const gutter = document.getElementById('exGutter');
-  if (!ta || !gutter) return;
+  const hl = document.getElementById('exHighlight');
+  if (!ta || !gutter || !hl) return;
   const wrong = new Set(exWrongLines);
-  const count = ta.value.split('\n').length;
-  let html = '';
-  for (let i = 1; i <= count; i++) html += (wrong.has(i) ? '<span class="live-gut-err">' + i + '</span>' : i) + '\n';
-  gutter.innerHTML = html;
-  gutter.scrollTop = ta.scrollTop;
+  const lines = ta.value.split('\n');
+  let gutterHtml = '';
+  for (let i = 1; i <= lines.length; i++) gutterHtml += (wrong.has(i) ? '<span class="live-gut-err">' + i + '</span>' : i) + '\n';
+  gutter.innerHTML = gutterHtml;
+  hl.innerHTML = lines.map((l, i) => wrong.has(i + 1) ? '<span class="live-err">' + highlightGhcCppLine(l) + '</span>' : highlightGhcCppLine(l)).join('\n');
+  syncExEditorScroll();
 }
 
-function syncExGutterScroll(){
+// Scroll olanda sətir nömrələri, rəngli qat və aktiv sətir zolağı textarea ilə birgə hərəkət edir.
+function syncExEditorScroll(){
   const ta = document.getElementById('exTyped');
   const gutter = document.getElementById('exGutter');
-  if (ta && gutter) gutter.scrollTop = ta.scrollTop;
+  const hl = document.getElementById('exHighlight');
+  if (!ta || !gutter || !hl) return;
+  gutter.scrollTop = ta.scrollTop;
+  hl.scrollTop = ta.scrollTop;
+  hl.scrollLeft = ta.scrollLeft;
+  syncExActiveLine();
+}
+
+function syncExActiveLine(){
+  const ta = document.getElementById('exTyped');
+  const el = document.getElementById('exActiveLine');
+  if (!ta || !el) return;
+  const lineIdx = ta.value.slice(0, ta.selectionStart).split('\n').length - 1;
+  el.style.top = (10 + lineIdx * LIVE_LINE_HEIGHT - ta.scrollTop) + 'px';
 }
 
 function onExTyped(){
   const cur = currentExample();
   exTyped[cur.id] = document.getElementById('exTyped').value;
   exWrongLines = []; // yazı dəyişdi — köhnə yoxlamanın sətir işarələri artıq etibarlı deyil
-  syncExGutter();
+  syncExEditor();
 }
 
+// Tab → 4 boşluq; Enter əvvəlki sətrin girintisini saxlayır ({ ( [ ilə bitibsə +4). Mötərizələri özü
+// bağlamır — şagird hər simvolu özü yazır (məşqin məqsədi budur).
 function onExKeydown(e){
-  if (e.key !== 'Tab') return;
-  e.preventDefault();
   const ta = e.target;
   const s = ta.selectionStart;
-  ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(ta.selectionEnd);
-  ta.selectionStart = ta.selectionEnd = s + 4;
-  onExTyped();
+  const end = ta.selectionEnd;
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = s + 4;
+    onExTyped();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const lineStart = ta.value.lastIndexOf('\n', s - 1) + 1;
+    const current = ta.value.slice(lineStart, s);
+    const indent = (current.match(/^\s*/) || [''])[0] + (/[{([]\s*$/.test(current) ? '    ' : '');
+    ta.value = ta.value.slice(0, s) + '\n' + indent + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = s + 1 + indent.length;
+    onExTyped();
+  }
 }
 
 function blockExPaste(e){
@@ -2194,7 +2218,7 @@ async function checkExample(){
       if (data.missingTokens > 0) msg += ' Nümunədəki bəzi hissələr hələ yazılmayıb.';
       verdict.textContent = msg;
     }
-    syncExGutter();
+    syncExEditor();
   } catch (err) {
     hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
   } finally {
