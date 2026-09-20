@@ -9,7 +9,9 @@ import az.azcup.backend.entity.User;
 import az.azcup.backend.exception.ConflictException;
 import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
+import az.azcup.backend.repository.AssignmentExampleRepository;
 import az.azcup.backend.repository.AssignmentRepository;
+import az.azcup.backend.repository.ExampleCompletionRepository;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
 import az.azcup.backend.repository.SubmissionRepository;
@@ -37,6 +39,9 @@ public class GroupService {
     private final SubmissionRepository submissionRepository;
     // Qrup silinəndə ona aid tapşırıqları da təmizləmək üçün.
     private final AssignmentRepository assignmentRepository;
+    // Tapşırıqların kod nümunələri və onların tamamlanma qeydləri də qrupla birgə silinməlidir.
+    private final AssignmentExampleRepository assignmentExampleRepository;
+    private final ExampleCompletionRepository exampleCompletionRepository;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public GroupService(
@@ -44,13 +49,17 @@ public class GroupService {
         GroupMemberRepository groupMemberRepository,
         UserRepository userRepository,
         SubmissionRepository submissionRepository,
-        AssignmentRepository assignmentRepository
+        AssignmentRepository assignmentRepository,
+        AssignmentExampleRepository assignmentExampleRepository,
+        ExampleCompletionRepository exampleCompletionRepository
     ) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
         this.submissionRepository = submissionRepository;
         this.assignmentRepository = assignmentRepository;
+        this.assignmentExampleRepository = assignmentExampleRepository;
+        this.exampleCompletionRepository = exampleCompletionRepository;
     }
 
     // Bir müəllimin sahib olduğu bütün qrupların siyahısı ("Qruplarım" ekranı).
@@ -96,6 +105,8 @@ public class GroupService {
     public void deleteGroup(Long groupId, User requester) {
         Group group = getGroupOrThrow(groupId);
         requireOwnership(group, requester);
+        exampleCompletionRepository.deleteByExample_Assignment_Group(group);
+        assignmentExampleRepository.deleteByAssignment_Group(group);
         assignmentRepository.deleteByGroup(group);
         groupMemberRepository.deleteByGroup(group);
         groupRepository.delete(group);

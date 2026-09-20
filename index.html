@@ -446,6 +446,43 @@
   .live-check-msg:empty{ display:none; }
   .live-check-bad{ color:#ff6b6b; }
   .live-check-ok{ color:var(--green); }
+
+  /* ---------- Tapşırıq kod nümunəsi məşqi (baxıb yaz) ---------- */
+  .ex-panels{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+  @media (max-width:900px){ .ex-panels{ grid-template-columns:1fr; } }
+  .ex-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .ex-chip{
+    font-family:var(--mono); font-size:12px; padding:6px 12px; border-radius:16px; cursor:pointer;
+    background:none; border:1px solid var(--grid-line-strong); color:var(--ink-soft);
+  }
+  .ex-chip:hover{ border-color:var(--gold); color:var(--ink); }
+  .ex-chip.active{ background:rgba(255,193,7,0.14); border-color:var(--gold); color:var(--gold); }
+  .ex-chip.done::after{ content:' ✓'; color:var(--green); font-weight:700; }
+  .ex-code{
+    background:#272822; color:#f8f8f2; border:1px solid var(--grid-line-strong); border-radius:4px;
+    padding:10px 0; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    min-height:420px; box-sizing:border-box; overflow:auto;
+  }
+  .ex-code-line{ display:flex; white-space:pre; min-height:18.75px; }
+  .ex-ln{ flex:0 0 34px; text-align:right; padding-right:8px; color:#75715e; user-select:none; }
+  .ex-code-text{ padding-left:10px; }
+  .ex-typed{
+    display:block; width:100%; min-height:420px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:#272822; color:#f8f8f2; caret-color:#f8f8f2; border:1px solid var(--grid-line-strong); border-radius:4px;
+    padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box; white-space:pre; overflow:auto;
+  }
+  .ex-typed:focus{ border-color:var(--gold); }
+  .ex-manage-item{
+    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px;
+    padding:10px 14px; margin-bottom:8px;
+  }
+  .ex-manage-head{ display:flex; align-items:center; gap:8px; }
+  .ex-manage-item summary{ cursor:pointer; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-top:6px; }
+  .ex-manage-code{
+    margin:8px 0 0; padding:10px 12px; background:#272822; color:#f8f8f2; border-radius:4px;
+    font-family:var(--mono); font-size:12px; line-height:1.5; overflow:auto; max-height:320px;
+  }
+  .ex-form-code{ font-family:var(--mono); font-size:12.5px; min-height:200px; white-space:pre; }
   .live-run-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
   .live-run-output{ margin-top:8px; }
   .live-run-status{
@@ -1211,6 +1248,8 @@ function handleLogout(){
   liveStudents = [];
   liveSelectedStudentId = null;
   resetLiveChecks();
+  exState = null;
+  Object.keys(exTyped).forEach(k => delete exTyped[k]);
   AzcupAuth.clearSession();
   backToLangSelect();
   updateAuthUI();
@@ -1803,24 +1842,32 @@ async function deleteAssignmentConfirm(groupId, assignmentId){
 async function openGradebook(groupId, assignmentId){
   const body = document.getElementById('myGroupsPanelBody');
   body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  const base = '/api/teacher/groups/' + groupId + '/assignments/' + assignmentId;
   try {
-    const [assignmentsRes, gradebookRes] = await Promise.all([
+    const [assignmentsRes, gradebookRes, examplesRes, progressRes] = await Promise.all([
       azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments'),
-      azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/gradebook'),
+      azcupApiFetch(base + '/gradebook'),
+      azcupApiFetch(base + '/examples'),
+      azcupApiFetch(base + '/examples/progress'),
     ]);
-    if (!assignmentsRes.ok || !gradebookRes.ok) throw new Error('fetch failed');
+    if (!assignmentsRes.ok || !gradebookRes.ok || !examplesRes.ok || !progressRes.ok) throw new Error('fetch failed');
     const assignments = await assignmentsRes.json();
     const assignment = assignments.find(a => a.id === assignmentId);
     const rows = await gradebookRes.json();
+    const examples = await examplesRes.json();
+    const exampleProgress = await progressRes.json();
     if (!assignment) throw new Error('assignment not found');
-    renderGradebook(groupId, assignment, rows);
+    renderGradebook(groupId, assignment, rows, examples, exampleProgress);
   } catch (err) {
     body.innerHTML = '<div class="teacher-panel-error">Jurnalı yükləmək mümkün olmadı.</div>';
   }
 }
 
-function renderGradebook(groupId, assignment, rows){
+function renderGradebook(groupId, assignment, rows, examples, exampleProgress){
   const body = document.getElementById('myGroupsPanelBody');
+  const hasExamples = examples.length > 0;
+  const doneByStudent = {};
+  exampleProgress.forEach(p => { doneByStudent[p.studentId] = p; });
   const tableRows = rows.map(r => {
     const pct = assignment.totalProblems > 0 ? Math.round((r.solvedCount / assignment.totalProblems) * 100) : 0;
     const statusBadge = r.overdue
@@ -1828,19 +1875,74 @@ function renderGradebook(groupId, assignment, rows){
       : (r.solvedCount >= assignment.totalProblems
         ? '<span class="user-badge active">Bitirib</span>'
         : '<span class="user-badge active">Davam edir</span>');
+    const ep = doneByStudent[r.studentId];
     return '<tr><td>' + escapeHtml(r.fullName) + '<span class="user-email">' + escapeHtml(r.email) + '</span></td>'
       + '<td>' + r.solvedCount + ' / ' + r.totalCount + ' (' + pct + '%)</td>'
+      + (hasExamples ? '<td>' + (ep ? ep.done + ' / ' + ep.total : '0 / ' + examples.length) + '</td>' : '')
       + '<td>' + statusBadge + '</td></tr>';
   }).join('');
   const table = rows.length
-    ? '<table class="teacher-table"><thead><tr><th>Şagird</th><th>İrəliləyiş</th><th>Status</th></tr></thead><tbody>' + tableRows + '</tbody></table>'
+    ? '<table class="teacher-table"><thead><tr><th>Şagird</th><th>İrəliləyiş</th>' + (hasExamples ? '<th>Kod nümunələri</th>' : '') + '<th>Status</th></tr></thead><tbody>' + tableRows + '</tbody></table>'
     : '<div class="teacher-panel-empty">Bu qrupda hələ şagird yoxdur.</div>';
+
+  const exampleItems = examples.map(e =>
+    '<div class="ex-manage-item">'
+    + '<div class="ex-manage-head"><b>' + escapeHtml(e.title) + '</b>'
+    + '<span class="user-email" style="display:inline;margin-left:8px;">' + e.completedCount + ' şagird tamamlayıb</span>'
+    + '<button type="button" class="contest-action-btn secondary" style="margin-left:auto;" onclick="deleteExampleConfirm(' + groupId + ',' + assignment.id + ',' + e.id + ')">Sil</button></div>'
+    + '<details><summary>Kodu göstər</summary><pre class="ex-manage-code">' + escapeHtml(e.sourceCode) + '</pre></details>'
+    + '</div>'
+  ).join('');
+  const exampleSection =
+    '<h3 style="margin:28px 0 4px;color:var(--ink);font-size:16px;">Kod nümunələri</h3>'
+    + '<p class="teacher-panel-sub">Şagirdlər bu nümunələrə baxıb kodu özləri yazır (yapışdırma bloklanıb), sistem yazdıqlarını nümunə ilə müqayisə edir. Boşluq və şərh fərqi nəzərə alınmır.</p>'
+    + (examples.length ? exampleItems : '<div class="teacher-panel-empty">Hələ kod nümunəsi əlavə edilməyib.</div>')
+    + '<div class="contest-form" style="margin-top:14px;max-width:760px;">'
+    + '<input class="auth-input" type="text" id="newExampleTitle" placeholder="Nümunənin adı (məs. for dövrü ilə cəm)">'
+    + '<textarea class="contest-textarea ex-form-code" id="newExampleCode" spellcheck="false" placeholder="#include <iostream>&#10;using namespace std;&#10;int main(){&#10;    &#10;    return 0;&#10;}"></textarea>'
+    + '<button type="button" class="contest-action-btn" onclick="submitAddExample(' + groupId + ',' + assignment.id + ')">Nümunə əlavə et</button>'
+    + '</div>';
 
   body.innerHTML =
     '<button type="button" class="back-to-select" onclick="openGroupDetail(' + groupId + ')" style="margin-bottom:16px;">← Qrupa qayıt</button>'
     + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(assignment.title) + '</h3>'
     + '<p class="teacher-panel-sub">' + escapeHtml(assignment.topicTitle) + ' · Son tarix: ' + formatYarishDateTime(assignment.dueAt) + '</p>'
-    + table;
+    + table
+    + exampleSection;
+}
+
+async function submitAddExample(groupId, assignmentId){
+  const title = document.getElementById('newExampleTitle').value.trim();
+  const sourceCode = document.getElementById('newExampleCode').value;
+  if (!title || !sourceCode.trim()) {
+    alert('Nümunənin adını və kodunu daxil et.');
+    return;
+  }
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/examples', {
+      method: 'POST',
+      body: JSON.stringify({ title, sourceCode }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(data.message || 'Nümunə əlavə etmək mümkün olmadı.');
+      return;
+    }
+    openGradebook(groupId, assignmentId);
+  } catch (err) {
+    alert('Nümunə əlavə etmək mümkün olmadı.');
+  }
+}
+
+async function deleteExampleConfirm(groupId, assignmentId, exampleId){
+  if (!confirm('Bu kod nümunəsini silmək istəyirsən? Şagirdlərin bu nümunə üzrə irəliləyişi də silinəcək.')) return;
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/examples/' + exampleId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    openGradebook(groupId, assignmentId);
+  } catch (err) {
+    alert('Nümunəni silmək mümkün olmadı.');
+  }
 }
 
 /* ---------- Şagird tərəfi: "Tapşırıqlarım" ---------- */
@@ -1848,28 +1950,191 @@ async function loadAssignmentsPanel(){
   const body = document.getElementById('assignmentsPanelBody');
   body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
   try {
-    const res = await azcupApiFetch('/api/me/assignments');
+    const [res, summaryRes] = await Promise.all([
+      azcupApiFetch('/api/me/assignments'),
+      azcupApiFetch('/api/me/assignments/examples-summary').catch(() => null),
+    ]);
     if (!res.ok) throw new Error('fetch failed');
     const assignments = await res.json();
+    const summaries = {};
+    if (summaryRes && summaryRes.ok) (await summaryRes.json()).forEach(s => { summaries[s.assignmentId] = s; });
     if (!assignments.length) {
       body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir tapşırıq verilməyib.</div>';
       return;
     }
     const cards = assignments.map(a => {
+      exAssignmentTitles[a.id] = a.title;
       const pct = a.totalCount > 0 ? Math.round((a.solvedCount / a.totalCount) * 100) : 0;
       const statusBadge = a.overdue
         ? '<span class="contest-status-badge ended">Gecikib</span>'
         : (a.solvedCount >= a.totalCount ? '<span class="contest-status-badge active">Bitirilib</span>' : '<span class="contest-status-badge upcoming">Davam edir</span>');
+      const ex = summaries[a.id];
       return '<div class="contest-card">'
         + '<div class="contest-card-top"><div class="contest-card-title">' + escapeHtml(a.title) + '</div>' + statusBadge + '</div>'
         + '<div class="contest-card-meta">' + escapeHtml(a.groupName) + ' · ' + escapeHtml(a.topicTitle) + ' · Son tarix: ' + formatYarishDateTime(a.dueAt) + '</div>'
         + '<div class="contest-card-meta">İrəliləyiş: ' + a.solvedCount + ' / ' + a.totalCount + ' (' + pct + '%)</div>'
         + (a.description ? '<div class="teacher-panel-sub" style="margin-top:8px;">' + escapeHtml(a.description) + '</div>' : '')
+        + (ex ? '<div class="contest-card-meta">Kod nümunələri: ' + ex.done + ' / ' + ex.total + '</div>'
+          + '<button type="button" class="contest-action-btn" style="margin-top:10px;" onclick="openExamplePractice(' + a.id + ')">✍ Kod yazma məşqi</button>' : '')
         + '</div>';
     }).join('');
     body.innerHTML = cards;
   } catch (err) {
     body.innerHTML = '<div class="teacher-panel-error">Tapşırıqları yükləmək mümkün olmadı.</div>';
+  }
+}
+
+/* ---------- Şagird tərəfi: kod nümunəsinə baxıb yazma məşqi ----------
+   Müəllim tapşırığa kod nümunələri əlavə edir; şagird solda nümunəyə baxır, sağda
+   kodu ÖZÜ yazır (yapışdırma bloklanıb — məqsəd yazma vərdişidir). "Yoxla" yazılanı
+   serverdə nümunə ilə müqayisə edir (boşluq/şərh fərqi sayılmır); tam uyğun gələndə
+   nümunə tamamlanmış sayılır və müəllimin jurnalında görünür. */
+const exAssignmentTitles = {};
+let exState = null;     // { assignmentId, examples: [{id,title,sourceCode,completed}], selectedId }
+const exTyped = {};     // nümunə id -> şagirdin yazdığı mətn (nümunələr arası keçəndə itməsin)
+let exWrongLines = [];  // son yoxlamada nümunədən fərqli çıxan yazılmış sətirlər
+let exChecking = false;
+
+async function openExamplePractice(assignmentId){
+  const body = document.getElementById('assignmentsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/me/assignments/' + assignmentId + '/examples');
+    if (!res.ok) throw new Error('fetch failed');
+    const examples = await res.json();
+    if (!examples.length) { loadAssignmentsPanel(); return; }
+    const first = examples.find(e => !e.completed) || examples[0];
+    exState = { assignmentId, examples, selectedId: first.id };
+    exWrongLines = [];
+    renderExamplePractice();
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Nümunələri yükləmək mümkün olmadı.</div>';
+  }
+}
+
+function currentExample(){
+  return exState.examples.find(e => e.id === exState.selectedId);
+}
+
+function renderExamplePractice(){
+  const body = document.getElementById('assignmentsPanelBody');
+  const cur = currentExample();
+  const refLines = cur.sourceCode.split('\n');
+  const refHtml = refLines.map((l, i) =>
+    '<div class="ex-code-line"><span class="ex-ln">' + (i + 1) + '</span><span class="ex-code-text">' + highlightGhcCppLine(l) + '</span></div>'
+  ).join('');
+  body.innerHTML =
+    '<button type="button" class="contest-back-btn" onclick="loadAssignmentsPanel()">← Tapşırıqlara qayıt</button>'
+    + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(exAssignmentTitles[exState.assignmentId] || 'Tapşırıq') + ' — kod yazma məşqi</h3>'
+    + '<p class="teacher-panel-sub">Soldakı nümunəyə baxıb kodu sağda özün yaz. Yapışdırma bloklanıb.</p>'
+    + '<div class="ex-chips" id="exChips"></div>'
+    + '<div class="ex-panels">'
+    + '<div><div class="live-panel-title">Nümunə — baxıb yaz</div><div class="ex-code">' + refHtml + '</div></div>'
+    + '<div><div class="live-panel-title">Sənin yazdığın</div>'
+    + '<div class="live-editor"><div class="live-gutter" id="exGutter">1</div>'
+    + '<textarea class="ex-typed" id="exTyped" spellcheck="false" wrap="off" placeholder="Nümunəyə baxıb buraya yaz..." oninput="onExTyped()" onscroll="syncExGutterScroll()" onkeydown="onExKeydown(event)" onpaste="blockExPaste(event)" ondrop="blockExPaste(event)"></textarea></div>'
+    + '<div class="live-run-row"><button type="button" class="contest-action-btn" id="exCheckBtn" onclick="checkExample()">Yoxla</button><span class="live-submit-hint" id="exHint"></span></div>'
+    + '<div class="contest-verdict" id="exVerdict"></div></div>'
+    + '</div>';
+  document.getElementById('exTyped').value = exTyped[cur.id] || '';
+  renderExampleChips();
+  syncExGutter();
+}
+
+function renderExampleChips(){
+  const el = document.getElementById('exChips');
+  if (!el) return;
+  el.innerHTML = exState.examples.map(e =>
+    '<button type="button" class="ex-chip' + (e.id === exState.selectedId ? ' active' : '') + (e.completed ? ' done' : '') + '" onclick="selectExample(' + e.id + ')">' + escapeHtml(e.title) + '</button>'
+  ).join('');
+}
+
+function selectExample(id){
+  if (id === exState.selectedId) return;
+  exState.selectedId = id;
+  exWrongLines = [];
+  renderExamplePractice();
+}
+
+function syncExGutter(){
+  const ta = document.getElementById('exTyped');
+  const gutter = document.getElementById('exGutter');
+  if (!ta || !gutter) return;
+  const wrong = new Set(exWrongLines);
+  const count = ta.value.split('\n').length;
+  let html = '';
+  for (let i = 1; i <= count; i++) html += (wrong.has(i) ? '<span class="live-gut-err">' + i + '</span>' : i) + '\n';
+  gutter.innerHTML = html;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+function syncExGutterScroll(){
+  const ta = document.getElementById('exTyped');
+  const gutter = document.getElementById('exGutter');
+  if (ta && gutter) gutter.scrollTop = ta.scrollTop;
+}
+
+function onExTyped(){
+  const cur = currentExample();
+  exTyped[cur.id] = document.getElementById('exTyped').value;
+  exWrongLines = []; // yazı dəyişdi — köhnə yoxlamanın sətir işarələri artıq etibarlı deyil
+  syncExGutter();
+}
+
+function onExKeydown(e){
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const ta = e.target;
+  const s = ta.selectionStart;
+  ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(ta.selectionEnd);
+  ta.selectionStart = ta.selectionEnd = s + 4;
+  onExTyped();
+}
+
+function blockExPaste(e){
+  e.preventDefault();
+  const hint = document.getElementById('exHint');
+  if (hint) hint.textContent = 'Yapışdırma bloklanıb — özün yaz ✍';
+}
+
+async function checkExample(){
+  if (exChecking) return;
+  const cur = currentExample();
+  const typed = document.getElementById('exTyped').value;
+  const hint = document.getElementById('exHint');
+  const verdict = document.getElementById('exVerdict');
+  const btn = document.getElementById('exCheckBtn');
+  hint.textContent = '';
+  if (!typed.trim()) { hint.textContent = 'Əvvəlcə kodu yaz.'; return; }
+  exChecking = true;
+  btn.disabled = true;
+  try {
+    const res = await azcupApiFetch('/api/me/assignments/' + exState.assignmentId + '/examples/' + cur.id + '/check', {
+      method: 'POST',
+      body: JSON.stringify({ typedCode: typed }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { hint.textContent = data.message || 'Yoxlamaq mümkün olmadı.'; return; }
+    verdict.className = 'contest-verdict show ' + (data.match ? 'accepted' : 'rejected');
+    if (data.match) {
+      cur.completed = true;
+      exWrongLines = [];
+      const next = exState.examples.find(e => !e.completed);
+      verdict.textContent = '✓ Əla! Kodu düzgün yazdın.' + (next ? ' Növbəti nümunəyə keç: «' + next.title + '».' : ' Bu tapşırığın bütün nümunələri tamamlandı!');
+      renderExampleChips();
+    } else {
+      exWrongLines = data.wrongLines || [];
+      let msg = data.tooLongForDiff ? 'Kod nümunə ilə eyni deyil.' : 'Uyğunluq: ' + data.percent + '%.';
+      if (exWrongLines.length) msg += ' Nümunədən fərqli sətirlər: ' + exWrongLines.join(', ') + '.';
+      if (data.missingTokens > 0) msg += ' Nümunədəki bəzi hissələr hələ yazılmayıb.';
+      verdict.textContent = msg;
+    }
+    syncExGutter();
+  } catch (err) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    exChecking = false;
+    btn.disabled = false;
   }
 }
 

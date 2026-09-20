@@ -1,10 +1,18 @@
 package az.azcup.backend.service;
 
+import az.azcup.backend.dto.ExampleCheckResponse;
+import az.azcup.backend.dto.ExampleSummaryDto;
 import az.azcup.backend.dto.StudentAssignmentDto;
+import az.azcup.backend.dto.StudentExampleDto;
 import az.azcup.backend.dto.teacher.AssignmentDto;
 import az.azcup.backend.dto.teacher.AssignmentUpsertRequest;
+import az.azcup.backend.dto.teacher.ExampleDto;
+import az.azcup.backend.dto.teacher.ExampleProgressRowDto;
+import az.azcup.backend.dto.teacher.ExampleUpsertRequest;
 import az.azcup.backend.dto.teacher.GradebookRowDto;
 import az.azcup.backend.entity.Assignment;
+import az.azcup.backend.entity.AssignmentExample;
+import az.azcup.backend.entity.ExampleCompletion;
 import az.azcup.backend.entity.Group;
 import az.azcup.backend.entity.GroupMember;
 import az.azcup.backend.entity.Role;
@@ -12,7 +20,9 @@ import az.azcup.backend.entity.Topic;
 import az.azcup.backend.entity.User;
 import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
+import az.azcup.backend.repository.AssignmentExampleRepository;
 import az.azcup.backend.repository.AssignmentRepository;
+import az.azcup.backend.repository.ExampleCompletionRepository;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
 import az.azcup.backend.repository.ProblemRepository;
@@ -23,7 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 // Müəllimin öz qrupuna tapşırıq (Assignment) yaratmasını/idarə etməsini və
 // sinif jurnalını (Gradebook) görməsini, həmçinin şagirdin öz tapşırıqlarını
@@ -47,6 +61,9 @@ public class AssignmentService {
     private final ProblemRepository problemRepository;
     // Hər şagirdin bu mövzuda həll etdiyi problem sayını hesablamaq üçün.
     private final SubmissionRepository submissionRepository;
+    // Tapşırığın kod nümunələri və şagirdlərin onları tamamlama qeydləri.
+    private final AssignmentExampleRepository exampleRepository;
+    private final ExampleCompletionRepository completionRepository;
 
     // Spring tərəfindən inject olunan asılılıqları sahələrə təyin edir.
     public AssignmentService(
@@ -55,7 +72,9 @@ public class AssignmentService {
         GroupMemberRepository groupMemberRepository,
         TopicRepository topicRepository,
         ProblemRepository problemRepository,
-        SubmissionRepository submissionRepository
+        SubmissionRepository submissionRepository,
+        AssignmentExampleRepository exampleRepository,
+        ExampleCompletionRepository completionRepository
     ) {
         this.assignmentRepository = assignmentRepository;
         this.groupRepository = groupRepository;
@@ -63,6 +82,8 @@ public class AssignmentService {
         this.topicRepository = topicRepository;
         this.problemRepository = problemRepository;
         this.submissionRepository = submissionRepository;
+        this.exampleRepository = exampleRepository;
+        this.completionRepository = completionRepository;
     }
 
     // Bir qrupun bütün tapşırıqlarının siyahısı (ən yenisi əvvəldə).
@@ -111,7 +132,164 @@ public class AssignmentService {
         Group group = getGroupOrThrow(groupId);
         requireOwnership(group, requester);
         Assignment assignment = getAssignmentOrThrow(group, assignmentId);
+        completionRepository.deleteByExample_Assignment(assignment);
+        exampleRepository.deleteByAssignment(assignment);
         assignmentRepository.delete(assignment);
+    }
+
+    // ---------- Kod nümunələri (şagird baxıb yazır) ----------
+
+    // Tapşırığın kod nümunələri, hər biri üçün neçə şagirdin tamamladığı ilə (müəllim üçün).
+    @Transactional(readOnly = true)
+    public List<ExampleDto> listExamples(Long groupId, Long assignmentId, User requester) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        Map<Long, Long> completedCounts = new HashMap<>();
+        for (ExampleCompletion c : completionRepository.findByExample_Assignment(assignment)) {
+            completedCounts.merge(c.getExample().getId(), 1L, Long::sum);
+        }
+        List<ExampleDto> result = new ArrayList<>();
+        for (AssignmentExample e : exampleRepository.findByAssignmentOrderByIdAsc(assignment)) {
+            result.add(new ExampleDto(e.getId(), e.getTitle(), e.getSourceCode(), completedCounts.getOrDefault(e.getId(), 0L)));
+        }
+        return result;
+    }
+
+    // Tapşırığa yeni kod nümunəsi əlavə edir.
+    @Transactional
+    public ExampleDto addExample(Long groupId, Long assignmentId, User requester, ExampleUpsertRequest req) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        AssignmentExample example = new AssignmentExample();
+        example.setAssignment(assignment);
+        example.setTitle(req.getTitle().trim());
+        example.setSourceCode(req.getSourceCode());
+        exampleRepository.save(example);
+        return new ExampleDto(example.getId(), example.getTitle(), example.getSourceCode(), 0L);
+    }
+
+    // Kod nümunəsini (və şagirdlərin ona aid tamamlanma qeydlərini) silir.
+    @Transactional
+    public void deleteExample(Long groupId, Long assignmentId, Long exampleId, User requester) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        AssignmentExample example = getExampleOrThrow(assignment, exampleId);
+        completionRepository.deleteAll(completionRepository.findByExample_Assignment(assignment).stream()
+            .filter(c -> c.getExample().getId().equals(example.getId()))
+            .toList());
+        exampleRepository.delete(example);
+    }
+
+    // Qrupun hər şagirdinin bu tapşırığın kod nümunələrindən neçəsini tamamladığı (müəllim jurnalı üçün).
+    @Transactional(readOnly = true)
+    public List<ExampleProgressRowDto> getExampleProgress(Long groupId, Long assignmentId, User requester) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        long total = exampleRepository.findByAssignmentOrderByIdAsc(assignment).size();
+        Map<Long, Long> doneByStudent = new HashMap<>();
+        for (ExampleCompletion c : completionRepository.findByExample_Assignment(assignment)) {
+            doneByStudent.merge(c.getStudent().getId(), 1L, Long::sum);
+        }
+        List<ExampleProgressRowDto> result = new ArrayList<>();
+        for (GroupMember member : groupMemberRepository.findByGroupOrderByJoinedAtAsc(assignment.getGroup())) {
+            Long studentId = member.getStudent().getId();
+            result.add(new ExampleProgressRowDto(studentId, doneByStudent.getOrDefault(studentId, 0L), total));
+        }
+        return result;
+    }
+
+    // Şagirdin bu tapşırığın kod nümunələri (yalnız qrupun üzvü görə bilər).
+    @Transactional(readOnly = true)
+    public List<StudentExampleDto> listExamplesForStudent(Long assignmentId, User student) {
+        Assignment assignment = getAssignmentForMember(assignmentId, student);
+        List<AssignmentExample> examples = exampleRepository.findByAssignmentOrderByIdAsc(assignment);
+        if (examples.isEmpty()) {
+            return List.of();
+        }
+        Set<Long> doneIds = new HashSet<>();
+        for (ExampleCompletion c : completionRepository.findByStudentAndExampleIn(student, examples)) {
+            doneIds.add(c.getExample().getId());
+        }
+        List<StudentExampleDto> result = new ArrayList<>();
+        for (AssignmentExample e : examples) {
+            result.add(new StudentExampleDto(e.getId(), e.getTitle(), e.getSourceCode(), doneIds.contains(e.getId())));
+        }
+        return result;
+    }
+
+    // Şagirdin yazdığı kodu nümunə ilə müqayisə edir; tam uyğun gələndə nümunə "tamamlandı" yazılır.
+    @Transactional
+    public ExampleCheckResponse checkExample(Long assignmentId, Long exampleId, User student, String typedCode) {
+        Assignment assignment = getAssignmentForMember(assignmentId, student);
+        AssignmentExample example = getExampleOrThrow(assignment, exampleId);
+        ExampleCheckResponse response = CodeTypingComparer.compare(example.getSourceCode(), typedCode);
+        if (response.isMatch() && !completionRepository.existsByExampleAndStudent(example, student)) {
+            ExampleCompletion completion = new ExampleCompletion();
+            completion.setExample(example);
+            completion.setStudent(student);
+            completionRepository.save(completion);
+        }
+        return response;
+    }
+
+    // "Tapşırıqlarım" kartları üçün: nümunəsi olan hər tapşırıqda neçə nümunə var, şagird neçəsini tamamlayıb.
+    @Transactional(readOnly = true)
+    public List<ExampleSummaryDto> examplesSummaryForStudent(User student) {
+        List<Group> groups = new ArrayList<>();
+        for (GroupMember member : groupMemberRepository.findByStudent(student)) {
+            groups.add(member.getGroup());
+        }
+        if (groups.isEmpty()) {
+            return List.of();
+        }
+        List<Assignment> assignments = assignmentRepository.findByGroupInOrderByDueAtAsc(groups);
+        if (assignments.isEmpty()) {
+            return List.of();
+        }
+        List<AssignmentExample> examples = exampleRepository.findByAssignmentIn(assignments);
+        if (examples.isEmpty()) {
+            return List.of();
+        }
+        Set<Long> doneIds = new HashSet<>();
+        for (ExampleCompletion c : completionRepository.findByStudentAndExampleIn(student, examples)) {
+            doneIds.add(c.getExample().getId());
+        }
+        Map<Long, long[]> perAssignment = new HashMap<>(); // [total, done]
+        for (AssignmentExample e : examples) {
+            long[] counts = perAssignment.computeIfAbsent(e.getAssignment().getId(), k -> new long[2]);
+            counts[0]++;
+            if (doneIds.contains(e.getId())) {
+                counts[1]++;
+            }
+        }
+        List<ExampleSummaryDto> result = new ArrayList<>();
+        for (Map.Entry<Long, long[]> entry : perAssignment.entrySet()) {
+            result.add(new ExampleSummaryDto(entry.getKey(), entry.getValue()[0], entry.getValue()[1]));
+        }
+        return result;
+    }
+
+    // Qrupun sahibliyini yoxlayıb tapşırığı qaytarır.
+    private Assignment getOwnedAssignment(Long groupId, Long assignmentId, User requester) {
+        Group group = getGroupOrThrow(groupId);
+        requireOwnership(group, requester);
+        return getAssignmentOrThrow(group, assignmentId);
+    }
+
+    // Şagirdin tapşırığın qrupunun üzvü olduğunu yoxlayır; deyilsə 404 (tapşırığın varlığını da açmır).
+    private Assignment getAssignmentForMember(Long assignmentId, User student) {
+        Assignment assignment = assignmentRepository.findById(assignmentId)
+            .orElseThrow(() -> new NotFoundException("Tapşırıq tapılmadı: " + assignmentId));
+        if (!groupMemberRepository.existsByGroupAndStudent(assignment.getGroup(), student)) {
+            throw new NotFoundException("Tapşırıq tapılmadı: " + assignmentId);
+        }
+        return assignment;
+    }
+
+    // Nümunəni tapır və onun DOĞRUDAN bu tapşırığa aid olduğunu yoxlayır.
+    private AssignmentExample getExampleOrThrow(Assignment assignment, Long exampleId) {
+        AssignmentExample example = exampleRepository.findById(exampleId)
+            .orElseThrow(() -> new NotFoundException("Nümunə tapılmadı: " + exampleId));
+        if (!example.getAssignment().getId().equals(assignment.getId())) {
+            throw new NotFoundException("Nümunə tapılmadı: " + exampleId);
+        }
+        return example;
     }
 
     // Bir tapşırığın sinif jurnalı — qrupun hər üzvü üçün, mövzudakı

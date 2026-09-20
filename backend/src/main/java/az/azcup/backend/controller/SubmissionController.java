@@ -1,8 +1,12 @@
 package az.azcup.backend.controller;
 
 import az.azcup.backend.dto.ActivityDayDto;
+import az.azcup.backend.dto.ExampleCheckRequest;
+import az.azcup.backend.dto.ExampleCheckResponse;
+import az.azcup.backend.dto.ExampleSummaryDto;
 import az.azcup.backend.dto.ProgressDto;
 import az.azcup.backend.dto.StudentAssignmentDto;
+import az.azcup.backend.dto.StudentExampleDto;
 import az.azcup.backend.dto.SubmissionRequest;
 import az.azcup.backend.dto.SubmissionResponse;
 import az.azcup.backend.security.UserPrincipal;
@@ -71,5 +75,31 @@ public class SubmissionController {
     @GetMapping("/api/me/assignments")
     public List<StudentAssignmentDto> myAssignments(@AuthenticationPrincipal UserPrincipal principal) {
         return assignmentService.listForStudent(principal.getUser());
+    }
+
+    // Şagirdin tapşırıqlarındakı kod nümunələrinin sayı və tamamlanma vəziyyəti ("Tapşırıqlarım" kartları üçün).
+    @GetMapping("/api/me/assignments/examples-summary")
+    public List<ExampleSummaryDto> myExamplesSummary(@AuthenticationPrincipal UserPrincipal principal) {
+        return assignmentService.examplesSummaryForStudent(principal.getUser());
+    }
+
+    // Bir tapşırığın kod nümunələri — şagird baxıb özü yazır.
+    @GetMapping("/api/me/assignments/{assignmentId}/examples")
+    public List<StudentExampleDto> myAssignmentExamples(
+        @PathVariable Long assignmentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.listExamplesForStudent(assignmentId, principal.getUser());
+    }
+
+    // Şagirdin yazdığı kodu nümunə ilə müqayisə edir; tam uyğun gələndə nümunə tamamlanmış sayılır.
+    @PostMapping("/api/me/assignments/{assignmentId}/examples/{exampleId}/check")
+    public ExampleCheckResponse checkExample(
+        @PathVariable Long assignmentId,
+        @PathVariable Long exampleId,
+        @Valid @RequestBody ExampleCheckRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.checkExample(assignmentId, exampleId, principal.getUser(), request.getTypedCode());
     }
 }

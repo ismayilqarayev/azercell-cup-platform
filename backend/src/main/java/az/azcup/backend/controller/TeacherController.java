@@ -6,6 +6,9 @@ import az.azcup.backend.dto.admin.PublishUpdateRequest;
 import az.azcup.backend.dto.teacher.AddGroupMemberRequest;
 import az.azcup.backend.dto.teacher.AssignmentDto;
 import az.azcup.backend.dto.teacher.AssignmentUpsertRequest;
+import az.azcup.backend.dto.teacher.ExampleDto;
+import az.azcup.backend.dto.teacher.ExampleProgressRowDto;
+import az.azcup.backend.dto.teacher.ExampleUpsertRequest;
 import az.azcup.backend.dto.teacher.GradebookRowDto;
 import az.azcup.backend.dto.teacher.GroupCreateRequest;
 import az.azcup.backend.dto.teacher.GroupDto;
@@ -204,5 +207,51 @@ public class TeacherController {
         @AuthenticationPrincipal UserPrincipal principal
     ) {
         return assignmentService.getGradebook(groupId, assignmentId, principal.getUser());
+    }
+
+    // ---------- Tapşırığın kod nümunələri (şagird baxıb yazır) ----------
+
+    // Tapşırığın kod nümunələri, hər birini neçə şagirdin tamamladığı ilə.
+    @GetMapping("/groups/{groupId}/assignments/{assignmentId}/examples")
+    public List<ExampleDto> listExamples(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.listExamples(groupId, assignmentId, principal.getUser());
+    }
+
+    // Tapşırığa yeni kod nümunəsi əlavə edir.
+    @PostMapping("/groups/{groupId}/assignments/{assignmentId}/examples")
+    public ResponseEntity<ExampleDto> addExample(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @Valid @RequestBody ExampleUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        ExampleDto created = assignmentService.addExample(groupId, assignmentId, principal.getUser(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    // Kod nümunəsini silir.
+    @DeleteMapping("/groups/{groupId}/assignments/{assignmentId}/examples/{exampleId}")
+    public ResponseEntity<Void> deleteExample(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @PathVariable Long exampleId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        assignmentService.deleteExample(groupId, assignmentId, exampleId, principal.getUser());
+        return ResponseEntity.noContent().build();
+    }
+
+    // Qrupun hər şagirdinin nümunələrdən neçəsini tamamladığı (jurnal üçün).
+    @GetMapping("/groups/{groupId}/assignments/{assignmentId}/examples/progress")
+    public List<ExampleProgressRowDto> getExampleProgress(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.getExampleProgress(groupId, assignmentId, principal.getUser());
     }
 }
