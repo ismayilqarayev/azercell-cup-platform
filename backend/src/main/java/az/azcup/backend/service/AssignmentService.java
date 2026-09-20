@@ -228,6 +228,15 @@ public class AssignmentService {
         return response;
     }
 
+    // Müəllimin "şagird kimi bax" baxışı: yazılanı nümunə ilə müqayisə edir, amma
+    // heç bir tamamlanma qeydi YAZMIR (müəllim qrupun şagirdi deyil).
+    @Transactional(readOnly = true)
+    public ExampleCheckResponse previewCheckExample(Long groupId, Long assignmentId, Long exampleId, User requester, String typedCode) {
+        Assignment assignment = getOwnedAssignment(groupId, assignmentId, requester);
+        AssignmentExample example = getExampleOrThrow(assignment, exampleId);
+        return CodeTypingComparer.compare(example.getSourceCode(), typedCode);
+    }
+
     // "Tapşırıqlarım" kartları üçün: nümunəsi olan hər tapşırıqda neçə nümunə var, şagird neçəsini tamamlayıb.
     @Transactional(readOnly = true)
     public List<ExampleSummaryDto> examplesSummaryForStudent(User student) {

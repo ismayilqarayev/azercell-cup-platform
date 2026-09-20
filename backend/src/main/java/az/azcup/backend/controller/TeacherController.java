@@ -4,6 +4,8 @@ import az.azcup.backend.dto.ActivityDayDto;
 import az.azcup.backend.dto.admin.AdminTopicDto;
 import az.azcup.backend.dto.admin.PublishUpdateRequest;
 import az.azcup.backend.dto.teacher.AddGroupMemberRequest;
+import az.azcup.backend.dto.ExampleCheckRequest;
+import az.azcup.backend.dto.ExampleCheckResponse;
 import az.azcup.backend.dto.teacher.AssignmentDto;
 import az.azcup.backend.dto.teacher.AssignmentUpsertRequest;
 import az.azcup.backend.dto.teacher.ExampleDto;
@@ -243,6 +245,18 @@ public class TeacherController {
     ) {
         assignmentService.deleteExample(groupId, assignmentId, exampleId, principal.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    // Müəllimin "şagird kimi bax" baxışı üçün: yazılanı nümunə ilə müqayisə edir, tamamlanma QEYD ETMİR.
+    @PostMapping("/groups/{groupId}/assignments/{assignmentId}/examples/{exampleId}/check")
+    public ExampleCheckResponse previewCheckExample(
+        @PathVariable Long groupId,
+        @PathVariable Long assignmentId,
+        @PathVariable Long exampleId,
+        @Valid @RequestBody ExampleCheckRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return assignmentService.previewCheckExample(groupId, assignmentId, exampleId, principal.getUser(), request.getTypedCode());
     }
 
     // Qrupun hər şagirdinin nümunələrdən neçəsini tamamladığı (jurnal üçün).

@@ -1893,8 +1893,11 @@ function renderGradebook(groupId, assignment, rows, examples, exampleProgress){
     + '<details><summary>Kodu göstər</summary><pre class="ex-manage-code">' + escapeHtml(e.sourceCode) + '</pre></details>'
     + '</div>'
   ).join('');
+  exAssignmentTitles[assignment.id] = assignment.title;
   const exampleSection =
-    '<h3 style="margin:28px 0 4px;color:var(--ink);font-size:16px;">Kod nümunələri</h3>'
+    '<h3 style="margin:28px 0 4px;color:var(--ink);font-size:16px;">Kod nümunələri'
+    + (hasExamples ? ' <button type="button" class="contest-action-btn secondary" style="margin-left:10px;font-size:11.5px;padding:6px 12px;" onclick="openExamplePreview(' + groupId + ',' + assignment.id + ')">👁 Şagird kimi bax</button>' : '')
+    + '</h3>'
     + '<p class="teacher-panel-sub">Şagirdlər bu nümunələrə baxıb kodu özləri yazır (yapışdırma bloklanıb), sistem yazdıqlarını nümunə ilə müqayisə edir. Boşluq və şərh fərqi nəzərə alınmır.</p>'
     + (examples.length ? exampleItems : '<div class="teacher-panel-empty">Hələ kod nümunəsi əlavə edilməyib.</div>')
     + '<div class="contest-form" style="margin-top:14px;max-width:760px;">'
@@ -2004,7 +2007,25 @@ async function openExamplePractice(assignmentId){
     const examples = await res.json();
     if (!examples.length) { loadAssignmentsPanel(); return; }
     const first = examples.find(e => !e.completed) || examples[0];
-    exState = { assignmentId, examples, selectedId: first.id };
+    exState = { mode: 'student', bodyId: 'assignmentsPanelBody', assignmentId, examples, selectedId: first.id };
+    exWrongLines = [];
+    renderExamplePractice();
+  } catch (err) {
+    body.innerHTML = '<div class="teacher-panel-error">Nümunələri yükləmək mümkün olmadı.</div>';
+  }
+}
+
+// Müəllim/admin üçün "şagird kimi bax": şagirdin gördüyü eyni məşq ekranı, amma qrupun üzvü
+// olmaq tələb olunmur və "Yoxla" heç bir tamamlanma qeydi yazmır (bax: previewCheckExample).
+async function openExamplePreview(groupId, assignmentId){
+  const body = document.getElementById('myGroupsPanelBody');
+  body.innerHTML = '<div class="teacher-panel-loading">Yüklənir...</div>';
+  try {
+    const res = await azcupApiFetch('/api/teacher/groups/' + groupId + '/assignments/' + assignmentId + '/examples');
+    if (!res.ok) throw new Error('fetch failed');
+    const examples = (await res.json()).map(e => ({ id: e.id, title: e.title, sourceCode: e.sourceCode, completed: false }));
+    if (!examples.length) { openGradebook(groupId, assignmentId); return; }
+    exState = { mode: 'preview', bodyId: 'myGroupsPanelBody', groupId, assignmentId, examples, selectedId: examples[0].id };
     exWrongLines = [];
     renderExamplePractice();
   } catch (err) {
@@ -2017,15 +2038,19 @@ function currentExample(){
 }
 
 function renderExamplePractice(){
-  const body = document.getElementById('assignmentsPanelBody');
+  const body = document.getElementById(exState.bodyId);
+  const preview = exState.mode === 'preview';
   const cur = currentExample();
   const refLines = cur.sourceCode.split('\n');
   const refHtml = refLines.map((l, i) =>
     '<div class="ex-code-line"><span class="ex-ln">' + (i + 1) + '</span><span class="ex-code-text">' + highlightGhcCppLine(l) + '</span></div>'
   ).join('');
   body.innerHTML =
-    '<button type="button" class="contest-back-btn" onclick="loadAssignmentsPanel()">← Tapşırıqlara qayıt</button>'
+    (preview
+      ? '<button type="button" class="contest-back-btn" onclick="openGradebook(' + exState.groupId + ',' + exState.assignmentId + ')">← Jurnala qayıt</button>'
+      : '<button type="button" class="contest-back-btn" onclick="loadAssignmentsPanel()">← Tapşırıqlara qayıt</button>')
     + '<h3 style="margin:0 0 4px;color:var(--ink);font-size:16px;">' + escapeHtml(exAssignmentTitles[exState.assignmentId] || 'Tapşırıq') + ' — kod yazma məşqi</h3>'
+    + (preview ? '<p class="contest-verdict show pending" style="margin:0 0 10px;">👁 Baxış rejimi: şagirdin gördüyü ekrandır. Buradakı yoxlamalar qeyd olunmur və jurnalda görünmür.</p>' : '')
     + '<p class="teacher-panel-sub">Soldakı nümunəyə baxıb kodu sağda özün yaz. Yapışdırma bloklanıb.</p>'
     + '<div class="ex-chips" id="exChips"></div>'
     + '<div class="ex-panels">'
@@ -2109,7 +2134,10 @@ async function checkExample(){
   exChecking = true;
   btn.disabled = true;
   try {
-    const res = await azcupApiFetch('/api/me/assignments/' + exState.assignmentId + '/examples/' + cur.id + '/check', {
+    const checkUrl = exState.mode === 'preview'
+      ? '/api/teacher/groups/' + exState.groupId + '/assignments/' + exState.assignmentId + '/examples/' + cur.id + '/check'
+      : '/api/me/assignments/' + exState.assignmentId + '/examples/' + cur.id + '/check';
+    const res = await azcupApiFetch(checkUrl, {
       method: 'POST',
       body: JSON.stringify({ typedCode: typed }),
     });
