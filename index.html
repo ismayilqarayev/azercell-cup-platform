@@ -2005,7 +2005,7 @@ async function loadAssignmentsPanel(){
     const summaries = {};
     if (summaryRes && summaryRes.ok) (await summaryRes.json()).forEach(s => { summaries[s.assignmentId] = s; });
     if (!assignments.length) {
-      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir tapşırıq verilməyib.</div>';
+      body.innerHTML = '<div class="teacher-panel-empty">Hələ heç bir tapşırıq verilməyib.<br>Tapşırıqlar yalnız müəllimin səni əlavə etdiyi qrup üçün görünür — qrupa əlavə olunmusansa, müəllimindən yoxla.</div>';
       return;
     }
     const cards = assignments.map(a => {
