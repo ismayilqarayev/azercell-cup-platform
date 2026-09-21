@@ -3,6 +3,7 @@ package az.azcup.backend.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -58,6 +60,13 @@ public class SecurityConfig {
             // STATELESS — server heç bir sessiya saxlamır, hər sorğu özü ilə
             // gətirdiyi JWT token vasitəsilə tam müstəqil autentifikasiya olunur.
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Giriş edilməyib / token müddəti bitib halında 401 qaytarırıq (Spring-in
+            // defoltu 403-dür). Frontend yalnız 401-də köhnə sessiyanı silib yenidən
+            // giriş ekranını göstərir (bax: index.html-dəki azcupApiFetch) — əks halda
+            // müddəti bitmiş token-li istifadəçi "giriş edilib" görünüb hər paneldə
+            // "yükləmək mümkün olmadı" xətası görürdü. Rol çatmadıqda (giriş var, icazə
+            // yox) hələ də 403 qalır.
+            .exceptionHandling(eh -> eh.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .authorizeHttpRequests(auth -> auth
                 // Qeydiyyat və giriş hər kəsə açıqdır (hələ token yoxdur ki).
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()

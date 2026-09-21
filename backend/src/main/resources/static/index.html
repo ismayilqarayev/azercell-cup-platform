@@ -921,8 +921,24 @@
 /* ---------- Auth: JWT saxlanılması, login/qeydiyyat forması, ortaq fetch ---------- */
 const AzcupAuth = (function(){
   const KEY = 'azcup_session';
+  // JWT-nin "exp" (saniyə) sahəsini oxuyub müddətinin bitib-bitmədiyini yoxlayır.
+  // Müddəti bitmiş sessiya localStorage-da qalıb istifadəçini "giriş edilib"
+  // göstərərdi, amma hər sorğu rədd olunardı — ona görə oxunan kimi silirik və
+  // istifadəçi normal giriş ekranına düşür.
+  function isExpired(token){
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return !!payload.exp && payload.exp * 1000 <= Date.now();
+    } catch(e){ return false; }
+  }
   function getSession(){
-    try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; }
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; }
+    if (s && s.token && isExpired(s.token)) {
+      localStorage.removeItem(KEY);
+      return null;
+    }
+    return s;
   }
   function getToken(){ const s = getSession(); return s ? s.token : null; }
   function getUser(){
