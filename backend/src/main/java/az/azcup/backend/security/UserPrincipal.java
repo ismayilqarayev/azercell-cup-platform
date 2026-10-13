@@ -1,5 +1,6 @@
 package az.azcup.backend.security;
 
+import az.azcup.backend.entity.Role;
 import az.azcup.backend.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +26,13 @@ public class UserPrincipal implements UserDetails {
     // user sahəsinin dəyərini qaytarır (əsl User entity-sinə çatmaq üçün).
     public User getUser() {
         return user;
+    }
+
+    // Hesab sistemdən istifadə edə bilərmi: aktivdir və (müəllimdirsə) admin tərəfindən təsdiqlənib.
+    // AuthService.login ilə eyni qayda — JwtAuthFilter hər sorğuda yoxlayır ki, bloklanmış
+    // hesabın əvvəlcədən alınmış tokeni də dərhal etibarsız olsun.
+    public boolean canSignIn() {
+        return user.isActive() && !(user.getRole() == Role.TEACHER && !user.isApproved());
     }
 
     // Rol adını "ROLE_" prefiksi ilə qaytarır (məs. "ROLE_ADMIN") — Spring
