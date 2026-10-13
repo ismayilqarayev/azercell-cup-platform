@@ -2,3 +2,5 @@
 # this repo's subject is the Java backend port, not the pre-existing HTML.
 *.html linguist-vendored=true
 backend/src/main/resources/seed/seed-data.json linguist-generated=true
+# Server skriptləri (bash) mütləq LF olmalıdır — CRLF onları pozur.
+deploy/** text eol=lf
