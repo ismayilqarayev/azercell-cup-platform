@@ -1,5 +1,8 @@
 package az.azcup.backend.controller;
 
+import az.azcup.backend.security.LoginThrottle;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.AuthenticationException;
 import az.azcup.backend.dto.auth.AuthResponse;
 import az.azcup.backend.dto.auth.LoginRequest;
 import az.azcup.backend.dto.auth.RegisterRequest;
@@ -29,9 +32,13 @@ public class AuthController {
     // Qeydiyyat/giriş məntiqinin faktiki icraçısı.
     private final AuthService authService;
 
+    // Parol sınamasına qarşı: uğursuz cəhdlər (e-poçt+IP) üzrə sayılır, çox olarsa giriş müvəqqəti bağlanır.
+    private final LoginThrottle loginThrottle;
+
     // Spring tərəfindən inject olunan AuthService-i sahəyə təyin edir.
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, LoginThrottle loginThrottle) {
         this.authService = authService;
+        this.loginThrottle = loginThrottle;
     }
 
     // Yeni istifadəçi qeydiyyatdan keçirir və 201 CREATED statusu ilə token+profil cavabını qaytarır.
@@ -42,8 +49,18 @@ public class AuthController {
 
     // E-poçt/parol ilə giriş edir və uğurlu olarsa JWT token qaytarır.
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
+        String key = loginThrottle.key(request.getEmail(), http.getRemoteAddr());
+        loginThrottle.ensureAllowed(key);
+        try {
+            AuthResponse response = authService.login(request);
+            loginThrottle.reset(key);
+            return response;
+        } catch (AuthenticationException e) {
+            // Yanlış e-poçt/parol — bu cəhdi say (GlobalExceptionHandler yenə də 401 qaytarır).
+            loginThrottle.recordFailure(key);
+            throw e;
+        }
     }
 
     // Frontend səhifə açılanda (yenilənəndə) hazırkı istifadəçinin kim
