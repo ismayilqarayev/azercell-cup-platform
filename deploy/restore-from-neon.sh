@@ -42,7 +42,7 @@ read -rp "Davam etmək üçün SIL yazın: " CONFIRM
 [ "$CONFIRM" = "SIL" ] || { echo "Ləğv edildi, heç nə dəyişmədi"; exit 1; }
 
 echo "==> backend dayandırılır, köhnə sxem silinir"
-docker compose stop backend
+docker compose stop azcup-backend
 "${PSQL[@]}" -c "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"
 
 echo "==> fayldan bərpa olunur"
@@ -54,5 +54,5 @@ for t in $("${PSQL[@]}" -At -c "SELECT tablename FROM pg_tables WHERE schemaname
 done
 
 echo "==> backend başladılır"
-docker compose up -d backend
+docker compose up -d azcup-backend
 echo "HAZIRDIR. Köhnə admin parolu bazadan gəlir — yeni .env parolu mövcud admin hesabını DƏYİŞMİR: sayta daxil olub admin parolunu dəyişin."

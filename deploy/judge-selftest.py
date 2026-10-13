@@ -13,6 +13,8 @@ import urllib.request
 BASE = "http://azcup-backend:8080"
 BASE_UID = int(sys.argv[1]) if len(sys.argv) > 1 else 61000   # uid hovuzunun başlanğıcı
 POOL = int(sys.argv[2]) if len(sys.argv) > 2 else 4            # hovuzun ölçüsü
+PG_IP = sys.argv[3] if len(sys.argv) > 3 else ""               # Postgres-in daxili IP-si (şəbəkə testi üçün)
+EHOSTUNREACH = 113                                             # docker-entrypoint.sh-dakı "icmp-admin-prohibited" rədd kodu
 SECRET_WORDS = ("JWT_SECRET", "DB_PASSWORD", "ADMIN_PASSWORD", "GITHUB_TOKEN", "DB_USERNAME")
 failed = False
 
@@ -49,8 +51,8 @@ if not token:
 print("Test şagirdi yaradıldı (%s)" % email)
 
 
-def run(source):
-    status, body = call("/api/run", {"sourceCode": source, "stdin": ""}, token)
+def run(source, stdin=""):
+    status, body = call("/api/run", {"sourceCode": source, "stdin": stdin}, token)
     return body.get("status"), (body.get("stdout") or ""), (body.get("stderr") or "")
 
 
@@ -101,7 +103,53 @@ int main(){
 }''')
 (ok if "WROTE" not in out else hole)("çıxış: %r" % out[:120])
 
-print("6) fork-bomba serveri çökdürməməlidir (limitlər + vaxt aşımı)")
+print("6) şagird proqramı şəbəkəyə çıxa bilməməlidir (internet, backend-in özü, Postgres)")
+# Qayda olmasaydı hər üç IPv4 qoşulma UĞURLU olardı (8080-də backend, 5432-də Postgres dinləyir; internet açıqdır) — yəni
+# "BLOCKED 113" yalnız iptables qaydasının işlədiyini sübut edir (113 = EHOSTUNREACH, entrypoint-dəki rədd növü).
+NET_PROBE = r'''#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <cerrno>
+#include <iostream>
+#include <string>
+
+// Hədəf stdin-dən oxunur ("ip port"). Rədd edilən qoşulma ~1 san çəkir (nüvə ICMP xətasını SYN-in ilk təkrarına qədər
+// gözlədir), icra vaxt limiti isə 3 san-dir — ona görə hər hədəf AYRI icrada yoxlanılır.
+int main() {
+  std::string ip; int port = 0;
+  std::cin >> ip >> port;
+  bool v6 = ip.find(':') != std::string::npos;
+  int fd = socket(v6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
+  if (fd < 0) { std::cout << "NOSOCKET " << errno << "\n"; return 0; }
+  timeval tv{2, 0};
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof tv);
+  int rc;
+  if (v6) {
+    sockaddr_in6 a{}; a.sin6_family = AF_INET6; a.sin6_port = htons(port); inet_pton(AF_INET6, ip.c_str(), &a.sin6_addr);
+    rc = connect(fd, (sockaddr*)&a, sizeof a);
+  } else {
+    sockaddr_in a{}; a.sin_family = AF_INET; a.sin_port = htons(port); inet_pton(AF_INET, ip.c_str(), &a.sin_addr);
+    rc = connect(fd, (sockaddr*)&a, sizeof a);
+  }
+  if (rc == 0) std::cout << "CONNECTED\n"; else std::cout << "BLOCKED " << errno << "\n";
+  close(fd);
+}
+'''
+if not PG_IP:
+    hole("Postgres IP-si verilməyib (judge-selftest.sh bunu ötürməlidir)")
+else:
+    targets = [("loopback", "127.0.0.1", 8080), ("internet", "1.1.1.1", 443), ("postgres", PG_IP, 5432)]
+    for label, ip, port in targets:
+        st, out, err = run(NET_PROBE, "%s %d" % (ip, port))
+        got = out.split()
+        (ok if got == ["BLOCKED", str(EHOSTUNREACH)] else hole)("%s (%s:%d): %s [status=%s]" % (label, ip, port, out.strip() or "nəticə yoxdur", st))
+    # IPv6 konteynerdə söndürülü ola bilər (NOSOCKET) və ya başqa kodla rədd edilə bilər — əsas odur ki, QOŞULMASIN.
+    st, out, err = run(NET_PROBE, "::1 8080")
+    got6 = out.split()
+    (ok if got6 and got6[0] != "CONNECTED" else hole)("loopback6 (::1:8080): %s [status=%s]" % (out.strip() or "nəticə yoxdur", st))
+
+print("7) fork-bomba serveri çökdürməməlidir (limitlər + vaxt aşımı)")
 t0 = time.time()
 st, out, err = run('#include <unistd.h>\nint main(){ for(;;) fork(); }')
 print("  (məlumat) status=%s, %.1f san" % (st, time.time() - t0))

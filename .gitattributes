@@ -4,3 +4,5 @@
 backend/src/main/resources/seed/seed-data.json linguist-generated=true
 # Server skriptləri (bash) mütləq LF olmalıdır — CRLF onları pozur.
 deploy/** text eol=lf
+# Konteyner giriş skripti (sh) də LF olmalıdır.
+backend/docker-entrypoint.sh text eol=lf

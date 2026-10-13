@@ -8,7 +8,10 @@ cd "$(dirname "$0")"
 set -a; . ./.env; set +a
 
 BACKUPS=/opt/azcup/backups
+# Dump-lar parol hash-ləri daxil olmaqla bütün bazanı ehtiva edir — yalnız root oxuya bilsin (700 qovluq, 600 fayl).
+umask 077
 mkdir -p "$BACKUPS"
+chmod 700 "$BACKUPS"
 out="$BACKUPS/azcup-$(date +%F-%H%M).sql.gz"
 
 docker compose exec -T postgres pg_dump -U "$DB_USERNAME" -d "$DB_NAME" --no-owner --no-acl | gzip -9 > "$out"

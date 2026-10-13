@@ -32,7 +32,10 @@ services:
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETUID, SETGID]   # Postgres şəklinin işə düşməsi üçün minimum
     security_opt: ["no-new-privileges:true"]
 
-  backend:
+  # DİQQƏT: xidmətin adı BİLƏREKDƏN "azcup-backend"-dir. Docker xidmət adını qoşulduğu hər şəbəkədə alias edir; ortaq
+  # azcup_web şəbəkəsində Gəncənin Caddy-si "backend" adını Gəncənin öz backend-i üçün işlədir — burada da "backend" olsaydı
+  # ad ikiyə həll olunar və Gəncə trafiki AzCup-a düşərdi (502). Ona görə xidmət adları unikal saxlanılır.
+  azcup-backend:
     build: ../backend
     image: azcup-backend:local
     restart: unless-stopped
@@ -63,16 +66,17 @@ services:
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=45
     networks:
       internal: {}
-      web:
-        aliases: [azcup-backend]     # Gəncə Caddy-si bu ad ilə çağırır
+      web: {}      # Gəncə Caddy-si bu şəbəkədə "azcup-backend" adı ilə çağırır
     # Konteyner özü sərtləşdirilir: kök fayl sistemi yalnız oxunur, yazılan yeganə yer /tmp (judge iş qovluğu; "exec" lazımdır —
     # compile olunmuş proqramlar oradan işləyir). Hüquqların hamısı alınır, yalnız şagird kodunun uid-ini dəyişmək üçün
     # SETUID/SETGID qalır. no-new-privileges yeni hüquq almağı bağlayır.
+    # NET_ADMIN/NET_RAW/SETPCAP YALNIZ giriş skripti üçündür (docker-entrypoint.sh): o, şagird uid-lərinin şəbəkə çıxışını
+    # iptables ilə bağlayır və Java başlamazdan əvvəl bu üç hüququ bounding set-dən ATIR — işləyən tətbiqdə (CapBnd=0xc0) yoxdur.
     read_only: true
     tmpfs:
       - /tmp:rw,exec,nosuid,size=512m,mode=1777
     cap_drop: [ALL]
-    cap_add: [SETUID, SETGID]
+    cap_add: [SETUID, SETGID, NET_ADMIN, NET_RAW, SETPCAP]
     security_opt: ["no-new-privileges:true"]
     # Resurs tavanı: kompilyasiya "fırtınası" Gəncə saytını (eyni server) ləngitməsin.
     mem_limit: 2g
