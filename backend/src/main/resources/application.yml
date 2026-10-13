@@ -35,3 +35,15 @@ app:
     run-timeout-seconds: 3
     max-source-length: 20000
     max-output-bytes: 65536
+    # Şagird kodunun təhlükəsiz işə salınması (bax: JudgeSandbox). Mühit HƏMİŞƏ təmizlənir; aşağıdakı hüquq endirmə
+    # yalnız Linux-da və tətbiq root olanda (Docker production) açılır: JUDGE_RUN_AS_UID=61000 — bu, uid HOVUZUNUN
+    # başlanğıcıdır: eyni anda ən çox uid-pool-size yoxlama gedir, hər biri öz uid-i ilə (61000, 61001, ...) işləyir.
+    # Boş buraxılsa (lokal Windows/Mac) proqram tətbiqin öz istifadəçisi ilə işləyir.
+    sandbox:
+      run-as-uid: ${JUDGE_RUN_AS_UID:}
+      uid-pool-size: ${JUDGE_UID_POOL:4}
+      lease-timeout-seconds: ${JUDGE_LEASE_TIMEOUT_SECONDS:30}
+      max-processes: ${JUDGE_MAX_PROCESSES:64}
+      max-memory-mb: ${JUDGE_MAX_MEMORY_MB:1024}
+      max-cpu-seconds: ${JUDGE_MAX_CPU_SECONDS:10}
+      max-file-mb: ${JUDGE_MAX_FILE_MB:16}

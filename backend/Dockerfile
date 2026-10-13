@@ -8,7 +8,8 @@ RUN mvn -q package -DskipTests
 
 # --- Run stage ---
 FROM eclipse-temurin:21-jre
-RUN apt-get update && apt-get install -y --no-install-recommends g++ \
+# util-linux: şagird kodunu başqa istifadəçi ilə və limitlərlə işə salan prlimit/setpriv (bax: JudgeSandbox).
+RUN apt-get update && apt-get install -y --no-install-recommends g++ util-linux \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
