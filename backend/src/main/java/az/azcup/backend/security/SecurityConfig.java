@@ -30,9 +30,13 @@ public class SecurityConfig {
     // Hər sorğuda JWT-ni yoxlayan öz filtrimiz (bax: filterChain() bean-i).
     private final JwtAuthFilter jwtAuthFilter;
 
-    // Spring tərəfindən inject olunan JwtAuthFilter-i sahəyə təyin edir.
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    // Sui-istifadəyə qarşı sürət limiti (bax: RateLimitFilter) — JWT filtrindən SONRA işləyir ki, istifadəçi məlum olsun.
+    private final RateLimitFilter rateLimitFilter;
+
+    // Spring tərəfindən inject olunan filtrləri sahələrə təyin edir.
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, RateLimitFilter rateLimitFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     // Parollar bazaya HEÇ VAXT açıq mətn kimi yazılmır — BCrypt hər dəfə
@@ -85,7 +89,8 @@ public class SecurityConfig {
             // Öz JWT filtrimizi Spring-in standart
             // istifadəçi adı/parol filtrindən ƏVVƏL işə salırıq ki, hər sorğuda
             // əvvəlcə token yoxlanılsın (bax: JwtAuthFilter).
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(rateLimitFilter, JwtAuthFilter.class);
         return http.build();
     }
 

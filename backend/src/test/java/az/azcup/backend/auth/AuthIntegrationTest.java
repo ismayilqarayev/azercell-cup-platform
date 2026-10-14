@@ -1,5 +1,7 @@
 package az.azcup.backend.auth;
 
+import az.azcup.backend.entity.User;
+import az.azcup.backend.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +36,10 @@ class AuthIntegrationTest {
     // Test gövdələrini JSON-a çevirmək və JSON cavabları oxumaq üçün.
     @Autowired
     private ObjectMapper objectMapper;
+
+    // Hesabı birbaşa bazada deaktiv etmək üçün (admin panelinin etdiyi kimi).
+    @Autowired
+    private UserRepository userRepository;
 
     // Uğurlu ssenari: qeydiyyatdan keç -> giriş et -> "mən kiməm" sorğusu ilə
     // token-in etibarlı olduğunu təsdiqlə. Hər dəfə TƏSADÜFİ e-poçt istifadə
@@ -105,6 +111,35 @@ class AuthIntegrationTest {
                     .contentType(APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(loginBody))
             )
+            .andExpect(status().isUnauthorized());
+    }
+
+    // Admin hesabı deaktiv edəndə əvvəlcədən alınmış token də dərhal işləməməlidir —
+    // 12 saatlıq müddətin bitməsini gözləmədən 401 qaytarılır (bax: JwtAuthFilter).
+    @Test
+    void deactivatedUserTokenIsRejected() throws Exception {
+        String email = "student-" + UUID.randomUUID() + "@example.com";
+        Map<String, String> registerBody = new HashMap<>();
+        registerBody.put("fullName", "Test Student");
+        registerBody.put("email", email);
+        registerBody.put("password", "password123");
+        String registerResponse = mockMvc.perform(
+                post("/api/auth/register")
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(registerBody))
+            )
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        String token = objectMapper.readTree(registerResponse).get("token").asString();
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk());
+
+        User user = userRepository.findByEmail(email);
+        user.setActive(false);
+        userRepository.save(user);
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + token))
             .andExpect(status().isUnauthorized());
     }
 }

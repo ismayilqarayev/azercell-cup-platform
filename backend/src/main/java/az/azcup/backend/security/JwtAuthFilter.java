@@ -52,6 +52,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (jwtService.isValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
                     String email = jwtService.extractEmail(token);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    // Token hələ etibarlı olsa da, hesab sonradan deaktiv edilibsə (və ya müəllimin təsdiqi
+                    // götürülübsə) sorğu "giriş edilməyib" sayılır — 401 alan frontend sessiyanı silir.
+                    // Əks halda bloklanmış istifadəçi tokenin müddəti bitənə qədər (12 saat) işləməyə davam edirdi.
+                    if (userDetails instanceof UserPrincipal principal && !principal.canSignIn()) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

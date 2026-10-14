@@ -7,6 +7,7 @@ import az.azcup.backend.entity.SubmissionStatus;
 import az.azcup.backend.exception.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -38,13 +39,11 @@ import java.util.stream.Stream;
  * Şagirdin göndərdiyi C++ kodunu compile edib, problemin nümunə giriş/çıxışına
  * qarşı icra edən mərkəzi servis — platformanın "judge" (yoxlayıcı) hissəsi.
  *
- * DİQQƏT (təhlükəsizlik): burada konteyner (Docker və s.) izolyasiyası
- * İSTİFADƏ OLUNMUR — compile olunan proqram sərbəst bir OS prosesi kimi,
- * tətbiqin öz istifadəçi hüquqları altında icra olunur. Yalnız vaxt limiti
- * (timeout) və çıxış ölçüsü limiti (max-output-bytes) ilə məhdudlaşdırılır.
- * Bu, LOKAL/ETİBARLI istifadə üçün qəbul edilə bilər, amma açıq internetə
- * çıxarılan production mühitdə icra addımı mütləq konteynerləşdirilmiş
- * (sandboxed) bir alternativlə əvəz olunmalıdır (bax: runAgainstInput/runNoComparison).
+ * DİQQƏT (təhlükəsizlik): şagird kodu etibarsızdır. {@link JudgeSandbox} hər alt prosesin mühitini ağ siyahıya endirir
+ * (DB_PASSWORD, JWT_SECRET və s. sızmasın) və production-da ({@code app.judge.sandbox.run-as-uid}) proqramı başqa
+ * istifadəçi ilə, proses/yaddaş/CPU/fayl limitləri altında işlədir. Bundan əlavə vaxt limiti (timeout) və çıxış
+ * ölçüsü limiti (max-output-bytes) var. Tam konteyner izolyasiyası (şəbəkəsiz ayrıca icra konteyneri) HƏLƏ YOXDUR —
+ * Docker-də tətbiq ayrıca şəbəkədə, hüquqları azaldılmış konteynerdə işlədilməlidir (bax: deploy/azcup).
  */
 @Service
 public class JudgeService {
@@ -64,18 +63,36 @@ public class JudgeService {
     private final int maxSourceLength;
     // Sonsuz dövrdə çap edən proqramların yaddaşı doldurmasının qarşısını alır.
     private final int maxOutputBytes;
+    // Şagird kodunun mühiti və hüquqları (bax: JudgeSandbox).
+    private final JudgeSandbox sandbox;
+
+    // Sandbox-sız (yalnız mühit təmizlənir) nümunə — testlər və lokal istifadə üçün.
+    public JudgeService(
+        String gppPath,
+        String workspaceDirPath,
+        long compileTimeoutSeconds,
+        long runTimeoutSeconds,
+        int maxSourceLength,
+        int maxOutputBytes
+    ) {
+        this(gppPath, workspaceDirPath, compileTimeoutSeconds, runTimeoutSeconds, maxSourceLength, maxOutputBytes,
+            JudgeSandbox.disabled());
+    }
 
     // Spring tərəfindən application.yml-dəki "app.judge.*" dəyərləri ilə
     // çağırılır; bütün sahələri təyin edir və servis işə düşərkən iş
     // qovluğunun (workspaceDir) mövcud olduğuna əmin olur.
+    @Autowired
     public JudgeService(
         @Value("${app.judge.gpp-path}") String gppPath,
         @Value("${app.judge.workspace-dir}") String workspaceDirPath,
         @Value("${app.judge.compile-timeout-seconds}") long compileTimeoutSeconds,
         @Value("${app.judge.run-timeout-seconds}") long runTimeoutSeconds,
         @Value("${app.judge.max-source-length}") int maxSourceLength,
-        @Value("${app.judge.max-output-bytes}") int maxOutputBytes
+        @Value("${app.judge.max-output-bytes}") int maxOutputBytes,
+        JudgeSandbox sandbox
     ) {
+        this.sandbox = sandbox;
         this.gppPath = gppPath;
         this.workspaceDir = Paths.get(workspaceDirPath);
         this.compileTimeoutSeconds = compileTimeoutSeconds;
@@ -88,6 +105,8 @@ public class JudgeService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+        // Başqa şagirdin qovluğunu siyahıdan tapmaq mümkün olmasın (yalnız hüquq endirmə açıqdırsa).
+        this.sandbox.restrictParent(this.workspaceDir);
     }
 
     // Konkret bir PROBLEMƏ qarşı yoxlama — SubmissionService bunu çağırır.
@@ -104,10 +123,12 @@ public class JudgeService {
         // Hər yoxlama üçün TƏSADÜFİ AD-lı ayrıca qovluq — paralel sorğular
         // bir-birinin fayllarını üst-üstə yazmasın deyə (izolyasiya).
         Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
-        try {
+        // Bu yoxlama üçün ayrıca uid icarəyə götürülür; bitəndə (uğurlu/uğursuz) həmin uid-in bütün prosesləri öldürülür.
+        try (JudgeSandbox.Lease ignored = sandbox.lease()) {
             Files.createDirectories(workDir);
             Path sourceFile = workDir.resolve("main.cpp");
             Files.writeString(sourceFile, sourceCode, StandardCharsets.UTF_8);
+            sandbox.prepareWorkDir(workDir);
             Path binary = workDir.resolve("main.exe");
 
             CompileOutcome compileOutcome = compile(sourceFile, binary, workDir);
@@ -141,10 +162,12 @@ public class JudgeService {
         }
 
         Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
-        try {
+        // Bu yoxlama üçün ayrıca uid icarəyə götürülür; bitəndə (uğurlu/uğursuz) həmin uid-in bütün prosesləri öldürülür.
+        try (JudgeSandbox.Lease ignored = sandbox.lease()) {
             Files.createDirectories(workDir);
             Path sourceFile = workDir.resolve("main.cpp");
             Files.writeString(sourceFile, sourceCode, StandardCharsets.UTF_8);
+            sandbox.prepareWorkDir(workDir);
             Path binary = workDir.resolve("main.exe");
 
             CompileOutcome compileOutcome = compile(sourceFile, binary, workDir);
@@ -184,21 +207,30 @@ public class JudgeService {
         if (sourceCode.length() > maxSourceLength || !syntaxCheckSlots.tryAcquire()) {
             return unchecked;
         }
+        // Uid yoxdursa (hamısı məşğuldur) gözləmirik — yoxlama sadəcə atlanır.
+        JudgeSandbox.Lease lease = sandbox.tryLease();
+        if (lease == null) {
+            syntaxCheckSlots.release();
+            return unchecked;
+        }
         Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
         try {
             Files.createDirectories(workDir);
             Files.writeString(workDir.resolve("main.cpp"), sourceCode, StandardCharsets.UTF_8);
+            sandbox.prepareWorkDir(workDir);
 
-            ProcessBuilder pb = new ProcessBuilder(gppPath, "-fsyntax-only", "-std=c++17", "-fmax-errors=" + MAX_SYNTAX_ERRORS, "main.cpp");
+            ProcessBuilder pb = new ProcessBuilder(sandbox.wrap(
+                List.of(gppPath, "-fsyntax-only", "-std=c++17", "-fmax-errors=" + MAX_SYNTAX_ERRORS, "main.cpp"),
+                JudgeSandbox.Phase.COMPILE));
             pb.directory(workDir.toFile());
-            pb.environment().put("LC_ALL", "C"); // mesaj formatı yerli dildən asılı olmasın
+            sandbox.prepare(pb); // mühit ağ siyahıya endirilir, mesaj formatı yerli dildən asılı olmur (LC_ALL=C)
             Process process = pb.start();
             CappedStreamReader stderrReader = CappedStreamReader.start(process.getErrorStream(), maxOutputBytes);
             process.getOutputStream().close();
             CappedStreamReader stdoutReader = CappedStreamReader.start(process.getInputStream(), maxOutputBytes);
 
             if (!waitQuietly(process, compileTimeoutSeconds)) {
-                process.destroyForcibly();
+                JudgeSandbox.killTree(process);
                 return unchecked;
             }
             stdoutReader.join();
@@ -222,6 +254,7 @@ public class JudgeService {
             log.warn("Syntax check unavailable: {}", e.getMessage());
             return unchecked;
         } finally {
+            lease.close(); // qalıq prosesləri öldür, sonra qovluğu sil
             deleteRecursively(workDir);
             syntaxCheckSlots.release();
         }
@@ -249,10 +282,12 @@ public class JudgeService {
         int totalTestCases = testCases.size();
 
         Path workDir = workspaceDir.resolve(UUID.randomUUID().toString());
-        try {
+        // Bu yoxlama üçün ayrıca uid icarəyə götürülür; bitəndə (uğurlu/uğursuz) həmin uid-in bütün prosesləri öldürülür.
+        try (JudgeSandbox.Lease ignored = sandbox.lease()) {
             Files.createDirectories(workDir);
             Path sourceFile = workDir.resolve("main.cpp");
             Files.writeString(sourceFile, sourceCode, StandardCharsets.UTF_8);
+            sandbox.prepareWorkDir(workDir);
             Path binary = workDir.resolve("main.exe");
 
             CompileOutcome compileOutcome = compile(sourceFile, binary, workDir);
@@ -355,10 +390,11 @@ public class JudgeService {
     // g++ ilə mənbə faylını binar-a çevirir. -O2 (optimallaşdırma) və
     // -std=c++17 (dil standartı) bayraqları istifadə olunur.
     private CompileOutcome compile(Path sourceFile, Path binary, Path workDir) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(
-            gppPath, "-O2", "-std=c++17", "-o", binary.getFileName().toString(), sourceFile.getFileName().toString()
-        );
+        ProcessBuilder pb = new ProcessBuilder(sandbox.wrap(
+            List.of(gppPath, "-O2", "-std=c++17", "-o", binary.getFileName().toString(), sourceFile.getFileName().toString()),
+            JudgeSandbox.Phase.COMPILE));
         pb.directory(workDir.toFile());
+        sandbox.prepare(pb);
         Process process = pb.start();
 
         // stdout/stderr oxunuşu ayrı thread-lərdə aparılır ki, proses öz
@@ -371,7 +407,7 @@ public class JudgeService {
 
         boolean finished = waitQuietly(process, compileTimeoutSeconds);
         if (!finished) {
-            process.destroyForcibly();
+            JudgeSandbox.killTree(process);
             return new CompileOutcome(false, "Kompilyasiya vaxtı bitdi (timeout)");
         }
         stdoutReader.join();
@@ -387,8 +423,9 @@ public class JudgeService {
     // gözlənilən nəticəsi (expectedOutput) ilə müqayisə edərək
     // ACCEPTED/WRONG_ANSWER qərarı verir.
     private JudgeResult runAgainstInput(Path binary, Path workDir, String input, String expectedOutput) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(binary.toAbsolutePath().toString());
+        ProcessBuilder pb = new ProcessBuilder(sandbox.wrap(List.of(binary.toAbsolutePath().toString()), JudgeSandbox.Phase.RUN));
         pb.directory(workDir.toFile());
+        sandbox.prepare(pb);
         Process process = pb.start();
 
         try (OutputStream stdin = process.getOutputStream()) {
@@ -414,7 +451,7 @@ public class JudgeService {
 
         if (!finished) {
             // Vaxt bitdi (məs. sonsuz dövr) — məcburi dayandır.
-            process.destroyForcibly();
+            JudgeSandbox.killTree(process);
             return new JudgeResult(SubmissionStatus.TIME_LIMIT_EXCEEDED, "", "", elapsed);
         }
         stdoutReader.join();
@@ -447,8 +484,9 @@ public class JudgeService {
      * mənasını daşıyır (düzgün NƏTİCƏ demək deyil, yalnız uğurlu İCRA deməkdir).
      */
     private JudgeResult runNoComparison(Path binary, Path workDir, String input) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(binary.toAbsolutePath().toString());
+        ProcessBuilder pb = new ProcessBuilder(sandbox.wrap(List.of(binary.toAbsolutePath().toString()), JudgeSandbox.Phase.RUN));
         pb.directory(workDir.toFile());
+        sandbox.prepare(pb);
         Process process = pb.start();
 
         try (OutputStream stdin = process.getOutputStream()) {
@@ -474,7 +512,7 @@ public class JudgeService {
 
         if (!finished) {
             // Vaxt bitdi (məs. sonsuz dövr) — məcburi dayandır.
-            process.destroyForcibly();
+            JudgeSandbox.killTree(process);
             return new JudgeResult(SubmissionStatus.TIME_LIMIT_EXCEEDED, "", "", elapsed);
         }
         stdoutReader.join();
@@ -558,7 +596,7 @@ public class JudgeService {
             return process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            process.destroyForcibly();
+            JudgeSandbox.killTree(process);
             return false;
         }
     }

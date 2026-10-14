@@ -1,5 +1,7 @@
 server:
   port: ${PORT:8080}
+  # Caddy/Render arxasında müştəri IP-si X-Forwarded-For-dan oxunur (sürət limiti və giriş kilidi IP üzrədir).
+  forward-headers-strategy: framework
 
 spring:
   datasource:
@@ -28,6 +30,14 @@ app:
     # No real password here — set ADMIN_PASSWORD as an environment variable.
     password: ${ADMIN_PASSWORD:CHANGE-ME-set-ADMIN_PASSWORD-env-var}
     full-name: "Ismayil Garayev"
+  # Sui-istifadəyə qarşı limitlər (bax: RateLimitFilter, LoginThrottle). Sinif eyni məktəb IP-sindən girir — IP limitləri səxavətlidir.
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    login-per-ip: ${RATE_LIMIT_LOGIN_PER_IP:200}          # 10 dəqiqədə
+    register-per-ip: ${RATE_LIMIT_REGISTER_PER_IP:100}    # 1 saatda
+    login-failures: ${RATE_LIMIT_LOGIN_FAILURES:8}        # (e-poçt, IP) cütü üçün 10 dəqiqədə uğursuz cəhd
+    run-per-user: ${RATE_LIMIT_RUN_PER_USER:20}           # dəqiqədə kod icrası/göndərmə (eyni anda 1)
+    check-per-user: ${RATE_LIMIT_CHECK_PER_USER:120}      # dəqiqədə canlı sintaksis yoxlaması (eyni anda 2)
   judge:
     gpp-path: ${GPP_PATH:g++}
     workspace-dir: ${JUDGE_WORKSPACE:${java.io.tmpdir}/azcup-judge}
@@ -35,3 +45,15 @@ app:
     run-timeout-seconds: 3
     max-source-length: 20000
     max-output-bytes: 65536
+    # Şagird kodunun təhlükəsiz işə salınması (bax: JudgeSandbox). Mühit HƏMİŞƏ təmizlənir; aşağıdakı hüquq endirmə
+    # yalnız Linux-da və tətbiq root olanda (Docker production) açılır: JUDGE_RUN_AS_UID=61000 — bu, uid HOVUZUNUN
+    # başlanğıcıdır: eyni anda ən çox uid-pool-size yoxlama gedir, hər biri öz uid-i ilə (61000, 61001, ...) işləyir.
+    # Boş buraxılsa (lokal Windows/Mac) proqram tətbiqin öz istifadəçisi ilə işləyir.
+    sandbox:
+      run-as-uid: ${JUDGE_RUN_AS_UID:}
+      uid-pool-size: ${JUDGE_UID_POOL:4}
+      lease-timeout-seconds: ${JUDGE_LEASE_TIMEOUT_SECONDS:30}
+      max-processes: ${JUDGE_MAX_PROCESSES:64}
+      max-memory-mb: ${JUDGE_MAX_MEMORY_MB:1024}
+      max-cpu-seconds: ${JUDGE_MAX_CPU_SECONDS:10}
+      max-file-mb: ${JUDGE_MAX_FILE_MB:16}

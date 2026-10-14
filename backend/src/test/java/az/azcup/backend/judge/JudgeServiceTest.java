@@ -150,4 +150,25 @@ class JudgeServiceTest {
         assertThat(result.getPassedTestCases()).isEqualTo(0);
         assertThat(result.getStderr()).isNotBlank();
     }
+
+    // Şagird proqramı server prosesinin mühit dəyişənlərini (DB_PASSWORD, JWT_SECRET kimi sirləri) GÖRMƏMƏLİDİR.
+    // pom.xml surefire-ı AZCUP_JUDGE_TEST_SECRET dəyişənini test JVM-inə qoyur; proqram onu oxumağa çalışır.
+    @Test
+    void studentProgramDoesNotSeeServerEnvironment() {
+        // İDE-dən başladılıbsa (dəyişən yoxdursa) test mənasızdır — atla, yalan "uğur" göstərmə.
+        org.junit.jupiter.api.Assumptions.assumeTrue(
+            "top-secret-value".equals(System.getenv("AZCUP_JUDGE_TEST_SECRET")),
+            "AZCUP_JUDGE_TEST_SECRET test JVM-ində təyin olunmayıb");
+        String source = """
+            #include <cstdlib>
+            #include <iostream>
+            int main(){
+                const char* v = std::getenv("AZCUP_JUDGE_TEST_SECRET");
+                std::cout << (v ? v : "NONE");
+            }
+            """;
+        JudgeResult result = newService().runFree(source, "");
+        assertThat(result.getStatus()).isEqualTo(SubmissionStatus.ACCEPTED);
+        assertThat(result.getStdout()).isEqualTo("NONE");
+    }
 }
