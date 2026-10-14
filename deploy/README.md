@@ -46,3 +46,23 @@ Xidmət adı bilərəkdən `azcup-backend`-dir (Gəncənin `backend` adı ilə t
 ## Qalan risk
 
 Bütün bunlara baxmayaraq şagird kodu **host nüvəsini Gəncə ilə paylaşan konteynerdə** işləyir; nüvədə hələ bilinməyən zəiflik konteynerdən çıxışa imkan verə bilər. Tam izolyasiya — ayrıca VM və ya gVisor/Firecracker kimi icra mühiti. `judge-selftest.sh` hər yeniləmədən sonra yuxarıdakı qatların işlədiyini yoxlayır.
+
+## Render-dən köçürmə (cutover) qaydası
+
+Məqsəd: bütün istifadəçilər `https://azcup.gencefritl.com` ünvanına keçir, Render və Neon söndürülür. Neon bazası **bir dəfəlik**
+köçürülür, ona görə köçürmədən sonra Render-də yazılan hər şey itir — əvvəl Render dayandırılır.
+
+1. **Serveri `main`-ə keçirin** (`harden-judge-sandbox` artıq `main`-dədir):
+   `cd /opt/azcup/app && git status --short && git fetch origin && git checkout main && git pull --ff-only && cd deploy && ./deploy.sh`
+2. `./judge-selftest.sh` — bütün sətirlər OK olmalıdır. Hər işə salınanda bazada 2 `selftest-*@azcup.local` şagirdi yaranır;
+   son bərpa bunları silir, ondan sonra self-test-i canlı bazada təkrar işlətməyin (və ya həmin hesabları admin paneldən silin).
+3. **Render-də yazmanı dayandırın:** Render → `azcup-backend` → Settings → *Suspend Service* (geri qaytarıla bilər; silmək deyil).
+4. `./restore-from-neon.sh` — Neon-un **birbaşa** (`-pooler`siz) bağlantı sətrini istəyir (Render-də `DB_HOST/DB_USERNAME/DB_PASSWORD`).
+   Skript əvvəl Neon-dan faylı yükləyib yoxlayır, uğurlu olarsa bu serverin bazasını əvəz edir.
+5. Yoxlayın (köhnə admin parolu bazadan gəlir — saytda dərhal dəyişin): şagird/müəllim/admin girişi, qrup və tapşırıqlar, Kod Arxivi,
+   Canlı Dərs, bir məşq "Yoxla".
+6. `crontab`/`/etc/cron.d`-də gündəlik `backup.sh` var olsun və bir dəfə əl ilə işlədin: `./backup.sh` → `/opt/azcup/backups/`.
+7. Şagirdlərə yeni ünvanı bildirin; köhnə ünvana istinad edən xarici yoxlayıcıları (məs. UptimeRobot) yeniləyin və ya silin.
+8. Bir-iki həftə sabit işləyəndən sonra: Render xidmətini və Neon layihəsini silin (silmədən əvvəl Neon-dan son bir `pg_dump` saxlayın).
+
+Geri qayıtmaq lazım olsa (3-cü addımdan sonra, 8-dən əvvəl): Render-də *Resume Service*; Neon dəyişməyib.
