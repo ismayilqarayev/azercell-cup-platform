@@ -174,11 +174,11 @@
     gap:0;
     border-top:1px solid var(--grid-line-strong);
   }
-  .specs div{
+  .specs > div{
     padding:12px 14px;
     border-right:1px solid var(--grid-line-strong);
   }
-  .specs div:last-child{ border-right:none; }
+  .specs > div:last-child{ border-right:none; }
   .specs .k{
     font-family:var(--mono);
     font-size:10px;
@@ -188,6 +188,20 @@
     margin-bottom:4px;
   }
   .specs .v{ font-size:15px; font-weight:600; color:var(--ink); }
+  /* Dar ekranda: foto + ad yan-yana yığcam başlıq, statistika isə 2 sütun (əvvəl 4 xana
+     bir-birinin altına yığılıb ilk ekranların çoxunu tuturdu, ayırıcı xətlər də yersiz qalırdı). */
+  @media (max-width:600px){
+    .titleblock{ padding:26px 18px 14px; }
+    .titleblock-inner{ gap:14px; }
+    .profile-photo-col{ flex-direction:row; align-items:center; gap:12px; width:auto; }
+    .profile-photo{ width:56px; height:56px; }
+    .profile-name{ margin-top:0; text-align:left; font-size:12px; }
+    .titleblock-text{ min-width:0; flex-basis:100%; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .specs > div{ border-bottom:1px solid var(--grid-line); }
+    .specs > div:nth-child(2n){ border-right:none; }
+    .specs > div:nth-last-child(-n+2){ border-bottom:none; }
+  }
 
   /* ==========================================================================
      METOD QEYDİ (müəllimə yönəlik izahat bloku)
@@ -316,7 +330,10 @@
   .roadmap-nav-item.current .rn-num{ color:var(--on-accent); }
   .roadmap{ flex:1; min-width:0; }
   @media (max-width:900px){
-    .roadmap-layout{ flex-direction:column; }
+    /* flex-start qalsaydı, sütun istiqamətində .roadmap konteynerin eni yox, kod bloklarının
+       uzun sətirləri qədər genişlənirdi (mobildə səhifə ~1100px olub üfüqi sürüşürdü). */
+    .roadmap-layout{ flex-direction:column; align-items:stretch; }
+    .roadmap{ width:100%; }
     .roadmap-nav{
       position:static; width:100%; flex-direction:row; flex-wrap:wrap;
       max-height:none; overflow-y:visible;
