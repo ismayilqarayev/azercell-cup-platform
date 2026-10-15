@@ -6,7 +6,6 @@ name: Deploy
 on:
   push:
     branches: [main]
-    paths: ["backend/**", "deploy/**", ".github/workflows/deploy.yml"]
   workflow_dispatch:
 
 concurrency:
@@ -20,6 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # frontend-src/*.html və kökdəki index.html saytın səhifəsinə (backend/.../static/index.html) yalnız bu skriptlə düşür —
+      # kimsə onu lokal işlətməyi unutsa belə sayt mənbədən yığılsın.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Frontend-i yığ
+        run: node tools/build-index.js
+
       - name: SSH hazırla
         run: |
           install -m 700 -d ~/.ssh
@@ -29,7 +36,7 @@ jobs:
 
       - name: Serverə yüklə və deploy et
         run: |
-          git archive --format=tar.gz HEAD backend deploy \
+          tar czf - --exclude=.git backend deploy \
             | ssh -o BatchMode=yes -o ServerAliveInterval=30 root@169.58.100.131 "$GITHUB_SHA"
 
       - name: Sayt cavab verir?

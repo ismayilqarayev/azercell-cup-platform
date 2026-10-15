@@ -2,7 +2,7 @@
 # GitHub Actions-dan avtomatik deploy (bax: .github/workflows/deploy.yml). Serverdə /opt/azcup/ci-deploy.sh kimi saxlanılır və
 # authorized_keys-də "azcup-github-actions" açarına forced command kimi bağlanır — o açar YALNIZ bunu işlədə bilər, shell ala bilməz:
 #   command="/opt/azcup/ci-deploy.sh",restrict ssh-ed25519 AAAA... azcup-github-actions
-# stdin: `git archive --format=tar.gz HEAD backend deploy`; SSH_ORIGINAL_COMMAND: commit SHA (yalnız qeyd üçün).
+# stdin: backend/ və deploy/ qovluqlarının tar.gz arxivi (frontend CI-də yığılandan sonra); SSH_ORIGINAL_COMMAND: commit SHA (yalnız qeyd üçün).
 # Bu skript tarball-dan gəlmir — dəyişsə, serverdəki nüsxəni əl ilə yeniləyin.
 set -euo pipefail
 
