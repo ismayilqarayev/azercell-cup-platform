@@ -1195,11 +1195,13 @@ document.getElementById('frame-prep').addEventListener('load', () => {
 // showTab()/chooseLanguage() istifadəçi ora ilk dəfə keçəndə yükləyir.
 ensureIframeLoaded('frame-prep');
 
-// "HACKER" KOD YAĞIŞI — giriş/rol seçimi ekranının arxa fonunda düşən simvollar
-// (Matrix filmindəki effektə bənzər), lakin saytın öz vurğu rəngi (gold/cyan)
-// ilə. Canvas-a çəkilir (DOM-a yüzlərlə element əlavə etməkdənsə) ki, performans
-// problemsiz olsun. #matrixRain elementi tapılmazsa və ya istifadəçi
-// "prefers-reduced-motion" seçibsə, funksiya sükutla heç nə etmir.
+// "HACKER" KOD FONU — giriş/rol seçimi ekranının arxa fonunda yuxarıdan aşağı
+// sürüşən sətirlər, amma TƏSADÜFİ SİMVOL/KATAKANA yox, HƏQİQİ (oxuna bilən)
+// C++ kodu — platformanın öz mövzusuna uyğun (EBOB, sadə ədəd, vector, I/O
+// və s., bax: solutions/ qovluğu). Canvas-a çəkilir (DOM-a yüzlərlə element
+// əlavə etməkdənsə) ki, performans problemsiz olsun. #matrixRain elementi
+// tapılmazsa və ya istifadəçi "prefers-reduced-motion" seçibsə, funksiya
+// sükutla heç nə etmir.
 function initMatrixRain(){
   const canvas = document.getElementById('matrixRain');
   const langSelect = document.getElementById('langSelect');
@@ -1208,32 +1210,104 @@ function initMatrixRain(){
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const chars = '01{}<>/;=+-*#アイウエオカキクケコサシスセソタチツテト'.split('');
-  const fontSize = 15;
-  let columns = 0, drops = [], rafId = null, running = false;
+  const CODE_LINES = [
+    '#include <bits/stdc++.h>',
+    'using namespace std;',
+    'int main() {',
+    '    int n; cin >> n;',
+    '    vector<int> arr(n);',
+    '    for (int i = 0; i < n; i++) cin >> arr[i];',
+    '    int ebob = arr[0];',
+    '    for (int i = 1; i < n; i++) ebob = __gcd(ebob, arr[i]);',
+    '    long long cem = 0;',
+    '    for (int x : arr) cem += x;',
+    '    bool sade = true;',
+    '    for (int i = 2; i * i <= n; i++)',
+    '        if (n % i == 0) sade = false;',
+    '    sort(arr.begin(), arr.end());',
+    '    reverse(arr.begin(), arr.end());',
+    '    map<int, int> say;',
+    '    for (auto& x : arr) say[x]++;',
+    '    cout << ebob << "\\n";',
+    '    cout << cem << endl;',
+    '    return 0;',
+    '}',
+    'while (t--) {',
+    '    solve();',
+    '}',
+    'struct Point {',
+    '    double x, y;',
+    '};',
+    'double mesafe(Point a, Point b) {',
+    '    return sqrt(pow(a.x-b.x,2)+pow(a.y-b.y,2));',
+    '}',
+    'int ekob(int a, int b) {',
+    '    return a / __gcd(a,b) * b;',
+    '}',
+    'const int MOD = 1e9 + 7;',
+    'long long qivvet(long long a, long long b) {',
+    '    long long res = 1;',
+    '    while (b > 0) {',
+    '        if (b & 1) res = res * a % MOD;',
+    '        a = a * a % MOD; b >>= 1;',
+    '    }',
+    '    return res;',
+    '}',
+  ];
+
+  // DİQQƏT: sətirlər canvas-a TEK-TEK (character-by-character) yox, tam sətir
+  // kimi çəkilir ki, həqiqətən OXUNA BİLƏN kod kimi görünsün (əvvəlki versiya
+  // hərfləri təsadüfi seçirdi, nəticədə mənasız simvol yağışı alınırdı).
+  let cols = [];
+  const fontSize = 13.5, lineHeight = 19, colWidth = 260;
+  let rafId = null, running = false;
+
+  function buildColumns(){
+    const count = Math.max(1, Math.ceil(canvas.width / colWidth));
+    cols = [];
+    for (let i = 0; i < count; i++){
+      const lineCount = Math.ceil(canvas.height / lineHeight) + 8;
+      const lines = [];
+      for (let j = 0; j < lineCount; j++){
+        lines.push(CODE_LINES[Math.floor(Math.random() * CODE_LINES.length)]);
+      }
+      cols.push({
+        x: i * colWidth + 14,
+        y: -Math.random() * canvas.height,
+        speed: 0.22 + Math.random() * 0.3,
+        lines,
+      });
+    }
+  }
 
   function resize(){
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    columns = Math.max(1, Math.floor(canvas.width / fontSize));
-    drops = new Array(columns).fill(0).map(() => Math.random() * -50);
+    buildColumns();
   }
 
   function draw(){
     if (!running) return;
-    // Hər kadrda tam təmizləmək əvəzinə çox aşağı qeyri-şəffaf fon çəkmək
-    // köhnə simvolların tədricən "sönməsi" (iz) effektini yaradır.
-    ctx.fillStyle = 'rgba(11,13,18,0.08)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Hər kadr tam təmizlənir (iz/trail effekti YOXDUR) ki, mətn bulanmasın
+    // və real kod kimi aydın oxuna bilsin — bu bir dekorativ fon olduğu üçün
+    // rəng daim aşağı qeyri-şəffaflıqda saxlanılır (diqqəti yormasın).
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = fontSize + "px 'JetBrains Mono','IBM Plex Mono','Courier New',monospace";
-    for (let i = 0; i < columns; i++){
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      const isHead = Math.random() > 0.975;
-      ctx.fillStyle = isHead ? 'rgba(63,196,222,0.9)' : 'rgba(63,196,222,0.22)';
-      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
+    cols.forEach(col => {
+      col.y += col.speed;
+      const colHeight = col.lines.length * lineHeight;
+      if (col.y > canvas.height) col.y = -colHeight * 0.4;
+      col.lines.forEach((line, idx) => {
+        const ly = col.y + idx * lineHeight;
+        if (ly < -lineHeight || ly > canvas.height + lineHeight) return;
+        // Ekranın ortasına yaxın sətirlər bir qədər daha parlaq görünür
+        // (dərinlik/fokus hissi) — kənarlarda isə daha da solğun.
+        const depth = 1 - Math.abs((ly / canvas.height) - 0.5) * 1.6;
+        const alpha = Math.max(0.05, Math.min(0.3, 0.08 + 0.22 * depth));
+        ctx.fillStyle = 'rgba(63,196,222,' + alpha.toFixed(2) + ')';
+        ctx.fillText(line, col.x, ly);
+      });
+    });
     rafId = requestAnimationFrame(draw);
   }
 
