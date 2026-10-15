@@ -40,13 +40,39 @@
     align-items:center; justify-content:center; padding:20px;
     background-color:var(--blueprint-deep);
     /* Geniş ekranlarda kartın ətrafında boş qalan sahəni "blueprint" mövzusuna
-       uyğun incə xətkeş şəbəkəsi ilə doldurur — dizayn dilinin adı bundan gəlir. */
+       uyğun incə xətkeş şəbəkəsi ilə doldurur — dizayn dilinin adı bundan gəlir.
+       Şəbəkə yavaş-yavaş diaqonal sürüşür ("blueprint-drift") ki, fon tamamilə
+       cansız görünməsin; 480px = 48px * 10, ona görə bir dövrün sonunda şəbəkə
+       başlanğıc mövqeyinə tam üst-üstə düşür (sıçrayış/"jump" olmur). */
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 48px 48px;
+    animation: blueprint-drift 60s linear infinite;
+    overflow:hidden;
   }
   .lang-select.hide{ display:none; }
+  /* Kartın arxasında yumşaq, yavaş "nəfəs alan" vurğu parıltısı — dərinlik hissi
+     yaradır, amma mətnin oxunaqlılığına mane olmasın deyə kartın ARXASINDA
+     (z-index:0) və çox aşağı qeyri-şəffaflıqla saxlanılır. */
+  .lang-select::before{
+    content:""; position:absolute; top:50%; left:50%; width:900px; height:900px;
+    background: radial-gradient(circle, rgba(63,196,222,0.16), transparent 70%);
+    transform: translate(-50%,-50%) scale(1); z-index:0; pointer-events:none;
+    animation: blueprint-glow 8s ease-in-out infinite;
+  }
+  @keyframes blueprint-drift{
+    from{ background-position: 0 0, 0 0; }
+    to{ background-position: 480px 480px, 480px 480px; }
+  }
+  @keyframes blueprint-glow{
+    0%, 100%{ opacity:0.6; transform: translate(-50%,-50%) scale(1); }
+    50%{ opacity:1; transform: translate(-50%,-50%) scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .lang-select{ animation:none; }
+    .lang-select::before{ animation:none; }
+  }
   .lang-card{ max-width:560px; width:100%; text-align:center; position:relative; z-index:1; }
   .lang-eyebrow{
     font-family:var(--mono); font-size:12px; letter-spacing:4px;
@@ -139,7 +165,17 @@
 
   .python-app{
     display:none; position:fixed; inset:0; z-index:800; flex-direction:column;
-    background:var(--blueprint-deep);
+    background-color:var(--blueprint-deep);
+    /* Lang-select ekranındakı eyni "blueprint-drift" fonu — Python tətbiqi də
+       öz pəncərəsi daxilində açılır, ona görə ardıcıllıq üçün təkrarlanır. */
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: blueprint-drift 60s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .python-app{ animation:none; }
   }
   .python-app.show{ display:flex; }
   .py-back{
