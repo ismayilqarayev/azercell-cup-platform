@@ -24,7 +24,10 @@
     --paper: #151822;
     --paper-raised: #1B1F2B;
     --card-radius: 14px;
-    --card-shadow: 0 10px 30px rgba(0,0,0,0.28);
+    /* Yalnız qara (rgba(0,0,0,x)) kölgə tünd (demək olar qara) fonda demək
+       olar görünmür, ona görə ikinci, YUXARI kənarda incə AÇIQ xətt
+       (inset) əlavə olunub — kart "qalxmış" effektini bununla verir. */
+    --card-shadow: 0 14px 34px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
     --mono: 'JetBrains Mono','IBM Plex Mono','Courier New',monospace;
     --sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
   }
@@ -359,16 +362,18 @@
      "üzürdü", indi aydın kənarlı, kölgəli bir səth üzərindədir. */
   .teacher-panel-inner{
     max-width:900px; margin:36px auto 60px; padding:28px 30px 34px;
-    /* DİQQƏT: kartın fonu qəsdən var(--paper) YOX, var(--blueprint-deep)-dir
-       (səhifə fonu ilə eynidir) — çünki panel daxilindəki onlarla element
-       (approval-btn, activity-toggle-btn, live-role-card, contest-card,
-       ghc-tree, user-role-select və s.) artıq ÖZ fonunu var(--paper) kimi
-       təyin edib, "səhifə fonunun üzərində paper kontrastı" məntiqi ilə
-       işləyir. Kartın fonu da var(--paper) olsaydı, bu onlarla element
-       kartla eyni rəngə düşüb GÖRÜNMƏZ qalardı. Elevasiya hissi yalnız
-       border+kölgə+radius ilə verilir (rəng fərqi ilə deyil) — bu da
-       tanınmış bir dizayn yanaşmasıdır (Linear/Vercel dashboard tipli).*/
-    background:var(--blueprint-deep); border:1px solid var(--grid-line-strong);
+    /* ÜÇ QATLI tünd-tema elevasiyası: səhifə (--blueprint-deep, ən tünd) ->
+       bu kart (--paper, bir az açıq) -> kartın İÇİNDƏKİ düymə/alt-kartlar
+       (--paper-raised, daha da açıq: approval-btn, activity-toggle-btn,
+       live-role-card, contest-card, ghc-tree, user-role-select və s. —
+       hamısı bu dəyişiklik zamanı --paper-dən --paper-raised-ə keçirilib
+       ki, bu kartla eyni rəngə düşüb görünməz qalmasınlar).
+       DİQQƏT: tünd fonda box-shadow-un rəngi SIRF qara (rgba(0,0,0,x))
+       olsa, demək olar görünmür (fon artıq qara-ya yaxındır) — ona görə
+       --card-shadow indi bir az aşağı/geniş və iki qatlıdır (adi qara
+       kölgə + yuxarı kənarda incə işıq xətti) ki, kart HƏQİQƏTƏN "qalxmış"
+       görünsün, sadəcə kodda yazılı qalmasın. */
+    background:var(--paper); border:1px solid var(--grid-line-strong);
     border-radius:var(--card-radius); box-shadow:var(--card-shadow);
   }
   .teacher-panel-title{ font-size:19px; margin:0 0 4px; color:var(--ink); font-weight:700; letter-spacing:-0.2px; }
@@ -400,7 +405,7 @@
   }
   .activity-toggle-btn{
     font-family:var(--mono); font-size:11px; padding:5px 10px; border-radius:6px; cursor:pointer;
-    background:var(--paper); border:1px solid var(--grid-line-strong); color:var(--ink-soft);
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); color:var(--ink-soft);
   }
   .activity-toggle-btn:hover{ border-color:var(--gold); color:var(--gold); }
   .activity-row td{ background:var(--blueprint-deep); padding:14px 16px !important; }
@@ -435,7 +440,7 @@
   .approval-btn{
     font-family:var(--mono); font-size:11px; letter-spacing:0.3px; padding:6px 12px;
     border-radius:6px; cursor:pointer; border:1px solid var(--grid-line-strong);
-    background:var(--paper); color:var(--ink); transition:background 0.15s ease;
+    background:var(--paper-raised); color:var(--ink); transition:background 0.15s ease;
   }
   .approval-btn.approve{ border-color:var(--green); color:var(--green); }
   .approval-btn.approve:hover{ background:rgba(31,209,168,0.1); }
@@ -444,12 +449,12 @@
   .approval-btn.warn{ border-color:var(--bronze); color:var(--bronze); }
   .approval-btn.warn:hover{ background:rgba(255,122,0,0.1); }
   .approval-btn:disabled{ opacity:0.35; cursor:default; }
-  .approval-btn:disabled:hover{ background:var(--paper); }
+  .approval-btn:disabled:hover{ background:var(--paper-raised); }
   .users-panel-inner{ max-width:1180px; }
   .live-panel-inner{ max-width:1180px; }
   .live-role-picker{ display:flex; gap:16px; flex-wrap:wrap; margin-top:6px; }
   .live-role-card{
-    flex:1; min-width:240px; background:var(--paper); border:1px solid var(--grid-line-strong);
+    flex:1; min-width:240px; background:var(--paper-raised); border:1px solid var(--grid-line-strong);
     border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:10px;
   }
   .live-role-card h3{ margin:0; font-size:15px; color:var(--ink); }
@@ -564,7 +569,7 @@
   .ghc-code-block.ex-ref{ line-height:1.5; min-height:460px; max-height:none; box-sizing:border-box; }
   .live-textarea.ex-live{ min-height:460px; }
   .ex-manage-item{
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:8px;
     padding:10px 14px; margin-bottom:8px;
   }
   .ex-manage-head{ display:flex; align-items:center; gap:8px; }
@@ -586,7 +591,7 @@
   .live-run-status.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.14); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
   .live-run-out{
     font-family:var(--mono); font-size:11.5px; white-space:pre-wrap; word-break:break-word;
-    background:var(--paper); border:1px solid var(--grid-line); border-radius:4px; padding:8px 10px;
+    background:var(--paper-raised); border:1px solid var(--grid-line); border-radius:4px; padding:8px 10px;
     margin:0 0 6px; max-height:160px; overflow:auto; color:var(--ink);
   }
   .live-run-out.live-run-err{ color:#e08080; }
@@ -594,7 +599,7 @@
   .ghc-layout{ display:grid; grid-template-columns:260px 1fr; gap:20px; align-items:start; }
   @media (max-width:860px){ .ghc-layout{ grid-template-columns:1fr; } }
   .ghc-tree{
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:10px;
     padding:10px; font-family:var(--mono); font-size:12.5px; max-height:560px; overflow:auto;
     white-space:nowrap;
   }
@@ -638,7 +643,7 @@
   .user-edit-input + .user-edit-input{ margin-top:5px; }
   .user-role-select{
     font-family:var(--mono); font-size:11.5px; padding:6px 8px;
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:6px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:6px;
     color:var(--ink); cursor:pointer;
   }
   .user-role-select:disabled{ opacity:0.4; cursor:default; }
@@ -646,7 +651,7 @@
   /* ---------- Yarış (Contest) bölməsi ---------- */
   .contest-form{
     display:flex; flex-direction:column; gap:10px; max-width:520px;
-    padding:18px; margin-bottom:26px; background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    padding:18px; margin-bottom:26px; background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:10px;
   }
   .contest-form-row{ display:flex; gap:10px; }
   .contest-form-row .auth-input{ flex:1; }
@@ -657,7 +662,7 @@
   }
   .contest-textarea:focus{ border-color:var(--gold); }
   .contest-card{
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:10px;
     padding:16px 18px; margin-bottom:12px; cursor:pointer; transition:border-color 0.15s ease;
   }
   .contest-card:hover{ border-color:var(--gold); }
@@ -704,7 +709,7 @@
     font-family:var(--mono); font-size:13px; color:var(--gold-bright); margin:4px 0 18px;
   }
   .contest-problem-card{
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:10px;
     padding:16px 18px; margin-bottom:14px;
   }
   .contest-problem-head{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; gap:10px; }
@@ -728,12 +733,12 @@
   .contest-verdict.show{ display:block; }
   .contest-verdict.accepted{ background:rgba(31,209,168,0.1); border:1px solid var(--green); color:var(--green); }
   .contest-verdict.rejected{ background:rgba(224,48,63,0.1); border:1px solid var(--alert); color:var(--alert); }
-  .contest-verdict.pending{ background:var(--paper); border:1px solid var(--grid-line-strong); color:var(--ink-soft); }
+  .contest-verdict.pending{ background:var(--paper-raised); border:1px solid var(--grid-line-strong); color:var(--ink-soft); }
   .contest-leaderboard-rank{ font-family:var(--mono); font-weight:700; color:var(--gold-bright); }
   .contest-manage-list{ margin-bottom:24px; }
   .contest-manage-item{
     display:flex; align-items:center; justify-content:space-between; gap:12px;
-    background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px;
+    background:var(--paper-raised); border:1px solid var(--grid-line-strong); border-radius:8px;
     padding:12px 16px; margin-bottom:8px; cursor:pointer;
   }
   .contest-manage-item:hover{ border-color:var(--gold); }
