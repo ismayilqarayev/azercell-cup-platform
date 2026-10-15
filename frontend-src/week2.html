@@ -6,41 +6,24 @@
 <title>Mövzu 2 — Test: Massiv, Funksiya, I/O, Struct</title>
 <style>
   :root{
-    --blueprint-deep:   #F6F6FB;
-    --grid-line:        rgba(18, 19, 26, 0.10);
-    --grid-line-strong: rgba(18, 19, 26, 0.20);
-    --paper:            #FFFFFF;
-    --paper-warm:       #F1F0EC;
-    --well:             #E9EBF2;
-    --ink:              #12131A;
-    --ink-soft:         #5B6472;
-    --gold:             #0B7A93;
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
     --gold-bright:      #26D2FF;
     --on-accent:        #001529;
-    --bronze:           #B85C00;
-    --bronze-text:      #B85C00;
-    --green:            #0E8F72;
-    --green-text:       #0E8F72;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
     --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  }
-  /* DARK MODE: eyni dəyişən adları saxlanılır, yalnız dəyərlər tündə çevrilir. */
-  @media (prefers-color-scheme: dark){
-    :root{
-      --blueprint-deep:   #0B0D12;
-      --grid-line:        rgba(255, 255, 255, 0.08);
-      --grid-line-strong: rgba(255, 255, 255, 0.16);
-      --paper:            #151822;
-      --paper-warm:       #1B1E27;
-      --well:             #1E2230;
-      --ink:              #F2F3F7;
-      --ink-soft:         #9AA3B2;
-      --gold:             #3FC4DE;
-      --bronze:           #E2A64D;
-      --bronze-text:      #E2A64D;
-      --green:            #4ADFB9;
-      --green-text:       #4ADFB9;
-    }
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }

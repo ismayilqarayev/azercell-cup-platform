@@ -32,46 +32,26 @@
      üzərində qızıl/bürünc vurğular, planlaşdırma sənədi hissi yaratmaq üçün.
      ========================================================================== */
   :root{
-    --blueprint-deep:   #F6F6FB; /* Ən tünd fon rəngi — səhifənin əsas arxa planı */
-    --blueprint-mid:    #EDEEF2; /* Bir az açıq tünd mavi (hazırda ehtiyat rəng) */
-    --grid-line:        rgba(18, 19, 26, 0.10); /* Blueprint effekti üçün incə xətlər — kiçik şəbəkə (16px) */
-    --grid-line-strong: rgba(18, 19, 26, 0.20); /* Eyni şəbəkənin qalın/görünən xətləri — böyük şəbəkə (96px) */
-    --paper:            #FFFFFF; /* "Kağız" rəngi — açıq fonlu kart/blok elementləri (məs. mövzu kartları) üçün */
-    --paper-warm:       #F1F0EC; /* Kağızın isti (yaşılımtıl) variantı — cədvəl başlıqları və s. üçün */
-    --well: #E9EBF2;
-    --ink:              #12131A; /* Açıq fon üzərində əsas mətn rəngi (tünd, oxunaqlı) */
-    --ink-soft:         #5B6472; /* İkinci dərəcəli, az vurğulu mətn üçün yumşaq rəng */
-    --gold:             #0B7A93; /* Əsas vurğu rəngi — çərçivələr, xətlər, teqlər */
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12; /* Fon rəngi — səhifənin əsas arxa planı */
+    --blueprint-mid:    #11141B;
+    --grid-line:        rgba(255, 255, 255, 0.08); /* Blueprint effekti üçün incə xətlər — kiçik şəbəkə (16px) */
+    --grid-line-strong: rgba(255, 255, 255, 0.16); /* Eyni şəbəkənin qalın/görünən xətləri — böyük şəbəkə (96px) */
+    --paper:            #151822; /* "Kağız" rəngi — kart/blok elementləri üçün */
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7; /* Əsas mətn rəngi (açıq, tünd fon üzərində oxunaqlı) */
+    --ink-soft:         #9AA3B2; /* İkinci dərəcəli, az vurğulu mətn üçün yumşaq rəng */
+    --gold:             #3FC4DE; /* Əsas vurğu rəngi — çərçivələr, xətlər, teqlər */
     --gold-bright:      #26D2FF; /* Qızılın parlaq forması — başlıqlar, önə çıxan mətnlər üçün */
     --on-accent: #001529;
-    --bronze:           #B85C00; /* İkinci dərəcəli vurğu rəngi — kiçik başlıqlar (h4), teqlər */
-    --bronze-text:      #B85C00;
-    --green:            #0E8F72;
-    --green-text:       #0E8F72;
-    --alert:            #E0303F; /* Xəbərdarlıq/hover zamanı diqqət çəkən rəng */
+    --bronze:           #E2A64D; /* İkinci dərəcəli vurğu rəngi — kiçik başlıqlar (h4), teqlər */
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --alert:            #FF6B76; /* Xəbərdarlıq/hover zamanı diqqət çəkən rəng */
     --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace; /* Kod və texniki yazılar üçün mono şrift */
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; /* Adi mətn üçün oxunaqlı şrift */
-  }
-
-  /* DARK MODE: eyni dəyişən adları saxlanılır, yalnız dəyərlər tündə çevrilir. */
-  @media (prefers-color-scheme: dark){
-    :root{
-      --blueprint-deep:   #0B0D12;
-      --blueprint-mid:    #11141B;
-      --grid-line:        rgba(255, 255, 255, 0.08);
-      --grid-line-strong: rgba(255, 255, 255, 0.16);
-      --paper:            #151822;
-      --paper-warm:       #1B1E27;
-      --well:             #1E2230;
-      --ink:              #F2F3F7;
-      --ink-soft:         #9AA3B2;
-      --gold:             #3FC4DE;
-      --bronze:           #E2A64D;
-      --bronze-text:      #E2A64D;
-      --green:            #4ADFB9;
-      --green-text:       #4ADFB9;
-      --alert:            #FF6B76;
-    }
   }
 
   /* box-sizing:border-box — padding və border dəyərləri elementin ÜMUMİ enin/boyunun
