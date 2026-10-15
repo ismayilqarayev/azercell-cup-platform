@@ -26,7 +26,7 @@ echo "$SHA $(date -Is)" > "$APP/.deployed-commit"
 
 # Backend qalxana qədər gözlə (Spring ~30-60 san.).
 for _ in $(seq 1 40); do
-  if docker compose exec -T azcup-backend sh -c 'exec 3<>/dev/tcp/127.0.0.1/8080' </dev/null 2>/dev/null; then
+  if docker compose exec -T azcup-backend bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' </dev/null 2>/dev/null; then
     echo "DEPLOY OK $SHA"; exit 0
   fi
   sleep 3
