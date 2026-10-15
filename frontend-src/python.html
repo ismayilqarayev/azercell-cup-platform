@@ -29,6 +29,28 @@
     --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   }
+  /* DARK MODE: eyni dəyişən adları saxlanılır, yalnız dəyərlər tündə çevrilir. */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --blueprint-deep:   #0B0D12;
+      --grid-line:        rgba(255, 255, 255, 0.08);
+      --grid-line-strong: rgba(255, 255, 255, 0.16);
+      --paper:            #151822;
+      --paper-warm:       #1B1E27;
+      --well:             #1E2230;
+      --ink:              #F2F3F7;
+      --ink-soft:         #9AA3B2;
+      --gold:             #3FC4DE;
+      --bronze:           #E2A64D;
+      --bronze-text:      #E2A64D;
+      --green:            #4ADFB9;
+      --green-text:       #4ADFB9;
+      --py-blue:          #6FB2F2;
+      --py-blue-text:     #6FB2F2;
+      --py-yellow:        #E8C34D;
+      --py-yellow-text:   #E8C34D;
+    }
+  }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
   body{
