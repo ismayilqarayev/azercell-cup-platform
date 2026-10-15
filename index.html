@@ -22,10 +22,20 @@
     --green: #4ADFB9;
     --alert: #FF6B76;
     --paper: #151822;
+    --paper-raised: #1B1F2B;
+    --card-radius: 14px;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.28);
     --mono: 'JetBrains Mono','IBM Plex Mono','Courier New',monospace;
     --sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
   }
   *{ box-sizing:border-box; }
+  /* Dark temaya uyğun nazik, az-diqqət-çəkən scrollbar — defolt OS scrollbar
+     (adətən açıq/boz) tünd fonda kobud və "hazır olmayan" görünürdü. */
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:var(--grid-line-strong); border-radius:20px; border:2px solid transparent; background-clip:padding-box; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--ink-soft); background-clip:padding-box; }
+  *{ scrollbar-width:thin; scrollbar-color:var(--grid-line-strong) transparent; }
   html,body{ margin:0; padding:0; height:100%; background:var(--blueprint-deep); font-family:var(--sans); }
   body{
     background-image: none;
@@ -210,9 +220,10 @@
   }
   .tabbar::before{
     content:"AZ-CUP";
-    font-family:var(--sans); font-size:13px; letter-spacing:1px; font-weight:700;
-    color:var(--bronze); align-self:flex-start; margin:0 0 20px 6px;
-    opacity:0.95;
+    font-family:var(--sans); font-size:13px; letter-spacing:2px; font-weight:700;
+    color:var(--bronze); align-self:flex-start; margin:0 0 18px 6px;
+    padding-bottom:18px; width:calc(100% - 12px); opacity:0.95;
+    border-bottom:1px solid var(--grid-line-strong);
   }
   .tab-group-label{
     font-family:var(--sans); font-size:10.5px; letter-spacing:0.5px; text-transform:uppercase;
@@ -304,7 +315,10 @@
       position:static; border-right:none; border-bottom:1px solid var(--grid-line-strong);
       padding:10px 0 0; gap:0; flex-shrink:0; background:var(--paper);
     }
-    .tabbar::before{ order:1; flex:1 1 auto; width:auto; margin:0 0 0 14px; }
+    .tabbar::before{
+      order:1; flex:1 1 auto; width:auto; margin:0 0 0 14px;
+      padding-bottom:0; border-bottom:none;
+    }
     .live-indicator{ order:2; margin:0 10px 0 0; padding:0; align-self:center; font-size:10px; letter-spacing:1px; }
     .tabbar-user{ order:3; margin:0; padding:0 12px 0 0; border-top:none; gap:8px; min-width:0; }
     .tabbar-user-name{ max-width:34vw; }
@@ -338,23 +352,48 @@
     background:var(--blueprint-deep); display:none; overflow-y:auto;
   }
   .teacher-panel.active{ display:block; }
-  .teacher-panel-inner{ max-width:900px; margin:0 auto; padding:32px 24px 60px; }
-  .teacher-panel-title{ font-size:20px; margin:0 0 4px; color:var(--ink); }
-  .teacher-panel-sub{ font-size:13px; color:var(--ink-soft); margin:0 0 20px; }
+  /* Hər panel (müəllim/admin cədvəlləri, qrup/tapşırıq siyahıları və s.) bu
+     sinifdən istifadə edir, ona görə burada bir dəfə "kart" səthinə
+     çevirmək bütün daxili panelləri eyni anda daha "hazır" dashboard
+     görünüşünə salır — əvvəllər cədvəl/kontent birbaşa səhifə fonunda
+     "üzürdü", indi aydın kənarlı, kölgəli bir səth üzərindədir. */
+  .teacher-panel-inner{
+    max-width:900px; margin:36px auto 60px; padding:28px 30px 34px;
+    /* DİQQƏT: kartın fonu qəsdən var(--paper) YOX, var(--blueprint-deep)-dir
+       (səhifə fonu ilə eynidir) — çünki panel daxilindəki onlarla element
+       (approval-btn, activity-toggle-btn, live-role-card, contest-card,
+       ghc-tree, user-role-select və s.) artıq ÖZ fonunu var(--paper) kimi
+       təyin edib, "səhifə fonunun üzərində paper kontrastı" məntiqi ilə
+       işləyir. Kartın fonu da var(--paper) olsaydı, bu onlarla element
+       kartla eyni rəngə düşüb GÖRÜNMƏZ qalardı. Elevasiya hissi yalnız
+       border+kölgə+radius ilə verilir (rəng fərqi ilə deyil) — bu da
+       tanınmış bir dizayn yanaşmasıdır (Linear/Vercel dashboard tipli).*/
+    background:var(--blueprint-deep); border:1px solid var(--grid-line-strong);
+    border-radius:var(--card-radius); box-shadow:var(--card-shadow);
+  }
+  .teacher-panel-title{ font-size:19px; margin:0 0 4px; color:var(--ink); font-weight:700; letter-spacing:-0.2px; }
+  .teacher-panel-sub{
+    font-size:13px; color:var(--ink-soft); margin:0 0 22px; padding-bottom:18px;
+    border-bottom:1px solid var(--grid-line);
+  }
   .teacher-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
   .teacher-table th{
     text-align:left; font-family:var(--mono); font-size:11px; letter-spacing:1px;
-    text-transform:uppercase; color:var(--ink-soft); padding:8px 12px;
+    text-transform:uppercase; color:var(--ink-soft); padding:10px 14px;
     border-bottom:1px solid var(--grid-line-strong);
   }
-  .teacher-table td{ padding:10px 12px; border-bottom:1px solid var(--grid-line); color:var(--ink); }
-  .teacher-table tr:hover td{ background:var(--paper); }
+  .teacher-table td{ padding:12px 14px; border-bottom:1px solid var(--grid-line); color:var(--ink); }
+  .teacher-table tr:last-child td{ border-bottom:none; }
+  /* DİQQƏT: kart indi özü var(--paper) fonunda olduğu üçün hover rəngi köhnə
+     kimi birbaşa var(--paper) ola bilməz (kartın fonu ilə eyni olub görünməz
+     qalardı) — əvəzinə vurğu rənginin incə (aşağı qeyri-şəffaflıq) tonu. */
+  .teacher-table tr:hover td{ background:rgba(63,196,222,0.07); }
   .teacher-table td.teacher-solved{ color:var(--green); font-weight:700; font-family:var(--mono); }
   /* Dar ekranda geniş cədvəl bütün paneli yox, yalnız öz qabını üfüqi sürüşdürsün
      (əvvəl jurnalın sağ sütunları kəsilir, səhifəyə üfüqi sürüşmə düşürdü). */
   @media (max-width:860px){
     .teacher-table{ display:block; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-    .teacher-panel-inner{ padding:24px 16px 48px; }
+    .teacher-panel-inner{ margin:18px auto 40px; padding:20px 18px 26px; border-radius:12px; }
   }
   .teacher-panel-loading, .teacher-panel-empty{
     color:var(--ink-soft); font-family:var(--mono); font-size:12px; padding:20px 0;
