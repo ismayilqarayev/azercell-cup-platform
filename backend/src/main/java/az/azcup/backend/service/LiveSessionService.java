@@ -3,6 +3,7 @@ package az.azcup.backend.service;
 import az.azcup.backend.dto.live.LiveSessionDto;
 import az.azcup.backend.dto.live.LiveSessionStateDto;
 import az.azcup.backend.dto.live.LiveStudentCodeDto;
+import az.azcup.backend.entity.SubmissionStatus;
 import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.live.LiveSessionState;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -78,6 +79,23 @@ public class LiveSessionService {
         return toDto(state);
     }
 
+    // Şagirdin "✋ Kömək istə" bayrağını açıb-bağlayır.
+    public LiveSessionStateDto setStudentNeedsHelp(String code, Long studentId, String studentName, boolean needsHelp) {
+        LiveSessionState state = getOrThrow(code);
+        state.setNeedsHelp(studentId, studentName, needsHelp);
+        state.touch();
+        return toDto(state);
+    }
+
+    // Şagirdin son "İşə sal" nəticəsinin statusunu saxlayır (müəllim panelində
+    // çipin rənglə işarələnməsi üçün).
+    public LiveSessionStateDto setStudentLastStatus(String code, Long studentId, String studentName, SubmissionStatus status) {
+        LiveSessionState state = getOrThrow(code);
+        state.setLastStatus(studentId, studentName, status);
+        state.touch();
+        return toDto(state);
+    }
+
     // Hər 30 dəqiqədən bir işə düşür və 3 saatdan artıq toxunulmamış (dərsi
     // bitmiş) sessiyaları yaddaşdan təmizləyir — əks halda server heç vaxt
     // dayanmayan sessiyalarla yavaş-yavaş yaddaş dolduracaqdı.
@@ -124,7 +142,12 @@ public class LiveSessionService {
     // qoşulma sırasını qoruyan siyahıya çevrilir (bax: LiveSessionState.students, LinkedHashMap).
     private LiveSessionStateDto toDto(LiveSessionState state) {
         List<LiveStudentCodeDto> students = state.getStudents().entrySet().stream()
-                .map(e -> new LiveStudentCodeDto(e.getKey(), e.getValue().getStudentName(), e.getValue().getSourceCode()))
+                .map(e -> new LiveStudentCodeDto(
+                        e.getKey(),
+                        e.getValue().getStudentName(),
+                        e.getValue().getSourceCode(),
+                        e.getValue().isNeedsHelp(),
+                        e.getValue().getLastStatus()))
                 .collect(Collectors.toList());
         return new LiveSessionStateDto(state.getCode(), state.getTeacherCode(), students, state.getLastActivity());
     }

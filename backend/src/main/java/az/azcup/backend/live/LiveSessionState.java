@@ -1,5 +1,7 @@
 package az.azcup.backend.live;
 
+import az.azcup.backend.entity.SubmissionStatus;
+
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -62,6 +64,25 @@ public class LiveSessionState {
         entry.setSourceCode(sourceCode);
     }
 
+    // Şagirdin "köməyə ehtiyacım var" bayrağını təyin edir — müəllim panelində
+    // bu şagirdin çipini fərqləndirmək üçün istifadə olunur (bax:
+    // LiveStudentCodeDto.needsHelp). Şagird hələ kod göndərməyibsə belə
+    // (nəzəri cəhətdən) bayraqlaya bilsin deyə computeIfAbsent istifadə olunur.
+    public void setNeedsHelp(Long studentId, String studentName, boolean needsHelp) {
+        StudentEntry entry = students.computeIfAbsent(studentId, id -> new StudentEntry(studentName));
+        entry.setStudentName(studentName);
+        entry.setNeedsHelp(needsHelp);
+    }
+
+    // Şagirdin öz kodunu son dəfə icra etdiyi nəticənin statusunu (ACCEPTED,
+    // COMPILE_ERROR və s.) saxlayır — müəllim panelindəki çipi rənglə
+    // işarələmək üçün (bax: LiveStudentCodeDto.lastStatus).
+    public void setLastStatus(Long studentId, String studentName, SubmissionStatus status) {
+        StudentEntry entry = students.computeIfAbsent(studentId, id -> new StudentEntry(studentName));
+        entry.setStudentName(studentName);
+        entry.setLastStatus(status);
+    }
+
     // Bütün qoşulmuş şagirdlərin xəritəsini qaytarır (id -> ad+kod).
     public Map<Long, StudentEntry> getStudents() {
         return students;
@@ -77,6 +98,12 @@ public class LiveSessionState {
 
         private String studentName;
         private String sourceCode = "";
+        // Şagird "✋ Kömək istə" düyməsini basıbsa true — manual olaraq
+        // şagird özü açıb-bağlayır (avtomatik təmizlənmir).
+        private boolean needsHelp = false;
+        // Şagirdin son "İşə sal" nəticəsinin statusu (ACCEPTED, COMPILE_ERROR,
+        // RUNTIME_ERROR, TIME_LIMIT_EXCEEDED) — hələ heç icra etməyibsə null.
+        private SubmissionStatus lastStatus;
 
         public StudentEntry(String studentName) {
             this.studentName = studentName;
@@ -96,6 +123,22 @@ public class LiveSessionState {
 
         public void setSourceCode(String sourceCode) {
             this.sourceCode = sourceCode;
+        }
+
+        public boolean isNeedsHelp() {
+            return needsHelp;
+        }
+
+        public void setNeedsHelp(boolean needsHelp) {
+            this.needsHelp = needsHelp;
+        }
+
+        public SubmissionStatus getLastStatus() {
+            return lastStatus;
+        }
+
+        public void setLastStatus(SubmissionStatus lastStatus) {
+            this.lastStatus = lastStatus;
         }
     }
 }

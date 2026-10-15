@@ -499,6 +499,21 @@
     background:transparent; border:1px solid var(--grid-line-strong); color:var(--ink);
   }
   .live-copy-btn:hover{ border-color:var(--gold); color:var(--gold); }
+  .live-help-btn{
+    font-family:var(--mono); font-size:11px; padding:6px 12px; border-radius:20px; cursor:pointer;
+    background:transparent; border:1px solid var(--bronze); color:var(--bronze);
+    transition:background 0.15s ease;
+  }
+  .live-help-btn:hover{ background:rgba(226,166,77,0.1); }
+  .live-help-btn.active{
+    background:var(--bronze); color:var(--on-accent); font-weight:700;
+    animation:live-help-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes live-help-pulse{
+    0%, 100%{ box-shadow:0 0 0 0 rgba(226,166,77,0.5); }
+    50%{ box-shadow:0 0 0 6px rgba(226,166,77,0); }
+  }
+  @media (prefers-reduced-motion: reduce){ .live-help-btn.active{ animation:none; } }
   .live-panels{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   @media (max-width:860px){ .live-panels{ grid-template-columns:1fr; } }
   .live-panel-title{
@@ -521,6 +536,21 @@
   }
   .live-student-chip:hover{ border-color:var(--gold); color:var(--ink); }
   .live-student-chip.active{ background:rgba(255,193,7,0.14); border-color:var(--gold); color:var(--gold); }
+  /* Son "İşə sal" statusuna görə çipin kənarı rənglənir — müəllim sinfi bir
+     baxışda tarayıb kimin compile xətası olduğunu görə bilsin. Eyni rəng
+     palitrası .live-run-status ilə eynidir ki, iki yerdə ayrı məna daşımasın. */
+  .live-student-chip.status-ACCEPTED{ border-color:var(--green); }
+  .live-student-chip.status-COMPILE_ERROR{ border-color:var(--bronze); }
+  .live-student-chip.status-RUNTIME_ERROR{ border-color:var(--alert); }
+  .live-student-chip.status-TIME_LIMIT_EXCEEDED{ border-color:#b79ce8; }
+  /* "✋ Kömək istə" basan şagirdin çipi — digər bütün status rənglərindən
+     üstün olmalıdır (bir şagird HƏM compile-error, HƏM kömək istəyə bilər,
+     köməyə ehtiyac daha təcili olduğu üçün görsənməlidir). */
+  .live-student-chip.help{
+    background:rgba(226,166,77,0.16); border-color:var(--bronze); color:var(--bronze); font-weight:700;
+    animation:live-help-pulse 1.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .live-student-chip.help{ animation:none; } }
   .live-editor{ position:relative; border-radius:4px; transition:box-shadow 0.15s ease; }
   .live-editor:focus-within{ box-shadow:0 0 0 1px var(--gold), 0 0 16px rgba(38,210,255,0.15); }
   .live-gutter{
@@ -563,6 +593,12 @@
   .live-check-msg:empty{ display:none; }
   .live-check-bad{ color:#ff6b6b; }
   .live-check-ok{ color:var(--green); }
+  /* Mobildə iki redaktor paneli (özün + digəri) alt-alta düşür (bax: 860px-lik
+     .live-panels qaydası) — hər biri 520px olanda bu, çox uzun şaquli sürüşmə
+     yaradır. Daha kiçik, amma yenə də rahat işlənə bilən hündürlük veririk. */
+  @media (max-width:860px){
+    .live-textarea{ min-height:260px; }
+  }
 
   /* ---------- Tapşırıq kod nümunəsi məşqi (baxıb yaz) ---------- */
   .ex-panels{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
@@ -2627,9 +2663,51 @@ let liveOwnValue = '';
 // hazırda hansı şagirdin panelinə baxdığı (chip seçimi).
 let liveStudents = [];
 let liveSelectedStudentId = null;
+// Şagird özü "✋ Kömək istə" düyməsini basıbsa true (bax: toggleLiveHelp).
+let liveNeedsHelp = false;
+
+// SessionStorage açarı — səhifə yenilənəndə (F5) aktiv canlı dərs sessiyasını
+// itirməmək üçün. localStorage YOX, sessionStorage istifadə olunur: tab
+// bağlananda avtomatik təmizlənir, köhnə/unudulmuş sessiya başqa vaxt
+// təsadüfən bərpa olunmasın.
+const LIVE_SESSION_STORAGE_KEY = 'azcup-live-session';
+function saveLiveSessionToStorage(){
+  try {
+    if (liveCode && liveRole) {
+      sessionStorage.setItem(LIVE_SESSION_STORAGE_KEY, JSON.stringify({ code: liveCode, role: liveRole }));
+    }
+  } catch (e) { /* məs. privat rejim — sükutla keç */ }
+}
+function clearLiveSessionStorage(){
+  try { sessionStorage.removeItem(LIVE_SESSION_STORAGE_KEY); } catch (e) { /* sükutla keç */ }
+}
+function getStoredLiveSession(){
+  try {
+    const raw = sessionStorage.getItem(LIVE_SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.code && parsed.role) return parsed;
+  } catch (e) { /* korlanmış JSON və s. — sükutla rədd et */ }
+  return null;
+}
 
 function loadLivePanel(){
   if (liveCode) { renderLiveActive(); resumeLiveSessionPolling(); return; }
+  // Səhifə yenilənəndən sonra bu tab İLK dəfə açılırsa, əvvəlki sessiyanı
+  // sessionStorage-dan bərpa etməyə çalış — server-dən təsdiq alınmadan
+  // birbaşa "aktiv" göstərmirik (sessiya artıq bitmiş ola bilər).
+  const stored = getStoredLiveSession();
+  if (stored) {
+    const body0 = document.getElementById('liveSessionBody');
+    body0.innerHTML = '<div class="teacher-panel-loading">Əvvəlki sessiya yoxlanılır...</div>';
+    azcupApiFetch('/api/live/sessions/' + encodeURIComponent(stored.code))
+      .then(res => {
+        if (!res.ok) { clearLiveSessionStorage(); loadLivePanel(); return; }
+        enterLiveSession(stored.code, stored.role);
+      })
+      .catch(() => { clearLiveSessionStorage(); loadLivePanel(); });
+    return;
+  }
   const body = document.getElementById('liveSessionBody');
   const user = AzcupAuth.getUser();
   const canTeach = !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
@@ -2689,7 +2767,9 @@ async function joinLiveSession(){
 function enterLiveSession(code, role){
   liveCode = code;
   liveRole = role;
+  liveNeedsHelp = false;
   resetLiveChecks();
+  saveLiveSessionToStorage();
   renderLiveActive();
   resumeLiveSessionPolling();
 }
@@ -2701,7 +2781,9 @@ function leaveLiveSession(){
   liveOwnValue = '';
   liveStudents = [];
   liveSelectedStudentId = null;
+  liveNeedsHelp = false;
   resetLiveChecks();
+  clearLiveSessionStorage();
   loadLivePanel();
 }
 
@@ -2715,17 +2797,70 @@ function pauseLiveSessionPolling(){
   if (livePollTimer) { clearInterval(livePollTimer); livePollTimer = null; }
 }
 
-function copyLiveCode(){
+function copyLiveCode(btn){
   if (!liveCode) return;
-  if (navigator.clipboard) navigator.clipboard.writeText(liveCode).catch(() => {});
+  // Uğur/uğursuzluq haqqında əvvəllər heç bir geri bildirim yox idi (sükutla
+  // kopyalanırdı) — indi düymənin mətni bir anlıq dəyişir ki, istifadəçi
+  // əmin ola bilsin.
+  const showFeedback = (text) => {
+    if (!btn) return;
+    const original = btn.dataset.originalLabel || btn.textContent;
+    btn.dataset.originalLabel = original;
+    btn.textContent = text;
+    clearTimeout(btn._liveCopyResetTimer);
+    btn._liveCopyResetTimer = setTimeout(() => { btn.textContent = original; }, 1600);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(liveCode)
+      .then(() => showFeedback('Kopyalandı ✓'))
+      .catch(() => showFeedback('Kopyalanmadı ✗'));
+  } else {
+    showFeedback('Kopyalanmadı ✗');
+  }
+}
+
+// Şagird "✋ Kömək istə" düyməsini basanda çağırılır — serverə bildirir,
+// müəllim panelində bu şagirdin çipi fərqlənsin deyə (bax: renderLiveStudentList).
+// Düymə dərhal (server cavabını gözləmədən) yenilənir ki, basma özü "ani" hiss
+// olunsun; server sorğusu uğursuz olarsa, vəziyyət geri qaytarılır.
+async function toggleLiveHelp(){
+  if (!liveCode || liveRole !== 'student') return;
+  const next = !liveNeedsHelp;
+  liveNeedsHelp = next;
+  const btn = document.getElementById('liveHelpBtn');
+  if (btn) {
+    btn.classList.toggle('active', next);
+    btn.textContent = next ? '✋ Kömək göndərildi (ləğv et)' : '✋ Kömək istə';
+  }
+  try {
+    const res = await azcupApiFetch('/api/live/sessions/' + encodeURIComponent(liveCode) + '/help', {
+      method: 'PUT',
+      body: JSON.stringify({ needsHelp: next }),
+    });
+    if (!res.ok) throw new Error('request failed');
+  } catch (e) {
+    // Server qəbul etmədi — əks vəziyyətə qaytar ki, düymə serverlə uyğun qalsın.
+    liveNeedsHelp = !next;
+    if (btn) {
+      btn.classList.toggle('active', liveNeedsHelp);
+      btn.textContent = liveNeedsHelp ? '✋ Kömək göndərildi (ləğv et)' : '✋ Kömək istə';
+    }
+  }
 }
 
 function renderLiveActive(){
   const body = document.getElementById('liveSessionBody');
   const ownLabel = liveRole === 'teacher' ? 'Sizin panel (Müəllim)' : 'Sizin panel (Şagird)';
+  // Yalnız şagird üçün: müəllimə "köməyə ehtiyacım var" bildirişi — çip
+  // siyahısında bu şagirdi fərqləndirəcək (bax: renderLiveStudentList, CSS .help).
+  const helpBtnHtml = liveRole === 'student'
+    ? '<button type="button" class="live-help-btn' + (liveNeedsHelp ? ' active' : '') + '" id="liveHelpBtn" onclick="toggleLiveHelp()">'
+      + (liveNeedsHelp ? '✋ Kömək göndərildi (ləğv et)' : '✋ Kömək istə') + '</button>'
+    : '';
   body.innerHTML = ''
     + '<div class="live-code-share">Sessiya kodu: <b>' + escapeHtml(liveCode) + '</b>'
-    + '<button type="button" class="live-copy-btn" onclick="copyLiveCode()">Kopyala</button>'
+    + '<button type="button" class="live-copy-btn" onclick="copyLiveCode(this)">Kopyala</button>'
+    + helpBtnHtml
     + '<button type="button" class="live-leave-btn" onclick="leaveLiveSession()">Sessiyadan çıx</button>'
     + '</div>'
     + '<div class="live-panels">'
@@ -2810,9 +2945,20 @@ function renderLiveStudentList(){
   if (liveSelectedStudentId == null || !liveStudents.some(s => s.studentId === liveSelectedStudentId)) {
     liveSelectedStudentId = liveStudents[0].studentId;
   }
-  setLiveStudentListHtml(listEl, liveStudents.map(s =>
-    '<button type="button" class="live-student-chip' + (s.studentId === liveSelectedStudentId ? ' active' : '') + '" onclick="selectLiveStudent(' + s.studentId + ')">' + escapeHtml(s.studentName) + '</button>'
-  ).join(''));
+  // "✋ Kömək istə" basan şagirdlər siyahının BAŞINA çıxır ki, müəllim böyük
+  // sinifdə kimin köməyə ehtiyacı olduğunu dərhal görsün, hər çipi tək-tək
+  // yoxlamasın. Array.prototype.sort ES2019-dan bəri stabildir, ona görə
+  // bərabər prioritetli (ikisi də kömək istəyən/istəməyən) şagirdlər öz
+  // aralarında qoşulma sırasını qoruyur.
+  const sorted = liveStudents.slice().sort((a, b) => (b.needsHelp ? 1 : 0) - (a.needsHelp ? 1 : 0));
+  setLiveStudentListHtml(listEl, sorted.map(s => {
+    const classes = ['live-student-chip'];
+    if (s.studentId === liveSelectedStudentId) classes.push('active');
+    if (s.needsHelp) classes.push('help');
+    if (s.lastStatus) classes.push('status-' + s.lastStatus);
+    const marker = s.needsHelp ? '✋ ' : '';
+    return '<button type="button" class="' + classes.join(' ') + '" onclick="selectLiveStudent(' + s.studentId + ')">' + marker + escapeHtml(s.studentName) + '</button>';
+  }).join(''));
   updateSelectedStudentPanel();
 }
 
@@ -3180,6 +3326,16 @@ async function runLiveCode(which){
     statusEl.textContent = (LIVE_RUN_STATUS_LABELS[data.status] || data.status) + ' · ' + data.executionTimeMs + ' ms';
     document.getElementById(which === 'own' ? 'liveOwnRunStdout' : 'liveOtherRunStdout').textContent = data.stdout || '';
     document.getElementById(which === 'own' ? 'liveOwnRunStderr' : 'liveOtherRunStderr').textContent = data.stderr || '';
+    // Şagird ÖZ kodunu işə salıbsa, nəticəni canlı sessiyaya da bildiririk ki,
+    // müəllim panelindəki çip rənglə işarələnsin (bax: renderLiveStudentList).
+    // /api/run ümumi endpoint olduğu üçün bunu AYRI, fire-and-forget bir
+    // çağırışla edirik — uğursuz olsa belə əsas "İşə sal" nəticəsini göstərməyə mane olmur.
+    if (which === 'own' && liveRole === 'student' && liveCode) {
+      azcupApiFetch('/api/live/sessions/' + encodeURIComponent(liveCode) + '/status', {
+        method: 'PUT',
+        body: JSON.stringify({ status: data.status }),
+      }).catch(() => { /* kosmetik bir bildirişdir, uğursuz olsa önəmli deyil */ });
+    }
   } catch (e) {
     hintEl.textContent = 'Serverə qoşulmaq mümkün olmadı.';
   }

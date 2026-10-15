@@ -1,8 +1,10 @@
 package az.azcup.backend.controller;
 
 import az.azcup.backend.dto.live.LiveCodeUpdateRequest;
+import az.azcup.backend.dto.live.LiveHelpRequest;
 import az.azcup.backend.dto.live.LiveSessionDto;
 import az.azcup.backend.dto.live.LiveSessionStateDto;
+import az.azcup.backend.dto.live.LiveStatusRequest;
 import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.LiveSessionService;
 import org.springframework.http.HttpStatus;
@@ -67,5 +69,33 @@ public class LiveSessionController {
     ) {
         return liveSessionService.updateStudentCode(
                 code, principal.getUser().getId(), principal.getUser().getFullName(), request.getSourceCode());
+    }
+
+    // Şagird "✋ Kömək istə" düyməsini açıb-bağlayır — müəllim panelindəki
+    // çipi fərqləndirmək üçün (bax: index.html renderLiveStudentList).
+    @PutMapping("/{code}/help")
+    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
+    public LiveSessionStateDto setNeedsHelp(
+            @PathVariable String code,
+            @RequestBody LiveHelpRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return liveSessionService.setStudentNeedsHelp(
+                code, principal.getUser().getId(), principal.getUser().getFullName(), request.isNeedsHelp());
+    }
+
+    // Şagird öz kodunu "İşə sal" etdikdən sonra nəticəni (ACCEPTED,
+    // COMPILE_ERROR və s.) bildirir — /api/run ümumi endpoint-i canlı
+    // sessiyadan xəbərsiz olduğu üçün bu, AYRI bir çağırışdır (bax: index.html
+    // runLiveCode). Müəllim panelindəki çip bununla rəngli işarələnir.
+    @PutMapping("/{code}/status")
+    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
+    public LiveSessionStateDto setLastStatus(
+            @PathVariable String code,
+            @RequestBody LiveStatusRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return liveSessionService.setStudentLastStatus(
+                code, principal.getUser().getId(), principal.getUser().getFullName(), request.getStatus());
     }
 }
