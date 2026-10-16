@@ -144,6 +144,21 @@ test('çıxış müqayisəsi yoxlayıcının qaydası ilə eynidir', () => {
   assert.equal(T.compareOutputs('a', 'a\nb').line, 2);
 });
 
+test('axtarış azərbaycan hərflərinə dözümlüdür', () => {
+  assert.equal(T.foldAz('ƏDƏDLƏR Çıxış ÖĞÜŞ İki Işıq'), 'ededler cixis ogus iki isiq');
+  const hay = T.foldAz('M01 17 və 5 ədədlərinin əməliyyatları ASAN riyaziyyat');
+  assert.ok(T.matchQuery(hay, 'ededler'));        // ə yazılmadan
+  assert.ok(T.matchQuery(hay, 'ƏDƏDLƏRİN 17'));   // böyük hərf və nömrə
+  assert.ok(T.matchQuery(hay, 'm01'));
+  assert.ok(T.matchQuery(hay, ''));               // boş sorğu hamısını göstərir
+  assert.equal(T.matchQuery(hay, 'ededler yoxdur'), false); // bütün sözlər olmalıdır
+});
+
+test('köməklər açarı istifadəçi və məsələyə görə fərqlənir və qaralama açarından ayrıdır', () => {
+  assert.notEqual(T.hintKey(1, 'frame-week1', 'A01', 'x'), T.hintKey(2, 'frame-week1', 'A01', 'x'));
+  assert.notEqual(T.hintKey(1, 'frame-week1', 'A01', 'x'), T.draftKey(1, 'frame-week1', 'A01', 'x'));
+});
+
 test('qaralama açarı istifadəçi və məsələyə görə fərqlənir', () => {
   assert.notEqual(T.draftKey(1, 'frame-week1', 'A01', 'x'), T.draftKey(2, 'frame-week1', 'A01', 'x'));
   assert.notEqual(T.draftKey(1, 'frame-week1', 'A01', 'x'), T.draftKey(1, 'frame-week1', 'A02', 'x'));

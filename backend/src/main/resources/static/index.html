@@ -1200,6 +1200,10 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
  *      rəngləmə (Monokai), səhv sətirlərinin qırmızı göstərilməsi (yüngül yoxlama + g++ -fsyntax-only).
  *   2. Qaralama: kod hər dəyişəndə localStorage-a yazılır, səhifə yenilənəndə bərpa olunur.
  *   3. "Nümunə ilə sına" və "Öz giriş ilə işə sal" (/api/run) — göndərmədən əvvəl yoxlamaq üçün.
+ *   5. Mərhələli köməklər: teqlər və "Yanaşma" gizlidir, "💡" düyməsi ilə addım-addım açılır (həll edilibsə və ya
+ *      müəllim/admin üçün hamısı açıqdır). Açılmış səviyyə istifadəçi və məsələ üzrə yadda qalır.
+ *   6. Tarixçə: hər göndərişin kodunu göstərir və "Redaktora yüklə" ilə redaktora qaytarır (API kodu artıq qaytarırdı).
+ *   7. Siyahı: irəliləyiş zolağı, axtarış (azərbaycan hərflərinə dözümlü), çətinlik/vəziyyət filtri, "Növbəti həll edilməmiş".
  *   8. Klaviatura: Ctrl+Enter = göndər, Ctrl+Shift+Enter = nümunə ilə sına, Esc sonra Tab = redaktordan çıx.
  *
  * Sırf məntiq funksiyaları (editForKey, highlightCppLines, liteCheckCpp, ...) DOM-dan asılı deyil və
@@ -1474,6 +1478,26 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
     return 'azcup.draft.v1.' + userId + '.' + frameId + '.' + num + '.' + title;
   }
 
+  function hintKey(userId, frameId, num, title) {
+    return 'azcup.hint.v1.' + userId + '.' + frameId + '.' + num + '.' + title;
+  }
+
+  // Axtarış üçün: kiçik hərf, azərbaycan hərfləri latın qarşılığına (ə→e, ı→i, ö→o, ü→u, ş→s, ç→c, ğ→g), ki
+  // "ededler" yazan da "ədədlər"i tapsın.
+  function foldAz(s) {
+    var t;
+    try { t = String(s == null ? '' : s).toLocaleLowerCase('az'); } catch (e) { t = String(s == null ? '' : s).toLowerCase(); }
+    return t.replace(/̇/g, '').replace(/ə/g, 'e').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u')
+      .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+  }
+
+  // Sorğunun bütün sözləri saman mətnində (nömrə + başlıq + teqlər, artıq foldAz-dan keçmiş) olmalıdır.
+  function matchQuery(haystack, query) {
+    var tokens = foldAz(query).split(/\s+/).filter(Boolean);
+    for (var i = 0; i < tokens.length; i++) if (haystack.indexOf(tokens[i]) === -1) return false;
+    return true;
+  }
+
   /* ---------------------------------------------------------------- DOM hissəsi */
 
   var STYLE_ID = 'azcup-pt-style';
@@ -1510,10 +1534,37 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
     '.pt-stdin:focus{ border-color:var(--gold); }',
     '.pt-run{ display:none; margin-top:10px; } .pt-run.show{ display:block; }',
     '.pt-run .verdict-badge{ margin-bottom:8px; }',
-    '.pt-run-time{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-left:8px; }',
+    '.pt-run-time{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-left:8px; white-space:nowrap; display:inline-block; margin-bottom:8px; }',
     '.pt-run pre{ max-height:260px; overflow:auto; }',
     '.pt-diff{ background:rgba(255,59,59,0.22); color:inherit; display:inline-block; width:100%; }',
     '.pt-label{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }',
+    '.pt-hide{ display:none !important; }',
+    // Uzun kod/çıxış sətri (white-space:pre) grid elementini genişləndirib kartı kənardan çıxarmasın.
+    '.problem-left, .problem-right{ min-width:0; }',
+    '.pt-toolbar{ margin:0 0 16px; padding:14px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:6px; }',
+    '.pt-prog{ display:flex; align-items:center; gap:12px; margin-bottom:12px; font-family:var(--mono); font-size:12px; color:var(--ink-soft); }',
+    '.pt-prog-text{ white-space:nowrap; color:var(--ink); }',
+    '.pt-prog-bar{ flex:1; height:6px; border-radius:3px; background:var(--grid-line); overflow:hidden; }',
+    '.pt-prog-bar i{ display:block; height:100%; width:0; background:var(--green); transition:width 0.3s ease; }',
+    '.pt-filters{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }',
+    '.pt-search{ flex:1 1 220px; min-width:0; font-family:var(--sans); font-size:14px; color:var(--ink); background:var(--paper);',
+    '  border:1px solid var(--grid-line-strong); border-radius:20px; padding:8px 14px; outline:none; }',
+    '.pt-search:focus{ border-color:var(--gold); }',
+    '.pt-chips{ display:flex; gap:6px; flex-wrap:wrap; }',
+    '.pt-chip{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); background:transparent; border:1px solid var(--grid-line-strong);',
+    '  border-radius:16px; padding:6px 12px; cursor:pointer; }',
+    '.pt-chip:hover{ border-color:var(--gold); color:var(--ink); }',
+    '.pt-chip[aria-pressed="true"]{ background:rgba(63,196,222,0.16); border-color:var(--gold); color:var(--ink); }',
+    '.pt-chip:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }',
+    '.pt-count{ margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-soft); } .pt-count:empty{ display:none; }',
+    '.pt-empty{ display:none; padding:18px; text-align:center; color:var(--ink-soft); font-size:14px; } .pt-empty.show{ display:block; }',
+    '.pt-hints{ margin:12px 0; padding:10px 12px; border:1px dashed var(--grid-line-strong); border-radius:6px; display:flex; align-items:center; gap:10px 14px; flex-wrap:wrap; }',
+    '.pt-hint-note{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }',
+    '.pt-hist-row{ border-bottom:1px solid var(--grid-line); padding:4px 0 6px; } .pt-hist-row:last-child{ border-bottom:none; }',
+    '.pt-hist-actions{ display:flex; gap:14px; padding:0 10px 2px; }',
+    '.pt-hist-code{ display:none; margin:6px 10px 4px; padding:10px 12px; background:#272822; color:#f8f8f2; border:1px solid var(--grid-line-strong);',
+    '  border-radius:4px; font-family:var(--mono); font-size:12.5px; line-height:1.5; tab-size:4; white-space:pre; overflow:auto; max-height:280px; }',
+    '.pt-hist-code.show{ display:block; }',
     '@media (max-width:560px){ .pt-keys{ display:none; } }',
   ].join('\n');
 
@@ -1544,12 +1595,129 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
     doc.documentElement.setAttribute('data-pt', '1');
     injectStyles(doc);
     var container = doc.getElementById('problems');
+    var toolbar = buildToolbar(doc, win, container);
     function scan() {
       var list = container.querySelectorAll('.problem');
       for (var i = 0; i < list.length; i++) enhanceProblem(frameEl, doc, win, list[i]);
+      toolbar.refresh();
     }
     new win.MutationObserver(scan).observe(container, { childList: true });
+    // "✓ Həll edilib" nişanı səhifənin öz kodu tərəfindən (style.display) göstərilir — irəliləyişi və filtri yeniləyir.
+    var refreshTimer = null;
+    new win.MutationObserver(function () {
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(toolbar.refresh, 60);
+    }).observe(container, { subtree: true, attributes: true, attributeFilter: ['style'] });
     scan();
+  }
+
+  // Məsələ siyahısının üstündə: irəliləyiş zolağı, axtarış, çətinlik/vəziyyət filtri, "Növbəti həll edilməmiş".
+  function buildToolbar(doc, win, container) {
+    var bar = doc.createElement('div');
+    bar.className = 'pt-toolbar';
+    bar.innerHTML = '<div class="pt-prog"><span class="pt-prog-text"></span><span class="pt-prog-bar" aria-hidden="true"><i></i></span></div>'
+      + '<div class="pt-filters">'
+      + '<input type="search" class="pt-search" placeholder="Axtar: başlıq, nömrə, teq…" aria-label="Məsələ axtar" autocomplete="off" spellcheck="false">'
+      + '<div class="pt-chips" role="group" aria-label="Çətinlik">'
+      + '<button type="button" class="pt-chip" data-diff="all" aria-pressed="true">Hamısı</button>'
+      + '<button type="button" class="pt-chip" data-diff="easy" aria-pressed="false">Asan</button>'
+      + '<button type="button" class="pt-chip" data-diff="mid" aria-pressed="false">Orta</button></div>'
+      + '<div class="pt-chips" role="group" aria-label="Vəziyyət">'
+      + '<button type="button" class="pt-chip" data-stat="all" aria-pressed="true">Hamısı</button>'
+      + '<button type="button" class="pt-chip" data-stat="todo" aria-pressed="false">Həll edilməyib</button>'
+      + '<button type="button" class="pt-chip" data-stat="done" aria-pressed="false">Həll edilib</button></div>'
+      + '<button type="button" class="pt-btn ghost pt-next">Növbəti həll edilməmiş →</button>'
+      + '</div><div class="pt-count" aria-live="polite"></div>';
+    var empty = doc.createElement('div');
+    empty.className = 'pt-empty';
+    empty.innerHTML = 'Heç bir məsələ tapılmadı. <button type="button" class="pt-link pt-clear">Filtrləri sıfırla</button>';
+    container.parentElement.insertBefore(bar, container);
+    container.parentElement.insertBefore(empty, container);
+
+    var state = { q: '', diff: 'all', stat: 'all' };
+    var search = bar.querySelector('.pt-search');
+    var progText = bar.querySelector('.pt-prog-text');
+    var progBar = bar.querySelector('.pt-prog-bar i');
+    var countEl = bar.querySelector('.pt-count');
+
+    function info(el) {
+      if (!el.__pt) {
+        var numEl = el.querySelector('.problem-num'), titleEl = el.querySelector('h3'), tags = el.querySelectorAll('.tag');
+        var tagText = '';
+        for (var i = 0; i < tags.length; i++) tagText += ' ' + tags[i].textContent;
+        var dEl = el.querySelector('.difficulty');
+        el.__pt = {
+          hay: foldAz((numEl ? numEl.textContent : '') + ' ' + (titleEl ? titleEl.textContent : '') + tagText),
+          diff: dEl ? (/\beasy\b/.test(dEl.className) ? 'easy' : (/\bmid\b/.test(dEl.className) ? 'mid' : 'other')) : 'other',
+        };
+      }
+      return el.__pt;
+    }
+    function isSolved(el) {
+      var sb = doc.getElementById('solved-' + el.id.replace('problem-', ''));
+      return !!sb && sb.style.display !== 'none';
+    }
+
+    function refresh() {
+      var probs = container.querySelectorAll('.problem');
+      var total = probs.length, solved = 0, shown = 0;
+      for (var i = 0; i < probs.length; i++) {
+        var el = probs[i], inf = info(el), done = isSolved(el);
+        if (done) solved++;
+        var ok = matchQuery(inf.hay, state.q)
+          && (state.diff === 'all' || inf.diff === state.diff)
+          && (state.stat === 'all' || (state.stat === 'done' ? done : !done));
+        el.classList.toggle('pt-hide', !ok);
+        if (ok) shown++;
+      }
+      progText.textContent = solved + '/' + total + ' həll edilib';
+      progBar.style.width = (total ? Math.round(solved * 100 / total) : 0) + '%';
+      countEl.textContent = shown !== total ? 'Göstərilir: ' + shown + '/' + total : '';
+      empty.classList.toggle('show', total > 0 && shown === 0);
+    }
+
+    search.addEventListener('input', function () { state.q = search.value; refresh(); });
+    function bindChips(attr, key) {
+      var chips = bar.querySelectorAll('.pt-chip[' + attr + ']');
+      for (var i = 0; i < chips.length; i++) {
+        chips[i].addEventListener('click', function () {
+          state[key] = this.getAttribute(attr);
+          for (var j = 0; j < chips.length; j++) chips[j].setAttribute('aria-pressed', chips[j] === this ? 'true' : 'false');
+          refresh();
+        });
+      }
+    }
+    bindChips('data-diff', 'diff');
+    bindChips('data-stat', 'stat');
+    empty.querySelector('.pt-clear').addEventListener('click', function () {
+      state.q = ''; state.diff = 'all'; state.stat = 'all'; search.value = '';
+      var chips = bar.querySelectorAll('.pt-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].setAttribute('aria-pressed', /^(all)$/.test(chips[i].getAttribute('data-diff') || chips[i].getAttribute('data-stat')) ? 'true' : 'false');
+      refresh();
+    });
+    bar.querySelector('.pt-next').addEventListener('click', function () {
+      var probs = container.querySelectorAll('.problem');
+      for (var i = 0; i < probs.length; i++) {
+        var el = probs[i];
+        if (el.classList.contains('pt-hide') || isSolved(el)) continue;
+        if (!el.classList.contains('expanded') && typeof win.toggleProblem === 'function') win.toggleProblem(parseInt(el.id.replace('problem-', ''), 10));
+        el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        return;
+      }
+      countEl.textContent = 'Bu filtrdə həll edilməmiş məsələ yoxdur.';
+    });
+    return { refresh: refresh };
+  }
+
+  // Məsələnin ID-sini səhifənin öz məlumatından tapır (Mövzu 1: problemIdByKey, Mövzu 2–5: problemIdByTitle).
+  function lookupProblemId(win, title) {
+    try {
+      return win.eval('(function(t){'
+        + 'if (typeof problemIdByTitle !== "undefined" && problemIdByTitle[t]) return problemIdByTitle[t].id;'
+        + 'if (typeof problemIdByKey !== "undefined" && typeof PROBLEM_SETS !== "undefined") {'
+        + '  var k = PROBLEM_SETS[activeSet].label + "|" + t; return problemIdByKey[k] ? problemIdByKey[k].id : null; }'
+        + 'return null; })')(title);
+    } catch (e) { return null; }
   }
 
   function enhanceProblem(frameEl, doc, win, problemEl) {
@@ -1879,6 +2047,137 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
     sampleBtn.addEventListener('click', function () { if (!sampleBtn.disabled) runCode('sample'); });
     runCustomBtn.addEventListener('click', function () { runCode('custom'); });
 
+    /* ---- 5) mərhələli köməklər: teqlər → yanaşma (müəllim/admin üçün hamısı açıq qalır) */
+    var left = problemEl.querySelector('.problem-left');
+    var steps = [];
+    var tagRow = left && left.querySelector('.tag-row');
+    var approachBlock = left && left.querySelector('.approach-block');
+    var revealBtnEl = left && left.querySelector('.reveal-btn'); // "Həlli göstər (GitHub)" — sonuncu addım
+    if (tagRow) steps.push({ el: tagRow, label: '💡 İpucu göstər (mövzu teqləri)' });
+    if (approachBlock) steps.push({ el: approachBlock, label: '💡 Yanaşmanı göstər' });
+    var role = user && user.role;
+    if (steps.length && role !== 'TEACHER' && role !== 'ADMIN') {
+      var hintStoreKey = user && user.id !== undefined ? hintKey(user.id, frameEl.id, num, title) : null;
+      var hintBox = doc.createElement('div');
+      hintBox.className = 'pt-hints';
+      hintBox.innerHTML = '<button type="button" class="pt-btn ghost pt-hint-btn"></button>'
+        + '<span class="pt-hint-note">Əvvəlcə özün cəhd et. Köməklər addım-addım açılır: ipucu → yanaşma → həll.</span>';
+      left.insertBefore(hintBox, steps[0].el);
+      var hintBtn = hintBox.querySelector('.pt-hint-btn');
+      var level = 0;
+      var setLevel = function (n, persist) {
+        level = Math.max(0, Math.min(steps.length, n));
+        for (var s = 0; s < steps.length; s++) steps[s].el.classList.toggle('pt-hide', s >= level);
+        if (revealBtnEl) revealBtnEl.classList.toggle('pt-hide', level < steps.length);
+        if (level >= steps.length) hintBox.classList.add('pt-hide');
+        else { hintBox.classList.remove('pt-hide'); hintBtn.textContent = steps[level].label; }
+        if (persist && hintStoreKey && level > 0) { try { localStorage.setItem(hintStoreKey, String(level)); } catch (e) { /* saxlama qadağası */ } }
+      };
+      var savedLevel = 0;
+      if (hintStoreKey) { try { savedLevel = parseInt(localStorage.getItem(hintStoreKey), 10) || 0; } catch (e) { savedLevel = 0; } }
+      var solvedEl = doc.getElementById('solved-' + idx);
+      var solvedNow = function () { return !!solvedEl && solvedEl.style.display !== 'none'; };
+      setLevel(solvedNow() ? steps.length : savedLevel, false);
+      hintBtn.addEventListener('click', function () { setLevel(level + 1, true); });
+      // Məsələ həll edilibsə (səhifə nişanı göstərəndə) bütün köməklər açılır.
+      if (solvedEl) {
+        new win.MutationObserver(function () { if (solvedNow() && level < steps.length) setLevel(steps.length, true); })
+          .observe(solvedEl, { attributes: true, attributeFilter: ['style'] });
+      }
+    }
+
+    /* ---- 6) tarixçə: hər göndərişin kodunu göstər və redaktora yüklə (API kodu artıq qaytarır) */
+    var historyBtn = submitRow.querySelector('.history-btn');
+    var historyEl = doc.getElementById('history-' + idx);
+    var histList = [];
+    var histTimer = null;
+    var SUBMIT_LABELS = {
+      ACCEPTED: '✓ QƏBUL EDİLDİ',
+      WRONG_ANSWER: '✗ SƏHV CAVAB',
+      COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+      RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+      TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+    };
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      catch (e) { return ''; }
+    }
+    function renderHistory(showAll) {
+      if (!histList.length) { historyEl.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>'; return; }
+      var LIMIT = 15;
+      var rows = showAll ? histList : histList.slice(0, LIMIT);
+      historyEl.innerHTML = rows.map(function (s, i) {
+        var tests = s.totalTestCases > 1 ? s.passedTestCases + '/' + s.totalTestCases + ' test · ' : '';
+        return '<div class="pt-hist-row" data-i="' + i + '"><div class="history-item">'
+          + '<span class="verdict-badge ' + escapeHtml(s.status) + '">' + escapeHtml(SUBMIT_LABELS[s.status] || s.status) + '</span>'
+          + '<span class="history-time">' + tests + escapeHtml(fmtDate(s.submittedAt)) + '</span></div>'
+          + '<div class="pt-hist-actions"><button type="button" class="pt-link pt-hist-view" aria-expanded="false">Kodu göstər</button>'
+          + '<button type="button" class="pt-link pt-hist-load">Redaktora yüklə</button></div>'
+          + '<pre class="pt-hist-code"></pre></div>';
+      }).join('') + (!showAll && histList.length > LIMIT
+        ? '<button type="button" class="pt-link pt-hist-more">Daha köhnə ' + (histList.length - LIMIT) + ' göndərişi göstər</button>' : '');
+    }
+    async function loadHistory() {
+      var pid = lookupProblemId(win, title);
+      if (!pid) { historyEl.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>'; return; }
+      if (!histList.length) historyEl.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+      try {
+        var res = await root.azcupApiFetch('/api/problems/' + pid + '/submissions');
+        var data = await res.json();
+        if (!res.ok) { historyEl.innerHTML = '<p class="history-empty">' + escapeHtml(data.message || 'Yüklənə bilmədi.') + '</p>'; return; }
+        histList = data;
+        renderHistory(false);
+      } catch (e) {
+        historyEl.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+      }
+    }
+    function loadIntoEditor(code) {
+      if (ta.value !== code && ta.value.trim() && ta.value !== starter
+          && !win.confirm('Redaktordakı kod bu göndərişin kodu ilə əvəz olunacaq. Davam edək?')) return;
+      ta.value = code;
+      ta.dispatchEvent(new win.Event('input', { bubbles: true }));
+      ta.focus();
+      editor.scrollIntoView({ block: 'nearest' });
+    }
+    if (historyBtn && historyEl) {
+      historyBtn.removeAttribute('onclick'); // səhifənin köhnə (kodsuz) tarixçəsi əvəzinə bu işləyir
+      historyBtn.setAttribute('aria-expanded', 'false');
+      historyBtn.addEventListener('click', function () {
+        var open = !historyEl.classList.contains('show');
+        historyEl.classList.toggle('show', open);
+        historyBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) loadHistory();
+      });
+      historyEl.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var row = t.closest('.pt-hist-row');
+        if (t.closest('.pt-hist-more')) { renderHistory(true); return; }
+        if (!row) return;
+        var item = histList[parseInt(row.getAttribute('data-i'), 10)];
+        if (!item) return;
+        if (t.closest('.pt-hist-view')) {
+          var pre = row.querySelector('.pt-hist-code');
+          var btn = row.querySelector('.pt-hist-view');
+          var show = !pre.classList.contains('show');
+          if (show && !pre.innerHTML) pre.innerHTML = highlightCppLines(item.sourceCode || '').join('\n');
+          pre.classList.toggle('show', show);
+          btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+          btn.textContent = show ? 'Kodu gizlət' : 'Kodu göstər';
+        } else if (t.closest('.pt-hist-load')) {
+          loadIntoEditor(item.sourceCode || '');
+        }
+      });
+      // Yeni göndəriş nəticəsi gələndə açıq tarixçə yenilənir.
+      if (badgeEl) {
+        new win.MutationObserver(function () {
+          if (!historyEl.classList.contains('show')) return;
+          clearTimeout(histTimer);
+          histTimer = setTimeout(loadHistory, 400);
+        }).observe(badgeEl, { childList: true, characterData: true, subtree: true });
+      }
+    }
+
     render();
     updateDraftNote(false);
     if (ta.value !== starter && key) draftEl.textContent = 'Qaralama bərpa olundu.';
@@ -1907,6 +2206,9 @@ const PYTHON_HTML_B64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJheiI+DQo8aGVhZD4
     normalizeOutput: normalizeOutput,
     compareOutputs: compareOutputs,
     draftKey: draftKey,
+    hintKey: hintKey,
+    foldAz: foldAz,
+    matchQuery: matchQuery,
     escapeHtml: escapeHtml,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
