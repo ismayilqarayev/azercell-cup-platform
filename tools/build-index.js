@@ -36,6 +36,22 @@ for (const [constName, fileName] of Object.entries(FILES)) {
   console.log(constName, '<-', fileName, '(' + html.length + ' chars)');
 }
 
+// frontend-src/problem-tools.js (məsələ həlli redaktoru, qaralama, nümunə sınağı) index.html-də
+// PROBLEM_TOOLS:BEGIN ... PROBLEM_TOOLS:END işarələri arasına kopyalanır.
+const TOOLS_SRC = path.join(SRC_DIR, 'problem-tools.js');
+const toolsJs = fs.readFileSync(TOOLS_SRC, 'utf-8').replace(/\r\n/g, '\n');
+if (/<\/script/i.test(toolsJs)) {
+  throw new Error('problem-tools.js must not contain "</script" (it is inlined into a <script> block)');
+}
+const toolsRe = /\/\* PROBLEM_TOOLS:BEGIN[^\n]*\*\/[\s\S]*?\/\* PROBLEM_TOOLS:END \*\//;
+if (!toolsRe.test(indexHtml)) {
+  throw new Error('Could not find the PROBLEM_TOOLS:BEGIN/END markers in index.html');
+}
+indexHtml = indexHtml.replace(toolsRe, () =>
+  '/* PROBLEM_TOOLS:BEGIN (frontend-src/problem-tools.js-dən tools/build-index.js ilə yaradılır — burada əl ilə dəyişməyin) */\n'
+  + toolsJs.replace(/\n+$/, '') + '\n/* PROBLEM_TOOLS:END */');
+console.log('PROBLEM_TOOLS <- problem-tools.js (' + toolsJs.length + ' chars)');
+
 fs.writeFileSync(INDEX_HTML, indexHtml, 'utf-8');
 console.log('Wrote', INDEX_HTML);
 
