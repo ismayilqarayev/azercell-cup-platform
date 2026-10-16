@@ -153,8 +153,11 @@
   .auth-toggle a{ color:var(--gold); text-decoration:none; cursor:pointer; }
   .auth-toggle a:hover{ text-decoration:underline; }
   .admin-entry{ margin:14px 0 0; text-align:center; }
-  .admin-entry a{ font-size:11px; color:var(--ink-soft); text-decoration:none; cursor:pointer; opacity:0.6; }
-  .admin-entry a:hover{ opacity:1; text-decoration:underline; }
+  /* "Admin girişi" keçidi əvvəllər 11px + opacity .6 idi: kontrast 3.4:1 (WCAG AA üçün 4.5 lazımdır) və toxunma sahəsi çox kiçik. İndi
+     tam --ink-soft (7.6:1), 13px və padding ilə ~32px hündürlüklü toxunma sahəsi; klaviatura fokusu da görünür. */
+  .admin-entry a{ display:inline-block; padding:8px 12px; font-size:13px; color:var(--ink-soft); text-decoration:none; cursor:pointer; border-radius:6px; }
+  .admin-entry a:hover{ color:var(--ink); text-decoration:underline; }
+  .admin-entry a:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
   .user-greeting{
     display:flex; align-items:center; justify-content:center; gap:14px;
     margin:-10px 0 18px; flex-wrap:wrap;
