@@ -37,12 +37,15 @@ if [ "$size" -lt 10000 ] || ! tail -n 5 "$DUMP" | grep -q "PostgreSQL database d
 fi
 
 # Köçürmədən sonra bu serverin bazası CANLI olur — təsadüfən yenidən işlədilsə yeni məlumatı silməsin.
-echo "Bu serverin cari bazası SİLİNƏCƏK. Hazırkı istifadəçi sayı: $("${PSQL[@]}" -At -c 'SELECT count(*) FROM users' </dev/null 2>/dev/null || echo 'yoxdur')"
+echo "Bu serverin cari bazası SİLİNƏCƏK. Hazırkı istifadəçi sayı: $("${PSQL[@]}" -At -c 'SELECT count(*) FROM app_user' </dev/null 2>/dev/null || echo 'yoxdur')"
 read -rp "Davam etmək üçün SIL yazın: " CONFIRM
 [ "$CONFIRM" = "SIL" ] || { echo "Ləğv edildi, heç nə dəyişmədi"; exit 1; }
 
 echo "==> backend dayandırılır, köhnə sxem silinir"
 docker compose stop azcup-backend
+# DROP SCHEMA PostgreSQL "large object"-ləri (məs. @Lob sütunları) silmir; qalsalar dump-un bərpası
+# "pg_largeobject_metadata ... already exists" xətası ilə dayanır. Ona görə əvvəlcə hamısı açılır.
+echo "Silinən large object sayı: $("${PSQL[@]}" -At -c 'SELECT count(lo_unlink(oid)) FROM pg_largeobject_metadata' </dev/null)"
 "${PSQL[@]}" -c "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"
 
 echo "==> fayldan bərpa olunur"
