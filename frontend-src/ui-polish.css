@@ -1,0 +1,231 @@
+/* AZ-CUP ortaq dizayn qatı. tools/build-index.js bu faylı HƏM index.html-in qabığına (UI_POLISH:BEGIN/END),
+   HƏM də hər iframe səhifəsinin </head>-indən əvvəl (id="azcup-ui-polish") əlavə edir; ona görə ən sonda gəlir və
+   eyni xüsusiyyətlilikdə səhifənin öz qaydalarını əvəz edir. Mənbə səhifələrinə (frontend-src/*.html) toxunulmur.
+   Sıra: 1) şriftlər  2) tokenlər  3) baza  4) toast/dialoq/skeleton  5) ortaq səhifə komponentləri  6) azaldılmış hərəkət. */
+
+/* ---------- 1) Şriftlər: öz serverimizdən (xarici sorğu yoxdur), dəyişən çəkili woff2 ---------- */
+@font-face{
+  font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url('/assets/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face{
+  font-family:'Inter'; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url('/assets/fonts/inter-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:'JetBrains Mono'; font-style:normal; font-weight:100 800; font-display:swap;
+  src:url('/assets/fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face{
+  font-family:'JetBrains Mono'; font-style:normal; font-weight:100 800; font-display:swap;
+  src:url('/assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* ---------- 2) Tokenlər: köhnə dəyişən adları saxlanılıb, yalnız şrift və hərəkət/forma tokenləri əlavə olunur ---------- */
+:root{
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-in-out:cubic-bezier(.65,0,.35,1);
+  --dur-fast:140ms; --dur:240ms; --dur-slow:420ms;
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --ring:0 0 0 3px rgba(38,210,255,.20);
+  --lift:0 1px 0 rgba(255,255,255,.045) inset, 0 10px 28px rgba(0,0,0,.38);
+  --glow:0 0 0 1px rgba(38,210,255,.5), 0 10px 32px rgba(38,210,255,.14);
+}
+
+/* ---------- 3) Baza ---------- */
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{ text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+h1,h2,h3,h4{ text-wrap:balance; }
+p,li{ text-wrap:pretty; }
+::selection{ background:rgba(38,210,255,.28); color:#fff; }
+button,[role="button"],summary{ -webkit-tap-highlight-color:transparent; }
+:where(a,button,summary,[role="button"],[role="tab"],[tabindex]:not([tabindex="-1"])):focus-visible{
+  outline:2px solid var(--gold-bright,#26D2FF); outline-offset:2px;
+}
+:where(input,textarea,select):focus-visible{ outline:none; box-shadow:var(--ring); }
+:where(button):not(:disabled):active{ transform:translateY(1px) scale(.985); }
+:where(button):disabled{ cursor:not-allowed; }
+/* Rəqəmlər cədvəl və sayğaclarda sütun-sütun hizalansın */
+:where(table,.pbar,.specs .v,.progress-badge,.contest-countdown){ font-variant-numeric:tabular-nums; }
+
+/* ---------- 4) Ortaq hərəkət: yalnız istifadəçi əməlinə cavab (açılma, keçid, təsdiq) ---------- */
+@keyframes azFade   { from{ opacity:0 } to{ opacity:1 } }
+@keyframes azRise   { from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+@keyframes azPop    { from{ opacity:0; transform:scale(.94) } to{ opacity:1; transform:none } }
+@keyframes azReveal { from{ opacity:0; transform:translateY(-6px) } to{ opacity:1; transform:none } }
+@keyframes azShimmer{ from{ background-position:200% 0 } to{ background-position:-200% 0 } }
+@keyframes azSpin   { to{ transform:rotate(360deg) } }
+
+/* Skeleton: "Yüklənir..." mətninin yerinə parıldayan yer tutucu (az-skeleton sinfi və ya JS-siz .teacher-panel-loading) */
+.az-skeleton{
+  display:block; min-height:14px; border-radius:var(--r-sm);
+  background:linear-gradient(100deg, rgba(255,255,255,.05) 30%, rgba(255,255,255,.11) 50%, rgba(255,255,255,.05) 70%);
+  background-size:200% 100%; animation:azShimmer 1.4s linear infinite;
+}
+
+/* Toast */
+.az-toasts{
+  position:fixed; right:18px; bottom:18px; z-index:5200; display:flex; flex-direction:column; gap:10px;
+  width:min(380px, calc(100vw - 28px)); pointer-events:none;
+}
+.az-toast{
+  pointer-events:auto; position:relative; overflow:hidden; display:flex; align-items:flex-start; gap:10px;
+  padding:12px 14px 14px 14px; border-radius:var(--r-md); color:var(--ink,#F2F3F7);
+  background:var(--paper-raised,#1B1F2B); border:1px solid var(--grid-line-strong,rgba(255,255,255,.16));
+  box-shadow:0 14px 34px rgba(0,0,0,.5); font:500 13.5px/1.45 var(--sans);
+  animation:azRise var(--dur) var(--ease-out) both;
+}
+.az-toast.leaving{ opacity:0; transform:translateY(8px); transition:opacity .2s ease, transform .2s ease; }
+.az-toast-ic{ flex:0 0 auto; width:18px; height:18px; margin-top:1px; }
+.az-toast-msg{ flex:1 1 auto; min-width:0; word-break:break-word; }
+.az-toast-x{
+  flex:0 0 auto; margin:-4px -6px 0 0; width:26px; height:26px; border:0; border-radius:8px; cursor:pointer;
+  background:transparent; color:var(--ink-soft,#9AA3B2); font-size:16px; line-height:1;
+}
+.az-toast-x:hover{ background:rgba(255,255,255,.08); color:var(--ink,#fff); }
+.az-toast-bar{ position:absolute; left:0; bottom:0; height:3px; width:100%; transform-origin:left; animation:azBar linear forwards; }
+@keyframes azBar{ from{ transform:scaleX(1) } to{ transform:scaleX(0) } }
+.az-toast.error  { border-color:rgba(255,107,118,.55); } .az-toast.error  .az-toast-ic,.az-toast.error  .az-toast-bar{ color:var(--alert,#FF6B76); background:currentColor; }
+.az-toast.warn   { border-color:rgba(226,166,77,.5);  } .az-toast.warn   .az-toast-ic,.az-toast.warn   .az-toast-bar{ color:var(--bronze,#E2A64D); background:currentColor; }
+.az-toast.success{ border-color:rgba(74,223,185,.5);  } .az-toast.success .az-toast-ic,.az-toast.success .az-toast-bar{ color:var(--green,#4ADFB9); background:currentColor; }
+.az-toast.info   { border-color:rgba(63,196,222,.5);  } .az-toast.info   .az-toast-ic,.az-toast.info   .az-toast-bar{ color:var(--gold,#3FC4DE); background:currentColor; }
+.az-toast-ic{ background:none !important; }
+@media (max-width:560px){ .az-toasts{ right:14px; left:14px; width:auto; bottom:14px; } }
+
+/* "Yuxarı qayıt" düyməsi (uzun iframe səhifələrində, bax: ui-kit.js initBackToTop) */
+.az-top{
+  position:fixed; right:18px; bottom:18px; z-index:4000; width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
+  color:var(--ink,#F2F3F7); background:var(--paper-raised,#1B1F2B); border:1px solid var(--grid-line-strong,rgba(255,255,255,.16));
+  box-shadow:0 10px 24px rgba(0,0,0,.45); cursor:pointer; opacity:0; transform:translateY(8px); pointer-events:none;
+  transition:opacity var(--dur) ease, transform var(--dur) var(--ease-out), border-color var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out);
+}
+.az-top.show{ opacity:1; transform:none; pointer-events:auto; }
+.az-top:hover{ border-color:var(--gold,#3FC4DE); box-shadow:0 10px 28px rgba(38,210,255,.22); }
+.az-top svg{ width:18px; height:18px; }
+body:has(.az-top.show) .az-toasts{ bottom:72px; }
+
+/* Dialoq (confirm / prompt / gizli dəyər) */
+.az-modal-backdrop{
+  position:fixed; inset:0; z-index:5100; display:flex; align-items:center; justify-content:center; padding:18px;
+  background:rgba(6,8,12,.66); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  animation:azFade var(--dur-fast) ease both;
+}
+.az-modal-backdrop.leaving{ opacity:0; transition:opacity .16s ease; }
+.az-modal{
+  width:min(420px,100%); border-radius:var(--r-lg); padding:22px 22px 18px; color:var(--ink,#F2F3F7);
+  background:var(--paper,#151822); border:1px solid var(--grid-line-strong,rgba(255,255,255,.16));
+  box-shadow:0 30px 80px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.05) inset;
+  animation:azPop var(--dur) var(--ease-out) both; font-family:var(--sans);
+}
+.az-modal.danger{ border-top:3px solid var(--alert,#FF6B76); }
+.az-modal h4{ margin:0 0 8px; font:700 16px/1.35 var(--sans); letter-spacing:-.01em; }
+.az-modal p{ margin:0 0 16px; font-size:14px; line-height:1.6; color:var(--ink-soft,#9AA3B2); white-space:pre-line; }
+.az-modal-input{
+  width:100%; margin:0 0 16px; padding:11px 13px; border-radius:var(--r-md); color:var(--ink,#fff);
+  background:var(--blueprint-deep,#0B0D12); border:1px solid var(--grid-line-strong,rgba(255,255,255,.16));
+  font:500 14px var(--sans); outline:none; transition:border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.az-modal-input.mono{ font-family:var(--mono); letter-spacing:.04em; }
+.az-modal-input:focus{ border-color:var(--gold,#3FC4DE); box-shadow:var(--ring); }
+.az-modal-actions{ display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+.az-btn{
+  font:600 13px var(--sans); padding:10px 18px; border-radius:999px; cursor:pointer; border:1px solid transparent;
+  transition:background var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.az-btn.ghost{ background:transparent; color:var(--ink,#F2F3F7); border-color:var(--grid-line-strong,rgba(255,255,255,.16)); }
+.az-btn.ghost:hover{ border-color:var(--ink-soft,#9AA3B2); background:rgba(255,255,255,.05); }
+.az-btn.primary{ background:var(--gold-bright,#26D2FF); color:var(--on-accent,#001529); }
+.az-btn.primary:hover{ box-shadow:0 6px 22px rgba(38,210,255,.32); }
+.az-btn.danger{ background:var(--alert,#FF6B76); color:#2a0307; }
+.az-btn.danger:hover{ box-shadow:0 6px 22px rgba(255,107,118,.32); }
+
+/* ---------- 5) Ortaq səhifə komponentləri (Hazırlıq Planı, Mövzu testləri, alətlər üçün eyni sinif adları) ---------- */
+
+/* Başlıq bloku: mavi çərçivə + künc işarələri ("training schematic" kimliyi) */
+.titleblock{ border-width:1px !important; border-color:rgba(38,210,255,.55) !important; border-radius:4px;
+  box-shadow:inset 0 0 0 1px rgba(38,210,255,.06), 0 18px 50px rgba(0,0,0,.35); }
+.titleblock h1{ font-weight:800; letter-spacing:-.035em; line-height:1.12; text-wrap:balance; }
+.titleblock p, .titleblock p.sub{ line-height:1.7; }
+/* Dar ekranda çərçivənin üstündəki etiket (::before) iki sətrə sarılıb çərçivəni pozmasın */
+@media (max-width:520px){
+  .titleblock::before{ max-width:calc(100% - 28px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px !important; letter-spacing:1px !important; }
+}
+.specs .v{ font-weight:600; }
+.section-label{ font-weight:600; }
+
+/* Mövzu seçimi çipləri */
+.pset-tab{ transition:background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) ease; }
+.pset-tab:hover{ transform:translateY(-1px); }
+.pset-tab.active{ box-shadow:0 6px 22px rgba(38,210,255,.28); }
+
+/* Məsələ kartları: yumşaq künc, görünən sərhəd, açıq olanda vurğu kənarı, açılma animasiyası */
+.problem{
+  border-radius:var(--r-md) !important; border:1px solid var(--grid-line);
+  box-shadow:var(--lift) !important;
+  transition:border-color var(--dur) ease, background var(--dur) ease, box-shadow var(--dur) var(--ease-out);
+}
+.problem:hover{ border-color:rgba(38,210,255,.28); }
+.problem.expanded{ border-color:rgba(38,210,255,.5); box-shadow:var(--glow) !important; }
+.problem-head:hover{ background:rgba(255,255,255,.03) !important; }
+.problem-num{ border-radius:var(--r-sm) !important; font-weight:700; }
+.problem-main h3{ font-weight:650; letter-spacing:-.01em; }
+.difficulty{ padding:2px 8px; border-radius:999px; border:1px solid currentColor; font-weight:600 !important; }
+.difficulty.easy{ background:rgba(74,223,185,.08); }
+.difficulty.mid{ background:rgba(226,166,77,.08); }
+.problem.expanded .problem-body{ animation:azReveal var(--dur-slow) var(--ease-out) both; }
+.io-box{ border-radius:8px !important; border:1px solid var(--grid-line); }
+.tag{ border-radius:6px !important; }
+.reveal-btn, .history-btn, .test-btn, .open-code-modal-btn{ transition:background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out); }
+.reveal-btn:hover, .history-btn:hover{ box-shadow:0 4px 16px rgba(0,0,0,.28); }
+
+/* Əsas əməliyyat düymələri */
+.submit-btn, .run-btn{ transition:background var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out), opacity var(--dur-fast) ease, transform var(--dur-fast) ease; }
+.submit-btn:not(:disabled):hover, .run-btn:not(:disabled):hover{ box-shadow:0 6px 22px rgba(38,210,255,.32); }
+
+/* Redaktor/inputlar: fokusda yumşaq halqa */
+.code-input:focus, .code-editor-textarea:focus, .stdin-input:focus{ box-shadow:var(--ring); }
+
+/* Nəticə nişanı və hökm blokları göründükdə yumşaq çıxış */
+.verdict.show{ animation:azReveal var(--dur) var(--ease-out) both; }
+.verdict.show .verdict-badge{ animation:azPop var(--dur) var(--ease-out) both; }
+.run-output{ animation:azReveal var(--dur) var(--ease-out) both; }
+
+/* Modal pəncərələr (iframe səhifələrində): görünəndə yumşaq giriş */
+.confirm-overlay.show, .code-modal-backdrop.show{ animation:azFade var(--dur-fast) ease both; }
+.confirm-overlay.show .confirm-box, .code-modal-backdrop.show .code-modal{ animation:azPop var(--dur) var(--ease-out) both; }
+.confirm-box, .code-modal{ border-radius:var(--r-lg) !important; }
+.confirm-btn{ border-radius:999px !important; }
+
+/* Yol xəritəsi: həftə kartları */
+.week{ transition:border-color var(--dur) ease, box-shadow var(--dur) var(--ease-out); }
+.week.open .week-body{ animation:azReveal var(--dur-slow) var(--ease-out) both; }
+.roadmap-nav-item{ transition:background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-fast) ease; }
+.resource{ transition:border-color var(--dur) ease, transform var(--dur) var(--ease-out); }
+.resource:hover{ transform:translateY(-2px); }
+
+/* "Yüklənir..." yazısı skeleton rolunda (yalnız az-skel sinfi olanlar): mətn ekran oxuyucuya qalır, gözə parıltı göstərilir.
+   .teacher-panel-loading sinfi bəzi yerlərdə adi bildiriş mətni üçün də işlənir ("Fayl seçdikdə..."), onlar dəyişməz qalır. */
+.teacher-panel-loading.az-skel{
+  position:relative; display:block; min-height:96px; overflow:hidden; border-radius:var(--r-md);
+  color:transparent !important; font-size:0 !important;
+  background:
+    linear-gradient(100deg, transparent 30%, rgba(255,255,255,.07) 50%, transparent 70%) 200% 0 / 200% 100% no-repeat,
+    linear-gradient(rgba(255,255,255,.05), rgba(255,255,255,.05)) 0 8px / 100% 14px no-repeat,
+    linear-gradient(rgba(255,255,255,.04), rgba(255,255,255,.04)) 0 36px / 82% 14px no-repeat,
+    linear-gradient(rgba(255,255,255,.04), rgba(255,255,255,.04)) 0 64px / 64% 14px no-repeat;
+  animation:azShimmerBg 1.4s linear infinite;
+}
+@keyframes azShimmerBg{ from{ background-position:200% 0, 0 8px, 0 36px, 0 64px } to{ background-position:-200% 0, 0 8px, 0 36px, 0 64px } }
+
+/* ---------- 6) Azaldılmış hərəkət: bütün animasiya və keçidlər söndürülür ---------- */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; animation-delay:0s !important; transition-duration:.01ms !important; }
+  .az-skeleton, .teacher-panel-loading.az-skel{ animation:none !important; }
+}

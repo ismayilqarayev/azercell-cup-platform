@@ -2538,13 +2538,13 @@ async function loadAdminTestCases(i){
 async function addAdminTestCase(i){
   const meta = problemIdByTitle[problems[i].title];
   if (!meta) {
-    alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
     return;
   }
   const input = document.getElementById('newTcInput-' + i).value;
   const output = document.getElementById('newTcOutput-' + i).value.trim();
   if (!output) {
-    alert('Gözlənilən çıxışı daxil et.');
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
     return;
   }
   try {
@@ -2558,20 +2558,20 @@ async function addAdminTestCase(i){
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      alert(data.message || 'Əlavə etmək mümkün olmadı.');
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
       return;
     }
     document.getElementById('newTcInput-' + i).value = '';
     document.getElementById('newTcOutput-' + i).value = '';
     loadAdminTestCases(i);
   } catch (e) {
-    alert('Əlavə etmək mümkün olmadı.');
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
   }
 }
 
 // Bir gizli test halını silir.
 async function deleteAdminTestCase(i, testCaseId){
-  if (!confirm('Bu gizli testi silmək istəyirsən?')) return;
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
   const meta = problemIdByTitle[problems[i].title];
   if (!meta) return;
   try {
@@ -2579,7 +2579,7 @@ async function deleteAdminTestCase(i, testCaseId){
     if (!res.ok) throw new Error('delete failed');
     loadAdminTestCases(i);
   } catch (e) {
-    alert('Silmək mümkün olmadı.');
+    AzcupUI.alert('Silmək mümkün olmadı.');
   }
 }
 

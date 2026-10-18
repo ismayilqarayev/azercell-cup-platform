@@ -1,0 +1,253 @@
+/* AZ-CUP qabığı (index.html) üçün dizayn qatı: sidebar, giriş/dil ekranları, keçidlər, panellər, yükləmə ekranı.
+   tools/build-index.js bunu index.html-də UI_SHELL:BEGIN/END arasına yazır (ui-polish.css-dən SONRA). Yalnız qabığa aiddir,
+   iframe səhifələrinə daxil edilmir. Hərəkətin əsas anı: giriş -> dil seçimi -> tətbiq ardıcıllığı + sidebar göstəricisinin sürüşməsi. */
+
+/* ---------- Keçid animasiyaları ---------- */
+@keyframes azTabIn   { from{ opacity:0; transform:translateY(10px) } to{ opacity:1; transform:none } }
+@keyframes azAppIn   { from{ opacity:0 } to{ opacity:1 } }
+@keyframes azSlideIn { from{ opacity:0; transform:translateX(-12px) } to{ opacity:1; transform:none } }
+@keyframes azLeave   { to{ opacity:0; transform:scale(.985) } }
+@keyframes azShake   { 0%,100%{ transform:none } 20%{ transform:translateX(-5px) } 40%{ transform:translateX(5px) } 60%{ transform:translateX(-3px) } 80%{ transform:translateX(3px) } }
+@keyframes azBarSlide{ 0%{ transform:translateX(-100%) } 100%{ transform:translateX(320%) } }
+.az-out{ animation:azFade .15s ease reverse both; }
+.az-in { animation:azRise var(--dur) var(--ease-out) both; }
+svg.ico{ width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.2em; }
+/* Dil ekranı seçimdən sonra yumşaq söndürülür (öz fon animasiyası olduğu üçün keyframe ilə) */
+.lang-select.leaving{ animation:azLeave .26s ease forwards; pointer-events:none; }
+/* İlk dəfə yüklənən iframe hazır olana qədər gizlidir, sonra yumşaq daxil olur */
+.frame-wrap > iframe.az-wait{ opacity:0; animation:none; }
+
+/* Aktiv tab/panel görünəndə yumşaq giriş (köhnə tab dərhal gizlənir, yenisi gəlir) */
+.frame-wrap > iframe.active, .frame-wrap > .teacher-panel.active{ animation:azTabIn .34s var(--ease-out) both; }
+/* Panelin ilk açılışında bloklar kiçik fasilə ilə gəlir; .az-enter yalnız tab açılandan ~1,8 san. qalır
+   (canlı sorğu ilə təzələnən məzmun təkrar animasiya olunmasın deyə) */
+.teacher-panel.az-enter .teacher-panel-inner > *{ animation:azRise .45s var(--ease-out) both; }
+.teacher-panel.az-enter .teacher-panel-inner > *:nth-child(2){ animation-delay:50ms; }
+.teacher-panel.az-enter .teacher-panel-inner > *:nth-child(3){ animation-delay:100ms; }
+.teacher-panel.az-enter [id$="PanelBody"] > *, .teacher-panel.az-enter #githubCodesBody > *{ animation:azRise .45s var(--ease-out) both; }
+.teacher-panel.az-enter [id$="PanelBody"] > *:nth-child(2){ animation-delay:40ms; }
+.teacher-panel.az-enter [id$="PanelBody"] > *:nth-child(3){ animation-delay:80ms; }
+.teacher-panel.az-enter [id$="PanelBody"] > *:nth-child(n+4){ animation-delay:120ms; }
+.teacher-panel.az-enter .teacher-table tbody tr{ animation:azRise .4s var(--ease-out) both; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(1){ animation-delay:40ms; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(2){ animation-delay:80ms; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(3){ animation-delay:120ms; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(4){ animation-delay:160ms; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(5){ animation-delay:200ms; }
+.teacher-panel.az-enter .teacher-table tbody tr:nth-child(n+6){ animation-delay:240ms; }
+
+/* Ağır iframe ilk dəfə yüklənəndə yuxarıda nazik gedişat zolağı (süni gözləmə yox, real yükləmə) */
+.frame-progress{ position:absolute; left:0; right:0; top:0; height:3px; z-index:5; overflow:hidden; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+.frame-progress.show{ opacity:1; }
+.frame-progress::before{
+  content:""; position:absolute; inset:0 auto 0 0; width:34%;
+  background:linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+}
+.frame-progress.show::before{ animation:azBarSlide 1.1s var(--ease-in-out) infinite; } /* yalnız görünəndə işləyir */
+
+/* ---------- Giriş / rol / dil ekranları ---------- */
+/* Forma uzandıqda (qeydiyyat, xəta mesajı, kiçik ekran) aşağıdakı hissə kəsilməsin: konteyner sürüşə bilir, kart auto-margin ilə mərkəzlənir.
+   Parıltı scale/ölçü əvəzinə yalnız opacity animasiya edir və konteynerə sığır, ona görə lazımsız sürüşmə zolağı yaranmır. */
+.lang-select{ overflow-x:hidden; overflow-y:auto; }
+.lang-select::before{
+  top:0; left:0; width:auto; height:auto; inset:0; transform:none;
+  background:radial-gradient(60% 55% at 50% 46%, rgba(63,196,222,.15), transparent 72%);
+  animation:azGlow 8s ease-in-out infinite;
+}
+@keyframes azGlow{ 0%,100%{ opacity:.55 } 50%{ opacity:1 } }
+.lang-card{ max-width:780px; margin:auto; padding:8px 0; }
+.lang-eyebrow{
+  display:inline-flex; align-items:center; gap:10px; font-family:var(--mono); font-weight:800; font-size:13px; letter-spacing:.32em;
+  color:var(--bronze); margin-bottom:20px; text-indent:.32em;
+}
+.lang-eyebrow::before{
+  content:""; width:22px; height:22px; flex:0 0 auto;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E2A64D' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3Cpath d='M8 6H5a2 2 0 0 0 2 4M16 6h3a2 2 0 0 1-2 4M12 13v4M8.5 20h7M10 17h4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.lang-title{ font-family:var(--mono); font-weight:800; letter-spacing:-.035em; font-size:clamp(24px,4.4vw,34px); line-height:1.15; }
+.lang-sub{ font-size:15px; line-height:1.6; margin-bottom:30px; }
+.lang-options{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.lang-btn{
+  position:relative; flex:none; max-width:none; text-align:left; align-items:flex-start; gap:10px; padding:20px 20px 18px;
+  border-radius:16px; border:1px solid var(--grid-line-strong); overflow:hidden; isolation:isolate;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.012)), var(--paper);
+  transition:border-color var(--dur) ease, transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+/* Siçanı izləyən yumşaq işıq: yalnız hover/fokusda görünür, kartın mətninin arxasındadır */
+.lang-btn::before{
+  content:""; position:absolute; inset:0; z-index:-1; opacity:0; pointer-events:none; transition:opacity var(--dur) ease;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%), rgba(38,210,255,.16), transparent 62%);
+}
+.lang-btn:hover, .lang-btn:focus-visible{ border-color:rgba(38,210,255,.6); transform:translateY(-3px); box-shadow:var(--glow); }
+.lang-btn:hover::before, .lang-btn:focus-visible::before{ opacity:1; }
+.lang-btn:active{ transform:translateY(-1px) scale(.992); }
+.lang-ic{
+  display:grid; place-items:center; width:44px; height:44px; border-radius:12px; margin-bottom:4px;
+  color:var(--gold-bright); background:rgba(38,210,255,.09); border:1px solid rgba(38,210,255,.26);
+}
+.lang-ic svg{ width:22px; height:22px; }
+.lang-ic.warm{ color:var(--bronze); background:rgba(226,166,77,.09); border-color:rgba(226,166,77,.3); }
+.lang-ic.glyph{ font:800 15px/1 var(--mono); letter-spacing:-.04em; }
+.lang-name{ font-size:18px; font-weight:700; letter-spacing:-.01em; }
+.lang-desc{ font-size:13px; line-height:1.55; padding-right:26px; } /* sağ-alt ox mətnin üstünə düşməsin */
+.lang-go{ position:absolute; right:16px; bottom:16px; width:18px; height:18px; color:var(--gold-bright); opacity:0; transform:translateX(-6px); transition:opacity var(--dur) ease, transform var(--dur) var(--ease-out); }
+.lang-btn:hover .lang-go, .lang-btn:focus-visible .lang-go{ opacity:1; transform:none; }
+.lang-btn-python:hover, .lang-btn-python:focus-visible{ border-color:rgba(226,166,77,.6); box-shadow:0 0 0 1px rgba(226,166,77,.5), 0 10px 32px rgba(226,166,77,.13); }
+.lang-btn-python::before{ background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%), rgba(226,166,77,.15), transparent 62%); }
+.lang-btn-python .lang-go{ color:var(--bronze); }
+.lang-badge{ align-self:flex-start; }
+.admin-entry a{ transition:color var(--dur-fast) ease; }
+
+/* Giriş formaları: şüşə səthli panel */
+#studentAuth, #teacherAuth, #adminAuth{
+  max-width:400px; margin:0 auto; padding:28px 28px 22px; border-radius:20px; text-align:center;
+  background:rgba(21,24,34,.8); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  border:1px solid var(--grid-line-strong); box-shadow:var(--lift);
+}
+#studentAuth .lang-title, #teacherAuth .lang-title, #adminAuth .lang-title{ font-size:24px; }
+#studentAuth .lang-sub, #teacherAuth .lang-sub, #adminAuth .lang-sub{ font-size:14px; margin-bottom:22px; }
+.auth-form{ max-width:none; gap:14px; }
+.auth-input{
+  padding:13px 15px; border-radius:12px; font-size:14.5px; width:100%;
+  transition:border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.auth-input:focus{ border-color:var(--gold); box-shadow:var(--ring); background:rgba(11,13,18,.6); }
+.auth-field{ position:relative; }
+.auth-field .auth-input{ padding-right:46px; }
+.auth-eye{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%); width:36px; height:36px; border:0; border-radius:10px;
+  background:transparent; color:var(--ink-soft); cursor:pointer; display:grid; place-items:center; transition:color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.auth-eye:hover{ color:var(--ink); background:rgba(255,255,255,.06); }
+.auth-eye svg{ width:18px; height:18px; }
+.auth-error:not(:empty){ animation:azShake .36s ease both; padding:9px 12px; border-radius:10px; background:rgba(255,107,118,.09); border:1px solid rgba(255,107,118,.3); color:var(--alert); }
+.auth-submit{
+  padding:13px 16px; border-radius:12px; position:relative; transition:background var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out), opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+.auth-submit:not(:disabled):hover{ box-shadow:0 8px 26px rgba(38,210,255,.32); }
+.auth-submit:disabled{ color:transparent; }
+.auth-submit:disabled::after{
+  content:""; position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%;
+  border:2px solid rgba(0,21,41,.25); border-top-color:var(--on-accent); animation:azSpin .7s linear infinite;
+}
+.role-back{ display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:7px 14px; }
+.landing-profile{ opacity:.92; }
+.landing-profile-photo{ box-shadow:0 0 0 4px rgba(63,196,222,.12); }
+
+/* ---------- Yükləmə ekranı: yalnız dil seçimində (tab keçidində yox) ---------- */
+.loading-overlay{
+  display:flex; opacity:0; visibility:hidden; transition:opacity .26s ease, visibility 0s linear .26s;
+  background:
+    radial-gradient(700px 420px at 50% 42%, rgba(38,210,255,.08), transparent 70%),
+    var(--blueprint-deep);
+}
+.loading-overlay.show{ opacity:1; visibility:visible; transition-delay:0s; }
+.loading-box{ width:min(300px,78vw); }
+.loading-splash{ border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.5); animation:azPop .5s var(--ease-out) both; }
+.loading-label{ font-weight:700; letter-spacing:.34em; text-indent:.34em; }
+.loading-bar{ height:5px; border-radius:99px; border:none; background:rgba(255,255,255,.08); }
+.loading-fill{ border-radius:99px; box-shadow:0 0 14px rgba(38,210,255,.5); }
+
+/* ---------- Tətbiq qabığı: sidebar ---------- */
+.main-app.show{ animation:azAppIn .5s ease both; }
+.tabbar{ padding:22px 12px 16px; gap:3px; background:linear-gradient(180deg, rgba(38,210,255,.035), transparent 240px), var(--blueprint-deep); }
+.tabbar::before{
+  content:"AZ-CUP"; font-family:var(--mono); font-weight:800; font-size:14px; line-height:22px; letter-spacing:.22em; color:var(--bronze);
+  margin:0 0 14px 6px; padding:0 0 18px 34px; width:calc(100% - 12px); border-bottom:1px solid var(--grid-line-strong);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E2A64D' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3Cpath d='M8 6H5a2 2 0 0 0 2 4M16 6h3a2 2 0 0 1-2 4M12 13v4M8.5 20h7M10 17h4'/%3E%3C/svg%3E") 0 0 / 22px 22px no-repeat;
+}
+.tab-group-label{ font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; font-weight:700; margin:18px 0 4px 10px; opacity:.85; }
+.tab-btn{ position:relative; z-index:1; gap:12px; padding:10px 12px; border:1px solid transparent; border-left-width:1px; border-radius:10px; font-weight:500; }
+.tab-btn .ico{ width:18px; height:18px; flex:0 0 auto; opacity:.8; transition:opacity var(--dur-fast) ease, transform var(--dur) var(--ease-out); }
+.tab-btn:hover{ transform:none; background:rgba(255,255,255,.05); color:var(--ink); border-left-color:transparent; }
+.tab-btn:hover .ico{ opacity:1; transform:scale(1.08); }
+.tab-btn.active{ color:var(--on-accent); font-weight:650; box-shadow:0 6px 20px rgba(38,210,255,.24); }
+.tab-btn.active .ico{ opacity:1; }
+/* Sürüşən göstərici: aktiv tabın arxasında hərəkət edən cyan həb (JS mövqeləndirir; yoxdursa aktiv tab öz fonunu saxlayır) */
+.tab-indicator{
+  position:absolute; left:0; top:0; width:0; height:0; border-radius:10px; z-index:0; pointer-events:none; opacity:0;
+  background:var(--gold-bright); box-shadow:0 6px 22px rgba(38,210,255,.3);
+  transition:top .44s var(--ease-out), left .44s var(--ease-out), width .34s var(--ease-out), height .34s var(--ease-out), opacity .2s ease;
+}
+.tabbar.has-indicator .tab-indicator{ opacity:1; }
+.tabbar.has-indicator .tab-btn.active{ background:transparent; box-shadow:none; }
+.tabbar.has-indicator .tab-btn:hover:not(.active){ background:rgba(255,255,255,.05); }
+.main-app.show .tab-btn, .main-app.show .tab-group-label{ animation:azSlideIn .5s var(--ease-out) both; animation-delay:calc(var(--n, 0) * 26ms + 90ms); }
+.back-to-select{ display:flex; align-items:center; gap:8px; border-radius:10px; }
+.back-to-select .ico{ width:15px; height:15px; }
+.tabbar-user{ gap:10px; padding-top:14px; }
+.tabbar-user-name{ display:flex; align-items:center; gap:9px; min-width:0; color:var(--ink); font-weight:500; }
+.tabbar-user-name::before{
+  content:attr(data-initial); flex:0 0 auto; display:grid; place-items:center; width:28px; height:28px; border-radius:50%;
+  font:700 12px var(--mono); color:var(--on-accent); background:linear-gradient(135deg, var(--gold-bright), var(--gold));
+}
+.tabbar-user-name:empty::before{ display:none; }
+.tabbar-logout{ border-radius:999px; }
+.yarish-focus-exit{ border-radius:999px; transition:border-color var(--dur-fast) ease, background var(--dur-fast) ease; }
+.yarish-focus-exit:hover{ border-color:var(--gold); }
+
+/* ---------- Panellər (müəllim / admin / yarış / tapşırıq / canlı dərs / kod arxivi) ---------- */
+.teacher-panel-inner{
+  border-radius:20px; padding:30px 32px 36px;
+  background:linear-gradient(180deg, rgba(38,210,255,.03), transparent 140px), var(--paper);
+}
+.teacher-panel-title{ display:flex; align-items:center; gap:12px; font-family:var(--mono); font-weight:800; letter-spacing:-.03em; font-size:22px; }
+.teacher-panel-title .ico{ width:24px; height:24px; color:var(--gold-bright); flex:0 0 auto; }
+.teacher-panel-sub{ line-height:1.6; font-size:13.5px; }
+.teacher-table th{ position:sticky; top:0; background:var(--paper); z-index:1; font-weight:600; letter-spacing:.1em; }
+.teacher-table td{ transition:background var(--dur-fast) ease; }
+.teacher-table tr:hover td{ background:rgba(38,210,255,.06); }
+.teacher-table td.teacher-solved{ font-variant-numeric:tabular-nums; }
+.teacher-panel-empty, .teacher-panel-error{
+  text-align:center; padding:34px 18px; border-radius:14px; border:1px dashed var(--grid-line-strong); line-height:1.6;
+}
+.teacher-panel-error{ border-color:rgba(255,107,118,.4); background:rgba(255,107,118,.05); }
+.activity-toggle-btn, .approval-btn, .contest-action-btn, .contest-submit-btn, .live-copy-btn, .live-leave-btn, .live-help-btn, .live-submit-btn, .logout-btn, .role-back, .back-to-select, .tabbar-logout, .py-back{
+  transition:background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+.contest-submit-btn:not(:disabled):hover, .contest-action-btn:not(.secondary):hover{ box-shadow:0 6px 20px rgba(38,210,255,.28); }
+.contest-card, .contest-manage-item, .contest-problem-card, .live-role-card, .assignment-card{
+  border-radius:14px; transition:border-color var(--dur) ease, transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), background var(--dur) ease;
+}
+.contest-card:hover, .contest-manage-item:hover{ transform:translateY(-2px); box-shadow:0 12px 30px rgba(0,0,0,.35); }
+.contest-card:active, .contest-manage-item:active{ transform:none; }
+.contest-status-badge.active{ background:rgba(74,223,185,.08); }
+.contest-status-badge.upcoming{ background:rgba(226,166,77,.08); }
+.contest-form, .contest-textarea, .user-edit-input, .user-role-select, .live-code-input{ border-radius:12px; }
+.contest-textarea:focus, .user-edit-input:focus, .live-code-input:focus{ box-shadow:var(--ring); }
+.pbar{ height:7px; }
+.pbar > i{ background:linear-gradient(90deg, var(--gold), var(--gold-bright)); box-shadow:0 0 12px rgba(38,210,255,.35); }
+.pbar.done > i{ box-shadow:0 0 12px rgba(74,223,185,.35); }
+.live-student-chip, .ex-chip{ transition:background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease; }
+.live-editor:focus-within, .code-editor-wrap:focus-within{ box-shadow:0 0 0 1px var(--gold), 0 0 22px rgba(38,210,255,.16); }
+
+/* Python (IB Computer Science) səhifəsi: ümumi "iframe{display:none; position:absolute}" qaydası onu gizlədirdi və seçim boş açılırdı.
+   Bu qabda iframe normal axında qalır: yuxarıda "Dil seçiminə qayıt" düyməsi, qalan sahəni səhifə tutur. */
+.python-app iframe{ display:block; position:static; height:auto; min-height:0; flex:1 1 auto; width:100%; }
+
+/* ---------- Telefon / dar ekran ---------- */
+@media (max-width:860px){
+  .tabs-scroll{ position:relative; }
+  .tabbar::before{ padding:0 0 0 30px; margin:0 0 0 14px; line-height:22px; background-position:0 0; }
+  .tab-btn{ border-radius:999px; gap:8px; padding:8px 14px; }
+  .tab-btn .ico{ width:16px; height:16px; }
+  .tab-indicator{ border-radius:999px; }
+  .tabbar.has-indicator .tab-btn.active{ border-color:transparent; }
+  .main-app.show .tab-btn, .main-app.show .tab-group-label{ animation:none; }
+  .teacher-panel-inner{ padding:22px 18px 28px; border-radius:16px; }
+  .teacher-panel-title{ font-size:20px; }
+  .lang-card{ max-width:480px; }
+  #studentAuth, #teacherAuth, #adminAuth{ padding:24px 20px 18px; border-radius:18px; }
+}
+@media (max-width:480px){
+  .lang-options{ grid-template-columns:1fr; }
+  .lang-btn{ padding:16px; }
+  .lang-go{ opacity:.7; transform:none; }
+}
+
+/* ---------- Azaldılmış hərəkət (ui-polish.css-dəki ümumi qaydaya əlavə) ---------- */
+@media (prefers-reduced-motion: reduce){
+  .tab-indicator{ transition:none; }
+  .frame-progress::before{ animation:none; width:100%; opacity:.6; }
+  .main-app.show .tab-btn, .main-app.show .tab-group-label{ animation:none; }
+}

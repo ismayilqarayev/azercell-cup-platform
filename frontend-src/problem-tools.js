@@ -396,6 +396,12 @@
     try { return root.AzcupAuth && root.AzcupAuth.getUser(); } catch (e) { return null; }
   }
 
+  // Təsdiq dialoqu: iframe-in öz AzcupUI.confirm-i (bax: ui-kit.js); yoxdursa brauzerin yerli confirm-i. Həmişə Promise<boolean>.
+  function ask(win, message, opts) {
+    try { if (win.AzcupUI && win.AzcupUI.confirm) return win.AzcupUI.confirm(message, opts); } catch (e) { /* aşağıdakı ehtiyat yol */ }
+    return Promise.resolve(win.confirm(message));
+  }
+
   function attachFrame(frameEl) {
     var doc, win;
     try { doc = frameEl.contentDocument; win = frameEl.contentWindow; } catch (e) { return; }
@@ -697,8 +703,9 @@
         }
       } catch (e) { /* zədəli qaralama — nəzərə alma */ }
     }
-    resetBtn.addEventListener('click', function () {
-      if (!win.confirm('Kod şablona qaytarılsın? Yazdığın kod silinəcək.')) return;
+    resetBtn.addEventListener('click', async function () {
+      if (!(await ask(win, 'Yazdığın kod silinəcək və redaktor başlanğıc şablonla əvəz olunacaq.',
+        { title: 'Kod şablona qaytarılsın?', okText: 'Şablona qaytar', danger: true }))) return;
       ta.value = starter;
       compilerResult = null; liteErrors = {}; lastText = starter;
       saveDraftNow();
@@ -940,9 +947,10 @@
         historyEl.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
       }
     }
-    function loadIntoEditor(code) {
+    async function loadIntoEditor(code) {
       if (ta.value !== code && ta.value.trim() && ta.value !== starter
-          && !win.confirm('Redaktordakı kod bu göndərişin kodu ilə əvəz olunacaq. Davam edək?')) return;
+          && !(await ask(win, 'Redaktordakı kod bu göndərişin kodu ilə əvəz olunacaq. Davam edək?',
+            { title: 'Kod əvəz olunsun?', okText: 'Əvəz et', danger: false }))) return;
       ta.value = code;
       ta.dispatchEvent(new win.Event('input', { bubbles: true }));
       ta.focus();
