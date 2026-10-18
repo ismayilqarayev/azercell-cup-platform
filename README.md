@@ -69,6 +69,9 @@ The build also injects the shared design layer, so the page sources themselves s
 | `frontend-src/ui-kit.js` | `AzcupUI`: `toast`, `confirm`, `prompt`, `secret`, `swap`, back-to-top button (replaces native `alert/confirm/prompt`) | the shell and every iframe page |
 | `frontend-src/ui-shell.css` | Sidebar, sliding tab indicator, login/language screens, panels, page transitions | the shell only |
 | `frontend-src/problem-tools.js` | Editor, drafts, sample runs for the problem pages | the shell (attaches to the week iframes) |
+| `frontend-src/python-lessons/*.js` | The Python section's 85 lessons (original Azerbaijani text and code, each linking to the matching metanit.com lesson); merged into `python.html` at the `/* PY_LESSONS */` marker | `python.html` |
+
+`tools/python-lessons.test.js` checks the lesson structure and runs every Python snippet through `ast.parse` (needs `python` on PATH, skipped otherwise).
 
 Fonts (Inter and JetBrains Mono, SIL OFL 1.1) are self-hosted in `backend/src/main/resources/static/assets/fonts/`, with their licenses.
 `StaticAssetsConfig` gives that folder a 30-day cache; Spring Security would otherwise send `no-store` for every font request.

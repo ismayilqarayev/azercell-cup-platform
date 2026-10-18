@@ -35,6 +35,23 @@ const kitJs = readSrc('ui-kit.js');
 if (/<\/style/i.test(polishCss + shellCss)) throw new Error('CSS must not contain "</style"');
 if (/<\/script/i.test(kitJs)) throw new Error('ui-kit.js must not contain "</script"');
 
+// Python bölməsinin dərsləri frontend-src/python-lessons/*.js fayllarındadır (ad sırası ilə birləşdirilir) və python.html-dəki
+// "/* PY_LESSONS */" yerinə yazılır. Hər fayl PY_CHAPTERS.push({...}) çağırır.
+const PY_LESSONS_MARKER = '/* PY_LESSONS */';
+function readPythonLessons() {
+  const dir = path.join(SRC_DIR, 'python-lessons');
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort();
+  if (!files.length) throw new Error('frontend-src/python-lessons/ içində dərs faylı yoxdur');
+  const js = files.map(f => fs.readFileSync(path.join(dir, f), 'utf-8').replace(/\r\n/g, '\n').replace(/\n+$/, '')).join('\n\n');
+  if (/<\/script/i.test(js)) throw new Error('python-lessons must not contain "</script" (inlined into a <script> block)');
+  console.log('PY_LESSONS <-', files.length, 'files (' + js.length + ' chars)');
+  return js;
+}
+function injectPythonLessons(html) {
+  if (!html.includes(PY_LESSONS_MARKER)) throw new Error('python.html-də ' + PY_LESSONS_MARKER + ' yeri tapılmadı');
+  return html.replace(PY_LESSONS_MARKER, () => readPythonLessons());
+}
+
 function injectIntoPage(html, fileName) {
   const block = '<style id="azcup-ui-polish">\n' + polishCss + '\n</style>\n<script id="azcup-ui-kit">\n' + kitJs + '\n</script>\n';
   if (!/<\/head>/i.test(html)) throw new Error('No </head> found in ' + fileName + ' to inject the UI layer into');
@@ -49,7 +66,9 @@ indexHtml = indexHtml.replace(/\r\n/g, '\n');
 
 for (const [constName, fileName] of Object.entries(FILES)) {
   const srcPath = path.join(SRC_DIR, fileName);
-  const html = injectIntoPage(fs.readFileSync(srcPath, 'utf-8'), fileName);
+  let source = fs.readFileSync(srcPath, 'utf-8');
+  if (fileName === 'python.html') source = injectPythonLessons(source);
+  const html = injectIntoPage(source, fileName);
   const b64 = Buffer.from(html, 'utf-8').toString('base64');
   const re = new RegExp('const ' + constName + '_HTML_B64 = "[A-Za-z0-9+/=]+";');
   if (!re.test(indexHtml)) {

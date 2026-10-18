@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python ilə RFM Analizi</title>
+<title>Python proqramlaşdırma dərsləri</title>
 <style>
   :root{
-    /* DARK MODE: sabit (daimi) tünd tema. */
     --blueprint-deep:   #0B0D12;
     --grid-line:        rgba(255, 255, 255, 0.08);
     --grid-line-strong: rgba(255, 255, 255, 0.16);
@@ -19,297 +18,503 @@
     --gold-bright:      #26D2FF;
     --on-accent:        #001529;
     --bronze:           #E2A64D;
-    --bronze-text:      #E2A64D;
     --green:            #4ADFB9;
-    --green-text:       #4ADFB9;
-    --py-blue:          #6FB2F2;
-    --py-blue-bright:   #6DBBEA;
-    --py-blue-text:     #6FB2F2;
-    --py-yellow:        #E8C34D;
-    --py-yellow-text:   #E8C34D;
+    --alert:            #FF6B76;
     --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
-  body{
-    background-image: none;
-    background-attachment: fixed;
-  }
-  .wrap{ max-width:960px; margin:0 auto; padding:36px 20px 100px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:36px 20px 100px; }
 
-  .titleblock{
-    border:2px solid var(--py-blue-bright); position:relative;
-    padding:26px 24px 20px; margin-bottom:36px;
-    background:linear-gradient(180deg, rgba(75,139,190,0.08), transparent 60%);
-  }
+  /* ---------- Başlıq bloku ---------- */
+  .titleblock{ border:1px solid var(--bronze); position:relative; padding:28px 26px 8px; margin-bottom:28px; background:linear-gradient(180deg, rgba(226,166,77,0.05), transparent 70%); }
   .titleblock::before{
-    content:"ORİJİNAL MƏZMUN / PYTHON / DATA ANALİTİKASI";
-    position:absolute; top:-11px; left:20px;
-    background:var(--blueprint-deep); padding:0 10px;
-    font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--py-yellow-text);
+    content:"PYTHON / DƏRSLƏR / REV. 2026"; position:absolute; top:-11px; left:20px; background:var(--blueprint-deep);
+    padding:0 10px; font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--bronze);
   }
-  .titleblock h1{
-    font-family:var(--mono); font-size:clamp(24px,4.5vw,34px); line-height:1.2;
-    margin:8px 0 8px; color:var(--ink); letter-spacing:-0.5px;
-  }
-  .titleblock h1 span{ color:var(--py-blue); }
-  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:660px; margin:0 0 16px; }
-  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
-  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
-  .specs div:last-child{ border-right:none; }
-  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--py-yellow-text); text-transform:uppercase; margin-bottom:3px; }
-  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+  .wrap > .titleblock{ border-color:var(--bronze) !important; }  /* ortaq qatın cyan çərçivəsi əvəzinə Python bölməsinin bürünc vurğusu */
+  .titleblock h1{ font-family:var(--mono); font-size:clamp(26px,4.6vw,40px); line-height:1.15; margin:6px 0 10px; letter-spacing:-0.5px; }
+  .titleblock h1 span{ color:var(--bronze); }
+  .titleblock p.sub{ color:var(--ink-soft); font-size:15px; line-height:1.65; max-width:680px; margin:0 0 20px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs > div{ padding:12px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs > div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--bronze); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; }
 
-  .section-label{
-    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--py-yellow-text);
-    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  /* ---------- Alət paneli: gedişat, axtarış, filtrlər ---------- */
+  .toolbar{ margin:0 0 22px; padding:16px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:10px; }
+  .progress-row{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .progress-text{ font-family:var(--mono); font-size:12px; color:var(--ink); white-space:nowrap; }
+  .progress-bar{ flex:1; height:6px; border-radius:99px; background:var(--grid-line); overflow:hidden; }
+  .progress-bar i{ display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg, var(--bronze), #F2C879); transition:width .45s ease; }
+  .filters{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  .search{
+    flex:1 1 240px; min-width:0; font-family:var(--sans); font-size:14px; color:var(--ink); background:var(--paper);
+    border:1px solid var(--grid-line-strong); border-radius:99px; padding:9px 16px; outline:none; transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+  .search:focus{ border-color:var(--bronze); }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft); background:transparent; border:1px solid var(--grid-line-strong);
+    border-radius:99px; padding:7px 13px; cursor:pointer; transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chip:hover{ border-color:var(--bronze); color:var(--ink); }
+  .chip[aria-pressed="true"]{ background:rgba(226,166,77,0.16); border-color:var(--bronze); color:var(--ink); }
+  .btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.3px; color:var(--on-accent); background:var(--bronze);
+    border:none; border-radius:99px; padding:9px 16px; cursor:pointer; transition:box-shadow .2s ease, transform .12s ease;
+  }
+  .btn:hover{ box-shadow:0 6px 20px rgba(226,166,77,0.32); }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1px solid var(--grid-line-strong); font-weight:600; }
+  .btn.ghost:hover{ border-color:var(--bronze); box-shadow:none; }
+  .count{ margin-top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-soft); min-height:16px; }
 
-  .rfm-explain{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-bottom:8px;
+  /* ---------- Yerləşmə: sol fəsil naviqasiyası + məzmun ---------- */
+  .layout{ display:grid; grid-template-columns:250px minmax(0,1fr); gap:28px; align-items:start; }
+  .nav{ position:sticky; top:16px; max-height:calc(100vh - 32px); overflow:auto; padding-right:4px; }
+  .nav-title{ font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--ink-soft); text-transform:uppercase; margin:0 0 10px 4px; }
+  .nav a{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; margin-bottom:3px; border-radius:8px; color:var(--ink-soft); text-decoration:none;
+    font-size:13px; line-height:1.35; border:1px solid transparent; transition:background .15s ease, color .15s ease, border-color .15s ease;
   }
-  .rfm-card{
-    background:var(--paper); color:var(--ink); border-radius:6px; padding:16px;
-    border-top:3px solid var(--py-blue-bright);
-  }
-  .rfm-card .letter{ font-family:var(--mono); font-size:22px; font-weight:700; color:var(--py-blue); }
-  .rfm-card h4{ margin:6px 0 4px; font-size:14px; }
-  .rfm-card p{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+  .nav a:hover{ background:rgba(255,255,255,0.05); color:var(--ink); }
+  .nav a.current{ background:rgba(226,166,77,0.12); border-color:rgba(226,166,77,0.4); color:var(--ink); }
+  .nav .n{ flex:0 0 auto; font-family:var(--mono); font-size:11px; color:var(--on-accent); background:var(--bronze); border-radius:5px; padding:2px 6px; font-weight:700; }
+  .nav .t{ flex:1; min-width:0; }
+  .nav .c{ flex:0 0 auto; font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .nav a.done .c{ color:var(--green); }
 
-  .step-card{
-    background:var(--paper); color:var(--ink); border-radius:3px;
-    box-shadow:0 1px 0 rgba(0,0,0,0.2); padding:20px 20px 22px; margin-bottom:18px;
-  }
-  .step-card .tag{
-    display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:1px;
-    background:rgba(75,139,190,0.15); color:var(--py-blue-text); padding:3px 9px; border-radius:3px; margin-bottom:10px;
-  }
-  .step-card h3{ margin:0 0 6px; font-size:17px; }
-  .step-card .desc{ font-size:13.5px; color:var(--ink-soft); margin:0 0 14px; line-height:1.55; }
-  .why-box{
-    background:var(--paper-warm); border-left:3px solid var(--py-blue); border-radius:2px;
-    padding:10px 14px; margin-bottom:14px; font-size:13px; line-height:1.55;
-  }
-  .why-box b{ color:var(--bronze-text); }
-  .out-box{
-    background:#0a1c2c; border-radius:4px; padding:10px 12px; margin-top:10px;
-    font-family:var(--mono); font-size:11.5px; color:#a8d8c0; overflow-x:auto; white-space:pre;
-  }
-  .out-label{ font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--ink-soft); margin:10px 0 4px; text-transform:uppercase; }
+  .chapter{ margin-bottom:38px; scroll-margin-top:16px; }
+  .chapter h2{ font-family:var(--mono); font-size:22px; margin:0 0 4px; letter-spacing:-0.3px; display:flex; align-items:baseline; gap:12px; }
+  .chapter h2 .num{ color:var(--bronze); }
+  .chapter .blurb{ margin:0 0 16px; color:var(--ink-soft); font-size:14px; line-height:1.6; }
 
-  .code-block{
-    background:var(--well); font-family:var(--mono); border-radius:4px;
-    overflow-x:auto; margin:0; padding:10px 8px;
+  /* ---------- Dərs kartı (akkordeon) ---------- */
+  .lesson{ background:var(--paper); border:1px solid var(--grid-line); border-radius:10px; margin-bottom:10px; overflow:hidden; transition:border-color .2s ease, box-shadow .25s ease; }
+  .lesson:hover{ border-color:rgba(226,166,77,0.3); }
+  .lesson.open{ border-color:rgba(226,166,77,0.55); }
+  .lesson.is-read .lesson-num{ background:var(--green); }
+  .lesson-head{
+    all:unset; box-sizing:border-box; display:flex; align-items:center; gap:14px; width:100%; padding:15px 18px; cursor:pointer;
+    transition:background .15s ease;
   }
-  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
-  .code-line .line-no{ flex-shrink:0; width:18px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
-  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
-  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
-  .code-block .kw{ color:var(--py-blue-bright); font-weight:600; }
-  .code-block .tp{ color:#8fd0a8; }
-  .code-block .str{ color:#e0b96b; }
-  .code-block .num{ color:#c9a0dc; }
-  .code-block .fn{ color:var(--py-yellow); }
+  .lesson-head:hover{ background:rgba(255,255,255,0.03); }
+  .lesson-head:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:-2px; }
+  .lesson-num{ flex:0 0 auto; font-family:var(--mono); font-size:12px; font-weight:700; color:var(--on-accent); background:var(--bronze); border-radius:6px; padding:5px 9px; letter-spacing:.5px; min-width:44px; text-align:center; }
+  .lesson-title{ flex:1; min-width:0; font-size:16px; font-weight:650; letter-spacing:-0.01em; }
+  .tag{ flex:0 0 auto; font-family:var(--mono); font-size:10.5px; padding:2px 8px; border-radius:99px; border:1px solid currentColor; }
+  .tag.task{ color:var(--gold); }
+  .tag.read{ color:var(--green); }
+  .chev{ flex:0 0 auto; width:18px; height:18px; color:var(--ink-soft); transition:transform .25s ease, color .2s ease; }
+  .lesson.open .chev{ transform:rotate(180deg); color:var(--bronze); }
+  .lesson-body{ display:none; padding:2px 20px 20px 18px; }
+  .lesson.open .lesson-body{ display:block; animation:lessonOpen .3s ease both; }
+  @keyframes lessonOpen{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:none; } }
+  .lesson-text p{ margin:0 0 12px; font-size:15px; line-height:1.75; color:#DDE2EC; max-width:78ch; }
+  .lesson-text code, .tip code, .task p code{ font-family:var(--mono); font-size:0.88em; background:rgba(255,255,255,0.08); border-radius:5px; padding:1px 6px; color:#F2D9A8; }
+  .lesson-text strong{ color:#fff; }
 
-  .footer{
-    margin-top:60px; text-align:center; font-family:var(--mono); font-size:11px;
-    letter-spacing:1.5px; color:var(--ink-soft);
+  /* Kod bloku */
+  .code{ margin:14px 0; border:1px solid var(--grid-line-strong); border-radius:8px; overflow:hidden; background:#272822; }
+  .code-head{ display:flex; align-items:center; justify-content:space-between; padding:6px 8px 6px 14px; background:rgba(0,0,0,0.25); border-bottom:1px solid rgba(255,255,255,0.08); }
+  .code-lang{ font-family:var(--mono); font-size:11px; letter-spacing:1.2px; color:#9a967f; text-transform:uppercase; }
+  .copy{ font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); background:transparent; border:1px solid transparent; border-radius:6px; padding:4px 10px; cursor:pointer; transition:background .15s ease, color .15s ease; }
+  .copy:hover{ background:rgba(255,255,255,0.08); color:#fff; }
+  .code pre{ margin:0; padding:14px 16px; overflow:auto; font-family:var(--mono); font-size:13px; line-height:1.65; color:#f8f8f2; tab-size:4; }
+  .code pre code{ font-family:inherit; background:none; padding:0; color:inherit; font-size:inherit; }
+  .kw{ color:#f92672; } .str{ color:#e6db74; } .num{ color:#ae81ff; } .cmt{ color:#9a967f; font-style:italic; }
+  .bi{ color:#66d9ef; } .fn{ color:#a6e22e; } .dec{ color:#fd971f; }
+
+  .tip{ margin:14px 0; padding:11px 14px; border-left:3px solid var(--gold); background:rgba(63,196,222,0.07); border-radius:0 8px 8px 0; font-size:14px; line-height:1.65; color:#CFE9F0; }
+  .tip b{ color:var(--gold-bright); }
+  .task{ margin:16px 0 4px; padding:14px 16px; border:1px dashed rgba(226,166,77,0.5); border-radius:10px; background:rgba(226,166,77,0.05); }
+  .task h4{ margin:0 0 6px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--bronze); }
+  .task p{ margin:0 0 10px; font-size:14.5px; line-height:1.65; }
+  .task details summary{ cursor:pointer; font-family:var(--mono); font-size:12px; color:var(--bronze); padding:4px 0; }
+  .task details summary:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:3px; border-radius:4px; }
+  .task details[open] summary{ margin-bottom:8px; }
+  .task .code{ margin:0; }
+
+  .lesson-foot{ display:flex; align-items:center; flex-wrap:wrap; gap:10px 14px; margin-top:18px; padding-top:14px; border-top:1px solid var(--grid-line); }
+  .done-btn[aria-pressed="true"]{ background:rgba(74,223,185,0.15); color:var(--green); border:1px solid var(--green); }
+  .src{ margin-left:auto; font-size:12.5px; color:var(--ink-soft); text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.2); }
+  .src:hover{ color:var(--ink); border-color:var(--bronze); }
+  .src:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:3px; border-radius:3px; }
+
+  .empty{ display:none; padding:34px 18px; text-align:center; color:var(--ink-soft); border:1px dashed var(--grid-line-strong); border-radius:12px; line-height:1.7; }
+  .empty.show{ display:block; }
+  .footer-note{ margin-top:40px; padding-top:18px; border-top:1px solid var(--grid-line-strong); font-size:12.5px; line-height:1.7; color:var(--ink-soft); max-width:80ch; }
+  .footer-note a{ color:var(--ink-soft); }
+
+  /* ---------- Dar ekran: fəsil naviqasiyası üfüqi çiplərə çevrilir ---------- */
+  @media (max-width:900px){
+    .layout{ display:block; }
+    .nav{ position:sticky; top:0; z-index:20; max-height:none; overflow-x:auto; overflow-y:hidden; display:flex; gap:6px; padding:10px 0; margin:0 -20px 18px; padding-left:20px; padding-right:20px; background:var(--blueprint-deep); border-bottom:1px solid var(--grid-line); scrollbar-width:none; }
+    .nav::-webkit-scrollbar{ display:none; }
+    .nav-title{ display:none; }
+    .nav a{ flex:0 0 auto; margin:0; white-space:nowrap; border:1px solid var(--grid-line-strong); border-radius:99px; padding:7px 12px; }
+    .nav .c{ display:none; }
   }
+  @media (max-width:560px){
+    .wrap{ padding:24px 14px 80px; }
+    .nav{ margin-left:-14px; margin-right:-14px; padding-left:14px; padding-right:14px; } /* .wrap-ın yeni kənar boşluğuna uyğun */
+    .lesson-head{ padding:13px 12px; gap:10px; }
+    .lesson-body{ padding:0 12px 16px; }
+    .tag.task, .tag.read{ display:none; }
+    .src{ margin-left:0; }
+    .specs{ grid-template-columns:1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="titleblock">
-    <h1>Python ilə <span>RFM Analizi</span></h1>
-    <p>RFM (Recency, Frequency, Monetary) — müştəriləri alış davranışına görə seqmentləşdirmək üçün istifadə olunan analitik metoddur. Bu səhifə addım-addım, real pandas kodu ilə RFM analizini necə qurmağı göstərir — hər kod nümunəsi faktiki işə salınıb yoxlanılıb.</p>
+  <header class="titleblock">
+    <h1>Python <span>proqramlaşdırma</span> dili</h1>
+    <p class="sub">Sıfırdan başlayıb obyekt yönümlü proqramlaşdırmaya, fayllarla işə və asinxron kodlaşdırmaya qədər addım-addım dərslər. Hər dərsdə qısa izah, işlək kod nümunəsi və (əsas mövzularda) tapşırıq var.</p>
     <div class="specs">
-      <div><div class="k">Metod</div><div class="v">RFM Analizi</div></div>
-      <div><div class="k">Kitabxana</div><div class="v">pandas</div></div>
-      <div><div class="k">Səviyyə</div><div class="v">Orta (data analitika)</div></div>
+      <div><div class="k">Fəsil</div><div class="v" id="specChapters">11</div></div>
+      <div><div class="k">Dərs</div><div class="v" id="specLessons">85</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıcdan orta səviyyəyə</div></div>
+      <div><div class="k">Python</div><div class="v">3.10 və yuxarı</div></div>
     </div>
-  </div>
+  </header>
 
-  <div class="section-label">RFM Nədir?</div>
-  <div class="rfm-explain">
-    <div class="rfm-card">
-      <div class="letter">R</div>
-      <h4>Recency (Yenilik)</h4>
-      <p>Müştəri ən son nə vaxt alış edib? Nə qədər yaxın zamanda alış edibsə, bir o qədər dəyərlidir.</p>
+  <section class="toolbar" aria-label="Dərslərin idarəsi">
+    <div class="progress-row">
+      <span class="progress-text" id="progressText">0 / 0 dərs oxunub</span>
+      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><i id="progressFill"></i></div>
+      <button type="button" class="btn" id="continueBtn">Davam et</button>
     </div>
-    <div class="rfm-card">
-      <div class="letter">F</div>
-      <h4>Frequency (Tezlik)</h4>
-      <p>Müştəri nə qədər tez-tez alış edib? Çox alış edən müştərilər daha sadiqdir.</p>
+    <div class="filters">
+      <input type="search" class="search" id="search" placeholder="Dərs axtar: məsələn «lüğət», «if», «dekorator»" aria-label="Dərs axtar" autocomplete="off">
+      <div class="chips" role="group" aria-label="Süzgəc">
+        <button type="button" class="chip" data-filter="all" aria-pressed="true">Hamısı</button>
+        <button type="button" class="chip" data-filter="unread" aria-pressed="false">Oxunmayıb</button>
+        <button type="button" class="chip" data-filter="read" aria-pressed="false">Oxunub</button>
+        <button type="button" class="chip" data-filter="task" aria-pressed="false">Tapşırıqlı</button>
+      </div>
+      <button type="button" class="btn ghost" id="collapseBtn">Hamısını bağla</button>
     </div>
-    <div class="rfm-card">
-      <div class="letter">M</div>
-      <h4>Monetary (Pul Dəyəri)</h4>
-      <p>Müştəri ümumilikdə nə qədər pul xərcləyib? Yüksək xərcləyən müştərilər prioritetlidir.</p>
-    </div>
+    <div class="count" id="count" aria-live="polite"></div>
+  </section>
+
+  <div class="layout">
+    <nav class="nav" id="nav" aria-label="Fəsillər"></nav>
+    <main id="chapters"></main>
   </div>
 
-  <div class="section-label">Addım-Addım Tətbiq</div>
-
-  <div class="step-card">
-    <span class="tag">Addım 1</span>
-    <h3>Nümunə Məlumatların Hazırlanması</h3>
-    <p class="desc">RFM analizi üçün minimum lazım olan sütunlar: müştəri ID-si, alış tarixi və alış məbləği.</p>
-    <div class="why-box"><b>Niyə vacibdir:</b> Real layihələrdə bu məlumat adətən satış/sifariş cədvəlindən gəlir — burada sadə nümunə ilə metodu izah edirik.</div>
-    <div class="code-block" id="s1"></div>
+  <div class="empty" id="empty">
+    Heç bir dərs tapılmadı.<br>
+    <button type="button" class="btn ghost" id="resetBtn" style="margin-top:12px;">Süzgəci təmizlə</button>
   </div>
 
-  <div class="step-card">
-    <span class="tag">Addım 2</span>
-    <h3>R, F, M Dəyərlərinin Hesablanması</h3>
-    <p class="desc"><code>groupby</code> ilə hər müştəri üçün Recency (son alışdan neçə gün keçib), Frequency (neçə alış edib) və Monetary (ümumi xərclədiyi məbləğ) hesablanır.</p>
-    <div class="why-box"><b>Niyə vacibdir:</b> <code>snapshot_date</code> — analizi apardığımız "bugünkü" tarixdir. Recency bu tarixdən son alışa qədər olan gün fərqidir.</div>
-    <div class="code-block" id="s2"></div>
-    <div class="out-label">Nəticə (konsol çıxışı)</div>
-    <div class="out-box" id="s2out"></div>
-  </div>
-
-  <div class="step-card">
-    <span class="tag">Addım 3</span>
-    <h3>Xallandırma (Scoring) — 1-4 Şkalası</h3>
-    <p class="desc">Hər R, F, M dəyəri 4 bərabər hissəyə (kvartilə) bölünərək 1-4 arası xal verilir. Ən yaxşı Recency ən yüksək xalı alır (yəni son alış nə qədər yaxındırsa, bir o qədər yüksək).</p>
-    <div class="why-box"><b>Diqqət:</b> <code>pd.qcut</code> təkrarlanan dəyərlərdə xəta verə bilər ("Bin edges must be unique"). Bunu <code>rank(method='first')</code> ilə həll edirik — hər dəyərə unikal sıra nömrəsi verilir, sonra həmin sıra kvartillərə bölünür.</div>
-    <div class="code-block" id="s3"></div>
-  </div>
-
-  <div class="step-card">
-    <span class="tag">Addım 4</span>
-    <h3>Müştəri Seqmentləşdirməsi</h3>
-    <p class="desc">R, F, M xallarının kombinasiyasına əsasən müştərilər mənalı qruplara bölünür: "Champions" (ən yaxşı müştərilər), "At Risk" (itirmə riski olanlar) və s.</p>
-    <div class="why-box"><b>Niyə vacibdir:</b> Bu seqmentləşdirmə marketinq qərarlarına birbaşa təsir edir — "Champions"-a mükafat, "At Risk"-ə xüsusi endirim təklif etmək kimi.</div>
-    <div class="code-block" id="s4"></div>
-    <div class="out-label">Yekun nəticə (konsol çıxışı)</div>
-    <div class="out-box" id="s4out"></div>
-  </div>
-
-  <div class="step-card">
-    <span class="tag">Addım 5</span>
-    <h3>Seqmentlərin Ümumi Sayı</h3>
-    <p class="desc">Hər seqmentdə neçə müştəri olduğunu tez baxmaq üçün <code>value_counts()</code> istifadə olunur.</p>
-    <div class="why-box"><b>Niyə vacibdir:</b> Bu, RFM analizinin son addımıdır — nəticəni raport və ya dashboard üçün ümumiləşdirir.</div>
-    <div class="code-block" id="s5"></div>
-    <div class="out-label">Nəticə (konsol çıxışı)</div>
-    <div class="out-box" id="s5out"></div>
-  </div>
-
-  <div class="footer">PYTHON + RFM ANALİZİ — ORİJİNAL MƏZMUN — BÜTÜN KODLAR PANDAS İLƏ İCRA EDİLİB YOXLANILIB</div>
+  <p class="footer-note">
+    Dərslərin mətni və kod nümunələri bu platforma üçün Azərbaycan dilində yazılıb. Mövzuların ardıcıllığı
+    <a href="https://metanit.com/python/tutorial/" target="_blank" rel="noopener noreferrer">metanit.com Python təlimatının</a>
+    mövzu siyahısına əsaslanır və hər dərsdə həmin mövzunun orijinal dərsinə (rus dilində) keçid var.
+  </p>
 </div>
 
 <script>
-function escapeHtml(str){
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-const PY_TOKEN_PATTERNS = [
-  ['cmt', /#.*$/],
-  ['str', /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"/],
-  ['num', /\b\d+(?:\.\d+)?\b/],
-  ['fn', /\b(?:pd|groupby|agg|qcut|rank|apply|reset_index|value_counts|astype|to_datetime|Timestamp)\b(?=\()/],
-  ['kw', /\b(?:import|as|def|return|if|elif|else|for|in|lambda|True|False|None|and|or|not)\b/],
-  ['tp', /\b(?:DataFrame|Series|int|str|float)\b/],
-];
-function highlightPyLine(rawLine){
-  const escaped = escapeHtml(rawLine);
-  const combined = new RegExp(PY_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
-  let out = '', last = 0, m;
-  while ((m = combined.exec(escaped)) !== null){
-    out += escaped.slice(last, m.index);
-    for (let i = 0; i < PY_TOKEN_PATTERNS.length; i++){
-      if (m[i + 1] !== undefined){
-        out += `<span class="${PY_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
-        break;
-      }
-    }
-    last = combined.lastIndex;
-    if (m.index === combined.lastIndex) combined.lastIndex++;
+const PY_CHAPTERS = [];
+/* PY_LESSONS */
+
+(function () {
+  'use strict';
+
+  /* ---------- Köməkçilər ---------- */
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  // `kod` -> <code>, **qalın** -> <strong>; əvvəlcə HTML qaçırılır, sonra işarələr çevrilir
+  function fmt(text) {
+    // Kod parçaları əvvəlcə kənara çıxarılır: içindəki ** (qüvvət operatoru) qalın mətn işarəsi ilə qarışmasın
+    const codes = [];
+    let s = escapeHtml(text).replace(/`([^`]+)`/g, (m, c) => { codes.push('<code>' + c + '</code>'); return '\u0000' + (codes.length - 1) + '\u0000'; });
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return s.replace(/\u0000(\d+)\u0000/g, (m, i) => codes[+i]);
   }
-  out += escaped.slice(last);
-  return out || '&nbsp;';
-}
-function renderCodeBlock(code){
-  const lines = code.split('\n');
-  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightPyLine(line)}</code></div>`).join('');
-  return `<div class="code-block">${rows}</div>`;
-}
-function fillCode(id, code){
-  document.getElementById(id).outerHTML = renderCodeBlock(code).replace('<div class="code-block">', `<div class="code-block" id="${id}">`);
-}
-function fillOut(id, text){
-  document.getElementById(id).textContent = text;
-}
+  // Axtarış azərbaycan hərflərinə dözümlüdür: ə, ı, ş, ç, ğ, ö, ü -> latın qarşılığı
+  function fold(s) {
+    return String(s).toLowerCase().replace(/ə/g, 'e').replace(/ı/g, 'i').replace(/̇/g, '')
+      .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ö/g, 'o').replace(/ü/g, 'u');
+  }
 
-fillCode('s1', `import pandas as pd
+  /* ---------- Python sintaksis rənglənməsi ---------- */
+  const KEYWORDS = 'False|None|True|and|as|assert|async|await|break|case|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|match|nonlocal|not|or|pass|raise|return|try|while|with|yield';
+  const BUILTINS = 'print|len|range|int|str|float|bool|list|dict|set|tuple|input|open|type|sum|min|max|abs|round|sorted|enumerate|zip|map|filter|isinstance|issubclass|super|object|bytes|repr|next|iter|hash|pow|divmod|bin|ord|chr|any|all|reversed|breakpoint|property|staticmethod|classmethod|Exception|ValueError|TypeError|KeyError|IndexError|ZeroDivisionError|FileNotFoundError';
+  const TOKEN = new RegExp([
+    '(#[^\\n]*)',                                                     // 1 şərh
+    '((?:[rRbBfFuU]{1,2})?(?:"""[\\s\\S]*?"""|\'\'\'[\\s\\S]*?\'\'\'))', // 2 üçqat dırnaq
+    '((?:[rRbBfFuU]{1,2})?(?:"(?:\\\\.|[^"\\\\\\n])*"|\'(?:\\\\.|[^\'\\\\\\n])*\'))', // 3 sətir
+    '(@[A-Za-z_][\\w.]*)',                                            // 4 dekorator
+    '(\\b0[bBxXoO][0-9a-fA-F_]+\\b|\\b\\d[\\d_]*(?:\\.\\d+)?(?:[eE][+-]?\\d+)?\\b)', // 5 ədəd
+    '((?<=\\bdef\\s|\\bclass\\s)[A-Za-z_]\\w*)',                        // 6 def/class adı
+    '(\\b(?:' + KEYWORDS + ')\\b)',                                   // 7 açar söz
+    '(\\b(?:' + BUILTINS + ')\\b)',                                   // 8 daxili ad
+  ].join('|'), 'g');
+  const CLASSES = ['cmt', 'str', 'str', 'dec', 'num', 'fn', 'kw', 'bi'];
+  function highlightPython(code) {
+    let out = '', last = 0, m;
+    TOKEN.lastIndex = 0;
+    while ((m = TOKEN.exec(code)) !== null) {
+      if (m[0] === '') { TOKEN.lastIndex++; continue; }
+      out += escapeHtml(code.slice(last, m.index));
+      for (let i = 0; i < CLASSES.length; i++) {
+        if (m[i + 1] !== undefined) { out += '<span class="' + CLASSES[i] + '">' + escapeHtml(m[0]) + '</span>'; break; }
+      }
+      last = TOKEN.lastIndex;
+    }
+    return out + escapeHtml(code.slice(last));
+  }
 
-data = {
-    'CustomerID': [101, 101, 102, 103, 103, 103, 104, 105, 105, 106],
-    'InvoiceDate': ['2024-01-05', '2024-03-10', '2024-02-15', '2024-01-20',
-                     '2024-02-25', '2024-03-28', '2023-12-01', '2024-03-01',
-                     '2024-03-15', '2023-11-10'],
-    'Amount': [120, 80, 200, 50, 60, 90, 300, 150, 170, 40],
-}
-df = pd.DataFrame(data)
-df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])`);
+  /* ---------- Vəziyyət: oxunmuş dərslər (istifadəçi üzrə, brauzerdə saxlanılır) ---------- */
+  function storageKey() {
+    try {
+      const u = window.parent && window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+      return 'azcup-py-read:' + ((u && u.email) || 'anon');
+    } catch (e) { return 'azcup-py-read:anon'; }
+  }
+  let read = new Set();
+  try { read = new Set(JSON.parse(localStorage.getItem(storageKey()) || '[]')); } catch (e) { /* saxlama əlçatan deyil */ }
+  function saveRead() { try { localStorage.setItem(storageKey(), JSON.stringify(Array.from(read))); } catch (e) { /* məs. məxfi rejim */ } }
 
-fillCode('s2', `snapshot_date = pd.Timestamp('2024-04-01')
+  /* ---------- Məlumatı hazırla ---------- */
+  const chapters = PY_CHAPTERS.map((c, ci) => Object.assign({}, c, {
+    index: ci + 1,
+    lessons: c.lessons.map((l, li) => Object.assign({}, l, { num: (ci + 1) + '.' + (li + 1), chapterId: c.id, chapterTitle: c.title })),
+  }));
+  const all = [];
+  chapters.forEach(c => c.lessons.forEach(l => { l.hay = fold(l.title + ' ' + c.title + ' ' + (l.text || []).join(' ')); all.push(l); }));
+  const byId = {};
+  all.forEach(l => { byId[l.id] = l; });
 
-rfm = df.groupby('CustomerID').agg(
-    Recency=('InvoiceDate', lambda x: (snapshot_date - x.max()).days),
-    Frequency=('InvoiceDate', 'count'),
-    Monetary=('Amount', 'sum')
-).reset_index()
+  const els = {
+    chapters: document.getElementById('chapters'), nav: document.getElementById('nav'),
+    progressText: document.getElementById('progressText'), progressFill: document.getElementById('progressFill'), progressBar: document.getElementById('progressBar'),
+    count: document.getElementById('count'), empty: document.getElementById('empty'), search: document.getElementById('search'),
+  };
+  document.getElementById('specChapters').textContent = chapters.length;
+  document.getElementById('specLessons').textContent = all.length;
 
-print(rfm)`);
+  const CHEVRON = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 
-fillOut('s2out', `   CustomerID  Recency  Frequency  Monetary
-0         101       22          2       200
-1         102       46          1       200
-2         103        4          3       200
-3         104      122          1       300
-4         105       17          2       320
-5         106      143          1        40`);
+  /* ---------- Render: fəsillər və dərs başlıqları (məzmun dərs açılanda qurulur) ---------- */
+  function renderShell() {
+    let navHtml = '<p class="nav-title">Fəsillər</p>';
+    let html = '';
+    chapters.forEach(c => {
+      navHtml += '<a href="#chap-' + c.id + '" data-chapter="' + c.id + '"><span class="n">' + c.index + '</span><span class="t">' + escapeHtml(c.title) + '</span><span class="c"></span></a>';
+      html += '<section class="chapter" id="chap-' + c.id + '" data-chapter="' + c.id + '">'
+        + '<h2><span class="num">' + c.index + '</span>' + escapeHtml(c.title) + '</h2>'
+        + '<p class="blurb">' + escapeHtml(c.blurb || '') + '</p>';
+      c.lessons.forEach(l => {
+        html += '<article class="lesson" id="lesson-' + l.id + '" data-id="' + l.id + '">'
+          + '<button type="button" class="lesson-head" aria-expanded="false" aria-controls="body-' + l.id + '">'
+          + '<span class="lesson-num">' + l.num + '</span>'
+          + '<span class="lesson-title">' + escapeHtml(l.title) + '</span>'
+          + (l.task ? '<span class="tag task">Tapşırıq</span>' : '')
+          + '<span class="tag read" hidden>Oxunub</span>' + CHEVRON + '</button>'
+          + '<div class="lesson-body" id="body-' + l.id + '" role="region"></div></article>';
+      });
+      html += '</section>';
+    });
+    els.nav.innerHTML = navHtml;
+    els.chapters.innerHTML = html;
+  }
 
-fillCode('s3', `rfm['R_Score'] = pd.qcut(rfm['Recency'].rank(method='first'), 4, labels=[4,3,2,1]).astype(int)
-rfm['F_Score'] = pd.qcut(rfm['Frequency'].rank(method='first'), 4, labels=[1,2,3,4]).astype(int)
-rfm['M_Score'] = pd.qcut(rfm['Monetary'].rank(method='first'), 4, labels=[1,2,3,4]).astype(int)
+  function codeBlock(code, lang) {
+    const isShell = lang === 'shell';
+    return '<figure class="code" style="margin:14px 0;"><div class="code-head"><span class="code-lang">' + (isShell ? 'Komanda sətri' : 'Python') + '</span>'
+      + '<button type="button" class="copy" aria-label="Kodu kopyala">Kopyala</button></div>'
+      + '<pre><code>' + (isShell ? escapeHtml(code) : highlightPython(code)) + '</code></pre></figure>';
+  }
 
-rfm['RFM_Score'] = (
-    rfm['R_Score'].astype(str) +
-    rfm['F_Score'].astype(str) +
-    rfm['M_Score'].astype(str)
-)`);
+  function buildBody(l) {
+    let h = '<div class="lesson-text">' + (l.text || []).map(p => '<p>' + fmt(p) + '</p>').join('') + '</div>';
+    if (l.code) h += codeBlock(l.code, l.lang);
+    if (l.tip) h += '<aside class="tip"><b>Qeyd.</b> ' + fmt(l.tip) + '</aside>';
+    if (l.task) {
+      h += '<div class="task"><h4>Tapşırıq</h4><p>' + fmt(l.task) + '</p>'
+        + (l.answer ? '<details><summary>Cavaba bax</summary>' + codeBlock(l.answer) + '</details>' : '') + '</div>';
+    }
+    h += '<div class="lesson-foot">'
+      + '<button type="button" class="btn done-btn" aria-pressed="false">Oxudum</button>'
+      + '<button type="button" class="btn ghost next-btn">Növbəti dərs</button>'
+      + '<a class="src" href="https://metanit.com/python/tutorial/' + encodeURIComponent(l.src) + '.php" target="_blank" rel="noopener noreferrer">Metanit-də oxu (rus dilində) ↗</a>'
+      + '</div>';
+    return h;
+  }
 
-fillCode('s4', `def segment(row):
-    if row['R_Score'] >= 3 and row['F_Score'] >= 3 and row['M_Score'] >= 3:
-        return 'Champions'
-    elif row['R_Score'] <= 2 and row['F_Score'] <= 2:
-        return 'At Risk'
-    else:
-        return 'Regular'
+  /* ---------- Vəziyyətin görünüşə tətbiqi ---------- */
+  function updateProgress() {
+    const done = all.filter(l => read.has(l.id)).length;
+    const pct = all.length ? Math.round(done * 100 / all.length) : 0;
+    els.progressText.textContent = done + ' / ' + all.length + ' dərs oxunub';
+    els.progressFill.style.width = pct + '%';
+    els.progressBar.setAttribute('aria-valuenow', String(pct));
+    chapters.forEach(c => {
+      const d = c.lessons.filter(l => read.has(l.id)).length;
+      const a = els.nav.querySelector('a[data-chapter="' + c.id + '"]');
+      if (!a) return;
+      a.querySelector('.c').textContent = d + '/' + c.lessons.length;
+      a.classList.toggle('done', d === c.lessons.length);
+    });
+  }
+  function paintLesson(id) {
+    const card = document.getElementById('lesson-' + id);
+    if (!card) return;
+    const isRead = read.has(id);
+    card.classList.toggle('is-read', isRead);
+    card.querySelector('.tag.read').hidden = !isRead;
+    const btn = card.querySelector('.done-btn');
+    if (btn) { btn.setAttribute('aria-pressed', isRead ? 'true' : 'false'); btn.textContent = isRead ? '✓ Oxunub' : 'Oxudum'; }
+  }
 
-rfm['Segment'] = rfm.apply(segment, axis=1)
-print(rfm[['CustomerID', 'RFM_Score', 'Segment']])`);
+  /* ---------- Açma / bağlama ---------- */
+  function setOpen(card, open) {
+    const id = card.getAttribute('data-id');
+    if (open && !card.dataset.built) {
+      card.querySelector('.lesson-body').innerHTML = buildBody(byId[id]);
+      card.dataset.built = '1';
+      paintLesson(id);
+    }
+    card.classList.toggle('open', open);
+    card.querySelector('.lesson-head').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  function openLesson(id, scroll) {
+    const card = document.getElementById('lesson-' + id);
+    if (!card) return;
+    if (card.hidden) { clearFilters(); }
+    setOpen(card, true);
+    if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
 
-fillOut('s4out', `   CustomerID RFM_Score    Segment
-0         101       331    Regular
-1         102       212    At Risk
-2         103       443  Champions
-3         104       114    At Risk
-4         105       444  Champions
-5         106       121    At Risk`);
+  /* ---------- Süzgəc və axtarış ---------- */
+  const state = { filter: 'all', query: '' };
+  function matches(l) {
+    if (state.filter === 'unread' && read.has(l.id)) return false;
+    if (state.filter === 'read' && !read.has(l.id)) return false;
+    if (state.filter === 'task' && !l.task) return false;
+    const words = fold(state.query).split(/\s+/).filter(Boolean);
+    return words.every(w => l.hay.indexOf(w) !== -1);
+  }
+  function applyFilter() {
+    let shown = 0;
+    chapters.forEach(c => {
+      let any = false;
+      c.lessons.forEach(l => {
+        const ok = matches(l);
+        document.getElementById('lesson-' + l.id).hidden = !ok;
+        if (ok) { any = true; shown++; }
+      });
+      const sec = document.getElementById('chap-' + c.id);
+      sec.hidden = !any;
+    });
+    const filtering = state.filter !== 'all' || state.query.trim() !== '';
+    els.count.textContent = filtering ? shown + ' dərs tapıldı' : '';
+    els.empty.classList.toggle('show', shown === 0);
+  }
+  function clearFilters() {
+    state.filter = 'all'; state.query = ''; els.search.value = '';
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.getAttribute('data-filter') === 'all' ? 'true' : 'false'));
+    applyFilter();
+  }
 
-fillCode('s5', `print(rfm['Segment'].value_counts())`);
+  /* ---------- Hadisələr ---------- */
+  function copyText(text) {
+    const done = ok => {
+      const ui = window.AzcupUI;
+      if (ui) ui.toast(ok ? 'Kod kopyalandı' : 'Kopyalamaq mümkün olmadı.', ok ? 'success' : 'error', { duration: 2200 });
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => done(true), () => done(false));
+      return;
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); document.body.removeChild(ta); done(!!ok);
+    } catch (e) { done(false); }
+  }
 
-fillOut('s5out', `Segment
-At Risk      3
-Champions    2
-Regular      1
-Name: count, dtype: int64`);
+  els.chapters.addEventListener('click', e => {
+    const head = e.target.closest('.lesson-head');
+    if (head) { const card = head.closest('.lesson'); setOpen(card, !card.classList.contains('open')); return; }
+    const copyBtn = e.target.closest('.copy');
+    if (copyBtn) { copyText(copyBtn.closest('.code').querySelector('pre').textContent); return; }
+    const done = e.target.closest('.done-btn');
+    if (done) {
+      const id = done.closest('.lesson').getAttribute('data-id');
+      if (read.has(id)) read.delete(id); else read.add(id);
+      saveRead(); paintLesson(id); updateProgress();
+      if (state.filter === 'unread' || state.filter === 'read') applyFilter();
+      return;
+    }
+    const next = e.target.closest('.next-btn');
+    if (next) {
+      const card = next.closest('.lesson');
+      const i = all.findIndex(l => l.id === card.getAttribute('data-id'));
+      for (let j = i + 1; j < all.length; j++) {
+        const target = document.getElementById('lesson-' + all[j].id);
+        if (!target.hidden) { setOpen(card, false); openLesson(all[j].id, true); return; }
+      }
+      if (window.AzcupUI) window.AzcupUI.toast('Bu, sonuncu dərsdir. Əhsən!', 'success');
+    }
+  });
+
+  els.nav.addEventListener('click', e => {
+    const a = e.target.closest('a[data-chapter]');
+    if (!a) return;
+    e.preventDefault();
+    const sec = document.getElementById('chap-' + a.getAttribute('data-chapter'));
+    if (sec) sec.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => {
+    state.filter = chip.getAttribute('data-filter');
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'));
+    applyFilter();
+  }));
+  let searchTimer = null;
+  els.search.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { state.query = els.search.value; applyFilter(); }, 120);
+  });
+  document.getElementById('resetBtn').addEventListener('click', clearFilters);
+  document.getElementById('collapseBtn').addEventListener('click', () => {
+    document.querySelectorAll('.lesson.open').forEach(card => setOpen(card, false));
+  });
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    const next = all.find(l => !read.has(l.id));
+    if (!next) { if (window.AzcupUI) window.AzcupUI.toast('Bütün dərsləri oxumusan. Təbrik edirəm!', 'success'); return; }
+    openLesson(next.id, true);
+  });
+
+  // Cari fəsil naviqasiyada vurğulanır
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const id = en.target.getAttribute('data-chapter');
+        els.nav.querySelectorAll('a').forEach(a => a.classList.toggle('current', a.getAttribute('data-chapter') === id));
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    document.querySelectorAll('.chapter').forEach(sec => io.observe(sec));
+  }
+
+  /* ---------- Başlanğıc ---------- */
+  if (!all.length) {
+    els.chapters.innerHTML = '<div class="empty show">Dərslər yüklənmədi.</div>';
+    return;
+  }
+  renderShell();
+  all.forEach(l => paintLesson(l.id));
+  updateProgress();
+})();
 </script>
 </body>
 </html>
