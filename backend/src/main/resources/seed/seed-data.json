@@ -70,7 +70,7 @@
       "title": "Backtracking",
       "monthTag": "Ay 5 · Backtracking",
       "description": "Alt-çoxluqlar, permutasiyalar",
-      "published": false
+      "published": true
     },
     {
       "slug": "week10",
@@ -20116,6 +20116,1806 @@
       "exampleOutput": "-3",
       "approach": "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
       "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    int n; cin >> n;\n    set<int> s;\n    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }\n    if (s.size() < 2) { cout << \"YOX\" << \"\\n\"; return 0; }\n    auto it = s.rbegin();\n    it++;\n    cout << *it << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 1,
+      "subgroupLabel": null,
+      "title": "3 elementin bütün permutasiyalarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "permutasiya"
+      ],
+      "statement": "N (fərqli) elementin bütün PERMUTASİYALARINI backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (N!).",
+      "exampleInput": "3",
+      "exampleOutput": "6",
+      "approach": "Backtracking: hər addımda hələ istifadə olunmamış bir elementi seç, onu \"istifadə edilib\" işarələ, daha dərinə get; N element seçildikdə 1 permutasiya tapılıb sayılır, sonra GERİ QAYIDIB (işarəni sil) başqa seçimi sına.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 2,
+      "subgroupLabel": null,
+      "title": "1 elementin permutasiyalarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "permutasiya"
+      ],
+      "statement": "N (fərqli) elementin bütün PERMUTASİYALARINI backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (N!).",
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər addımda hələ istifadə olunmamış bir elementi seç, onu \"istifadə edilib\" işarələ, daha dərinə get; N element seçildikdə 1 permutasiya tapılıb sayılır, sonra GERİ QAYIDIB (işarəni sil) başqa seçimi sına.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 3,
+      "subgroupLabel": null,
+      "title": "4 elementin bütün permutasiyalarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "permutasiya"
+      ],
+      "statement": "N (fərqli) elementin bütün PERMUTASİYALARINI backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (N!).",
+      "exampleInput": "4",
+      "exampleOutput": "24",
+      "approach": "Backtracking: hər addımda hələ istifadə olunmamış bir elementi seç, onu \"istifadə edilib\" işarələ, daha dərinə get; N element seçildikdə 1 permutasiya tapılıb sayılır, sonra GERİ QAYIDIB (işarəni sil) başqa seçimi sına.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 4,
+      "subgroupLabel": null,
+      "title": "5 elementin bütün permutasiyalarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "permutasiya"
+      ],
+      "statement": "N (fərqli) elementin bütün PERMUTASİYALARINI backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (N!).",
+      "exampleInput": "5",
+      "exampleOutput": "120",
+      "approach": "Backtracking: hər addımda hələ istifadə olunmamış bir elementi seç, onu \"istifadə edilib\" işarələ, daha dərinə get; N element seçildikdə 1 permutasiya tapılıb sayılır, sonra GERİ QAYIDIB (işarəni sil) başqa seçimi sına.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 5,
+      "subgroupLabel": null,
+      "title": "6 elementin bütün permutasiyalarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "permutasiya"
+      ],
+      "statement": "N (fərqli) elementin bütün PERMUTASİYALARINI backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (N!).",
+      "exampleInput": "6",
+      "exampleOutput": "720",
+      "approach": "Backtracking: hər addımda hələ istifadə olunmamış bir elementi seç, onu \"istifadə edilib\" işarələ, daha dərinə get; N element seçildikdə 1 permutasiya tapılıb sayılır, sonra GERİ QAYIDIB (işarəni sil) başqa seçimi sına.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 6,
+      "subgroupLabel": null,
+      "title": "3 elementin bütün alt çoxluqlarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N elementin bütün ALT ÇOXLUQLARINI (boş çoxluq və özü daxil) backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 20).",
+      "outputSpec": "Alt çoxluqların sayı (2^N).",
+      "exampleInput": "3",
+      "exampleOutput": "8",
+      "approach": "Backtracking: hər element üçün İKİ seçim var — alt çoxluğa DAXİL ET ya da ETMƏ; bütün N element üçün qərar verildikdə bir alt çoxluq tamamlanmış olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == n) { cnt++; return; }\n    bt(idx + 1);      // daxil etmə\n    bt(idx + 1);      // daxil et\n}\nint main(){\n    cin >> n;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 7,
+      "subgroupLabel": null,
+      "title": "0 elementin alt çoxluqlarının sayını backtracking ilə tapmaq (baza hal)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N elementin bütün ALT ÇOXLUQLARINI (boş çoxluq və özü daxil) backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 20).",
+      "outputSpec": "Alt çoxluqların sayı (2^N).",
+      "exampleInput": "0",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər element üçün İKİ seçim var — alt çoxluğa DAXİL ET ya da ETMƏ; bütün N element üçün qərar verildikdə bir alt çoxluq tamamlanmış olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == n) { cnt++; return; }\n    bt(idx + 1);      // daxil etmə\n    bt(idx + 1);      // daxil et\n}\nint main(){\n    cin >> n;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 8,
+      "subgroupLabel": null,
+      "title": "5 elementin bütün alt çoxluqlarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N elementin bütün ALT ÇOXLUQLARINI (boş çoxluq və özü daxil) backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 20).",
+      "outputSpec": "Alt çoxluqların sayı (2^N).",
+      "exampleInput": "5",
+      "exampleOutput": "32",
+      "approach": "Backtracking: hər element üçün İKİ seçim var — alt çoxluğa DAXİL ET ya da ETMƏ; bütün N element üçün qərar verildikdə bir alt çoxluq tamamlanmış olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == n) { cnt++; return; }\n    bt(idx + 1);      // daxil etmə\n    bt(idx + 1);      // daxil et\n}\nint main(){\n    cin >> n;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 9,
+      "subgroupLabel": null,
+      "title": "10 elementin bütün alt çoxluqlarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N elementin bütün ALT ÇOXLUQLARINI (boş çoxluq və özü daxil) backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 20).",
+      "outputSpec": "Alt çoxluqların sayı (2^N).",
+      "exampleInput": "10",
+      "exampleOutput": "1024",
+      "approach": "Backtracking: hər element üçün İKİ seçim var — alt çoxluğa DAXİL ET ya da ETMƏ; bütün N element üçün qərar verildikdə bir alt çoxluq tamamlanmış olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == n) { cnt++; return; }\n    bt(idx + 1);      // daxil etmə\n    bt(idx + 1);      // daxil et\n}\nint main(){\n    cin >> n;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 10,
+      "subgroupLabel": null,
+      "title": "1 elementin alt çoxluqlarının sayını backtracking ilə tapmaq",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N elementin bütün ALT ÇOXLUQLARINI (boş çoxluq və özü daxil) backtracking ilə generasiya edib, onların sayını çap edin.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 20).",
+      "outputSpec": "Alt çoxluqların sayı (2^N).",
+      "exampleInput": "1",
+      "exampleOutput": "2",
+      "approach": "Backtracking: hər element üçün İKİ seçim var — alt çoxluğa DAXİL ET ya da ETMƏ; bütün N element üçün qərar verildikdə bir alt çoxluq tamamlanmış olur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == n) { cnt++; return; }\n    bt(idx + 1);      // daxil etmə\n    bt(idx + 1);      // daxil et\n}\nint main(){\n    cin >> n;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 11,
+      "subgroupLabel": null,
+      "title": "5-dən 2 seçmənin sayını backtracking ilə tapmaq",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "kombinasiya"
+      ],
+      "statement": "N elementdən K-nı seçməyin bütün üsullarını (sıra fərq etmir) backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+      "outputSpec": "Kombinasiyaların sayı (C(N,K)).",
+      "exampleInput": "5 2",
+      "exampleOutput": "10",
+      "approach": "Backtracking: elementlər üzərindən sırayla gedilir, hər elementi ya seçib K-nı azaldaraq davam edirik, ya da keçib növbəti elementə baxırıq; K=0 olduqda bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n) return;\n    bt(idx + 1, remain - 1); // seç\n    bt(idx + 1, remain);     // keç\n}\nint main(){\n    cin >> n >> k;\n    bt(0, k);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 12,
+      "subgroupLabel": null,
+      "title": "4-dən 0 seçmənin sayını backtracking ilə tapmaq (baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "kombinasiya"
+      ],
+      "statement": "N elementdən K-nı seçməyin bütün üsullarını (sıra fərq etmir) backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+      "outputSpec": "Kombinasiyaların sayı (C(N,K)).",
+      "exampleInput": "4 0",
+      "exampleOutput": "1",
+      "approach": "Backtracking: elementlər üzərindən sırayla gedilir, hər elementi ya seçib K-nı azaldaraq davam edirik, ya da keçib növbəti elementə baxırıq; K=0 olduqda bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n) return;\n    bt(idx + 1, remain - 1); // seç\n    bt(idx + 1, remain);     // keç\n}\nint main(){\n    cin >> n >> k;\n    bt(0, k);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 13,
+      "subgroupLabel": null,
+      "title": "6-dan 6 seçmənin sayını backtracking ilə tapmaq (hamısı)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "kombinasiya"
+      ],
+      "statement": "N elementdən K-nı seçməyin bütün üsullarını (sıra fərq etmir) backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+      "outputSpec": "Kombinasiyaların sayı (C(N,K)).",
+      "exampleInput": "6 6",
+      "exampleOutput": "1",
+      "approach": "Backtracking: elementlər üzərindən sırayla gedilir, hər elementi ya seçib K-nı azaldaraq davam edirik, ya da keçib növbəti elementə baxırıq; K=0 olduqda bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n) return;\n    bt(idx + 1, remain - 1); // seç\n    bt(idx + 1, remain);     // keç\n}\nint main(){\n    cin >> n >> k;\n    bt(0, k);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 14,
+      "subgroupLabel": null,
+      "title": "10-dan 3 seçmənin sayını backtracking ilə tapmaq",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "kombinasiya"
+      ],
+      "statement": "N elementdən K-nı seçməyin bütün üsullarını (sıra fərq etmir) backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+      "outputSpec": "Kombinasiyaların sayı (C(N,K)).",
+      "exampleInput": "10 3",
+      "exampleOutput": "120",
+      "approach": "Backtracking: elementlər üzərindən sırayla gedilir, hər elementi ya seçib K-nı azaldaraq davam edirik, ya da keçib növbəti elementə baxırıq; K=0 olduqda bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n) return;\n    bt(idx + 1, remain - 1); // seç\n    bt(idx + 1, remain);     // keç\n}\nint main(){\n    cin >> n >> k;\n    bt(0, k);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 15,
+      "subgroupLabel": null,
+      "title": "7-dən 4 seçmənin sayını backtracking ilə tapmaq",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "kombinasiya"
+      ],
+      "statement": "N elementdən K-nı seçməyin bütün üsullarını (sıra fərq etmir) backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+      "outputSpec": "Kombinasiyaların sayı (C(N,K)).",
+      "exampleInput": "7 4",
+      "exampleOutput": "35",
+      "approach": "Backtracking: elementlər üzərindən sırayla gedilir, hər elementi ya seçib K-nı azaldaraq davam edirik, ya da keçib növbəti elementə baxırıq; K=0 olduqda bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n) return;\n    bt(idx + 1, remain - 1); // seç\n    bt(idx + 1, remain);     // keç\n}\nint main(){\n    cin >> n >> k;\n    bt(0, k);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 16,
+      "subgroupLabel": null,
+      "title": "1-Vəzir məsələsinin həll sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "n-vəzir"
+      ],
+      "statement": "N×N şahmat lövhəsində N vəziri elə yerləşdirin ki, heç biri digərini \"vurmasın\" (eyni sətir/sütun/diaqonalda olmasın). Bütün mümkün düzülüşlərin sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "N-Vəzir məsələsinin həll sayı.",
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Hər sətirdə dəqiq bir vəzir yerləşdirilir (backtracking sətir-sətir gedir); hər sütun seçimi ƏVVƏLKİ vəzirlərlə toqquşmur-mu (sütun/diaqonal) yoxlanılır — toqquşursa o sütun atlanır, yoxsa dərinə gedilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<int> col; // col[row] = yerləşdirilmiş sütun\nlong long cnt = 0;\nbool ok(int row, int c){\n    for (int r = 0; r < row; r++) {\n        if (col[r] == c) return false;\n        if (abs(col[r] - c) == abs(r - row)) return false;\n    }\n    return true;\n}\nvoid bt(int row){\n    if (row == n) { cnt++; return; }\n    for (int c = 0; c < n; c++) {\n        if (ok(row, c)) {\n            col[row] = c;\n            bt(row + 1);\n        }\n    }\n}\nint main(){\n    cin >> n;\n    col.assign(n, -1);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 17,
+      "subgroupLabel": null,
+      "title": "4-Vəzir məsələsinin həll sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "n-vəzir"
+      ],
+      "statement": "N×N şahmat lövhəsində N vəziri elə yerləşdirin ki, heç biri digərini \"vurmasın\" (eyni sətir/sütun/diaqonalda olmasın). Bütün mümkün düzülüşlərin sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "N-Vəzir məsələsinin həll sayı.",
+      "exampleInput": "4",
+      "exampleOutput": "2",
+      "approach": "Hər sətirdə dəqiq bir vəzir yerləşdirilir (backtracking sətir-sətir gedir); hər sütun seçimi ƏVVƏLKİ vəzirlərlə toqquşmur-mu (sütun/diaqonal) yoxlanılır — toqquşursa o sütun atlanır, yoxsa dərinə gedilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<int> col; // col[row] = yerləşdirilmiş sütun\nlong long cnt = 0;\nbool ok(int row, int c){\n    for (int r = 0; r < row; r++) {\n        if (col[r] == c) return false;\n        if (abs(col[r] - c) == abs(r - row)) return false;\n    }\n    return true;\n}\nvoid bt(int row){\n    if (row == n) { cnt++; return; }\n    for (int c = 0; c < n; c++) {\n        if (ok(row, c)) {\n            col[row] = c;\n            bt(row + 1);\n        }\n    }\n}\nint main(){\n    cin >> n;\n    col.assign(n, -1);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 18,
+      "subgroupLabel": null,
+      "title": "5-Vəzir məsələsinin həll sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "n-vəzir"
+      ],
+      "statement": "N×N şahmat lövhəsində N vəziri elə yerləşdirin ki, heç biri digərini \"vurmasın\" (eyni sətir/sütun/diaqonalda olmasın). Bütün mümkün düzülüşlərin sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "N-Vəzir məsələsinin həll sayı.",
+      "exampleInput": "5",
+      "exampleOutput": "10",
+      "approach": "Hər sətirdə dəqiq bir vəzir yerləşdirilir (backtracking sətir-sətir gedir); hər sütun seçimi ƏVVƏLKİ vəzirlərlə toqquşmur-mu (sütun/diaqonal) yoxlanılır — toqquşursa o sütun atlanır, yoxsa dərinə gedilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<int> col; // col[row] = yerləşdirilmiş sütun\nlong long cnt = 0;\nbool ok(int row, int c){\n    for (int r = 0; r < row; r++) {\n        if (col[r] == c) return false;\n        if (abs(col[r] - c) == abs(r - row)) return false;\n    }\n    return true;\n}\nvoid bt(int row){\n    if (row == n) { cnt++; return; }\n    for (int c = 0; c < n; c++) {\n        if (ok(row, c)) {\n            col[row] = c;\n            bt(row + 1);\n        }\n    }\n}\nint main(){\n    cin >> n;\n    col.assign(n, -1);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 19,
+      "subgroupLabel": null,
+      "title": "6-Vəzir məsələsinin həll sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "n-vəzir"
+      ],
+      "statement": "N×N şahmat lövhəsində N vəziri elə yerləşdirin ki, heç biri digərini \"vurmasın\" (eyni sətir/sütun/diaqonalda olmasın). Bütün mümkün düzülüşlərin sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "N-Vəzir məsələsinin həll sayı.",
+      "exampleInput": "6",
+      "exampleOutput": "4",
+      "approach": "Hər sətirdə dəqiq bir vəzir yerləşdirilir (backtracking sətir-sətir gedir); hər sütun seçimi ƏVVƏLKİ vəzirlərlə toqquşmur-mu (sütun/diaqonal) yoxlanılır — toqquşursa o sütun atlanır, yoxsa dərinə gedilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<int> col; // col[row] = yerləşdirilmiş sütun\nlong long cnt = 0;\nbool ok(int row, int c){\n    for (int r = 0; r < row; r++) {\n        if (col[r] == c) return false;\n        if (abs(col[r] - c) == abs(r - row)) return false;\n    }\n    return true;\n}\nvoid bt(int row){\n    if (row == n) { cnt++; return; }\n    for (int c = 0; c < n; c++) {\n        if (ok(row, c)) {\n            col[row] = c;\n            bt(row + 1);\n        }\n    }\n}\nint main(){\n    cin >> n;\n    col.assign(n, -1);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 20,
+      "subgroupLabel": null,
+      "title": "8-Vəzir məsələsinin həll sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "n-vəzir"
+      ],
+      "statement": "N×N şahmat lövhəsində N vəziri elə yerləşdirin ki, heç biri digərini \"vurmasın\" (eyni sətir/sütun/diaqonalda olmasın). Bütün mümkün düzülüşlərin sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (1 ≤ N ≤ 8).",
+      "outputSpec": "N-Vəzir məsələsinin həll sayı.",
+      "exampleInput": "8",
+      "exampleOutput": "92",
+      "approach": "Hər sətirdə dəqiq bir vəzir yerləşdirilir (backtracking sətir-sətir gedir); hər sütun seçimi ƏVVƏLKİ vəzirlərlə toqquşmur-mu (sütun/diaqonal) yoxlanılır — toqquşursa o sütun atlanır, yoxsa dərinə gedilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nvector<int> col; // col[row] = yerləşdirilmiş sütun\nlong long cnt = 0;\nbool ok(int row, int c){\n    for (int r = 0; r < row; r++) {\n        if (col[r] == c) return false;\n        if (abs(col[r] - c) == abs(r - row)) return false;\n    }\n    return true;\n}\nvoid bt(int row){\n    if (row == n) { cnt++; return; }\n    for (int c = 0; c < n; c++) {\n        if (ok(row, c)) {\n            col[row] = c;\n            bt(row + 1);\n        }\n    }\n}\nint main(){\n    cin >> n;\n    col.assign(n, -1);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 21,
+      "subgroupLabel": null,
+      "title": "\"abc\" sözünün hərf permutasiyalarının sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Hərfləri FƏRQLİ olan bir söz verilib. Onun hərflərinin bütün permutasiyalarını backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətir S (fərqli kiçik hərflər, 1 ≤ |S| ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (|S|!).",
+      "exampleInput": "abc",
+      "exampleOutput": "6",
+      "approach": "Permutasiya sayma ilə eynidir — amma bu dəfə elementlər bir sözün HƏRFLƏRİDİR; hər addımda istifadə olunmamış bir hərf seçilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == (int)s.size()) { cnt++; return; }\n    for (int i = 0; i < (int)s.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> s;\n    used.assign(s.size(), false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 22,
+      "subgroupLabel": null,
+      "title": "\"a\" sözünün hərf permutasiyalarının sayı (tək hərf)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Hərfləri FƏRQLİ olan bir söz verilib. Onun hərflərinin bütün permutasiyalarını backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətir S (fərqli kiçik hərflər, 1 ≤ |S| ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (|S|!).",
+      "exampleInput": "a",
+      "exampleOutput": "1",
+      "approach": "Permutasiya sayma ilə eynidir — amma bu dəfə elementlər bir sözün HƏRFLƏRİDİR; hər addımda istifadə olunmamış bir hərf seçilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == (int)s.size()) { cnt++; return; }\n    for (int i = 0; i < (int)s.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> s;\n    used.assign(s.size(), false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 23,
+      "subgroupLabel": null,
+      "title": "\"cup\" sözünün hərf permutasiyalarının sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Hərfləri FƏRQLİ olan bir söz verilib. Onun hərflərinin bütün permutasiyalarını backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətir S (fərqli kiçik hərflər, 1 ≤ |S| ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (|S|!).",
+      "exampleInput": "cup",
+      "exampleOutput": "6",
+      "approach": "Permutasiya sayma ilə eynidir — amma bu dəfə elementlər bir sözün HƏRFLƏRİDİR; hər addımda istifadə olunmamış bir hərf seçilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == (int)s.size()) { cnt++; return; }\n    for (int i = 0; i < (int)s.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> s;\n    used.assign(s.size(), false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 24,
+      "subgroupLabel": null,
+      "title": "\"azer\" sözünün hərf permutasiyalarının sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Hərfləri FƏRQLİ olan bir söz verilib. Onun hərflərinin bütün permutasiyalarını backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətir S (fərqli kiçik hərflər, 1 ≤ |S| ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (|S|!).",
+      "exampleInput": "azer",
+      "exampleOutput": "24",
+      "approach": "Permutasiya sayma ilə eynidir — amma bu dəfə elementlər bir sözün HƏRFLƏRİDİR; hər addımda istifadə olunmamış bir hərf seçilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == (int)s.size()) { cnt++; return; }\n    for (int i = 0; i < (int)s.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> s;\n    used.assign(s.size(), false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 25,
+      "subgroupLabel": null,
+      "title": "\"code\" sözünün hərf permutasiyalarının sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Hərfləri FƏRQLİ olan bir söz verilib. Onun hərflərinin bütün permutasiyalarını backtracking ilə generasiya edib, sayını çap edin.",
+      "inputSpec": "Bir sətir S (fərqli kiçik hərflər, 1 ≤ |S| ≤ 8).",
+      "outputSpec": "Permutasiyaların sayı (|S|!).",
+      "exampleInput": "code",
+      "exampleOutput": "24",
+      "approach": "Permutasiya sayma ilə eynidir — amma bu dəfə elementlər bir sözün HƏRFLƏRİDİR; hər addımda istifadə olunmamış bir hərf seçilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == (int)s.size()) { cnt++; return; }\n    for (int i = 0; i < (int)s.size(); i++) {\n        if (used[i]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> s;\n    used.assign(s.size(), false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 26,
+      "subgroupLabel": null,
+      "title": "3 cüt mötərizənin düzgün kombinasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "mötərizə"
+      ],
+      "statement": "N cüt mötərizə verilib. Düzgün BALANSLAŞDIRILMIŞ mötərizə ardıcıllıqlarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 15).",
+      "outputSpec": "Düzgün balanslaşdırılmış ardıcıllıqların sayı (Catalan ədədi).",
+      "exampleInput": "3",
+      "exampleOutput": "5",
+      "approach": "Backtracking: hər addımda \"(\" əlavə etmək olar (açıqların sayı N-dən azdırsa), \")\" əlavə etmək olar (bağlıların sayı açıqlardan azdırsa — əks halda balans pozulardı). 2N simvol yerləşdikdə bir düzgün ardıcıllıq tapılıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int open, int close){\n    if (open == n && close == n) { cnt++; return; }\n    if (open < n) bt(open + 1, close);\n    if (close < open) bt(open, close + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 27,
+      "subgroupLabel": null,
+      "title": "0 cüt mötərizənin düzgün kombinasiya sayı (baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "mötərizə"
+      ],
+      "statement": "N cüt mötərizə verilib. Düzgün BALANSLAŞDIRILMIŞ mötərizə ardıcıllıqlarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 15).",
+      "outputSpec": "Düzgün balanslaşdırılmış ardıcıllıqların sayı (Catalan ədədi).",
+      "exampleInput": "0",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər addımda \"(\" əlavə etmək olar (açıqların sayı N-dən azdırsa), \")\" əlavə etmək olar (bağlıların sayı açıqlardan azdırsa — əks halda balans pozulardı). 2N simvol yerləşdikdə bir düzgün ardıcıllıq tapılıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int open, int close){\n    if (open == n && close == n) { cnt++; return; }\n    if (open < n) bt(open + 1, close);\n    if (close < open) bt(open, close + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 28,
+      "subgroupLabel": null,
+      "title": "1 cüt mötərizənin düzgün kombinasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "mötərizə"
+      ],
+      "statement": "N cüt mötərizə verilib. Düzgün BALANSLAŞDIRILMIŞ mötərizə ardıcıllıqlarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 15).",
+      "outputSpec": "Düzgün balanslaşdırılmış ardıcıllıqların sayı (Catalan ədədi).",
+      "exampleInput": "1",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər addımda \"(\" əlavə etmək olar (açıqların sayı N-dən azdırsa), \")\" əlavə etmək olar (bağlıların sayı açıqlardan azdırsa — əks halda balans pozulardı). 2N simvol yerləşdikdə bir düzgün ardıcıllıq tapılıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int open, int close){\n    if (open == n && close == n) { cnt++; return; }\n    if (open < n) bt(open + 1, close);\n    if (close < open) bt(open, close + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 29,
+      "subgroupLabel": null,
+      "title": "5 cüt mötərizənin düzgün kombinasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "mötərizə"
+      ],
+      "statement": "N cüt mötərizə verilib. Düzgün BALANSLAŞDIRILMIŞ mötərizə ardıcıllıqlarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 15).",
+      "outputSpec": "Düzgün balanslaşdırılmış ardıcıllıqların sayı (Catalan ədədi).",
+      "exampleInput": "5",
+      "exampleOutput": "42",
+      "approach": "Backtracking: hər addımda \"(\" əlavə etmək olar (açıqların sayı N-dən azdırsa), \")\" əlavə etmək olar (bağlıların sayı açıqlardan azdırsa — əks halda balans pozulardı). 2N simvol yerləşdikdə bir düzgün ardıcıllıq tapılıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int open, int close){\n    if (open == n && close == n) { cnt++; return; }\n    if (open < n) bt(open + 1, close);\n    if (close < open) bt(open, close + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 30,
+      "subgroupLabel": null,
+      "title": "8 cüt mötərizənin düzgün kombinasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "mötərizə"
+      ],
+      "statement": "N cüt mötərizə verilib. Düzgün BALANSLAŞDIRILMIŞ mötərizə ardıcıllıqlarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (0 ≤ N ≤ 15).",
+      "outputSpec": "Düzgün balanslaşdırılmış ardıcıllıqların sayı (Catalan ədədi).",
+      "exampleInput": "8",
+      "exampleOutput": "1430",
+      "approach": "Backtracking: hər addımda \"(\" əlavə etmək olar (açıqların sayı N-dən azdırsa), \")\" əlavə etmək olar (bağlıların sayı açıqlardan azdırsa — əks halda balans pozulardı). 2N simvol yerləşdikdə bir düzgün ardıcıllıq tapılıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int open, int close){\n    if (open == n && close == n) { cnt++; return; }\n    if (open < n) bt(open + 1, close);\n    if (close < open) bt(open, close + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 31,
+      "subgroupLabel": null,
+      "title": "2, 3, 7, 8 massivində cəmi 10 olan alt çoxluq varmı (backtracking)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N ədəd və hədəf cəm T verilib. Massivdə elementlərinin cəmi DƏQİQ T-yə bərabər olan bir ALT ÇOXLUQ varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd (0 ≤ əədlər ≤ 1000).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4 10\n2 3 7 8",
+      "exampleOutput": "VAR",
+      "approach": "Backtracking: hər element üçün \"daxil et\" (T-dən çıx) və ya \"daxil etmə\" budaqlarını sına; T=0-a çatmaq VAR deməkdir, elementlər bitib T hələ 0 deyilsə həmin budaq uğursuzdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    cout << (bt(0, t) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 32,
+      "subgroupLabel": null,
+      "title": "2, 3, 7, 8 massivində cəmi 100 olan alt çoxluq varmı (backtracking)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N ədəd və hədəf cəm T verilib. Massivdə elementlərinin cəmi DƏQİQ T-yə bərabər olan bir ALT ÇOXLUQ varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd (0 ≤ əədlər ≤ 1000).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4 100\n2 3 7 8",
+      "exampleOutput": "YOX",
+      "approach": "Backtracking: hər element üçün \"daxil et\" (T-dən çıx) və ya \"daxil etmə\" budaqlarını sına; T=0-a çatmaq VAR deməkdir, elementlər bitib T hələ 0 deyilsə həmin budaq uğursuzdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    cout << (bt(0, t) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 33,
+      "subgroupLabel": null,
+      "title": "Boş massivdə cəmi 0 olan alt çoxluq varmı (backtracking, baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N ədəd və hədəf cəm T verilib. Massivdə elementlərinin cəmi DƏQİQ T-yə bərabər olan bir ALT ÇOXLUQ varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd (0 ≤ əədlər ≤ 1000).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "0 0",
+      "exampleOutput": "VAR",
+      "approach": "Backtracking: hər element üçün \"daxil et\" (T-dən çıx) və ya \"daxil etmə\" budaqlarını sına; T=0-a çatmaq VAR deməkdir, elementlər bitib T hələ 0 deyilsə həmin budaq uğursuzdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    cout << (bt(0, t) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 34,
+      "subgroupLabel": null,
+      "title": "5, 10, 12, 13, 15 massivində cəmi 30 olan alt çoxluq varmı (backtracking)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N ədəd və hədəf cəm T verilib. Massivdə elementlərinin cəmi DƏQİQ T-yə bərabər olan bir ALT ÇOXLUQ varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd (0 ≤ əədlər ≤ 1000).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "5 30\n5 10 12 13 15",
+      "exampleOutput": "VAR",
+      "approach": "Backtracking: hər element üçün \"daxil et\" (T-dən çıx) və ya \"daxil etmə\" budaqlarını sına; T=0-a çatmaq VAR deməkdir, elementlər bitib T hələ 0 deyilsə həmin budaq uğursuzdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    cout << (bt(0, t) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 35,
+      "subgroupLabel": null,
+      "title": "1, 2, 3 massivində cəmi 7 olan alt çoxluq varmı (backtracking)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N ədəd və hədəf cəm T verilib. Massivdə elementlərinin cəmi DƏQİQ T-yə bərabər olan bir ALT ÇOXLUQ varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd (0 ≤ əədlər ≤ 1000).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "3 7\n1 2 3",
+      "exampleOutput": "YOX",
+      "approach": "Backtracking: hər element üçün \"daxil et\" (T-dən çıx) və ya \"daxil etmə\" budaqlarını sına; T=0-a çatmaq VAR deməkdir, elementlər bitib T hələ 0 deyilsə həmin budaq uğursuzdur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    cout << (bt(0, t) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 36,
+      "subgroupLabel": null,
+      "title": "\"23\" rəqəmlərinə uyğun hərf kombinasiyalarının sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Köhnə telefon klaviaturasında rəqəmlərə hərflər uyğundur: 2→abc, 3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz. Verilmiş rəqəm ardıcıllığına uyğun bütün hərf kombinasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Yalnız 2-9 rəqəmlərindən ibarət bir sətir (1 ≤ uzunluq ≤ 6).",
+      "outputSpec": "Mümkün hərf kombinasiyalarının sayı.",
+      "exampleInput": "23",
+      "exampleOutput": "9",
+      "approach": "Backtracking: hər rəqəm üçün ona uyğun 3-4 hərfdən BİRİNİ seç və növbəti rəqəmə keç; bütün rəqəmlər üçün hərf seçildikdə bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring digits;\nvector<string> letters = {\"\",\"\",\"abc\",\"def\",\"ghi\",\"jkl\",\"mno\",\"pqrs\",\"tuv\",\"wxyz\"};\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == (int)digits.size()) { cnt++; return; }\n    string& opts = letters[digits[idx] - '0'];\n    for (char c : opts) bt(idx + 1);\n}\nint main(){\n    cin >> digits;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 37,
+      "subgroupLabel": null,
+      "title": "\"7\" rəqəminə uyğun hərf kombinasiyalarının sayı (tək rəqəm)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Köhnə telefon klaviaturasında rəqəmlərə hərflər uyğundur: 2→abc, 3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz. Verilmiş rəqəm ardıcıllığına uyğun bütün hərf kombinasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Yalnız 2-9 rəqəmlərindən ibarət bir sətir (1 ≤ uzunluq ≤ 6).",
+      "outputSpec": "Mümkün hərf kombinasiyalarının sayı.",
+      "exampleInput": "7",
+      "exampleOutput": "4",
+      "approach": "Backtracking: hər rəqəm üçün ona uyğun 3-4 hərfdən BİRİNİ seç və növbəti rəqəmə keç; bütün rəqəmlər üçün hərf seçildikdə bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring digits;\nvector<string> letters = {\"\",\"\",\"abc\",\"def\",\"ghi\",\"jkl\",\"mno\",\"pqrs\",\"tuv\",\"wxyz\"};\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == (int)digits.size()) { cnt++; return; }\n    string& opts = letters[digits[idx] - '0'];\n    for (char c : opts) bt(idx + 1);\n}\nint main(){\n    cin >> digits;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 38,
+      "subgroupLabel": null,
+      "title": "\"79\" rəqəmlərinə uyğun hərf kombinasiyalarının sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Köhnə telefon klaviaturasında rəqəmlərə hərflər uyğundur: 2→abc, 3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz. Verilmiş rəqəm ardıcıllığına uyğun bütün hərf kombinasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Yalnız 2-9 rəqəmlərindən ibarət bir sətir (1 ≤ uzunluq ≤ 6).",
+      "outputSpec": "Mümkün hərf kombinasiyalarının sayı.",
+      "exampleInput": "79",
+      "exampleOutput": "16",
+      "approach": "Backtracking: hər rəqəm üçün ona uyğun 3-4 hərfdən BİRİNİ seç və növbəti rəqəmə keç; bütün rəqəmlər üçün hərf seçildikdə bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring digits;\nvector<string> letters = {\"\",\"\",\"abc\",\"def\",\"ghi\",\"jkl\",\"mno\",\"pqrs\",\"tuv\",\"wxyz\"};\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == (int)digits.size()) { cnt++; return; }\n    string& opts = letters[digits[idx] - '0'];\n    for (char c : opts) bt(idx + 1);\n}\nint main(){\n    cin >> digits;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 39,
+      "subgroupLabel": null,
+      "title": "\"234\" rəqəmlərinə uyğun hərf kombinasiyalarının sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Köhnə telefon klaviaturasında rəqəmlərə hərflər uyğundur: 2→abc, 3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz. Verilmiş rəqəm ardıcıllığına uyğun bütün hərf kombinasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Yalnız 2-9 rəqəmlərindən ibarət bir sətir (1 ≤ uzunluq ≤ 6).",
+      "outputSpec": "Mümkün hərf kombinasiyalarının sayı.",
+      "exampleInput": "234",
+      "exampleOutput": "27",
+      "approach": "Backtracking: hər rəqəm üçün ona uyğun 3-4 hərfdən BİRİNİ seç və növbəti rəqəmə keç; bütün rəqəmlər üçün hərf seçildikdə bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring digits;\nvector<string> letters = {\"\",\"\",\"abc\",\"def\",\"ghi\",\"jkl\",\"mno\",\"pqrs\",\"tuv\",\"wxyz\"};\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == (int)digits.size()) { cnt++; return; }\n    string& opts = letters[digits[idx] - '0'];\n    for (char c : opts) bt(idx + 1);\n}\nint main(){\n    cin >> digits;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 40,
+      "subgroupLabel": null,
+      "title": "\"99\" rəqəmlərinə uyğun hərf kombinasiyalarının sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "string"
+      ],
+      "statement": "Köhnə telefon klaviaturasında rəqəmlərə hərflər uyğundur: 2→abc, 3→def, 4→ghi, 5→jkl, 6→mno, 7→pqrs, 8→tuv, 9→wxyz. Verilmiş rəqəm ardıcıllığına uyğun bütün hərf kombinasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Yalnız 2-9 rəqəmlərindən ibarət bir sətir (1 ≤ uzunluq ≤ 6).",
+      "outputSpec": "Mümkün hərf kombinasiyalarının sayı.",
+      "exampleInput": "99",
+      "exampleOutput": "16",
+      "approach": "Backtracking: hər rəqəm üçün ona uyğun 3-4 hərfdən BİRİNİ seç və növbəti rəqəmə keç; bütün rəqəmlər üçün hərf seçildikdə bir kombinasiya tamamlanıb.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring digits;\nvector<string> letters = {\"\",\"\",\"abc\",\"def\",\"ghi\",\"jkl\",\"mno\",\"pqrs\",\"tuv\",\"wxyz\"};\nlong long cnt = 0;\nvoid bt(int idx){\n    if (idx == (int)digits.size()) { cnt++; return; }\n    string& opts = letters[digits[idx] - '0'];\n    for (char c : opts) bt(idx + 1);\n}\nint main(){\n    cin >> digits;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 41,
+      "subgroupLabel": null,
+      "title": "1, 5, 11, 5 massivini bərabər cəmli iki yarıya bölmək mümkündürmü",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "partition"
+      ],
+      "statement": "N ədəd verilib. Massivi İKİ yarıya (hər element yalnız bir yarıda) elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20), ikinci sətirdə N tam ədəd (0 ≤ ədədlər ≤ 100).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4\n1 5 11 5",
+      "exampleOutput": "VAR",
+      "approach": "Bu, əslində cəmi (ümumi cəm)/2-yə bərabər olan alt çoxluğun axtarışıdır — ümumi cəm TƏK ədəddirsə, dərhal \"YOX\"; cütdürsə, subset-sum backtracking ilə (ümumi cəm)/2 hədəfi axtarılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    int total = 0;\n    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }\n    if (total % 2 != 0) { cout << \"YOX\" << \"\\n\"; return 0; }\n    cout << (bt(0, total / 2) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 42,
+      "subgroupLabel": null,
+      "title": "1, 2, 3, 5 massivini bərabər cəmli iki yarıya bölmək mümkündürmü",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "partition"
+      ],
+      "statement": "N ədəd verilib. Massivi İKİ yarıya (hər element yalnız bir yarıda) elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20), ikinci sətirdə N tam ədəd (0 ≤ ədədlər ≤ 100).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4\n1 2 3 5",
+      "exampleOutput": "YOX",
+      "approach": "Bu, əslində cəmi (ümumi cəm)/2-yə bərabər olan alt çoxluğun axtarışıdır — ümumi cəm TƏK ədəddirsə, dərhal \"YOX\"; cütdürsə, subset-sum backtracking ilə (ümumi cəm)/2 hədəfi axtarılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    int total = 0;\n    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }\n    if (total % 2 != 0) { cout << \"YOX\" << \"\\n\"; return 0; }\n    cout << (bt(0, total / 2) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 43,
+      "subgroupLabel": null,
+      "title": "2, 2, 2, 2 massivini bərabər cəmli iki yarıya bölmək mümkündürmü",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "partition"
+      ],
+      "statement": "N ədəd verilib. Massivi İKİ yarıya (hər element yalnız bir yarıda) elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20), ikinci sətirdə N tam ədəd (0 ≤ ədədlər ≤ 100).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4\n2 2 2 2",
+      "exampleOutput": "VAR",
+      "approach": "Bu, əslində cəmi (ümumi cəm)/2-yə bərabər olan alt çoxluğun axtarışıdır — ümumi cəm TƏK ədəddirsə, dərhal \"YOX\"; cütdürsə, subset-sum backtracking ilə (ümumi cəm)/2 hədəfi axtarılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    int total = 0;\n    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }\n    if (total % 2 != 0) { cout << \"YOX\" << \"\\n\"; return 0; }\n    cout << (bt(0, total / 2) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 44,
+      "subgroupLabel": null,
+      "title": "1, 3 massivini bərabər cəmli iki yarıya bölmək mümkündürmü (tək cəm)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "partition"
+      ],
+      "statement": "N ədəd verilib. Massivi İKİ yarıya (hər element yalnız bir yarıda) elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20), ikinci sətirdə N tam ədəd (0 ≤ ədədlər ≤ 100).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "2\n1 3",
+      "exampleOutput": "YOX",
+      "approach": "Bu, əslində cəmi (ümumi cəm)/2-yə bərabər olan alt çoxluğun axtarışıdır — ümumi cəm TƏK ədəddirsə, dərhal \"YOX\"; cütdürsə, subset-sum backtracking ilə (ümumi cəm)/2 hədəfi axtarılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    int total = 0;\n    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }\n    if (total % 2 != 0) { cout << \"YOX\" << \"\\n\"; return 0; }\n    cout << (bt(0, total / 2) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 45,
+      "subgroupLabel": null,
+      "title": "Boş massivi bərabər cəmli iki yarıya bölmək mümkündürmü (baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "partition"
+      ],
+      "statement": "N ədəd verilib. Massivi İKİ yarıya (hər element yalnız bir yarıda) elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20), ikinci sətirdə N tam ədəd (0 ≤ ədədlər ≤ 100).",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "0",
+      "exampleOutput": "VAR",
+      "approach": "Bu, əslində cəmi (ümumi cəm)/2-yə bərabər olan alt çoxluğun axtarışıdır — ümumi cəm TƏK ədəddirsə, dərhal \"YOX\"; cütdürsə, subset-sum backtracking ilə (ümumi cəm)/2 hədəfi axtarılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nbool bt(int idx, int remain){\n    if (remain == 0) return true;\n    if (idx == n || remain < 0) return false;\n    if (bt(idx + 1, remain - a[idx])) return true;\n    return bt(idx + 1, remain);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    int total = 0;\n    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }\n    if (total % 2 != 0) { cout << \"YOX\" << \"\\n\"; return 0; }\n    cout << (bt(0, total / 2) ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 46,
+      "subgroupLabel": null,
+      "title": "2, 3, 5, 7 massivində cəmi 10 olan alt çoxluqların sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N (fərqli) müsbət ədəd və hədəf cəm T verilib. Cəmi dəqiq T olan NEÇƏ FƏRQLİ alt çoxluq olduğunu backtracking ilə sayın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmi T olan alt çoxluqların sayı.",
+      "exampleInput": "4 10\n2 3 5 7",
+      "exampleOutput": "2",
+      "approach": "Subset-sum VARMI sualından fərqli olaraq, burada bütün uğurlu budaqlar SAYILIR (ilk tapılanda dayanmırıq) — hər element üçün daxil et/etmə budaqlarının hər ikisi sona qədər yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n || remain < 0) return;\n    bt(idx + 1, remain - a[idx]);\n    bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, t);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 47,
+      "subgroupLabel": null,
+      "title": "1, 1, 1, 1 massivində cəmi 2 olan alt çoxluqların sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N (fərqli) müsbət ədəd və hədəf cəm T verilib. Cəmi dəqiq T olan NEÇƏ FƏRQLİ alt çoxluq olduğunu backtracking ilə sayın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmi T olan alt çoxluqların sayı.",
+      "exampleInput": "4 2\n1 1 1 1",
+      "exampleOutput": "6",
+      "approach": "Subset-sum VARMI sualından fərqli olaraq, burada bütün uğurlu budaqlar SAYILIR (ilk tapılanda dayanmırıq) — hər element üçün daxil et/etmə budaqlarının hər ikisi sona qədər yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n || remain < 0) return;\n    bt(idx + 1, remain - a[idx]);\n    bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, t);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 48,
+      "subgroupLabel": null,
+      "title": "2, 4, 6, 8 massivində cəmi 1 olan alt çoxluqların sayı (heç biri)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N (fərqli) müsbət ədəd və hədəf cəm T verilib. Cəmi dəqiq T olan NEÇƏ FƏRQLİ alt çoxluq olduğunu backtracking ilə sayın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmi T olan alt çoxluqların sayı.",
+      "exampleInput": "4 1\n2 4 6 8",
+      "exampleOutput": "0",
+      "approach": "Subset-sum VARMI sualından fərqli olaraq, burada bütün uğurlu budaqlar SAYILIR (ilk tapılanda dayanmırıq) — hər element üçün daxil et/etmə budaqlarının hər ikisi sona qədər yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n || remain < 0) return;\n    bt(idx + 1, remain - a[idx]);\n    bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, t);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 49,
+      "subgroupLabel": null,
+      "title": "1, 2, 3, 4, 5 massivində cəmi 5 olan alt çoxluqların sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N (fərqli) müsbət ədəd və hədəf cəm T verilib. Cəmi dəqiq T olan NEÇƏ FƏRQLİ alt çoxluq olduğunu backtracking ilə sayın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmi T olan alt çoxluqların sayı.",
+      "exampleInput": "5 5\n1 2 3 4 5",
+      "exampleOutput": "3",
+      "approach": "Subset-sum VARMI sualından fərqli olaraq, burada bütün uğurlu budaqlar SAYILIR (ilk tapılanda dayanmırıq) — hər element üçün daxil et/etmə budaqlarının hər ikisi sona qədər yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n || remain < 0) return;\n    bt(idx + 1, remain - a[idx]);\n    bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, t);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 50,
+      "subgroupLabel": null,
+      "title": "Boş massivdə cəmi 0 olan alt çoxluqların sayı (baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "subset-sum"
+      ],
+      "statement": "N (fərqli) müsbət ədəd və hədəf cəm T verilib. Cəmi dəqiq T olan NEÇƏ FƏRQLİ alt çoxluq olduğunu backtracking ilə sayın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 20) və T, ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Cəmi T olan alt çoxluqların sayı.",
+      "exampleInput": "0 0",
+      "exampleOutput": "1",
+      "approach": "Subset-sum VARMI sualından fərqli olaraq, burada bütün uğurlu budaqlar SAYILIR (ilk tapılanda dayanmırıq) — hər element üçün daxil et/etmə budaqlarının hər ikisi sona qədər yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, int remain){\n    if (remain == 0) { cnt++; return; }\n    if (idx == n || remain < 0) return;\n    bt(idx + 1, remain - a[idx]);\n    bt(idx + 1, remain);\n}\nint main(){\n    int t; cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, t);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 51,
+      "subgroupLabel": null,
+      "title": "1, 1, 2 ardıcıllığının unikal permutasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "multiset"
+      ],
+      "statement": "TƏKRARLANA BİLƏN rəqəmlərdən ibarət ardıcıllıq verilib. Onun UNİKAL (bir-birindən fərqli) permutasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 8), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Unikal permutasiyaların sayı.",
+      "exampleInput": "3\n1 1 2",
+      "exampleOutput": "3",
+      "approach": "Ədədlər ƏVVƏLCƏ sıralanır; backtracking-də eyni mövqedə (eyni dərinlikdə) EYNİ dəyəri İKİNCİ dəfə seçməmək üçün \"əgər bu dəyər artıq bu addımda sınanıbsa, keç\" qaydası qoyulur — bu, təkrarlanan permutasiyaların bir dəfədən çox sayılmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        if (i > 0 && a[i] == a[i-1] && !used[i-1]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    sort(a.begin(), a.end());\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 52,
+      "subgroupLabel": null,
+      "title": "1, 2, 3 ardıcıllığının unikal permutasiya sayı (təkrar yoxdur)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "multiset"
+      ],
+      "statement": "TƏKRARLANA BİLƏN rəqəmlərdən ibarət ardıcıllıq verilib. Onun UNİKAL (bir-birindən fərqli) permutasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 8), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Unikal permutasiyaların sayı.",
+      "exampleInput": "3\n1 2 3",
+      "exampleOutput": "6",
+      "approach": "Ədədlər ƏVVƏLCƏ sıralanır; backtracking-də eyni mövqedə (eyni dərinlikdə) EYNİ dəyəri İKİNCİ dəfə seçməmək üçün \"əgər bu dəyər artıq bu addımda sınanıbsa, keç\" qaydası qoyulur — bu, təkrarlanan permutasiyaların bir dəfədən çox sayılmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        if (i > 0 && a[i] == a[i-1] && !used[i-1]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    sort(a.begin(), a.end());\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 53,
+      "subgroupLabel": null,
+      "title": "5, 5, 5 ardıcıllığının unikal permutasiya sayı (hamısı eyni)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "multiset"
+      ],
+      "statement": "TƏKRARLANA BİLƏN rəqəmlərdən ibarət ardıcıllıq verilib. Onun UNİKAL (bir-birindən fərqli) permutasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 8), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Unikal permutasiyaların sayı.",
+      "exampleInput": "3\n5 5 5",
+      "exampleOutput": "1",
+      "approach": "Ədədlər ƏVVƏLCƏ sıralanır; backtracking-də eyni mövqedə (eyni dərinlikdə) EYNİ dəyəri İKİNCİ dəfə seçməmək üçün \"əgər bu dəyər artıq bu addımda sınanıbsa, keç\" qaydası qoyulur — bu, təkrarlanan permutasiyaların bir dəfədən çox sayılmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        if (i > 0 && a[i] == a[i-1] && !used[i-1]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    sort(a.begin(), a.end());\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 54,
+      "subgroupLabel": null,
+      "title": "1, 1, 2, 2 ardıcıllığının unikal permutasiya sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "multiset"
+      ],
+      "statement": "TƏKRARLANA BİLƏN rəqəmlərdən ibarət ardıcıllıq verilib. Onun UNİKAL (bir-birindən fərqli) permutasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 8), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Unikal permutasiyaların sayı.",
+      "exampleInput": "4\n1 1 2 2",
+      "exampleOutput": "6",
+      "approach": "Ədədlər ƏVVƏLCƏ sıralanır; backtracking-də eyni mövqedə (eyni dərinlikdə) EYNİ dəyəri İKİNCİ dəfə seçməmək üçün \"əgər bu dəyər artıq bu addımda sınanıbsa, keç\" qaydası qoyulur — bu, təkrarlanan permutasiyaların bir dəfədən çox sayılmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        if (i > 0 && a[i] == a[i-1] && !used[i-1]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    sort(a.begin(), a.end());\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 55,
+      "subgroupLabel": null,
+      "title": "7 ardıcıllığının unikal permutasiya sayı (tək element)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "multiset"
+      ],
+      "statement": "TƏKRARLANA BİLƏN rəqəmlərdən ibarət ardıcıllıq verilib. Onun UNİKAL (bir-birindən fərqli) permutasiyalarının sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 8), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Unikal permutasiyaların sayı.",
+      "exampleInput": "1\n7",
+      "exampleOutput": "1",
+      "approach": "Ədədlər ƏVVƏLCƏ sıralanır; backtracking-də eyni mövqedə (eyni dərinlikdə) EYNİ dəyəri İKİNCİ dəfə seçməmək üçün \"əgər bu dəyər artıq bu addımda sınanıbsa, keç\" qaydası qoyulur — bu, təkrarlanan permutasiyaların bir dəfədən çox sayılmasının qarşısını alır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nvector<bool> used;\nlong long cnt = 0;\nvoid bt(int depth){\n    if (depth == n) { cnt++; return; }\n    for (int i = 0; i < n; i++) {\n        if (used[i]) continue;\n        if (i > 0 && a[i] == a[i-1] && !used[i-1]) continue;\n        used[i] = true;\n        bt(depth + 1);\n        used[i] = false;\n    }\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    sort(a.begin(), a.end());\n    used.assign(n, false);\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 56,
+      "subgroupLabel": null,
+      "title": "1, 5, 9, 12, 20 massivindən 2 ədəd seçərək minimum fərqi tapmaq",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "optimallaşdırma"
+      ],
+      "statement": "N ədəd və K verilib. Massivdən DƏQİQ K ədəd seçərək, seçilənlərin ən böyüyü ilə ən kiçiyi arasındakı fərqi MİNİMUMA endirin (backtracking ilə bütün seçimləri sınayaraq).",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ K ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Seçilmiş K elementin maksimum mümkün ən kiçik fərqi (max-min minimumu).",
+      "exampleInput": "5 2\n1 5 9 12 20",
+      "exampleOutput": "3",
+      "approach": "Backtracking bütün C(N,K) seçimini sınayır; hər tam seçimdə max-min hesablanır və qlobal minimum yenilənir. (Qeyd: massivi əvvəlcədən sıralasaq, ƏN YAXŞI seçim həmişə ARDICIL K elementdən ibarət olur — backtracking bunu avtomatik tapır.)",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best;\nvector<int> chosen;\nvoid bt(int idx, int cnt){\n    if (cnt == k) {\n        int mx = *max_element(chosen.begin(), chosen.end());\n        int mn = *min_element(chosen.begin(), chosen.end());\n        best = min(best, mx - mn);\n        return;\n    }\n    if (idx == n) return;\n    if (n - idx < k - cnt) return; // qalan element kifayət etmir\n    chosen.push_back(a[idx]);\n    bt(idx + 1, cnt + 1);\n    chosen.pop_back();\n    bt(idx + 1, cnt);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    best = INT_MAX;\n    bt(0, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 57,
+      "subgroupLabel": null,
+      "title": "3, 7, 10 massivindən 3 ədəd seçərək minimum fərqi tapmaq (hamısı)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "optimallaşdırma"
+      ],
+      "statement": "N ədəd və K verilib. Massivdən DƏQİQ K ədəd seçərək, seçilənlərin ən böyüyü ilə ən kiçiyi arasındakı fərqi MİNİMUMA endirin (backtracking ilə bütün seçimləri sınayaraq).",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ K ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Seçilmiş K elementin maksimum mümkün ən kiçik fərqi (max-min minimumu).",
+      "exampleInput": "3 3\n3 7 10",
+      "exampleOutput": "7",
+      "approach": "Backtracking bütün C(N,K) seçimini sınayır; hər tam seçimdə max-min hesablanır və qlobal minimum yenilənir. (Qeyd: massivi əvvəlcədən sıralasaq, ƏN YAXŞI seçim həmişə ARDICIL K elementdən ibarət olur — backtracking bunu avtomatik tapır.)",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best;\nvector<int> chosen;\nvoid bt(int idx, int cnt){\n    if (cnt == k) {\n        int mx = *max_element(chosen.begin(), chosen.end());\n        int mn = *min_element(chosen.begin(), chosen.end());\n        best = min(best, mx - mn);\n        return;\n    }\n    if (idx == n) return;\n    if (n - idx < k - cnt) return; // qalan element kifayət etmir\n    chosen.push_back(a[idx]);\n    bt(idx + 1, cnt + 1);\n    chosen.pop_back();\n    bt(idx + 1, cnt);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    best = INT_MAX;\n    bt(0, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 58,
+      "subgroupLabel": null,
+      "title": "5 massivindən 1 ədəd seçərək minimum fərqi tapmaq (fərq 0)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "optimallaşdırma"
+      ],
+      "statement": "N ədəd və K verilib. Massivdən DƏQİQ K ədəd seçərək, seçilənlərin ən böyüyü ilə ən kiçiyi arasındakı fərqi MİNİMUMA endirin (backtracking ilə bütün seçimləri sınayaraq).",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ K ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Seçilmiş K elementin maksimum mümkün ən kiçik fərqi (max-min minimumu).",
+      "exampleInput": "1 1\n5",
+      "exampleOutput": "0",
+      "approach": "Backtracking bütün C(N,K) seçimini sınayır; hər tam seçimdə max-min hesablanır və qlobal minimum yenilənir. (Qeyd: massivi əvvəlcədən sıralasaq, ƏN YAXŞI seçim həmişə ARDICIL K elementdən ibarət olur — backtracking bunu avtomatik tapır.)",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best;\nvector<int> chosen;\nvoid bt(int idx, int cnt){\n    if (cnt == k) {\n        int mx = *max_element(chosen.begin(), chosen.end());\n        int mn = *min_element(chosen.begin(), chosen.end());\n        best = min(best, mx - mn);\n        return;\n    }\n    if (idx == n) return;\n    if (n - idx < k - cnt) return; // qalan element kifayət etmir\n    chosen.push_back(a[idx]);\n    bt(idx + 1, cnt + 1);\n    chosen.pop_back();\n    bt(idx + 1, cnt);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    best = INT_MAX;\n    bt(0, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 59,
+      "subgroupLabel": null,
+      "title": "1, 2, 3, 100, 101 massivindən 2 ədəd seçərək minimum fərqi tapmaq",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "optimallaşdırma"
+      ],
+      "statement": "N ədəd və K verilib. Massivdən DƏQİQ K ədəd seçərək, seçilənlərin ən böyüyü ilə ən kiçiyi arasındakı fərqi MİNİMUMA endirin (backtracking ilə bütün seçimləri sınayaraq).",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ K ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Seçilmiş K elementin maksimum mümkün ən kiçik fərqi (max-min minimumu).",
+      "exampleInput": "5 2\n1 2 3 100 101",
+      "exampleOutput": "1",
+      "approach": "Backtracking bütün C(N,K) seçimini sınayır; hər tam seçimdə max-min hesablanır və qlobal minimum yenilənir. (Qeyd: massivi əvvəlcədən sıralasaq, ƏN YAXŞI seçim həmişə ARDICIL K elementdən ibarət olur — backtracking bunu avtomatik tapır.)",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best;\nvector<int> chosen;\nvoid bt(int idx, int cnt){\n    if (cnt == k) {\n        int mx = *max_element(chosen.begin(), chosen.end());\n        int mn = *min_element(chosen.begin(), chosen.end());\n        best = min(best, mx - mn);\n        return;\n    }\n    if (idx == n) return;\n    if (n - idx < k - cnt) return; // qalan element kifayət etmir\n    chosen.push_back(a[idx]);\n    bt(idx + 1, cnt + 1);\n    chosen.pop_back();\n    bt(idx + 1, cnt);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    best = INT_MAX;\n    bt(0, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 60,
+      "subgroupLabel": null,
+      "title": "4, 4, 4, 4 massivindən 2 ədəd seçərək minimum fərqi tapmaq (hamısı eyni)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "optimallaşdırma"
+      ],
+      "statement": "N ədəd və K verilib. Massivdən DƏQİQ K ədəd seçərək, seçilənlərin ən böyüyü ilə ən kiçiyi arasındakı fərqi MİNİMUMA endirin (backtracking ilə bütün seçimləri sınayaraq).",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ K ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Seçilmiş K elementin maksimum mümkün ən kiçik fərqi (max-min minimumu).",
+      "exampleInput": "4 2\n4 4 4 4",
+      "exampleOutput": "0",
+      "approach": "Backtracking bütün C(N,K) seçimini sınayır; hər tam seçimdə max-min hesablanır və qlobal minimum yenilənir. (Qeyd: massivi əvvəlcədən sıralasaq, ƏN YAXŞI seçim həmişə ARDICIL K elementdən ibarət olur — backtracking bunu avtomatik tapır.)",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best;\nvector<int> chosen;\nvoid bt(int idx, int cnt){\n    if (cnt == k) {\n        int mx = *max_element(chosen.begin(), chosen.end());\n        int mn = *min_element(chosen.begin(), chosen.end());\n        best = min(best, mx - mn);\n        return;\n    }\n    if (idx == n) return;\n    if (n - idx < k - cnt) return; // qalan element kifayət etmir\n    chosen.push_back(a[idx]);\n    bt(idx + 1, cnt + 1);\n    chosen.pop_back();\n    bt(idx + 1, cnt);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    best = INT_MAX;\n    bt(0, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 61,
+      "subgroupLabel": null,
+      "title": "\"aab\" sözünün palindrom bölgülərinin sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "palindrome"
+      ],
+      "statement": "Bir sətir verilib. Onu elə hissələrə bölün ki, HƏR HİSSƏ palindrom olsun. Bütün mümkün bölgü üsullarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Palindrom bölgülərinin sayı.",
+      "exampleInput": "aab",
+      "exampleOutput": "2",
+      "approach": "Backtracking: cari mövqedən başlayaraq hər mümkün uzunluqda PREFİKSİN palindrom olub-olmadığına baxılır; palindromdursa, onu bir \"hissə\" kimi qəbul edib qalan sətirlə davam edilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nlong long cnt = 0;\nbool isPal(int l, int r){\n    while (l < r) { if (s[l] != s[r]) return false; l++; r--; }\n    return true;\n}\nvoid bt(int start){\n    if (start == (int)s.size()) { cnt++; return; }\n    for (int end = start; end < (int)s.size(); end++) {\n        if (isPal(start, end)) bt(end + 1);\n    }\n}\nint main(){\n    cin >> s;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 62,
+      "subgroupLabel": null,
+      "title": "\"a\" sözünün palindrom bölgülərinin sayı (tək hərf)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "palindrome"
+      ],
+      "statement": "Bir sətir verilib. Onu elə hissələrə bölün ki, HƏR HİSSƏ palindrom olsun. Bütün mümkün bölgü üsullarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Palindrom bölgülərinin sayı.",
+      "exampleInput": "a",
+      "exampleOutput": "1",
+      "approach": "Backtracking: cari mövqedən başlayaraq hər mümkün uzunluqda PREFİKSİN palindrom olub-olmadığına baxılır; palindromdursa, onu bir \"hissə\" kimi qəbul edib qalan sətirlə davam edilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nlong long cnt = 0;\nbool isPal(int l, int r){\n    while (l < r) { if (s[l] != s[r]) return false; l++; r--; }\n    return true;\n}\nvoid bt(int start){\n    if (start == (int)s.size()) { cnt++; return; }\n    for (int end = start; end < (int)s.size(); end++) {\n        if (isPal(start, end)) bt(end + 1);\n    }\n}\nint main(){\n    cin >> s;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 63,
+      "subgroupLabel": null,
+      "title": "\"aaa\" sözünün palindrom bölgülərinin sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "palindrome"
+      ],
+      "statement": "Bir sətir verilib. Onu elə hissələrə bölün ki, HƏR HİSSƏ palindrom olsun. Bütün mümkün bölgü üsullarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Palindrom bölgülərinin sayı.",
+      "exampleInput": "aaa",
+      "exampleOutput": "4",
+      "approach": "Backtracking: cari mövqedən başlayaraq hər mümkün uzunluqda PREFİKSİN palindrom olub-olmadığına baxılır; palindromdursa, onu bir \"hissə\" kimi qəbul edib qalan sətirlə davam edilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nlong long cnt = 0;\nbool isPal(int l, int r){\n    while (l < r) { if (s[l] != s[r]) return false; l++; r--; }\n    return true;\n}\nvoid bt(int start){\n    if (start == (int)s.size()) { cnt++; return; }\n    for (int end = start; end < (int)s.size(); end++) {\n        if (isPal(start, end)) bt(end + 1);\n    }\n}\nint main(){\n    cin >> s;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 64,
+      "subgroupLabel": null,
+      "title": "\"abc\" sözünün palindrom bölgülərinin sayı (heç biri palindrom cütü deyil)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "palindrome"
+      ],
+      "statement": "Bir sətir verilib. Onu elə hissələrə bölün ki, HƏR HİSSƏ palindrom olsun. Bütün mümkün bölgü üsullarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Palindrom bölgülərinin sayı.",
+      "exampleInput": "abc",
+      "exampleOutput": "1",
+      "approach": "Backtracking: cari mövqedən başlayaraq hər mümkün uzunluqda PREFİKSİN palindrom olub-olmadığına baxılır; palindromdursa, onu bir \"hissə\" kimi qəbul edib qalan sətirlə davam edilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nlong long cnt = 0;\nbool isPal(int l, int r){\n    while (l < r) { if (s[l] != s[r]) return false; l++; r--; }\n    return true;\n}\nvoid bt(int start){\n    if (start == (int)s.size()) { cnt++; return; }\n    for (int end = start; end < (int)s.size(); end++) {\n        if (isPal(start, end)) bt(end + 1);\n    }\n}\nint main(){\n    cin >> s;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 65,
+      "subgroupLabel": null,
+      "title": "\"abba\" sözünün palindrom bölgülərinin sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "palindrome"
+      ],
+      "statement": "Bir sətir verilib. Onu elə hissələrə bölün ki, HƏR HİSSƏ palindrom olsun. Bütün mümkün bölgü üsullarının sayını backtracking ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Palindrom bölgülərinin sayı.",
+      "exampleInput": "abba",
+      "exampleOutput": "3",
+      "approach": "Backtracking: cari mövqedən başlayaraq hər mümkün uzunluqda PREFİKSİN palindrom olub-olmadığına baxılır; palindromdursa, onu bir \"hissə\" kimi qəbul edib qalan sətirlə davam edilir.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nstring s;\nlong long cnt = 0;\nbool isPal(int l, int r){\n    while (l < r) { if (s[l] != s[r]) return false; l++; r--; }\n    return true;\n}\nvoid bt(int start){\n    if (start == (int)s.size()) { cnt++; return; }\n    for (int end = start; end < (int)s.size(); end++) {\n        if (isPal(start, end)) bt(end + 1);\n    }\n}\nint main(){\n    cin >> s;\n    bt(0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 66,
+      "subgroupLabel": null,
+      "title": "1, 1, 1, 1, 1 ədədlərinə +/- qoyaraq cəmi 3 etmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "işarə"
+      ],
+      "statement": "N ədəd verilib. Hər ədədin qarşısına \"+\" ya da \"-\" işarəsi qoyaraq (backtracking ilə bütün kombinasiyaları sınayaraq) cəmin NEÇƏ FƏRQLİ YOLLA hədəf T-yə bərabər ola biləcəyini tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15) və T, ikinci sətirdə N tam ədəd (qeyri-mənfi).",
+      "outputSpec": "Cəmi T edən işarə kombinasiyalarının sayı.",
+      "exampleInput": "5 3\n1 1 1 1 1",
+      "exampleOutput": "5",
+      "approach": "Backtracking: hər ədəd üçün İKİ budaq sınanılır — onu CƏMƏ ƏLAVƏ ET, ya da CƏMDƏN ÇIX; bütün N ədəd üçün işarə seçildikdə yekun cəm T-yə bərabərdirmi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; long long t; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, long long sum){\n    if (idx == n) { if (sum == t) cnt++; return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum - a[idx]);\n}\nint main(){\n    cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 67,
+      "subgroupLabel": null,
+      "title": "1, 2 ədədlərinə +/- qoyaraq cəmi 100 etmənin yol sayı (heç yolu yoxdur)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "işarə"
+      ],
+      "statement": "N ədəd verilib. Hər ədədin qarşısına \"+\" ya da \"-\" işarəsi qoyaraq (backtracking ilə bütün kombinasiyaları sınayaraq) cəmin NEÇƏ FƏRQLİ YOLLA hədəf T-yə bərabər ola biləcəyini tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15) və T, ikinci sətirdə N tam ədəd (qeyri-mənfi).",
+      "outputSpec": "Cəmi T edən işarə kombinasiyalarının sayı.",
+      "exampleInput": "2 100\n1 2",
+      "exampleOutput": "0",
+      "approach": "Backtracking: hər ədəd üçün İKİ budaq sınanılır — onu CƏMƏ ƏLAVƏ ET, ya da CƏMDƏN ÇIX; bütün N ədəd üçün işarə seçildikdə yekun cəm T-yə bərabərdirmi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; long long t; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, long long sum){\n    if (idx == n) { if (sum == t) cnt++; return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum - a[idx]);\n}\nint main(){\n    cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 68,
+      "subgroupLabel": null,
+      "title": "Boş siyahıda cəmi 0 etmənin yol sayı (baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "işarə"
+      ],
+      "statement": "N ədəd verilib. Hər ədədin qarşısına \"+\" ya da \"-\" işarəsi qoyaraq (backtracking ilə bütün kombinasiyaları sınayaraq) cəmin NEÇƏ FƏRQLİ YOLLA hədəf T-yə bərabər ola biləcəyini tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15) və T, ikinci sətirdə N tam ədəd (qeyri-mənfi).",
+      "outputSpec": "Cəmi T edən işarə kombinasiyalarının sayı.",
+      "exampleInput": "0 0",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər ədəd üçün İKİ budaq sınanılır — onu CƏMƏ ƏLAVƏ ET, ya da CƏMDƏN ÇIX; bütün N ədəd üçün işarə seçildikdə yekun cəm T-yə bərabərdirmi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; long long t; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, long long sum){\n    if (idx == n) { if (sum == t) cnt++; return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum - a[idx]);\n}\nint main(){\n    cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 69,
+      "subgroupLabel": null,
+      "title": "1, 2, 3 ədədlərinə +/- qoyaraq cəmi 0 etmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "işarə"
+      ],
+      "statement": "N ədəd verilib. Hər ədədin qarşısına \"+\" ya da \"-\" işarəsi qoyaraq (backtracking ilə bütün kombinasiyaları sınayaraq) cəmin NEÇƏ FƏRQLİ YOLLA hədəf T-yə bərabər ola biləcəyini tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15) və T, ikinci sətirdə N tam ədəd (qeyri-mənfi).",
+      "outputSpec": "Cəmi T edən işarə kombinasiyalarının sayı.",
+      "exampleInput": "3 0\n1 2 3",
+      "exampleOutput": "2",
+      "approach": "Backtracking: hər ədəd üçün İKİ budaq sınanılır — onu CƏMƏ ƏLAVƏ ET, ya da CƏMDƏN ÇIX; bütün N ədəd üçün işarə seçildikdə yekun cəm T-yə bərabərdirmi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; long long t; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, long long sum){\n    if (idx == n) { if (sum == t) cnt++; return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum - a[idx]);\n}\nint main(){\n    cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 70,
+      "subgroupLabel": null,
+      "title": "2, 2 ədədlərinə +/- qoyaraq cəmi 0 etmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "işarə"
+      ],
+      "statement": "N ədəd verilib. Hər ədədin qarşısına \"+\" ya da \"-\" işarəsi qoyaraq (backtracking ilə bütün kombinasiyaları sınayaraq) cəmin NEÇƏ FƏRQLİ YOLLA hədəf T-yə bərabər ola biləcəyini tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15) və T, ikinci sətirdə N tam ədəd (qeyri-mənfi).",
+      "outputSpec": "Cəmi T edən işarə kombinasiyalarının sayı.",
+      "exampleInput": "2 0\n2 2",
+      "exampleOutput": "2",
+      "approach": "Backtracking: hər ədəd üçün İKİ budaq sınanılır — onu CƏMƏ ƏLAVƏ ET, ya da CƏMDƏN ÇIX; bütün N ədəd üçün işarə seçildikdə yekun cəm T-yə bərabərdirmi yoxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; long long t; vector<int> a;\nlong long cnt = 0;\nvoid bt(int idx, long long sum){\n    if (idx == n) { if (sum == t) cnt++; return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum - a[idx]);\n}\nint main(){\n    cin >> n >> t;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << cnt << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 71,
+      "subgroupLabel": null,
+      "title": "1, 2, 4 massivinin alt çoxluqlarının fərqli cəm sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N ədəd verilib. Bütün alt çoxluqların (boş çoxluq daxil) FƏRQLİ (unikal) cəmlərinin sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Fərqli cəmlərin sayı.",
+      "exampleInput": "3\n1 2 4",
+      "exampleOutput": "8",
+      "approach": "Backtracking BÜTÜN 2^N alt çoxluğun cəmini bir <b>set</b>-ə yazır (set təkrarları avtomatik aradan qaldırır); sonda set-in ölçüsü fərqli cəmlərin sayıdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nset<long long> sums;\nvoid bt(int idx, long long sum){\n    if (idx == n) { sums.insert(sum); return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << sums.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 72,
+      "subgroupLabel": null,
+      "title": "1, 1, 1 massivinin alt çoxluqlarının fərqli cəm sayı (təkrarlı)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N ədəd verilib. Bütün alt çoxluqların (boş çoxluq daxil) FƏRQLİ (unikal) cəmlərinin sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Fərqli cəmlərin sayı.",
+      "exampleInput": "3\n1 1 1",
+      "exampleOutput": "4",
+      "approach": "Backtracking BÜTÜN 2^N alt çoxluğun cəmini bir <b>set</b>-ə yazır (set təkrarları avtomatik aradan qaldırır); sonda set-in ölçüsü fərqli cəmlərin sayıdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nset<long long> sums;\nvoid bt(int idx, long long sum){\n    if (idx == n) { sums.insert(sum); return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << sums.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 73,
+      "subgroupLabel": null,
+      "title": "Boş massivin fərqli cəm sayı (yalnız 0, baza hal)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N ədəd verilib. Bütün alt çoxluqların (boş çoxluq daxil) FƏRQLİ (unikal) cəmlərinin sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Fərqli cəmlərin sayı.",
+      "exampleInput": "0",
+      "exampleOutput": "1",
+      "approach": "Backtracking BÜTÜN 2^N alt çoxluğun cəmini bir <b>set</b>-ə yazır (set təkrarları avtomatik aradan qaldırır); sonda set-in ölçüsü fərqli cəmlərin sayıdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nset<long long> sums;\nvoid bt(int idx, long long sum){\n    if (idx == n) { sums.insert(sum); return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << sums.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 74,
+      "subgroupLabel": null,
+      "title": "5 massivinin fərqli cəm sayı (tək element)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N ədəd verilib. Bütün alt çoxluqların (boş çoxluq daxil) FƏRQLİ (unikal) cəmlərinin sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Fərqli cəmlərin sayı.",
+      "exampleInput": "1\n5",
+      "exampleOutput": "2",
+      "approach": "Backtracking BÜTÜN 2^N alt çoxluğun cəmini bir <b>set</b>-ə yazır (set təkrarları avtomatik aradan qaldırır); sonda set-in ölçüsü fərqli cəmlərin sayıdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nset<long long> sums;\nvoid bt(int idx, long long sum){\n    if (idx == n) { sums.insert(sum); return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << sums.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 75,
+      "subgroupLabel": null,
+      "title": "1, 2, 3, 4 massivinin alt çoxluqlarının fərqli cəm sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "alt-çoxluq"
+      ],
+      "statement": "N ədəd verilib. Bütün alt çoxluqların (boş çoxluq daxil) FƏRQLİ (unikal) cəmlərinin sayını backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (0 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Fərqli cəmlərin sayı.",
+      "exampleInput": "4\n1 2 3 4",
+      "exampleOutput": "11",
+      "approach": "Backtracking BÜTÜN 2^N alt çoxluğun cəmini bir <b>set</b>-ə yazır (set təkrarları avtomatik aradan qaldırır); sonda set-in ölçüsü fərqli cəmlərin sayıdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nset<long long> sums;\nvoid bt(int idx, long long sum){\n    if (idx == n) { sums.insert(sum); return; }\n    bt(idx + 1, sum + a[idx]);\n    bt(idx + 1, sum);\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 0);\n    cout << sums.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 76,
+      "subgroupLabel": null,
+      "title": "10, 9, 2, 5, 3, 7, 101, 18 massivinin ən uzun artan alt-ardıcıllığı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd verilib. Massivin ən uzun ARTAN ALT-ARDICILLIĞININ (elementlər ardıcıl olmaya bilər, amma öz aralarında sıra qorunmalıdır) uzunluğunu backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+      "exampleInput": "8\n10 9 2 5 3 7 101 18",
+      "exampleOutput": "4",
+      "approach": "Backtracking: hər elementi (sondan böyükdürsə) alt-ardıcıllığa DAXİL ET ya da ETMƏ budaqları sınanılır; bütün budaqlar arasında əldə olunan maksimum uzunluq saxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1); // daxil et\n    bt(idx + 1, lastVal, len);                           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 77,
+      "subgroupLabel": null,
+      "title": "5, 4, 3, 2, 1 massivinin ən uzun artan alt-ardıcıllığı (tam azalan)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd verilib. Massivin ən uzun ARTAN ALT-ARDICILLIĞININ (elementlər ardıcıl olmaya bilər, amma öz aralarında sıra qorunmalıdır) uzunluğunu backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+      "exampleInput": "5\n5 4 3 2 1",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər elementi (sondan böyükdürsə) alt-ardıcıllığa DAXİL ET ya da ETMƏ budaqları sınanılır; bütün budaqlar arasında əldə olunan maksimum uzunluq saxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1); // daxil et\n    bt(idx + 1, lastVal, len);                           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 78,
+      "subgroupLabel": null,
+      "title": "1, 2, 3, 4, 5 massivinin ən uzun artan alt-ardıcıllığı (tam artan)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd verilib. Massivin ən uzun ARTAN ALT-ARDICILLIĞININ (elementlər ardıcıl olmaya bilər, amma öz aralarında sıra qorunmalıdır) uzunluğunu backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+      "exampleInput": "5\n1 2 3 4 5",
+      "exampleOutput": "5",
+      "approach": "Backtracking: hər elementi (sondan böyükdürsə) alt-ardıcıllığa DAXİL ET ya da ETMƏ budaqları sınanılır; bütün budaqlar arasında əldə olunan maksimum uzunluq saxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1); // daxil et\n    bt(idx + 1, lastVal, len);                           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 79,
+      "subgroupLabel": null,
+      "title": "7 massivinin ən uzun artan alt-ardıcıllığı (tək element)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd verilib. Massivin ən uzun ARTAN ALT-ARDICILLIĞININ (elementlər ardıcıl olmaya bilər, amma öz aralarında sıra qorunmalıdır) uzunluğunu backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+      "exampleInput": "1\n7",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər elementi (sondan böyükdürsə) alt-ardıcıllığa DAXİL ET ya da ETMƏ budaqları sınanılır; bütün budaqlar arasında əldə olunan maksimum uzunluq saxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1); // daxil et\n    bt(idx + 1, lastVal, len);                           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 80,
+      "subgroupLabel": null,
+      "title": "3, 3, 3, 3 massivinin ən uzun artan alt-ardıcıllığı (hamısı bərabər)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd verilib. Massivin ən uzun ARTAN ALT-ARDICILLIĞININ (elementlər ardıcıl olmaya bilər, amma öz aralarında sıra qorunmalıdır) uzunluğunu backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+      "exampleInput": "4\n3 3 3 3",
+      "exampleOutput": "1",
+      "approach": "Backtracking: hər elementi (sondan böyükdürsə) alt-ardıcıllığa DAXİL ET ya da ETMƏ budaqları sınanılır; bütün budaqlar arasında əldə olunan maksimum uzunluq saxlanılır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1); // daxil et\n    bt(idx + 1, lastVal, len);                           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 81,
+      "subgroupLabel": null,
+      "title": "10, 9, 2, 5, 3, 7, 101, 18 massivində uzunluğu 4 olan artan alt-ardıcıllıq varmı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd və K verilib. Massivdə uzunluğu DƏQİQ K (və ya daha çox) olan artan alt-ardıcıllıq varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "8 4\n10 9 2 5 3 7 101 18",
+      "exampleOutput": "VAR",
+      "approach": "Əvvəlki \"ən uzun artan alt-ardıcıllıq\" backtracking-i işlədilir, tapılan maksimum uzunluq K-dan böyük-bərabərdirsə \"VAR\" çap olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1);\n    bt(idx + 1, lastVal, len);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << (best >= k ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 82,
+      "subgroupLabel": null,
+      "title": "5, 4, 3, 2, 1 massivində uzunluğu 2 olan artan alt-ardıcıllıq varmı (yoxdur)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd və K verilib. Massivdə uzunluğu DƏQİQ K (və ya daha çox) olan artan alt-ardıcıllıq varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "5 2\n5 4 3 2 1",
+      "exampleOutput": "YOX",
+      "approach": "Əvvəlki \"ən uzun artan alt-ardıcıllıq\" backtracking-i işlədilir, tapılan maksimum uzunluq K-dan böyük-bərabərdirsə \"VAR\" çap olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1);\n    bt(idx + 1, lastVal, len);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << (best >= k ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 83,
+      "subgroupLabel": null,
+      "title": "1, 2, 3 massivində uzunluğu 3 olan artan alt-ardıcıllıq varmı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd və K verilib. Massivdə uzunluğu DƏQİQ K (və ya daha çox) olan artan alt-ardıcıllıq varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "3 3\n1 2 3",
+      "exampleOutput": "VAR",
+      "approach": "Əvvəlki \"ən uzun artan alt-ardıcıllıq\" backtracking-i işlədilir, tapılan maksimum uzunluq K-dan böyük-bərabərdirsə \"VAR\" çap olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1);\n    bt(idx + 1, lastVal, len);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << (best >= k ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 84,
+      "subgroupLabel": null,
+      "title": "7 massivində uzunluğu 1 olan artan alt-ardıcıllıq varmı (tək element)",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd və K verilib. Massivdə uzunluğu DƏQİQ K (və ya daha çox) olan artan alt-ardıcıllıq varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "1 1\n7",
+      "exampleOutput": "VAR",
+      "approach": "Əvvəlki \"ən uzun artan alt-ardıcıllıq\" backtracking-i işlədilir, tapılan maksimum uzunluq K-dan böyük-bərabərdirsə \"VAR\" çap olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1);\n    bt(idx + 1, lastVal, len);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << (best >= k ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 85,
+      "subgroupLabel": null,
+      "title": "1, 3, 2, 4 massivində uzunluğu 3 olan artan alt-ardıcıllıq varmı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "artan ardıcıllıq"
+      ],
+      "statement": "N ədəd və K verilib. Massivdə uzunluğu DƏQİQ K (və ya daha çox) olan artan alt-ardıcıllıq varmı? Backtracking ilə \"VAR\" və ya \"YOX\" çap edin.",
+      "inputSpec": "Birinci sətirdə N və K (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+      "outputSpec": "\"VAR\" və ya \"YOX\".",
+      "exampleInput": "4 3\n1 3 2 4",
+      "exampleOutput": "VAR",
+      "approach": "Əvvəlki \"ən uzun artan alt-ardıcıllıq\" backtracking-i işlədilir, tapılan maksimum uzunluq K-dan böyük-bərabərdirsə \"VAR\" çap olunur.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n, k; vector<int> a;\nint best = 0;\nvoid bt(int idx, int lastVal, int len){\n    best = max(best, len);\n    if (idx == n) return;\n    if (a[idx] > lastVal) bt(idx + 1, a[idx], len + 1);\n    bt(idx + 1, lastVal, len);\n}\nint main(){\n    cin >> n >> k;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, INT_MIN, 0);\n    cout << (best >= k ? \"VAR\" : \"YOX\") << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 86,
+      "subgroupLabel": null,
+      "title": "\"aba\" sözünün fərqli alt sətirlərinin sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "substring"
+      ],
+      "statement": "Bir sətir verilib. Onun bütün FƏRQLİ (unikal) ALT SƏTİRLƏRİNİN (ardıcıl simvol seqmentlərinin) sayını backtracking/brute-force ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Fərqli alt sətirlərin sayı (boş alt sətir sayılmır).",
+      "exampleInput": "aba",
+      "exampleOutput": "5",
+      "approach": "Bütün (başlanğıc, son) cütləri üzərindən keçərək hər alt sətir bir <b>set&lt;string&gt;</b>-ə yazılır — set təkrarları avtomatik aradan qaldırır, ölçüsü cavabdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    string s; cin >> s;\n    set<string> subs;\n    for (int i = 0; i < (int)s.size(); i++)\n        for (int j = i; j < (int)s.size(); j++)\n            subs.insert(s.substr(i, j - i + 1));\n    cout << subs.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 87,
+      "subgroupLabel": null,
+      "title": "\"a\" sözünün fərqli alt sətirlərinin sayı (tək hərf)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "substring"
+      ],
+      "statement": "Bir sətir verilib. Onun bütün FƏRQLİ (unikal) ALT SƏTİRLƏRİNİN (ardıcıl simvol seqmentlərinin) sayını backtracking/brute-force ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Fərqli alt sətirlərin sayı (boş alt sətir sayılmır).",
+      "exampleInput": "a",
+      "exampleOutput": "1",
+      "approach": "Bütün (başlanğıc, son) cütləri üzərindən keçərək hər alt sətir bir <b>set&lt;string&gt;</b>-ə yazılır — set təkrarları avtomatik aradan qaldırır, ölçüsü cavabdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    string s; cin >> s;\n    set<string> subs;\n    for (int i = 0; i < (int)s.size(); i++)\n        for (int j = i; j < (int)s.size(); j++)\n            subs.insert(s.substr(i, j - i + 1));\n    cout << subs.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 88,
+      "subgroupLabel": null,
+      "title": "\"aaa\" sözünün fərqli alt sətirlərinin sayı (eyni hərflər)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "substring"
+      ],
+      "statement": "Bir sətir verilib. Onun bütün FƏRQLİ (unikal) ALT SƏTİRLƏRİNİN (ardıcıl simvol seqmentlərinin) sayını backtracking/brute-force ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Fərqli alt sətirlərin sayı (boş alt sətir sayılmır).",
+      "exampleInput": "aaa",
+      "exampleOutput": "3",
+      "approach": "Bütün (başlanğıc, son) cütləri üzərindən keçərək hər alt sətir bir <b>set&lt;string&gt;</b>-ə yazılır — set təkrarları avtomatik aradan qaldırır, ölçüsü cavabdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    string s; cin >> s;\n    set<string> subs;\n    for (int i = 0; i < (int)s.size(); i++)\n        for (int j = i; j < (int)s.size(); j++)\n            subs.insert(s.substr(i, j - i + 1));\n    cout << subs.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 89,
+      "subgroupLabel": null,
+      "title": "\"abc\" sözünün fərqli alt sətirlərinin sayı (hamısı fərqli)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "substring"
+      ],
+      "statement": "Bir sətir verilib. Onun bütün FƏRQLİ (unikal) ALT SƏTİRLƏRİNİN (ardıcıl simvol seqmentlərinin) sayını backtracking/brute-force ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Fərqli alt sətirlərin sayı (boş alt sətir sayılmır).",
+      "exampleInput": "abc",
+      "exampleOutput": "6",
+      "approach": "Bütün (başlanğıc, son) cütləri üzərindən keçərək hər alt sətir bir <b>set&lt;string&gt;</b>-ə yazılır — set təkrarları avtomatik aradan qaldırır, ölçüsü cavabdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    string s; cin >> s;\n    set<string> subs;\n    for (int i = 0; i < (int)s.size(); i++)\n        for (int j = i; j < (int)s.size(); j++)\n            subs.insert(s.substr(i, j - i + 1));\n    cout << subs.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 90,
+      "subgroupLabel": null,
+      "title": "\"azer\" sözünün fərqli alt sətirlərinin sayı",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "substring"
+      ],
+      "statement": "Bir sətir verilib. Onun bütün FƏRQLİ (unikal) ALT SƏTİRLƏRİNİN (ardıcıl simvol seqmentlərinin) sayını backtracking/brute-force ilə tapın.",
+      "inputSpec": "Bir sətir S (kiçik hərflər, 1 ≤ |S| ≤ 10).",
+      "outputSpec": "Fərqli alt sətirlərin sayı (boş alt sətir sayılmır).",
+      "exampleInput": "azer",
+      "exampleOutput": "10",
+      "approach": "Bütün (başlanğıc, son) cütləri üzərindən keçərək hər alt sətir bir <b>set&lt;string&gt;</b>-ə yazılır — set təkrarları avtomatik aradan qaldırır, ölçüsü cavabdır.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    string s; cin >> s;\n    set<string> subs;\n    for (int i = 0; i < (int)s.size(); i++)\n        for (int j = i; j < (int)s.size(); j++)\n            subs.insert(s.substr(i, j - i + 1));\n    cout << subs.size() << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 91,
+      "subgroupLabel": null,
+      "title": "3 elementi iki boş olmayan qrupa bölmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "bölgü"
+      ],
+      "statement": "N fərqli element verilib. Onları İKİ BOŞ OLMAYAN qrupa (qruplar arasında sıra fərq etmir) bölməyin neçə fərqli yolu olduğunu backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 15).",
+      "outputSpec": "İki boş olmayan qrupa bölmənin yol sayı.",
+      "exampleInput": "3",
+      "exampleOutput": "3",
+      "approach": "Backtracking hər elementi A və ya B qrupuna yerləşdirərək bütün 2^N bölgünü sınayır, yalnız HƏR İKİ qrup boş olmayanları sayır; A/B adlandırma simmetriyası (hər bölgü iki dəfə — A↔B dəyişərək — sayıldığı üçün) nəticə 2-yə bölünür.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx, int sizeA, int sizeB){\n    if (idx == n) { if (sizeA > 0 && sizeB > 0) cnt++; return; }\n    bt(idx + 1, sizeA + 1, sizeB);\n    bt(idx + 1, sizeA, sizeB + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0, 0);\n    cout << (cnt / 2) << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 92,
+      "subgroupLabel": null,
+      "title": "2 elementi iki boş olmayan qrupa bölmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "bölgü"
+      ],
+      "statement": "N fərqli element verilib. Onları İKİ BOŞ OLMAYAN qrupa (qruplar arasında sıra fərq etmir) bölməyin neçə fərqli yolu olduğunu backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 15).",
+      "outputSpec": "İki boş olmayan qrupa bölmənin yol sayı.",
+      "exampleInput": "2",
+      "exampleOutput": "1",
+      "approach": "Backtracking hər elementi A və ya B qrupuna yerləşdirərək bütün 2^N bölgünü sınayır, yalnız HƏR İKİ qrup boş olmayanları sayır; A/B adlandırma simmetriyası (hər bölgü iki dəfə — A↔B dəyişərək — sayıldığı üçün) nəticə 2-yə bölünür.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx, int sizeA, int sizeB){\n    if (idx == n) { if (sizeA > 0 && sizeB > 0) cnt++; return; }\n    bt(idx + 1, sizeA + 1, sizeB);\n    bt(idx + 1, sizeA, sizeB + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0, 0);\n    cout << (cnt / 2) << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 93,
+      "subgroupLabel": null,
+      "title": "4 elementi iki boş olmayan qrupa bölmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "bölgü"
+      ],
+      "statement": "N fərqli element verilib. Onları İKİ BOŞ OLMAYAN qrupa (qruplar arasında sıra fərq etmir) bölməyin neçə fərqli yolu olduğunu backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 15).",
+      "outputSpec": "İki boş olmayan qrupa bölmənin yol sayı.",
+      "exampleInput": "4",
+      "exampleOutput": "7",
+      "approach": "Backtracking hər elementi A və ya B qrupuna yerləşdirərək bütün 2^N bölgünü sınayır, yalnız HƏR İKİ qrup boş olmayanları sayır; A/B adlandırma simmetriyası (hər bölgü iki dəfə — A↔B dəyişərək — sayıldığı üçün) nəticə 2-yə bölünür.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx, int sizeA, int sizeB){\n    if (idx == n) { if (sizeA > 0 && sizeB > 0) cnt++; return; }\n    bt(idx + 1, sizeA + 1, sizeB);\n    bt(idx + 1, sizeA, sizeB + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0, 0);\n    cout << (cnt / 2) << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 94,
+      "subgroupLabel": null,
+      "title": "5 elementi iki boş olmayan qrupa bölmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "bölgü"
+      ],
+      "statement": "N fərqli element verilib. Onları İKİ BOŞ OLMAYAN qrupa (qruplar arasında sıra fərq etmir) bölməyin neçə fərqli yolu olduğunu backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 15).",
+      "outputSpec": "İki boş olmayan qrupa bölmənin yol sayı.",
+      "exampleInput": "5",
+      "exampleOutput": "15",
+      "approach": "Backtracking hər elementi A və ya B qrupuna yerləşdirərək bütün 2^N bölgünü sınayır, yalnız HƏR İKİ qrup boş olmayanları sayır; A/B adlandırma simmetriyası (hər bölgü iki dəfə — A↔B dəyişərək — sayıldığı üçün) nəticə 2-yə bölünür.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx, int sizeA, int sizeB){\n    if (idx == n) { if (sizeA > 0 && sizeB > 0) cnt++; return; }\n    bt(idx + 1, sizeA + 1, sizeB);\n    bt(idx + 1, sizeA, sizeB + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0, 0);\n    cout << (cnt / 2) << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 95,
+      "subgroupLabel": null,
+      "title": "6 elementi iki boş olmayan qrupa bölmənin yol sayı",
+      "difficulty": "mid",
+      "tags": [
+        "backtracking",
+        "bölgü"
+      ],
+      "statement": "N fərqli element verilib. Onları İKİ BOŞ OLMAYAN qrupa (qruplar arasında sıra fərq etmir) bölməyin neçə fərqli yolu olduğunu backtracking ilə tapın.",
+      "inputSpec": "Bir tam ədəd N (2 ≤ N ≤ 15).",
+      "outputSpec": "İki boş olmayan qrupa bölmənin yol sayı.",
+      "exampleInput": "6",
+      "exampleOutput": "31",
+      "approach": "Backtracking hər elementi A və ya B qrupuna yerləşdirərək bütün 2^N bölgünü sınayır, yalnız HƏR İKİ qrup boş olmayanları sayır; A/B adlandırma simmetriyası (hər bölgü iki dəfə — A↔B dəyişərək — sayıldığı üçün) nəticə 2-yə bölünür.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n;\nlong long cnt = 0;\nvoid bt(int idx, int sizeA, int sizeB){\n    if (idx == n) { if (sizeA > 0 && sizeB > 0) cnt++; return; }\n    bt(idx + 1, sizeA + 1, sizeB);\n    bt(idx + 1, sizeA, sizeB + 1);\n}\nint main(){\n    cin >> n;\n    bt(0, 0, 0);\n    cout << (cnt / 2) << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 96,
+      "subgroupLabel": null,
+      "title": "2, 3, 4 massivindən maksimum hasil",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "hasil"
+      ],
+      "statement": "N (N ≥ 1) müsbət tam ədəd verilib. BOŞ OLMAYAN bir alt çoxluğun elementlərinin HASİLİNİN ola biləcəyi ƏN BÖYÜK dəyəri backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N müsbət tam ədəd (1 ≤ ədəd ≤ 10).",
+      "outputSpec": "Ən böyük mümkün hasil.",
+      "exampleInput": "3\n2 3 4",
+      "exampleOutput": "24",
+      "approach": "Bütün müsbət ədədlər üçün maksimum hasil HƏMİŞƏ BÜTÜN elementləri daxil etməklə əldə olunur (1-dən böyük müsbət ədədi əlavə etmək hasili heç vaxt azaltmır) — backtracking bunu daxil et/etmə budaqlarını sınayaraq TƏSDİQLƏYİR.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<long long> a;\nlong long best = LLONG_MIN;\nvoid bt(int idx, long long prod, bool any){\n    if (idx == n) { if (any) best = max(best, prod); return; }\n    bt(idx + 1, prod * a[idx], true); // daxil et\n    bt(idx + 1, prod, any);           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 1, false);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 97,
+      "subgroupLabel": null,
+      "title": "5 massivindən maksimum hasil (tək element)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "hasil"
+      ],
+      "statement": "N (N ≥ 1) müsbət tam ədəd verilib. BOŞ OLMAYAN bir alt çoxluğun elementlərinin HASİLİNİN ola biləcəyi ƏN BÖYÜK dəyəri backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N müsbət tam ədəd (1 ≤ ədəd ≤ 10).",
+      "outputSpec": "Ən böyük mümkün hasil.",
+      "exampleInput": "1\n5",
+      "exampleOutput": "5",
+      "approach": "Bütün müsbət ədədlər üçün maksimum hasil HƏMİŞƏ BÜTÜN elementləri daxil etməklə əldə olunur (1-dən böyük müsbət ədədi əlavə etmək hasili heç vaxt azaltmır) — backtracking bunu daxil et/etmə budaqlarını sınayaraq TƏSDİQLƏYİR.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<long long> a;\nlong long best = LLONG_MIN;\nvoid bt(int idx, long long prod, bool any){\n    if (idx == n) { if (any) best = max(best, prod); return; }\n    bt(idx + 1, prod * a[idx], true); // daxil et\n    bt(idx + 1, prod, any);           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 1, false);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 98,
+      "subgroupLabel": null,
+      "title": "1, 1, 1 massivindən maksimum hasil (hamısı 1)",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "hasil"
+      ],
+      "statement": "N (N ≥ 1) müsbət tam ədəd verilib. BOŞ OLMAYAN bir alt çoxluğun elementlərinin HASİLİNİN ola biləcəyi ƏN BÖYÜK dəyəri backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N müsbət tam ədəd (1 ≤ ədəd ≤ 10).",
+      "outputSpec": "Ən böyük mümkün hasil.",
+      "exampleInput": "3\n1 1 1",
+      "exampleOutput": "1",
+      "approach": "Bütün müsbət ədədlər üçün maksimum hasil HƏMİŞƏ BÜTÜN elementləri daxil etməklə əldə olunur (1-dən böyük müsbət ədədi əlavə etmək hasili heç vaxt azaltmır) — backtracking bunu daxil et/etmə budaqlarını sınayaraq TƏSDİQLƏYİR.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<long long> a;\nlong long best = LLONG_MIN;\nvoid bt(int idx, long long prod, bool any){\n    if (idx == n) { if (any) best = max(best, prod); return; }\n    bt(idx + 1, prod * a[idx], true); // daxil et\n    bt(idx + 1, prod, any);           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 1, false);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 99,
+      "subgroupLabel": null,
+      "title": "1, 2, 1, 3 massivindən maksimum hasil",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "hasil"
+      ],
+      "statement": "N (N ≥ 1) müsbət tam ədəd verilib. BOŞ OLMAYAN bir alt çoxluğun elementlərinin HASİLİNİN ola biləcəyi ƏN BÖYÜK dəyəri backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N müsbət tam ədəd (1 ≤ ədəd ≤ 10).",
+      "outputSpec": "Ən böyük mümkün hasil.",
+      "exampleInput": "4\n1 2 1 3",
+      "exampleOutput": "6",
+      "approach": "Bütün müsbət ədədlər üçün maksimum hasil HƏMİŞƏ BÜTÜN elementləri daxil etməklə əldə olunur (1-dən böyük müsbət ədədi əlavə etmək hasili heç vaxt azaltmır) — backtracking bunu daxil et/etmə budaqlarını sınayaraq TƏSDİQLƏYİR.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<long long> a;\nlong long best = LLONG_MIN;\nvoid bt(int idx, long long prod, bool any){\n    if (idx == n) { if (any) best = max(best, prod); return; }\n    bt(idx + 1, prod * a[idx], true); // daxil et\n    bt(idx + 1, prod, any);           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 1, false);\n    cout << best << \"\\n\";\n}"
+    },
+    {
+      "topicSlug": "week9",
+      "orderIndex": 100,
+      "subgroupLabel": null,
+      "title": "2, 2, 2, 2, 2 massivindən maksimum hasil",
+      "difficulty": "easy",
+      "tags": [
+        "backtracking",
+        "hasil"
+      ],
+      "statement": "N (N ≥ 1) müsbət tam ədəd verilib. BOŞ OLMAYAN bir alt çoxluğun elementlərinin HASİLİNİN ola biləcəyi ƏN BÖYÜK dəyəri backtracking ilə tapın.",
+      "inputSpec": "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N müsbət tam ədəd (1 ≤ ədəd ≤ 10).",
+      "outputSpec": "Ən böyük mümkün hasil.",
+      "exampleInput": "5\n2 2 2 2 2",
+      "exampleOutput": "32",
+      "approach": "Bütün müsbət ədədlər üçün maksimum hasil HƏMİŞƏ BÜTÜN elementləri daxil etməklə əldə olunur (1-dən böyük müsbət ədədi əlavə etmək hasili heç vaxt azaltmır) — backtracking bunu daxil et/etmə budaqlarını sınayaraq TƏSDİQLƏYİR.",
+      "referenceSolution": "#include <bits/stdc++.h>\nusing namespace std;\nint n; vector<long long> a;\nlong long best = LLONG_MIN;\nvoid bt(int idx, long long prod, bool any){\n    if (idx == n) { if (any) best = max(best, prod); return; }\n    bt(idx + 1, prod * a[idx], true); // daxil et\n    bt(idx + 1, prod, any);           // keç\n}\nint main(){\n    cin >> n;\n    a.resize(n);\n    for (int i = 0; i < n; i++) cin >> a[i];\n    bt(0, 1, false);\n    cout << best << \"\\n\";\n}"
     }
   ]
 }

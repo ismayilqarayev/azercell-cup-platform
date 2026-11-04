@@ -20,6 +20,7 @@ const FILES = {
   WEEK5: 'week5.html',
   WEEK7: 'week7.html',
   WEEK8: 'week8.html',
+  WEEK9: 'week9.html',
   WEEK16: 'week16.html',
   ALGO: 'algo.html',
   SCHEME: 'scheme.html',
