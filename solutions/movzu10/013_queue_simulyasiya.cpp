@@ -1,0 +1,9 @@
+#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    queue<int> q;
+    for (int i = 0; i < n; i++) { int x; cin >> x; q.push(x); }
+    for (int i = 0; i < n; i++) { cout << q.front(); q.pop(); if (i + 1 < n) cout << " "; }
+    cout << "\n";
+}

@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 11 — Test: Acgöz (Greedy) alqoritmlər (fəaliyyət seçimi, sikkə, interval, deadline)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:65vh; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>11</span> — Test Vərəqi</h1>
+    <p>Mövzu: greedy-nin əsas fikri (hər addımda lokal optimal seçim), fəaliyyət seçimi, sikkə problemi, interval birləşdirmə/örtmə, iş planlaşdırma, sort ilə birgə istifadə. Aşağıdakı 100 məsələ yalnız Mövzu 11-in mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 11 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "(1,4),(3,5),(0,6),(5,7),(8,9) fəaliyyətlərindən maksimum kəsişməyən seçim",
+    difficulty: "easy",
+    tags: ["greedy", "interval"],
+    statement: "N fəaliyyətin başlama/bitmə vaxtları verilib. BİR-BİRİ İLƏ KƏSİŞMƏYƏN ən çox sayda fəaliyyət seçin (greedy).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\" (tam ədədlər).",
+    output: "Seçilə bilən maksimum kəsişməyən fəaliyyət sayı.",
+    example: {in:"5\n1 4\n3 5\n0 6\n5 7\n8 9", out:"3"},
+    approach: "Fəaliyyətlər BİTMƏ VAXTINA görə ARTAN sıralanır; hər fəaliyyət, əgər ƏVVƏLKİ SEÇİLMİŞİN bitmə vaxtından SONRA başlayırsa, acgözcəsinə seçilir — ən tez bitən fəaliyyəti seçmək HƏMİŞƏ sonrakı seçimlər üçün ən çox yer buraxır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].second >> a[i].first; // {bitme, başlama} - end-ə görə sort üçün
+    for (int i = 0; i < n; i++) swap(a[i].first, a[i].second);
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int cnt = 0, lastEnd = INT_MIN;
+    for (auto& p : a) {
+        if (p.first >= lastEnd) { cnt++; lastEnd = p.second; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,2),(2,3),(3,4) fəaliyyətlərindən maksimum kəsişməyən seçim (hamısı)",
+    difficulty: "easy",
+    tags: ["greedy", "interval"],
+    statement: "N fəaliyyətin başlama/bitmə vaxtları verilib. BİR-BİRİ İLƏ KƏSİŞMƏYƏN ən çox sayda fəaliyyət seçin (greedy).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\" (tam ədədlər).",
+    output: "Seçilə bilən maksimum kəsişməyən fəaliyyət sayı.",
+    example: {in:"3\n1 2\n2 3\n3 4", out:"3"},
+    approach: "Fəaliyyətlər BİTMƏ VAXTINA görə ARTAN sıralanır; hər fəaliyyət, əgər ƏVVƏLKİ SEÇİLMİŞİN bitmə vaxtından SONRA başlayırsa, acgözcəsinə seçilir — ən tez bitən fəaliyyəti seçmək HƏMİŞƏ sonrakı seçimlər üçün ən çox yer buraxır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].second >> a[i].first; // {bitme, başlama} - end-ə görə sort üçün
+    for (int i = 0; i < n; i++) swap(a[i].first, a[i].second);
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int cnt = 0, lastEnd = INT_MIN;
+    for (auto& p : a) {
+        if (p.first >= lastEnd) { cnt++; lastEnd = p.second; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,10),(2,3),(4,5) fəaliyyətlərindən maksimum kəsişməyən seçim",
+    difficulty: "easy",
+    tags: ["greedy", "interval"],
+    statement: "N fəaliyyətin başlama/bitmə vaxtları verilib. BİR-BİRİ İLƏ KƏSİŞMƏYƏN ən çox sayda fəaliyyət seçin (greedy).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\" (tam ədədlər).",
+    output: "Seçilə bilən maksimum kəsişməyən fəaliyyət sayı.",
+    example: {in:"3\n1 10\n2 3\n4 5", out:"2"},
+    approach: "Fəaliyyətlər BİTMƏ VAXTINA görə ARTAN sıralanır; hər fəaliyyət, əgər ƏVVƏLKİ SEÇİLMİŞİN bitmə vaxtından SONRA başlayırsa, acgözcəsinə seçilir — ən tez bitən fəaliyyəti seçmək HƏMİŞƏ sonrakı seçimlər üçün ən çox yer buraxır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].second >> a[i].first; // {bitme, başlama} - end-ə görə sort üçün
+    for (int i = 0; i < n; i++) swap(a[i].first, a[i].second);
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int cnt = 0, lastEnd = INT_MIN;
+    for (auto& p : a) {
+        if (p.first >= lastEnd) { cnt++; lastEnd = p.second; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,5) fəaliyyətindən maksimum kəsişməyən seçim (tək fəaliyyət)",
+    difficulty: "easy",
+    tags: ["greedy", "interval"],
+    statement: "N fəaliyyətin başlama/bitmə vaxtları verilib. BİR-BİRİ İLƏ KƏSİŞMƏYƏN ən çox sayda fəaliyyət seçin (greedy).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\" (tam ədədlər).",
+    output: "Seçilə bilən maksimum kəsişməyən fəaliyyət sayı.",
+    example: {in:"1\n1 5", out:"1"},
+    approach: "Fəaliyyətlər BİTMƏ VAXTINA görə ARTAN sıralanır; hər fəaliyyət, əgər ƏVVƏLKİ SEÇİLMİŞİN bitmə vaxtından SONRA başlayırsa, acgözcəsinə seçilir — ən tez bitən fəaliyyəti seçmək HƏMİŞƏ sonrakı seçimlər üçün ən çox yer buraxır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].second >> a[i].first; // {bitme, başlama} - end-ə görə sort üçün
+    for (int i = 0; i < n; i++) swap(a[i].first, a[i].second);
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int cnt = 0, lastEnd = INT_MIN;
+    for (auto& p : a) {
+        if (p.first >= lastEnd) { cnt++; lastEnd = p.second; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,3),(1,3),(1,3) fəaliyyətlərindən maksimum kəsişməyən seçim (hamısı eyni)",
+    difficulty: "easy",
+    tags: ["greedy", "interval"],
+    statement: "N fəaliyyətin başlama/bitmə vaxtları verilib. BİR-BİRİ İLƏ KƏSİŞMƏYƏN ən çox sayda fəaliyyət seçin (greedy).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\" (tam ədədlər).",
+    output: "Seçilə bilən maksimum kəsişməyən fəaliyyət sayı.",
+    example: {in:"3\n1 3\n1 3\n1 3", out:"1"},
+    approach: "Fəaliyyətlər BİTMƏ VAXTINA görə ARTAN sıralanır; hər fəaliyyət, əgər ƏVVƏLKİ SEÇİLMİŞİN bitmə vaxtından SONRA başlayırsa, acgözcəsinə seçilir — ən tez bitən fəaliyyəti seçmək HƏMİŞƏ sonrakı seçimlər üçün ən çox yer buraxır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].second >> a[i].first; // {bitme, başlama} - end-ə görə sort üçün
+    for (int i = 0; i < n; i++) swap(a[i].first, a[i].second);
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int cnt = 0, lastEnd = INT_MIN;
+    for (auto& p : a) {
+        if (p.first >= lastEnd) { cnt++; lastEnd = p.second; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "163 məbləğini minimum sikkə ilə ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 50, 20, 10, 5, 1} olan bir sistemdə, verilmiş MƏBLƏĞİ MİNİMUM sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"163", out:"6"},
+    approach: "Ən BÖYÜK sikkədən başlayaraq, qalan məbləğə ən çox NEÇƏ DƏFƏ sığırsa o qədər götürülür, sonra NÖVBƏTİ (daha kiçik) sikkəyə keçilir. Bu sikkə dəyərləri KANONİK sistem olduğu üçün greedy HƏMİŞƏ optimaldır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 50, 20, 10, 5, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "0 məbləğini minimum sikkə ilə ödəmək (greedy, baza hal)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 50, 20, 10, 5, 1} olan bir sistemdə, verilmiş MƏBLƏĞİ MİNİMUM sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"0", out:"0"},
+    approach: "Ən BÖYÜK sikkədən başlayaraq, qalan məbləğə ən çox NEÇƏ DƏFƏ sığırsa o qədər götürülür, sonra NÖVBƏTİ (daha kiçik) sikkəyə keçilir. Bu sikkə dəyərləri KANONİK sistem olduğu üçün greedy HƏMİŞƏ optimaldır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 50, 20, 10, 5, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "7 məbləğini minimum sikkə ilə ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 50, 20, 10, 5, 1} olan bir sistemdə, verilmiş MƏBLƏĞİ MİNİMUM sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"7", out:"3"},
+    approach: "Ən BÖYÜK sikkədən başlayaraq, qalan məbləğə ən çox NEÇƏ DƏFƏ sığırsa o qədər götürülür, sonra NÖVBƏTİ (daha kiçik) sikkəyə keçilir. Bu sikkə dəyərləri KANONİK sistem olduğu üçün greedy HƏMİŞƏ optimaldır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 50, 20, 10, 5, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "100 məbləğini minimum sikkə ilə ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 50, 20, 10, 5, 1} olan bir sistemdə, verilmiş MƏBLƏĞİ MİNİMUM sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"100", out:"1"},
+    approach: "Ən BÖYÜK sikkədən başlayaraq, qalan məbləğə ən çox NEÇƏ DƏFƏ sığırsa o qədər götürülür, sonra NÖVBƏTİ (daha kiçik) sikkəyə keçilir. Bu sikkə dəyərləri KANONİK sistem olduğu üçün greedy HƏMİŞƏ optimaldır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 50, 20, 10, 5, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "99999 məbləğini minimum sikkə ilə ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 50, 20, 10, 5, 1} olan bir sistemdə, verilmiş MƏBLƏĞİ MİNİMUM sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"99999", out:"1007"},
+    approach: "Ən BÖYÜK sikkədən başlayaraq, qalan məbləğə ən çox NEÇƏ DƏFƏ sığırsa o qədər götürülür, sonra NÖVBƏTİ (daha kiçik) sikkəyə keçilir. Bu sikkə dəyərləri KANONİK sistem olduğu üçün greedy HƏMİŞƏ optimaldır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 50, 20, 10, 5, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,3),(2,6),(8,10),(15,18) intervallarını birləşdirmək",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N interval verilib. Toqquşan (üst-üstə düşən və ya toxunan) intervalları BİRLƏŞDİRİN. Neçə YEKUN (birləşmiş) interval qaldığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Birləşmədən sonra qalan interval sayı.",
+    example: {in:"4\n1 3\n2 6\n8 10\n15 18", out:"3"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır; sıra ilə gəzilərkən, cari interval ƏVVƏLKİ BİRLƏŞMİŞ intervalın bitməsindən ƏVVƏL (və ya onunla eyni anda) başlayırsa, onlar BİRLƏŞDİRİLİR (bitmə vaxtı maksimuma yenilənir); əks halda YENİ ayrıca interval başlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int cnt = 0, curEnd = INT_MIN;
+    for (auto& p : a) {
+        if (cnt == 0 || p.first > curEnd) { cnt++; curEnd = p.second; }
+        else curEnd = max(curEnd, p.second);
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,4),(4,5) intervallarını birləşdirmək (toxunan)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N interval verilib. Toqquşan (üst-üstə düşən və ya toxunan) intervalları BİRLƏŞDİRİN. Neçə YEKUN (birləşmiş) interval qaldığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Birləşmədən sonra qalan interval sayı.",
+    example: {in:"2\n1 4\n4 5", out:"1"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır; sıra ilə gəzilərkən, cari interval ƏVVƏLKİ BİRLƏŞMİŞ intervalın bitməsindən ƏVVƏL (və ya onunla eyni anda) başlayırsa, onlar BİRLƏŞDİRİLİR (bitmə vaxtı maksimuma yenilənir); əks halda YENİ ayrıca interval başlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int cnt = 0, curEnd = INT_MIN;
+    for (auto& p : a) {
+        if (cnt == 0 || p.first > curEnd) { cnt++; curEnd = p.second; }
+        else curEnd = max(curEnd, p.second);
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,2),(3,4),(5,6) intervallarını birləşdirmək (heç biri toqquşmur)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N interval verilib. Toqquşan (üst-üstə düşən və ya toxunan) intervalları BİRLƏŞDİRİN. Neçə YEKUN (birləşmiş) interval qaldığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Birləşmədən sonra qalan interval sayı.",
+    example: {in:"3\n1 2\n3 4\n5 6", out:"3"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır; sıra ilə gəzilərkən, cari interval ƏVVƏLKİ BİRLƏŞMİŞ intervalın bitməsindən ƏVVƏL (və ya onunla eyni anda) başlayırsa, onlar BİRLƏŞDİRİLİR (bitmə vaxtı maksimuma yenilənir); əks halda YENİ ayrıca interval başlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int cnt = 0, curEnd = INT_MIN;
+    for (auto& p : a) {
+        if (cnt == 0 || p.first > curEnd) { cnt++; curEnd = p.second; }
+        else curEnd = max(curEnd, p.second);
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,10) intervalını birləşdirmək (tək interval)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N interval verilib. Toqquşan (üst-üstə düşən və ya toxunan) intervalları BİRLƏŞDİRİN. Neçə YEKUN (birləşmiş) interval qaldığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Birləşmədən sonra qalan interval sayı.",
+    example: {in:"1\n1 10", out:"1"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır; sıra ilə gəzilərkən, cari interval ƏVVƏLKİ BİRLƏŞMİŞ intervalın bitməsindən ƏVVƏL (və ya onunla eyni anda) başlayırsa, onlar BİRLƏŞDİRİLİR (bitmə vaxtı maksimuma yenilənir); əks halda YENİ ayrıca interval başlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int cnt = 0, curEnd = INT_MIN;
+    for (auto& p : a) {
+        if (cnt == 0 || p.first > curEnd) { cnt++; curEnd = p.second; }
+        else curEnd = max(curEnd, p.second);
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "(1,5),(2,3),(4,8) intervallarını birləşdirmək (içəridə)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N interval verilib. Toqquşan (üst-üstə düşən və ya toxunan) intervalları BİRLƏŞDİRİN. Neçə YEKUN (birləşmiş) interval qaldığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Birləşmədən sonra qalan interval sayı.",
+    example: {in:"3\n1 5\n2 3\n4 8", out:"1"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır; sıra ilə gəzilərkən, cari interval ƏVVƏLKİ BİRLƏŞMİŞ intervalın bitməsindən ƏVVƏL (və ya onunla eyni anda) başlayırsa, onlar BİRLƏŞDİRİLİR (bitmə vaxtı maksimuma yenilənir); əks halda YENİ ayrıca interval başlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int cnt = 0, curEnd = INT_MIN;
+    for (auto& p : a) {
+        if (cnt == 0 || p.first > curEnd) { cnt++; curEnd = p.second; }
+        else curEnd = max(curEnd, p.second);
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "3, 1, 4, 1, 5 müddətli işlərin minimum bitmə cəmi (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "planlaşdırma"],
+    statement: "N işin müddəti verilib (tək prosessor, bir anda bir iş). İşləri elə sıraya düzün ki, BÜTÜN işlərin BİTMƏ VAXTLARININ CƏMİ MİNİMUM olsun (greedy: ən qısa iş əvvəl).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N müddət.",
+    output: "Minimum mümkün bitmə vaxtları cəmi.",
+    example: {in:"5\n3 1 4 1 5", out:"31"},
+    approach: "\"Ən qısa iş əvvəl\" (Shortest Job First) qaydası: işlər müddətə görə ARTAN sıralanır. Qısa işi əvvəl qoymaq, ondan SONRAKI bütün işlərin gözləmə vaxtını azaldır — bu, cəmi minimuma endirən sübut olunmuş greedy strategiyadır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long total = 0, finish = 0;
+    for (int x : a) { finish += x; total += finish; }
+    cout << total << "\\n";
+}`},
+  {
+    title: "5 müddətli işin minimum bitmə cəmi (greedy, tək iş)",
+    difficulty: "mid",
+    tags: ["greedy", "planlaşdırma"],
+    statement: "N işin müddəti verilib (tək prosessor, bir anda bir iş). İşləri elə sıraya düzün ki, BÜTÜN işlərin BİTMƏ VAXTLARININ CƏMİ MİNİMUM olsun (greedy: ən qısa iş əvvəl).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N müddət.",
+    output: "Minimum mümkün bitmə vaxtları cəmi.",
+    example: {in:"1\n5", out:"5"},
+    approach: "\"Ən qısa iş əvvəl\" (Shortest Job First) qaydası: işlər müddətə görə ARTAN sıralanır. Qısa işi əvvəl qoymaq, ondan SONRAKI bütün işlərin gözləmə vaxtını azaldır — bu, cəmi minimuma endirən sübut olunmuş greedy strategiyadır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long total = 0, finish = 0;
+    for (int x : a) { finish += x; total += finish; }
+    cout << total << "\\n";
+}`},
+  {
+    title: "2, 2, 2 müddətli işlərin minimum bitmə cəmi (greedy, eyni müddət)",
+    difficulty: "mid",
+    tags: ["greedy", "planlaşdırma"],
+    statement: "N işin müddəti verilib (tək prosessor, bir anda bir iş). İşləri elə sıraya düzün ki, BÜTÜN işlərin BİTMƏ VAXTLARININ CƏMİ MİNİMUM olsun (greedy: ən qısa iş əvvəl).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N müddət.",
+    output: "Minimum mümkün bitmə vaxtları cəmi.",
+    example: {in:"3\n2 2 2", out:"12"},
+    approach: "\"Ən qısa iş əvvəl\" (Shortest Job First) qaydası: işlər müddətə görə ARTAN sıralanır. Qısa işi əvvəl qoymaq, ondan SONRAKI bütün işlərin gözləmə vaxtını azaldır — bu, cəmi minimuma endirən sübut olunmuş greedy strategiyadır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long total = 0, finish = 0;
+    for (int x : a) { finish += x; total += finish; }
+    cout << total << "\\n";
+}`},
+  {
+    title: "10, 1 müddətli işlərin minimum bitmə cəmi (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "planlaşdırma"],
+    statement: "N işin müddəti verilib (tək prosessor, bir anda bir iş). İşləri elə sıraya düzün ki, BÜTÜN işlərin BİTMƏ VAXTLARININ CƏMİ MİNİMUM olsun (greedy: ən qısa iş əvvəl).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N müddət.",
+    output: "Minimum mümkün bitmə vaxtları cəmi.",
+    example: {in:"2\n10 1", out:"12"},
+    approach: "\"Ən qısa iş əvvəl\" (Shortest Job First) qaydası: işlər müddətə görə ARTAN sıralanır. Qısa işi əvvəl qoymaq, ondan SONRAKI bütün işlərin gözləmə vaxtını azaldır — bu, cəmi minimuma endirən sübut olunmuş greedy strategiyadır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long total = 0, finish = 0;
+    for (int x : a) { finish += x; total += finish; }
+    cout << total << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4 müddətli işlərin minimum bitmə cəmi (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "planlaşdırma"],
+    statement: "N işin müddəti verilib (tək prosessor, bir anda bir iş). İşləri elə sıraya düzün ki, BÜTÜN işlərin BİTMƏ VAXTLARININ CƏMİ MİNİMUM olsun (greedy: ən qısa iş əvvəl).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N müddət.",
+    output: "Minimum mümkün bitmə vaxtları cəmi.",
+    example: {in:"4\n1 2 3 4", out:"20"},
+    approach: "\"Ən qısa iş əvvəl\" (Shortest Job First) qaydası: işlər müddətə görə ARTAN sıralanır. Qısa işi əvvəl qoymaq, ondan SONRAKI bütün işlərin gözləmə vaxtını azaldır — bu, cəmi minimuma endirən sübut olunmuş greedy strategiyadır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long total = 0, finish = 0;
+    for (int x : a) { finish += x; total += finish; }
+    cout << total << "\\n";
+}`},
+  {
+    title: "(10,16),(2,8),(1,6),(7,12) balonlarını partlatmaq üçün min ox (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N balon verilib, hər birinin üfüqi intervalı (başlama, bitmə) var. Şaquli ox atışı, intervalına düşdüyü BÜTÜN balonları partladır. Bütün balonları partlatmaq üçün minimum NEÇƏ OX lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum ox sayı.",
+    example: {in:"4\n10 16\n2 8\n1 6\n7 12", out:"2"},
+    approach: "Balonlar BİTMƏ nöqtəsinə görə sıralanır; ilk balonun bitmə nöqtəsinə bir OX atılır — bu ox, başlama nöqtəsi həmin yerdən KİÇİK-BƏRABƏR olan BÜTÜN sonrakı balonları da partladır; partlamayan ilk balondan yeni ox atılır və təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int arrows = 0; long long shotAt = LLONG_MIN;
+    for (auto& p : a) {
+        if (p.first > shotAt) { arrows++; shotAt = p.second; }
+    }
+    cout << arrows << "\\n";
+}`},
+  {
+    title: "(1,2),(3,4),(5,6) balonlarını partlatmaq üçün min ox (greedy, kəsişmir)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N balon verilib, hər birinin üfüqi intervalı (başlama, bitmə) var. Şaquli ox atışı, intervalına düşdüyü BÜTÜN balonları partladır. Bütün balonları partlatmaq üçün minimum NEÇƏ OX lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum ox sayı.",
+    example: {in:"3\n1 2\n3 4\n5 6", out:"3"},
+    approach: "Balonlar BİTMƏ nöqtəsinə görə sıralanır; ilk balonun bitmə nöqtəsinə bir OX atılır — bu ox, başlama nöqtəsi həmin yerdən KİÇİK-BƏRABƏR olan BÜTÜN sonrakı balonları da partladır; partlamayan ilk balondan yeni ox atılır və təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int arrows = 0; long long shotAt = LLONG_MIN;
+    for (auto& p : a) {
+        if (p.first > shotAt) { arrows++; shotAt = p.second; }
+    }
+    cout << arrows << "\\n";
+}`},
+  {
+    title: "(1,10),(2,9),(3,8) balonlarını partlatmaq üçün min ox (greedy, iç-içə)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N balon verilib, hər birinin üfüqi intervalı (başlama, bitmə) var. Şaquli ox atışı, intervalına düşdüyü BÜTÜN balonları partladır. Bütün balonları partlatmaq üçün minimum NEÇƏ OX lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum ox sayı.",
+    example: {in:"3\n1 10\n2 9\n3 8", out:"1"},
+    approach: "Balonlar BİTMƏ nöqtəsinə görə sıralanır; ilk balonun bitmə nöqtəsinə bir OX atılır — bu ox, başlama nöqtəsi həmin yerdən KİÇİK-BƏRABƏR olan BÜTÜN sonrakı balonları da partladır; partlamayan ilk balondan yeni ox atılır və təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int arrows = 0; long long shotAt = LLONG_MIN;
+    for (auto& p : a) {
+        if (p.first > shotAt) { arrows++; shotAt = p.second; }
+    }
+    cout << arrows << "\\n";
+}`},
+  {
+    title: "(1,5) balonunu partlatmaq üçün min ox (greedy, tək balon)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N balon verilib, hər birinin üfüqi intervalı (başlama, bitmə) var. Şaquli ox atışı, intervalına düşdüyü BÜTÜN balonları partladır. Bütün balonları partlatmaq üçün minimum NEÇƏ OX lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum ox sayı.",
+    example: {in:"1\n1 5", out:"1"},
+    approach: "Balonlar BİTMƏ nöqtəsinə görə sıralanır; ilk balonun bitmə nöqtəsinə bir OX atılır — bu ox, başlama nöqtəsi həmin yerdən KİÇİK-BƏRABƏR olan BÜTÜN sonrakı balonları da partladır; partlamayan ilk balondan yeni ox atılır və təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int arrows = 0; long long shotAt = LLONG_MIN;
+    for (auto& p : a) {
+        if (p.first > shotAt) { arrows++; shotAt = p.second; }
+    }
+    cout << arrows << "\\n";
+}`},
+  {
+    title: "(1,2),(2,3),(3,4) balonlarını partlatmaq üçün min ox (greedy, toxunan)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N balon verilib, hər birinin üfüqi intervalı (başlama, bitmə) var. Şaquli ox atışı, intervalına düşdüyü BÜTÜN balonları partladır. Bütün balonları partlatmaq üçün minimum NEÇƏ OX lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum ox sayı.",
+    example: {in:"3\n1 2\n2 3\n3 4", out:"2"},
+    approach: "Balonlar BİTMƏ nöqtəsinə görə sıralanır; ilk balonun bitmə nöqtəsinə bir OX atılır — bu ox, başlama nöqtəsi həmin yerdən KİÇİK-BƏRABƏR olan BÜTÜN sonrakı balonları da partladır; partlamayan ilk balondan yeni ox atılır və təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end(), [](auto& x, auto& y){ return x.second < y.second; });
+    int arrows = 0; long long shotAt = LLONG_MIN;
+    for (auto& p : a) {
+        if (p.first > shotAt) { arrows++; shotAt = p.second; }
+    }
+    cout << arrows << "\\n";
+}`},
+  {
+    title: "1, 2 çəkili 2 nəfəri 3 limitli qayıqla keçirmək (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "two-pointer"],
+    statement: "N nəfərin çəkisi verilib. Hər qayıqda ƏN ÇOX 2 nəfər ola bilər, qayığın çəki LİMİTİ L-dir. Hamısını qarşı sahilə keçirmək üçün minimum NEÇƏ QAYIQ lazımdır (greedy)?",
+    input: "Birinci sətirdə N və L (1 ≤ N ≤ 1000), ikinci sətirdə N çəki (hər biri ≤ L).",
+    output: "Minimum qayıq sayı.",
+    example: {in:"2 3\n1 2", out:"1"},
+    approach: "Çəkilər sıralanır; İKİ GÖSTƏRİCİ (ən yüngül və ən ağır) istifadə olunur: ən ağır adam HƏMİŞƏ tək-başına və ya ən yüngüllə birlikdə gedir — əgər ikisinin cəmi limiti aşmırsa birlikdə, aşırsa ən ağır tək gedir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, l; cin >> n >> l;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    int lo = 0, hi = n - 1, boats = 0;
+    while (lo <= hi) {
+        if (lo < hi && a[lo] + a[hi] <= l) lo++;
+        hi--;
+        boats++;
+    }
+    cout << boats << "\\n";
+}`},
+  {
+    title: "3, 2, 2, 1 çəkili 4 nəfəri 3 limitli qayıqla keçirmək (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "two-pointer"],
+    statement: "N nəfərin çəkisi verilib. Hər qayıqda ƏN ÇOX 2 nəfər ola bilər, qayığın çəki LİMİTİ L-dir. Hamısını qarşı sahilə keçirmək üçün minimum NEÇƏ QAYIQ lazımdır (greedy)?",
+    input: "Birinci sətirdə N və L (1 ≤ N ≤ 1000), ikinci sətirdə N çəki (hər biri ≤ L).",
+    output: "Minimum qayıq sayı.",
+    example: {in:"4 3\n3 2 2 1", out:"3"},
+    approach: "Çəkilər sıralanır; İKİ GÖSTƏRİCİ (ən yüngül və ən ağır) istifadə olunur: ən ağır adam HƏMİŞƏ tək-başına və ya ən yüngüllə birlikdə gedir — əgər ikisinin cəmi limiti aşmırsa birlikdə, aşırsa ən ağır tək gedir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, l; cin >> n >> l;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    int lo = 0, hi = n - 1, boats = 0;
+    while (lo <= hi) {
+        if (lo < hi && a[lo] + a[hi] <= l) lo++;
+        hi--;
+        boats++;
+    }
+    cout << boats << "\\n";
+}`},
+  {
+    title: "3, 5, 3, 4 çəkili 4 nəfəri 5 limitli qayıqla keçirmək (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "two-pointer"],
+    statement: "N nəfərin çəkisi verilib. Hər qayıqda ƏN ÇOX 2 nəfər ola bilər, qayığın çəki LİMİTİ L-dir. Hamısını qarşı sahilə keçirmək üçün minimum NEÇƏ QAYIQ lazımdır (greedy)?",
+    input: "Birinci sətirdə N və L (1 ≤ N ≤ 1000), ikinci sətirdə N çəki (hər biri ≤ L).",
+    output: "Minimum qayıq sayı.",
+    example: {in:"4 5\n3 5 3 4", out:"4"},
+    approach: "Çəkilər sıralanır; İKİ GÖSTƏRİCİ (ən yüngül və ən ağır) istifadə olunur: ən ağır adam HƏMİŞƏ tək-başına və ya ən yüngüllə birlikdə gedir — əgər ikisinin cəmi limiti aşmırsa birlikdə, aşırsa ən ağır tək gedir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, l; cin >> n >> l;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    int lo = 0, hi = n - 1, boats = 0;
+    while (lo <= hi) {
+        if (lo < hi && a[lo] + a[hi] <= l) lo++;
+        hi--;
+        boats++;
+    }
+    cout << boats << "\\n";
+}`},
+  {
+    title: "5 çəkili 1 nəfəri 5 limitli qayıqla keçirmək (greedy, tək nəfər)",
+    difficulty: "mid",
+    tags: ["greedy", "two-pointer"],
+    statement: "N nəfərin çəkisi verilib. Hər qayıqda ƏN ÇOX 2 nəfər ola bilər, qayığın çəki LİMİTİ L-dir. Hamısını qarşı sahilə keçirmək üçün minimum NEÇƏ QAYIQ lazımdır (greedy)?",
+    input: "Birinci sətirdə N və L (1 ≤ N ≤ 1000), ikinci sətirdə N çəki (hər biri ≤ L).",
+    output: "Minimum qayıq sayı.",
+    example: {in:"1 5\n5", out:"1"},
+    approach: "Çəkilər sıralanır; İKİ GÖSTƏRİCİ (ən yüngül və ən ağır) istifadə olunur: ən ağır adam HƏMİŞƏ tək-başına və ya ən yüngüllə birlikdə gedir — əgər ikisinin cəmi limiti aşmırsa birlikdə, aşırsa ən ağır tək gedir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, l; cin >> n >> l;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    int lo = 0, hi = n - 1, boats = 0;
+    while (lo <= hi) {
+        if (lo < hi && a[lo] + a[hi] <= l) lo++;
+        hi--;
+        boats++;
+    }
+    cout << boats << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 çəkili 4 nəfəri 2 limitli qayıqla keçirmək (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "two-pointer"],
+    statement: "N nəfərin çəkisi verilib. Hər qayıqda ƏN ÇOX 2 nəfər ola bilər, qayığın çəki LİMİTİ L-dir. Hamısını qarşı sahilə keçirmək üçün minimum NEÇƏ QAYIQ lazımdır (greedy)?",
+    input: "Birinci sətirdə N və L (1 ≤ N ≤ 1000), ikinci sətirdə N çəki (hər biri ≤ L).",
+    output: "Minimum qayıq sayı.",
+    example: {in:"4 2\n1 1 1 1", out:"2"},
+    approach: "Çəkilər sıralanır; İKİ GÖSTƏRİCİ (ən yüngül və ən ağır) istifadə olunur: ən ağır adam HƏMİŞƏ tək-başına və ya ən yüngüllə birlikdə gedir — əgər ikisinin cəmi limiti aşmırsa birlikdə, aşırsa ən ağır tək gedir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, l; cin >> n >> l;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    int lo = 0, hi = n - 1, boats = 0;
+    while (lo <= hi) {
+        if (lo < hi && a[lo] + a[hi] <= l) lo++;
+        hi--;
+        boats++;
+    }
+    cout << boats << "\\n";
+}`},
+  {
+    title: "2, 1, 2, 1 son tarixli tapşırıqlardan maksimum vaxtında bitən sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "deadline"],
+    statement: "N tapşırığın SON TARİXİ (deadline) verilib (hər tapşırıq 1 vahid vaxt aparır). Maksimum NEÇƏ tapşırığı SON TARİXDƏN ƏVVƏL bitirmək mümkündür (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N son tarix (1 ≤ deadline ≤ N).",
+    output: "Vaxtında bitirilə bilən maksimum tapşırıq sayı.",
+    example: {in:"4\n2 1 2 1", out:"2"},
+    approach: "Tapşırıqlar SON TARİXƏ görə ARTAN sıralanır; hər tapşırıq üçün ƏN GEC mümkün BOŞ zaman yuvası (boolean massivlə) axtarılır və tutulur — ən tez son tarixli tapşırığı əvvəl yerləşdirmək digərlərinə daha çox yer saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    vector<bool> used(n + 1, false);
+    int cnt = 0;
+    for (int dl : d) {
+        for (int t = min(dl, n); t >= 1; t--) {
+            if (!used[t]) { used[t] = true; cnt++; break; }
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1, 1, 1 son tarixli tapşırıqlardan maksimum vaxtında bitən sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "deadline"],
+    statement: "N tapşırığın SON TARİXİ (deadline) verilib (hər tapşırıq 1 vahid vaxt aparır). Maksimum NEÇƏ tapşırığı SON TARİXDƏN ƏVVƏL bitirmək mümkündür (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N son tarix (1 ≤ deadline ≤ N).",
+    output: "Vaxtında bitirilə bilən maksimum tapşırıq sayı.",
+    example: {in:"3\n1 1 1", out:"1"},
+    approach: "Tapşırıqlar SON TARİXƏ görə ARTAN sıralanır; hər tapşırıq üçün ƏN GEC mümkün BOŞ zaman yuvası (boolean massivlə) axtarılır və tutulur — ən tez son tarixli tapşırığı əvvəl yerləşdirmək digərlərinə daha çox yer saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    vector<bool> used(n + 1, false);
+    int cnt = 0;
+    for (int dl : d) {
+        for (int t = min(dl, n); t >= 1; t--) {
+            if (!used[t]) { used[t] = true; cnt++; break; }
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "3, 3, 3 son tarixli tapşırıqlardan maksimum vaxtında bitən sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "deadline"],
+    statement: "N tapşırığın SON TARİXİ (deadline) verilib (hər tapşırıq 1 vahid vaxt aparır). Maksimum NEÇƏ tapşırığı SON TARİXDƏN ƏVVƏL bitirmək mümkündür (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N son tarix (1 ≤ deadline ≤ N).",
+    output: "Vaxtında bitirilə bilən maksimum tapşırıq sayı.",
+    example: {in:"3\n3 3 3", out:"3"},
+    approach: "Tapşırıqlar SON TARİXƏ görə ARTAN sıralanır; hər tapşırıq üçün ƏN GEC mümkün BOŞ zaman yuvası (boolean massivlə) axtarılır və tutulur — ən tez son tarixli tapşırığı əvvəl yerləşdirmək digərlərinə daha çox yer saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    vector<bool> used(n + 1, false);
+    int cnt = 0;
+    for (int dl : d) {
+        for (int t = min(dl, n); t >= 1; t--) {
+            if (!used[t]) { used[t] = true; cnt++; break; }
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1 son tarixli tapşırıqdan maksimum vaxtında bitən sayı (greedy, tək tapşırıq)",
+    difficulty: "mid",
+    tags: ["greedy", "deadline"],
+    statement: "N tapşırığın SON TARİXİ (deadline) verilib (hər tapşırıq 1 vahid vaxt aparır). Maksimum NEÇƏ tapşırığı SON TARİXDƏN ƏVVƏL bitirmək mümkündür (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N son tarix (1 ≤ deadline ≤ N).",
+    output: "Vaxtında bitirilə bilən maksimum tapşırıq sayı.",
+    example: {in:"1\n1", out:"1"},
+    approach: "Tapşırıqlar SON TARİXƏ görə ARTAN sıralanır; hər tapşırıq üçün ƏN GEC mümkün BOŞ zaman yuvası (boolean massivlə) axtarılır və tutulur — ən tez son tarixli tapşırığı əvvəl yerləşdirmək digərlərinə daha çox yer saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    vector<bool> used(n + 1, false);
+    int cnt = 0;
+    for (int dl : d) {
+        for (int t = min(dl, n); t >= 1; t--) {
+            if (!used[t]) { used[t] = true; cnt++; break; }
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "4, 1, 3, 2 son tarixli tapşırıqlardan maksimum vaxtında bitən sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "deadline"],
+    statement: "N tapşırığın SON TARİXİ (deadline) verilib (hər tapşırıq 1 vahid vaxt aparır). Maksimum NEÇƏ tapşırığı SON TARİXDƏN ƏVVƏL bitirmək mümkündür (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N son tarix (1 ≤ deadline ≤ N).",
+    output: "Vaxtında bitirilə bilən maksimum tapşırıq sayı.",
+    example: {in:"4\n4 1 3 2", out:"4"},
+    approach: "Tapşırıqlar SON TARİXƏ görə ARTAN sıralanır; hər tapşırıq üçün ƏN GEC mümkün BOŞ zaman yuvası (boolean massivlə) axtarılır və tutulur — ən tez son tarixli tapşırığı əvvəl yerləşdirmək digərlərinə daha çox yer saxlayır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    vector<bool> used(n + 1, false);
+    int cnt = 0;
+    for (int dl : d) {
+        for (int t = min(dl, n); t >= 1; t--) {
+            if (!used[t]) { used[t] = true; cnt++; break; }
+        }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "-5, 2, -3, 1 massivində 2 dəfə işarə dəyişərək maksimum cəm (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "işarə"],
+    statement: "N ədəd və K verilib. DƏQİQ K dəfə (bir ədədi dəfələrlə seçmək olar) ƏN KİÇİK elementin işarəsini dəyişərək (×-1) massivin CƏMİNİ MAKSİMUMA çatdırın (greedy).",
+    input: "Birinci sətirdə N və K (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "K əməliyyatdan sonra əldə edilə bilən maksimum cəm.",
+    example: {in:"4 2\n-5 2 -3 1", out:"11"},
+    approach: "Hər addımda ƏN KİÇİK (ən mənfi) elementin işarəsini dəyişmək CƏMİ ən çox artırır — min-heap ilə hər dəfə ən kiçik element çıxarılıb işarəsi dəyişdirilərək geri qoyulur, bu K dəfə təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; pq.push(x); }
+    for (int i = 0; i < k; i++) {
+        int x = pq.top(); pq.pop();
+        pq.push(-x);
+    }
+    long long sum = 0;
+    while (!pq.empty()) { sum += pq.top(); pq.pop(); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 2, 3 massivində 1 dəfə işarə dəyişərək maksimum cəm (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "işarə"],
+    statement: "N ədəd və K verilib. DƏQİQ K dəfə (bir ədədi dəfələrlə seçmək olar) ƏN KİÇİK elementin işarəsini dəyişərək (×-1) massivin CƏMİNİ MAKSİMUMA çatdırın (greedy).",
+    input: "Birinci sətirdə N və K (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "K əməliyyatdan sonra əldə edilə bilən maksimum cəm.",
+    example: {in:"3 1\n1 2 3", out:"4"},
+    approach: "Hər addımda ƏN KİÇİK (ən mənfi) elementin işarəsini dəyişmək CƏMİ ən çox artırır — min-heap ilə hər dəfə ən kiçik element çıxarılıb işarəsi dəyişdirilərək geri qoyulur, bu K dəfə təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; pq.push(x); }
+    for (int i = 0; i < k; i++) {
+        int x = pq.top(); pq.pop();
+        pq.push(-x);
+    }
+    long long sum = 0;
+    while (!pq.empty()) { sum += pq.top(); pq.pop(); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-1, -1, -1 massivində 3 dəfə işarə dəyişərək maksimum cəm (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "işarə"],
+    statement: "N ədəd və K verilib. DƏQİQ K dəfə (bir ədədi dəfələrlə seçmək olar) ƏN KİÇİK elementin işarəsini dəyişərək (×-1) massivin CƏMİNİ MAKSİMUMA çatdırın (greedy).",
+    input: "Birinci sətirdə N və K (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "K əməliyyatdan sonra əldə edilə bilən maksimum cəm.",
+    example: {in:"3 3\n-1 -1 -1", out:"3"},
+    approach: "Hər addımda ƏN KİÇİK (ən mənfi) elementin işarəsini dəyişmək CƏMİ ən çox artırır — min-heap ilə hər dəfə ən kiçik element çıxarılıb işarəsi dəyişdirilərək geri qoyulur, bu K dəfə təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; pq.push(x); }
+    for (int i = 0; i < k; i++) {
+        int x = pq.top(); pq.pop();
+        pq.push(-x);
+    }
+    long long sum = 0;
+    while (!pq.empty()) { sum += pq.top(); pq.pop(); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5 massivində 0 dəfə işarə dəyişərək maksimum cəm (greedy, dəyişmə yoxdur)",
+    difficulty: "mid",
+    tags: ["greedy", "işarə"],
+    statement: "N ədəd və K verilib. DƏQİQ K dəfə (bir ədədi dəfələrlə seçmək olar) ƏN KİÇİK elementin işarəsini dəyişərək (×-1) massivin CƏMİNİ MAKSİMUMA çatdırın (greedy).",
+    input: "Birinci sətirdə N və K (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "K əməliyyatdan sonra əldə edilə bilən maksimum cəm.",
+    example: {in:"1 0\n5", out:"5"},
+    approach: "Hər addımda ƏN KİÇİK (ən mənfi) elementin işarəsini dəyişmək CƏMİ ən çox artırır — min-heap ilə hər dəfə ən kiçik element çıxarılıb işarəsi dəyişdirilərək geri qoyulur, bu K dəfə təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; pq.push(x); }
+    for (int i = 0; i < k; i++) {
+        int x = pq.top(); pq.pop();
+        pq.push(-x);
+    }
+    long long sum = 0;
+    while (!pq.empty()) { sum += pq.top(); pq.pop(); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-2, -2, 3 massivində 4 dəfə işarə dəyişərək maksimum cəm (greedy, artıq dəfə)",
+    difficulty: "mid",
+    tags: ["greedy", "işarə"],
+    statement: "N ədəd və K verilib. DƏQİQ K dəfə (bir ədədi dəfələrlə seçmək olar) ƏN KİÇİK elementin işarəsini dəyişərək (×-1) massivin CƏMİNİ MAKSİMUMA çatdırın (greedy).",
+    input: "Birinci sətirdə N və K (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "K əməliyyatdan sonra əldə edilə bilən maksimum cəm.",
+    example: {in:"3 4\n-2 -2 3", out:"7"},
+    approach: "Hər addımda ƏN KİÇİK (ən mənfi) elementin işarəsini dəyişmək CƏMİ ən çox artırır — min-heap ilə hər dəfə ən kiçik element çıxarılıb işarəsi dəyişdirilərək geri qoyulur, bu K dəfə təkrarlanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; pq.push(x); }
+    for (int i = 0; i < k; i++) {
+        int x = pq.top(); pq.pop();
+        pq.push(-x);
+    }
+    long long sum = 0;
+    while (!pq.empty()) { sum += pq.top(); pq.pop(); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "(0,30),(5,10),(15,20) görüşlərinə minimum otaq sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N görüşün başlama/bitmə vaxtları verilib. Bütün görüşlərin EYNİ ANDA keçirilə bilməsi üçün minimum NEÇƏ OTAQ lazımdır (greedy: eyni anda maksimum neçə görüş üst-üstə düşür)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Lazım olan minimum otaq sayı.",
+    example: {in:"3\n0 30\n5 10\n15 20", out:"2"},
+    approach: "Bütün başlama vaxtları və bütün bitmə vaxtları AYRI-AYRI sıralanır; iki göstərici ilə vaxt üzrə irəli gedilir — hər başlama OTAQ sayını 1 artırır, hər bitmə (başlamadan ƏVVƏL baş verirsə) 1 azaldır; gəzinti boyu görülən MAKSİMUM otaq sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> starts(n), ends(n);
+    for (int i = 0; i < n; i++) cin >> starts[i] >> ends[i];
+    sort(starts.begin(), starts.end());
+    sort(ends.begin(), ends.end());
+    int i = 0, j = 0, cur = 0, best = 0;
+    while (i < n) {
+        if (starts[i] < ends[j]) { cur++; i++; best = max(best, cur); }
+        else { cur--; j++; }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "(7,10),(2,4) görüşlərinə minimum otaq sayı (greedy, kəsişmir)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N görüşün başlama/bitmə vaxtları verilib. Bütün görüşlərin EYNİ ANDA keçirilə bilməsi üçün minimum NEÇƏ OTAQ lazımdır (greedy: eyni anda maksimum neçə görüş üst-üstə düşür)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Lazım olan minimum otaq sayı.",
+    example: {in:"2\n7 10\n2 4", out:"1"},
+    approach: "Bütün başlama vaxtları və bütün bitmə vaxtları AYRI-AYRI sıralanır; iki göstərici ilə vaxt üzrə irəli gedilir — hər başlama OTAQ sayını 1 artırır, hər bitmə (başlamadan ƏVVƏL baş verirsə) 1 azaldır; gəzinti boyu görülən MAKSİMUM otaq sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> starts(n), ends(n);
+    for (int i = 0; i < n; i++) cin >> starts[i] >> ends[i];
+    sort(starts.begin(), starts.end());
+    sort(ends.begin(), ends.end());
+    int i = 0, j = 0, cur = 0, best = 0;
+    while (i < n) {
+        if (starts[i] < ends[j]) { cur++; i++; best = max(best, cur); }
+        else { cur--; j++; }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "(1,5),(1,5),(1,5) görüşlərinə minimum otaq sayı (greedy, hamısı üst-üstə)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N görüşün başlama/bitmə vaxtları verilib. Bütün görüşlərin EYNİ ANDA keçirilə bilməsi üçün minimum NEÇƏ OTAQ lazımdır (greedy: eyni anda maksimum neçə görüş üst-üstə düşür)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Lazım olan minimum otaq sayı.",
+    example: {in:"3\n1 5\n1 5\n1 5", out:"3"},
+    approach: "Bütün başlama vaxtları və bütün bitmə vaxtları AYRI-AYRI sıralanır; iki göstərici ilə vaxt üzrə irəli gedilir — hər başlama OTAQ sayını 1 artırır, hər bitmə (başlamadan ƏVVƏL baş verirsə) 1 azaldır; gəzinti boyu görülən MAKSİMUM otaq sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> starts(n), ends(n);
+    for (int i = 0; i < n; i++) cin >> starts[i] >> ends[i];
+    sort(starts.begin(), starts.end());
+    sort(ends.begin(), ends.end());
+    int i = 0, j = 0, cur = 0, best = 0;
+    while (i < n) {
+        if (starts[i] < ends[j]) { cur++; i++; best = max(best, cur); }
+        else { cur--; j++; }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "(1,2) görüşünə minimum otaq sayı (greedy, tək görüş)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N görüşün başlama/bitmə vaxtları verilib. Bütün görüşlərin EYNİ ANDA keçirilə bilməsi üçün minimum NEÇƏ OTAQ lazımdır (greedy: eyni anda maksimum neçə görüş üst-üstə düşür)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Lazım olan minimum otaq sayı.",
+    example: {in:"1\n1 2", out:"1"},
+    approach: "Bütün başlama vaxtları və bütün bitmə vaxtları AYRI-AYRI sıralanır; iki göstərici ilə vaxt üzrə irəli gedilir — hər başlama OTAQ sayını 1 artırır, hər bitmə (başlamadan ƏVVƏL baş verirsə) 1 azaldır; gəzinti boyu görülən MAKSİMUM otaq sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> starts(n), ends(n);
+    for (int i = 0; i < n; i++) cin >> starts[i] >> ends[i];
+    sort(starts.begin(), starts.end());
+    sort(ends.begin(), ends.end());
+    int i = 0, j = 0, cur = 0, best = 0;
+    while (i < n) {
+        if (starts[i] < ends[j]) { cur++; i++; best = max(best, cur); }
+        else { cur--; j++; }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "(1,3),(2,4),(3,5) görüşlərinə minimum otaq sayı (greedy, zəncirvari)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "N görüşün başlama/bitmə vaxtları verilib. Bütün görüşlərin EYNİ ANDA keçirilə bilməsi üçün minimum NEÇƏ OTAQ lazımdır (greedy: eyni anda maksimum neçə görüş üst-üstə düşür)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), növbəti N sətirdə \"başlama bitmə\".",
+    output: "Lazım olan minimum otaq sayı.",
+    example: {in:"3\n1 3\n2 4\n3 5", out:"2"},
+    approach: "Bütün başlama vaxtları və bütün bitmə vaxtları AYRI-AYRI sıralanır; iki göstərici ilə vaxt üzrə irəli gedilir — hər başlama OTAQ sayını 1 artırır, hər bitmə (başlamadan ƏVVƏL baş verirsə) 1 azaldır; gəzinti boyu görülən MAKSİMUM otaq sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> starts(n), ends(n);
+    for (int i = 0; i < n; i++) cin >> starts[i] >> ends[i];
+    sort(starts.begin(), starts.end());
+    sort(ends.begin(), ends.end());
+    int i = 0, j = 0, cur = 0, best = 0;
+    while (i < n) {
+        if (starts[i] < ends[j]) { cur++; i++; best = max(best, cur); }
+        else { cur--; j++; }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 rəqəmlərindən ən böyük ədəd qurmaq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN BÖYÜK ƏDƏDİ qurun (greedy: rəqəmləri azalan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən böyük ədəd.",
+    example: {in:"5\n5 3 8 1 9", out:"98531"},
+    approach: "Rəqəmlər AZALAN sıraya düzülür və ardıcıl calanır — ən böyük rəqəmi ən soldakı (ən əhəmiyyətli) mövqeyə qoymaq, ədədi həmişə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end(), greater<int>());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "1, 1, 1 rəqəmlərindən ən böyük ədəd qurmaq (greedy, hamısı eyni)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN BÖYÜK ƏDƏDİ qurun (greedy: rəqəmləri azalan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən böyük ədəd.",
+    example: {in:"3\n1 1 1", out:"111"},
+    approach: "Rəqəmlər AZALAN sıraya düzülür və ardıcıl calanır — ən böyük rəqəmi ən soldakı (ən əhəmiyyətli) mövqeyə qoymaq, ədədi həmişə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end(), greater<int>());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "7 rəqəmindən ən böyük ədəd qurmaq (greedy, tək rəqəm)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN BÖYÜK ƏDƏDİ qurun (greedy: rəqəmləri azalan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən böyük ədəd.",
+    example: {in:"1\n7", out:"7"},
+    approach: "Rəqəmlər AZALAN sıraya düzülür və ardıcıl calanır — ən böyük rəqəmi ən soldakı (ən əhəmiyyətli) mövqeyə qoymaq, ədədi həmişə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end(), greater<int>());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "9, 8, 7, 6 rəqəmlərindən ən böyük ədəd qurmaq (greedy, artıq azalan)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN BÖYÜK ƏDƏDİ qurun (greedy: rəqəmləri azalan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən böyük ədəd.",
+    example: {in:"4\n9 8 7 6", out:"9876"},
+    approach: "Rəqəmlər AZALAN sıraya düzülür və ardıcıl calanır — ən böyük rəqəmi ən soldakı (ən əhəmiyyətli) mövqeyə qoymaq, ədədi həmişə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end(), greater<int>());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "0, 0, 5 rəqəmlərindən ən böyük ədəd qurmaq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN BÖYÜK ƏDƏDİ qurun (greedy: rəqəmləri azalan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən böyük ədəd.",
+    example: {in:"3\n0 0 5", out:"500"},
+    approach: "Rəqəmlər AZALAN sıraya düzülür və ardıcıl calanır — ən böyük rəqəmi ən soldakı (ən əhəmiyyətli) mövqeyə qoymaq, ədədi həmişə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end(), greater<int>());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 rəqəmlərindən ən kiçik ədəd qurmaq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN KİÇİK ƏDƏDİ qurun (greedy: rəqəmləri artan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən kiçik ədəd (rəqəm ardıcıllığı kimi, aparıcı sıfırlar saxlanılır).",
+    example: {in:"5\n5 3 8 1 9", out:"13589"},
+    approach: "Rəqəmlər ARTAN sıraya düzülür və ardıcıl calanır — ən kiçik rəqəmi ən soldakı mövqeyə qoymaq, ədədi həmişə minimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "1, 1, 1 rəqəmlərindən ən kiçik ədəd qurmaq (greedy, hamısı eyni)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN KİÇİK ƏDƏDİ qurun (greedy: rəqəmləri artan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən kiçik ədəd (rəqəm ardıcıllığı kimi, aparıcı sıfırlar saxlanılır).",
+    example: {in:"3\n1 1 1", out:"111"},
+    approach: "Rəqəmlər ARTAN sıraya düzülür və ardıcıl calanır — ən kiçik rəqəmi ən soldakı mövqeyə qoymaq, ədədi həmişə minimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "7 rəqəmindən ən kiçik ədəd qurmaq (greedy, tək rəqəm)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN KİÇİK ƏDƏDİ qurun (greedy: rəqəmləri artan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən kiçik ədəd (rəqəm ardıcıllığı kimi, aparıcı sıfırlar saxlanılır).",
+    example: {in:"1\n7", out:"7"},
+    approach: "Rəqəmlər ARTAN sıraya düzülür və ardıcıl calanır — ən kiçik rəqəmi ən soldakı mövqeyə qoymaq, ədədi həmişə minimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4 rəqəmlərindən ən kiçik ədəd qurmaq (greedy, artıq artan)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN KİÇİK ƏDƏDİ qurun (greedy: rəqəmləri artan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən kiçik ədəd (rəqəm ardıcıllığı kimi, aparıcı sıfırlar saxlanılır).",
+    example: {in:"4\n1 2 3 4", out:"1234"},
+    approach: "Rəqəmlər ARTAN sıraya düzülür və ardıcıl calanır — ən kiçik rəqəmi ən soldakı mövqeyə qoymaq, ədədi həmişə minimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "9, 0, 5 rəqəmlərindən ən kiçik ədəd qurmaq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sort"],
+    statement: "N rəqəm (0-9) verilib. Onları bir-birinə calayaraq ƏN KİÇİK ƏDƏDİ qurun (greedy: rəqəmləri artan sıraya düzün).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N rəqəm (0-9, boşluqla ayrılmış).",
+    output: "Qurulan ən kiçik ədəd (rəqəm ardıcıllığı kimi, aparıcı sıfırlar saxlanılır).",
+    example: {in:"3\n9 0 5", out:"059"},
+    approach: "Rəqəmlər ARTAN sıraya düzülür və ardıcıl calanır — ən kiçik rəqəmi ən soldakı mövqeyə qoymaq, ədədi həmişə minimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> d(n);
+    for (int i = 0; i < n; i++) cin >> d[i];
+    sort(d.begin(), d.end());
+    string res;
+    for (int x : d) res += char('0' + x);
+    cout << res << "\\n";
+}`},
+  {
+    title: "7 məbləğini {2,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {2, 1} olan sadə bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"7", out:"4"},
+    approach: "Mümkün qədər çox 2-lik sikkə işlədilir (A/2 ədəd), qalan (A%2, yəni 0 və ya 1) 1-liklə tamamlanır — bu sistem (1-in var olması) HƏR ZAMAN greedy-ni optimal edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    cout << (a / 2 + a % 2) << "\\n";
+}`},
+  {
+    title: "0 məbləğini {2,1} sikkələri ilə minimum sayda ödəmək (greedy, baza hal)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {2, 1} olan sadə bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"0", out:"0"},
+    approach: "Mümkün qədər çox 2-lik sikkə işlədilir (A/2 ədəd), qalan (A%2, yəni 0 və ya 1) 1-liklə tamamlanır — bu sistem (1-in var olması) HƏR ZAMAN greedy-ni optimal edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    cout << (a / 2 + a % 2) << "\\n";
+}`},
+  {
+    title: "10 məbləğini {2,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {2, 1} olan sadə bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"10", out:"5"},
+    approach: "Mümkün qədər çox 2-lik sikkə işlədilir (A/2 ədəd), qalan (A%2, yəni 0 və ya 1) 1-liklə tamamlanır — bu sistem (1-in var olması) HƏR ZAMAN greedy-ni optimal edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    cout << (a / 2 + a % 2) << "\\n";
+}`},
+  {
+    title: "1 məbləğini {2,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {2, 1} olan sadə bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"1", out:"1"},
+    approach: "Mümkün qədər çox 2-lik sikkə işlədilir (A/2 ədəd), qalan (A%2, yəni 0 və ya 1) 1-liklə tamamlanır — bu sistem (1-in var olması) HƏR ZAMAN greedy-ni optimal edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    cout << (a / 2 + a % 2) << "\\n";
+}`},
+  {
+    title: "99 məbləğini {2,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {2, 1} olan sadə bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"99", out:"50"},
+    approach: "Mümkün qədər çox 2-lik sikkə işlədilir (A/2 ədəd), qalan (A%2, yəni 0 və ya 1) 1-liklə tamamlanır — bu sistem (1-in var olması) HƏR ZAMAN greedy-ni optimal edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    cout << (a / 2 + a % 2) << "\\n";
+}`},
+  {
+    title: "2, 3, 1, 1, 4 massivində sona çatmaq mümkündürmü (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "reachability"],
+    statement: "N mövqeli massiv verilib, a[i] həmin mövqedən edilə bilən MAKSİMUM sıçrayış məsafəsidir. 0-cı mövqedən BAŞLAYARAQ SON mövqeyə çatmaq mümkündürmü (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" (çatmaq mümkündür) və ya \"YOX\".",
+    example: {in:"5\n2 3 1 1 4", out:"VAR"},
+    approach: "Soldan sağa gəzilərkən ÇATILA BİLƏN ƏN UZAQ mövqe izlənilir (<b>reach</b>); əgər cari mövqe bu məsafədən KƏNARDADIRSA, oraya çatmaq mümkün deyil — dərhal \"YOX\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int reach = 0;
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        if (i > reach) { ok = false; break; }
+        reach = max(reach, i + a[i]);
+    }
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "3, 2, 1, 0, 4 massivində sona çatmaq mümkündürmü (greedy, mümkün deyil)",
+    difficulty: "mid",
+    tags: ["greedy", "reachability"],
+    statement: "N mövqeli massiv verilib, a[i] həmin mövqedən edilə bilən MAKSİMUM sıçrayış məsafəsidir. 0-cı mövqedən BAŞLAYARAQ SON mövqeyə çatmaq mümkündürmü (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" (çatmaq mümkündür) və ya \"YOX\".",
+    example: {in:"5\n3 2 1 0 4", out:"YOX"},
+    approach: "Soldan sağa gəzilərkən ÇATILA BİLƏN ƏN UZAQ mövqe izlənilir (<b>reach</b>); əgər cari mövqe bu məsafədən KƏNARDADIRSA, oraya çatmaq mümkün deyil — dərhal \"YOX\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int reach = 0;
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        if (i > reach) { ok = false; break; }
+        reach = max(reach, i + a[i]);
+    }
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "0 massivində sona çatmaq mümkündürmü (greedy, tək mövqe)",
+    difficulty: "mid",
+    tags: ["greedy", "reachability"],
+    statement: "N mövqeli massiv verilib, a[i] həmin mövqedən edilə bilən MAKSİMUM sıçrayış məsafəsidir. 0-cı mövqedən BAŞLAYARAQ SON mövqeyə çatmaq mümkündürmü (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" (çatmaq mümkündür) və ya \"YOX\".",
+    example: {in:"1\n0", out:"VAR"},
+    approach: "Soldan sağa gəzilərkən ÇATILA BİLƏN ƏN UZAQ mövqe izlənilir (<b>reach</b>); əgər cari mövqe bu məsafədən KƏNARDADIRSA, oraya çatmaq mümkün deyil — dərhal \"YOX\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int reach = 0;
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        if (i > reach) { ok = false; break; }
+        reach = max(reach, i + a[i]);
+    }
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 massivində sona çatmaq mümkündürmü (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "reachability"],
+    statement: "N mövqeli massiv verilib, a[i] həmin mövqedən edilə bilən MAKSİMUM sıçrayış məsafəsidir. 0-cı mövqedən BAŞLAYARAQ SON mövqeyə çatmaq mümkündürmü (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" (çatmaq mümkündür) və ya \"YOX\".",
+    example: {in:"4\n1 1 1 1", out:"VAR"},
+    approach: "Soldan sağa gəzilərkən ÇATILA BİLƏN ƏN UZAQ mövqe izlənilir (<b>reach</b>); əgər cari mövqe bu məsafədən KƏNARDADIRSA, oraya çatmaq mümkün deyil — dərhal \"YOX\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int reach = 0;
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        if (i > reach) { ok = false; break; }
+        reach = max(reach, i + a[i]);
+    }
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "0, 1 massivində sona çatmaq mümkündürmü (greedy, 0-dan irəli gedə bilmir)",
+    difficulty: "mid",
+    tags: ["greedy", "reachability"],
+    statement: "N mövqeli massiv verilib, a[i] həmin mövqedən edilə bilən MAKSİMUM sıçrayış məsafəsidir. 0-cı mövqedən BAŞLAYARAQ SON mövqeyə çatmaq mümkündürmü (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" (çatmaq mümkündür) və ya \"YOX\".",
+    example: {in:"2\n0 1", out:"YOX"},
+    approach: "Soldan sağa gəzilərkən ÇATILA BİLƏN ƏN UZAQ mövqe izlənilir (<b>reach</b>); əgər cari mövqe bu məsafədən KƏNARDADIRSA, oraya çatmaq mümkün deyil — dərhal \"YOX\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int reach = 0;
+    bool ok = true;
+    for (int i = 0; i < n; i++) {
+        if (i > reach) { ok = false; break; }
+        reach = max(reach, i + a[i]);
+    }
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "2, 3, 1, 1, 4 massivində minimum sıçrayış sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "sıçrayış"],
+    statement: "N mövqeli massiv verilib (həmişə sona çatmaq mümkündür), a[i] həmin mövqedən maksimum sıçrayış məsafəsidir. 0-cı mövqedən SON mövqeyə çatmaq üçün MİNİMUM neçə sıçrayış lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "Minimum sıçrayış sayı.",
+    example: {in:"5\n2 3 1 1 4", out:"2"},
+    approach: "Hər \"addım\" daxilində çatıla bilən ən uzaq mövqe (<b>farthest</b>) izlənilir; cari addımın sərhədinə (<b>curEnd</b>) çatdıqda, YENİ sıçrayış sayılır və sərhəd <b>farthest</b>-ə yenilənir — bu, BFS-in \"qat-qat\" genişlənməsinə bənzəyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int jumps = 0, curEnd = 0, farthest = 0;
+    for (int i = 0; i < n - 1; i++) {
+        farthest = max(farthest, i + a[i]);
+        if (i == curEnd) { jumps++; curEnd = farthest; }
+    }
+    cout << jumps << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 massivində minimum sıçrayış sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "sıçrayış"],
+    statement: "N mövqeli massiv verilib (həmişə sona çatmaq mümkündür), a[i] həmin mövqedən maksimum sıçrayış məsafəsidir. 0-cı mövqedən SON mövqeyə çatmaq üçün MİNİMUM neçə sıçrayış lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "Minimum sıçrayış sayı.",
+    example: {in:"4\n1 1 1 1", out:"3"},
+    approach: "Hər \"addım\" daxilində çatıla bilən ən uzaq mövqe (<b>farthest</b>) izlənilir; cari addımın sərhədinə (<b>curEnd</b>) çatdıqda, YENİ sıçrayış sayılır və sərhəd <b>farthest</b>-ə yenilənir — bu, BFS-in \"qat-qat\" genişlənməsinə bənzəyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int jumps = 0, curEnd = 0, farthest = 0;
+    for (int i = 0; i < n - 1; i++) {
+        farthest = max(farthest, i + a[i]);
+        if (i == curEnd) { jumps++; curEnd = farthest; }
+    }
+    cout << jumps << "\\n";
+}`},
+  {
+    title: "4, 1, 1, 1 massivində minimum sıçrayış sayı (greedy, tək sıçrayış kifayətdir)",
+    difficulty: "mid",
+    tags: ["greedy", "sıçrayış"],
+    statement: "N mövqeli massiv verilib (həmişə sona çatmaq mümkündür), a[i] həmin mövqedən maksimum sıçrayış məsafəsidir. 0-cı mövqedən SON mövqeyə çatmaq üçün MİNİMUM neçə sıçrayış lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "Minimum sıçrayış sayı.",
+    example: {in:"4\n4 1 1 1", out:"1"},
+    approach: "Hər \"addım\" daxilində çatıla bilən ən uzaq mövqe (<b>farthest</b>) izlənilir; cari addımın sərhədinə (<b>curEnd</b>) çatdıqda, YENİ sıçrayış sayılır və sərhəd <b>farthest</b>-ə yenilənir — bu, BFS-in \"qat-qat\" genişlənməsinə bənzəyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int jumps = 0, curEnd = 0, farthest = 0;
+    for (int i = 0; i < n - 1; i++) {
+        farthest = max(farthest, i + a[i]);
+        if (i == curEnd) { jumps++; curEnd = farthest; }
+    }
+    cout << jumps << "\\n";
+}`},
+  {
+    title: "5 massivində minimum sıçrayış sayı (greedy, tək mövqe, sıçrayış lazım deyil)",
+    difficulty: "mid",
+    tags: ["greedy", "sıçrayış"],
+    statement: "N mövqeli massiv verilib (həmişə sona çatmaq mümkündür), a[i] həmin mövqedən maksimum sıçrayış məsafəsidir. 0-cı mövqedən SON mövqeyə çatmaq üçün MİNİMUM neçə sıçrayış lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "Minimum sıçrayış sayı.",
+    example: {in:"1\n5", out:"0"},
+    approach: "Hər \"addım\" daxilində çatıla bilən ən uzaq mövqe (<b>farthest</b>) izlənilir; cari addımın sərhədinə (<b>curEnd</b>) çatdıqda, YENİ sıçrayış sayılır və sərhəd <b>farthest</b>-ə yenilənir — bu, BFS-in \"qat-qat\" genişlənməsinə bənzəyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int jumps = 0, curEnd = 0, farthest = 0;
+    for (int i = 0; i < n - 1; i++) {
+        farthest = max(farthest, i + a[i]);
+        if (i == curEnd) { jumps++; curEnd = farthest; }
+    }
+    cout << jumps << "\\n";
+}`},
+  {
+    title: "2, 1, 1, 1, 1 massivində minimum sıçrayış sayı (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "sıçrayış"],
+    statement: "N mövqeli massiv verilib (həmişə sona çatmaq mümkündür), a[i] həmin mövqedən maksimum sıçrayış məsafəsidir. 0-cı mövqedən SON mövqeyə çatmaq üçün MİNİMUM neçə sıçrayış lazımdır (greedy)?",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "Minimum sıçrayış sayı.",
+    example: {in:"5\n2 1 1 1 1", out:"3"},
+    approach: "Hər \"addım\" daxilində çatıla bilən ən uzaq mövqe (<b>farthest</b>) izlənilir; cari addımın sərhədinə (<b>curEnd</b>) çatdıqda, YENİ sıçrayış sayılır və sərhəd <b>farthest</b>-ə yenilənir — bu, BFS-in \"qat-qat\" genişlənməsinə bənzəyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int jumps = 0, curEnd = 0, farthest = 0;
+    for (int i = 0; i < n - 1; i++) {
+        farthest = max(farthest, i + a[i]);
+        if (i == curEnd) { jumps++; curEnd = farthest; }
+    }
+    cout << jumps << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 qiymətli məhsullardan 10 büdcə ilə maksimum alış (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "büdcə"],
+    statement: "N məhsulun qiyməti və büdcə B verilib. Büdcə daxilində ALINA BİLƏN maksimum sayda məhsulu tapın (greedy: ucuzdan başla).",
+    input: "Birinci sətirdə N və B (1 ≤ N ≤ 1000), ikinci sətirdə N qiymət.",
+    output: "Alına bilən maksimum məhsul sayı.",
+    example: {in:"5 10\n5 3 8 1 9", out:"3"},
+    approach: "Qiymətlər ARTAN sıralanır, ƏN UCUZDAN başlayaraq büdcə kifayət etdikcə alınır — ucuz məhsulları əvvəl almaq HƏMİŞƏ daha çox məhsul almağa imkan verir (ən çox SAY istənildiyi üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; long long b; cin >> n >> b;
+    vector<long long> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+    sort(p.begin(), p.end());
+    int cnt = 0;
+    for (long long x : p) {
+        if (b >= x) { b -= x; cnt++; }
+        else break;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "100, 200 qiymətli məhsullardan 50 büdcə ilə maksimum alış (greedy, heç biri)",
+    difficulty: "easy",
+    tags: ["greedy", "büdcə"],
+    statement: "N məhsulun qiyməti və büdcə B verilib. Büdcə daxilində ALINA BİLƏN maksimum sayda məhsulu tapın (greedy: ucuzdan başla).",
+    input: "Birinci sətirdə N və B (1 ≤ N ≤ 1000), ikinci sətirdə N qiymət.",
+    output: "Alına bilən maksimum məhsul sayı.",
+    example: {in:"2 50\n100 200", out:"0"},
+    approach: "Qiymətlər ARTAN sıralanır, ƏN UCUZDAN başlayaraq büdcə kifayət etdikcə alınır — ucuz məhsulları əvvəl almaq HƏMİŞƏ daha çox məhsul almağa imkan verir (ən çox SAY istənildiyi üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; long long b; cin >> n >> b;
+    vector<long long> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+    sort(p.begin(), p.end());
+    int cnt = 0;
+    for (long long x : p) {
+        if (b >= x) { b -= x; cnt++; }
+        else break;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1, 1, 1 qiymətli məhsullardan 3 büdcə ilə maksimum alış (greedy, hamısı)",
+    difficulty: "easy",
+    tags: ["greedy", "büdcə"],
+    statement: "N məhsulun qiyməti və büdcə B verilib. Büdcə daxilində ALINA BİLƏN maksimum sayda məhsulu tapın (greedy: ucuzdan başla).",
+    input: "Birinci sətirdə N və B (1 ≤ N ≤ 1000), ikinci sətirdə N qiymət.",
+    output: "Alına bilən maksimum məhsul sayı.",
+    example: {in:"3 3\n1 1 1", out:"3"},
+    approach: "Qiymətlər ARTAN sıralanır, ƏN UCUZDAN başlayaraq büdcə kifayət etdikcə alınır — ucuz məhsulları əvvəl almaq HƏMİŞƏ daha çox məhsul almağa imkan verir (ən çox SAY istənildiyi üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; long long b; cin >> n >> b;
+    vector<long long> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+    sort(p.begin(), p.end());
+    int cnt = 0;
+    for (long long x : p) {
+        if (b >= x) { b -= x; cnt++; }
+        else break;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "5 qiymətli məhsuldan 5 büdcə ilə maksimum alış (greedy, tək məhsul)",
+    difficulty: "easy",
+    tags: ["greedy", "büdcə"],
+    statement: "N məhsulun qiyməti və büdcə B verilib. Büdcə daxilində ALINA BİLƏN maksimum sayda məhsulu tapın (greedy: ucuzdan başla).",
+    input: "Birinci sətirdə N və B (1 ≤ N ≤ 1000), ikinci sətirdə N qiymət.",
+    output: "Alına bilən maksimum məhsul sayı.",
+    example: {in:"1 5\n5", out:"1"},
+    approach: "Qiymətlər ARTAN sıralanır, ƏN UCUZDAN başlayaraq büdcə kifayət etdikcə alınır — ucuz məhsulları əvvəl almaq HƏMİŞƏ daha çox məhsul almağa imkan verir (ən çox SAY istənildiyi üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; long long b; cin >> n >> b;
+    vector<long long> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+    sort(p.begin(), p.end());
+    int cnt = 0;
+    for (long long x : p) {
+        if (b >= x) { b -= x; cnt++; }
+        else break;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "2, 4, 6, 8 qiymətli məhsullardan 15 büdcə ilə maksimum alış (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "büdcə"],
+    statement: "N məhsulun qiyməti və büdcə B verilib. Büdcə daxilində ALINA BİLƏN maksimum sayda məhsulu tapın (greedy: ucuzdan başla).",
+    input: "Birinci sətirdə N və B (1 ≤ N ≤ 1000), ikinci sətirdə N qiymət.",
+    output: "Alına bilən maksimum məhsul sayı.",
+    example: {in:"4 15\n2 4 6 8", out:"3"},
+    approach: "Qiymətlər ARTAN sıralanır, ƏN UCUZDAN başlayaraq büdcə kifayət etdikcə alınır — ucuz məhsulları əvvəl almaq HƏMİŞƏ daha çox məhsul almağa imkan verir (ən çox SAY istənildiyi üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; long long b; cin >> n >> b;
+    vector<long long> p(n);
+    for (int i = 0; i < n; i++) cin >> p[i];
+    sort(p.begin(), p.end());
+    int cnt = 0;
+    for (long long x : p) {
+        if (b >= x) { b -= x; cnt++; }
+        else break;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "10 konfeti 3 uşağa paylayanda maksimum fərq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "bölgü"],
+    statement: "N konfet K uşağa MÜMKÜN QƏDƏR BƏRABƏR paylanır (hər uşağa tam ədəd konfet). Ən çox alan uşaqla ən az alan uşaq arasındakı FƏRQİ tapın (greedy: sırayla paylamaq).",
+    input: "Bir sətirdə N və K (1 ≤ K ≤ N ≤ 100000).",
+    output: "Ən çox və ən az alan arasındakı fərq (0 və ya 1).",
+    example: {in:"10 3", out:"1"},
+    approach: "N konfeti K uşağa BƏRABƏR paylasaq, hər uşaq ya <b>N/K</b>-nı (tam bölmə), ya da bir artığını (<b>N/K + 1</b>) alır — N tam bölünürsə fərq 0, bölünmürsə (qalıq varsa) fərq dəqiq 1-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n, k; cin >> n >> k;
+    cout << (n % k == 0 ? 0 : 1) << "\\n";
+}`},
+  {
+    title: "9 konfeti 3 uşağa paylayanda maksimum fərq (greedy, tam bölünür)",
+    difficulty: "easy",
+    tags: ["greedy", "bölgü"],
+    statement: "N konfet K uşağa MÜMKÜN QƏDƏR BƏRABƏR paylanır (hər uşağa tam ədəd konfet). Ən çox alan uşaqla ən az alan uşaq arasındakı FƏRQİ tapın (greedy: sırayla paylamaq).",
+    input: "Bir sətirdə N və K (1 ≤ K ≤ N ≤ 100000).",
+    output: "Ən çox və ən az alan arasındakı fərq (0 və ya 1).",
+    example: {in:"9 3", out:"0"},
+    approach: "N konfeti K uşağa BƏRABƏR paylasaq, hər uşaq ya <b>N/K</b>-nı (tam bölmə), ya da bir artığını (<b>N/K + 1</b>) alır — N tam bölünürsə fərq 0, bölünmürsə (qalıq varsa) fərq dəqiq 1-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n, k; cin >> n >> k;
+    cout << (n % k == 0 ? 0 : 1) << "\\n";
+}`},
+  {
+    title: "1 konfeti 1 uşağa paylayanda maksimum fərq (greedy, tək uşaq)",
+    difficulty: "easy",
+    tags: ["greedy", "bölgü"],
+    statement: "N konfet K uşağa MÜMKÜN QƏDƏR BƏRABƏR paylanır (hər uşağa tam ədəd konfet). Ən çox alan uşaqla ən az alan uşaq arasındakı FƏRQİ tapın (greedy: sırayla paylamaq).",
+    input: "Bir sətirdə N və K (1 ≤ K ≤ N ≤ 100000).",
+    output: "Ən çox və ən az alan arasındakı fərq (0 və ya 1).",
+    example: {in:"1 1", out:"0"},
+    approach: "N konfeti K uşağa BƏRABƏR paylasaq, hər uşaq ya <b>N/K</b>-nı (tam bölmə), ya da bir artığını (<b>N/K + 1</b>) alır — N tam bölünürsə fərq 0, bölünmürsə (qalıq varsa) fərq dəqiq 1-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n, k; cin >> n >> k;
+    cout << (n % k == 0 ? 0 : 1) << "\\n";
+}`},
+  {
+    title: "7 konfeti 7 uşağa paylayanda maksimum fərq (greedy, hərəyə 1)",
+    difficulty: "easy",
+    tags: ["greedy", "bölgü"],
+    statement: "N konfet K uşağa MÜMKÜN QƏDƏR BƏRABƏR paylanır (hər uşağa tam ədəd konfet). Ən çox alan uşaqla ən az alan uşaq arasındakı FƏRQİ tapın (greedy: sırayla paylamaq).",
+    input: "Bir sətirdə N və K (1 ≤ K ≤ N ≤ 100000).",
+    output: "Ən çox və ən az alan arasındakı fərq (0 və ya 1).",
+    example: {in:"7 7", out:"0"},
+    approach: "N konfeti K uşağa BƏRABƏR paylasaq, hər uşaq ya <b>N/K</b>-nı (tam bölmə), ya da bir artığını (<b>N/K + 1</b>) alır — N tam bölünürsə fərq 0, bölünmürsə (qalıq varsa) fərq dəqiq 1-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n, k; cin >> n >> k;
+    cout << (n % k == 0 ? 0 : 1) << "\\n";
+}`},
+  {
+    title: "100 konfeti 9 uşağa paylayanda maksimum fərq (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "bölgü"],
+    statement: "N konfet K uşağa MÜMKÜN QƏDƏR BƏRABƏR paylanır (hər uşağa tam ədəd konfet). Ən çox alan uşaqla ən az alan uşaq arasındakı FƏRQİ tapın (greedy: sırayla paylamaq).",
+    input: "Bir sətirdə N və K (1 ≤ K ≤ N ≤ 100000).",
+    output: "Ən çox və ən az alan arasındakı fərq (0 və ya 1).",
+    example: {in:"100 9", out:"1"},
+    approach: "N konfeti K uşağa BƏRABƏR paylasaq, hər uşaq ya <b>N/K</b>-nı (tam bölmə), ya da bir artığını (<b>N/K + 1</b>) alır — N tam bölünürsə fərq 0, bölünmürsə (qalıq varsa) fərq dəqiq 1-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long n, k; cin >> n >> k;
+    cout << (n % k == 0 ? 0 : 1) << "\\n";
+}`},
+  {
+    title: "1, 4, 3, 2 massivini cütləyib kiçiklərin maksimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN KİÇİK ELEMENTİNİN cəmi MAKSİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin kiçik elementlərinin maksimum mümkün cəmi.",
+    example: {in:"4\n1 4 3 2", out:"4"},
+    approach: "Massiv ARTAN sıraya düzülür və QONŞU elementlər cütlənir (0-1, 2-3, ...) — bu üsulla hər cütün kiçik elementi elə SIRALANMIŞ massivin CÜT İNDEKSLİ (0, 2, 4, ...) elementidir, və bu, kiçiklərin cəmini sübut olunmuş şəkildə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 0; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "6, 2, 6, 5, 1, 2 massivini cütləyib kiçiklərin maksimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN KİÇİK ELEMENTİNİN cəmi MAKSİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin kiçik elementlərinin maksimum mümkün cəmi.",
+    example: {in:"6\n6 2 6 5 1 2", out:"9"},
+    approach: "Massiv ARTAN sıraya düzülür və QONŞU elementlər cütlənir (0-1, 2-3, ...) — bu üsulla hər cütün kiçik elementi elə SIRALANMIŞ massivin CÜT İNDEKSLİ (0, 2, 4, ...) elementidir, və bu, kiçiklərin cəmini sübut olunmuş şəkildə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 0; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 1 massivini cütləyib kiçiklərin maksimum cəmini tapmaq (greedy, tək cüt)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN KİÇİK ELEMENTİNİN cəmi MAKSİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin kiçik elementlərinin maksimum mümkün cəmi.",
+    example: {in:"2\n1 1", out:"1"},
+    approach: "Massiv ARTAN sıraya düzülür və QONŞU elementlər cütlənir (0-1, 2-3, ...) — bu üsulla hər cütün kiçik elementi elə SIRALANMIŞ massivin CÜT İNDEKSLİ (0, 2, 4, ...) elementidir, və bu, kiçiklərin cəmini sübut olunmuş şəkildə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 0; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-1, 4, 1, 0 massivini cütləyib kiçiklərin maksimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN KİÇİK ELEMENTİNİN cəmi MAKSİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin kiçik elementlərinin maksimum mümkün cəmi.",
+    example: {in:"4\n-1 4 1 0", out:"0"},
+    approach: "Massiv ARTAN sıraya düzülür və QONŞU elementlər cütlənir (0-1, 2-3, ...) — bu üsulla hər cütün kiçik elementi elə SIRALANMIŞ massivin CÜT İNDEKSLİ (0, 2, 4, ...) elementidir, və bu, kiçiklərin cəmini sübut olunmuş şəkildə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 0; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5, 6 massivini cütləyib kiçiklərin maksimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN KİÇİK ELEMENTİNİN cəmi MAKSİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin kiçik elementlərinin maksimum mümkün cəmi.",
+    example: {in:"6\n1 2 3 4 5 6", out:"9"},
+    approach: "Massiv ARTAN sıraya düzülür və QONŞU elementlər cütlənir (0-1, 2-3, ...) — bu üsulla hər cütün kiçik elementi elə SIRALANMIŞ massivin CÜT İNDEKSLİ (0, 2, 4, ...) elementidir, və bu, kiçiklərin cəmini sübut olunmuş şəkildə maksimuma çatdırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 0; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 4, 3, 2 massivini cütləyib böyüklərin minimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN BÖYÜK ELEMENTİNİN cəmi MİNİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin böyük elementlərinin minimum mümkün cəmi.",
+    example: {in:"4\n1 4 3 2", out:"6"},
+    approach: "Massiv ARTAN sıraya düzülüb QONŞU elementlər cütlənir — hər cütün böyük elementi sıralanmış massivin TƏK İNDEKSLİ (1, 3, 5, ...) elementidir; qonşuları cütləmək böyüklərin cəmini sübut olunmuş şəkildə minimuma endirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 1; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "6, 2, 6, 5, 1, 2 massivini cütləyib böyüklərin minimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN BÖYÜK ELEMENTİNİN cəmi MİNİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin böyük elementlərinin minimum mümkün cəmi.",
+    example: {in:"6\n6 2 6 5 1 2", out:"13"},
+    approach: "Massiv ARTAN sıraya düzülüb QONŞU elementlər cütlənir — hər cütün böyük elementi sıralanmış massivin TƏK İNDEKSLİ (1, 3, 5, ...) elementidir; qonşuları cütləmək böyüklərin cəmini sübut olunmuş şəkildə minimuma endirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 1; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 1 massivini cütləyib böyüklərin minimum cəmini tapmaq (greedy, tək cüt)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN BÖYÜK ELEMENTİNİN cəmi MİNİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin böyük elementlərinin minimum mümkün cəmi.",
+    example: {in:"2\n1 1", out:"1"},
+    approach: "Massiv ARTAN sıraya düzülüb QONŞU elementlər cütlənir — hər cütün böyük elementi sıralanmış massivin TƏK İNDEKSLİ (1, 3, 5, ...) elementidir; qonşuları cütləmək böyüklərin cəmini sübut olunmuş şəkildə minimuma endirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 1; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-1, 4, 1, 0 massivini cütləyib böyüklərin minimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN BÖYÜK ELEMENTİNİN cəmi MİNİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin böyük elementlərinin minimum mümkün cəmi.",
+    example: {in:"4\n-1 4 1 0", out:"4"},
+    approach: "Massiv ARTAN sıraya düzülüb QONŞU elementlər cütlənir — hər cütün böyük elementi sıralanmış massivin TƏK İNDEKSLİ (1, 3, 5, ...) elementidir; qonşuları cütləmək böyüklərin cəmini sübut olunmuş şəkildə minimuma endirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 1; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5, 6 massivini cütləyib böyüklərin minimum cəmini tapmaq (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "cütlər"],
+    statement: "N (CÜT sayda) ədəd verilib. Onları N/2 cütə bölün ki, HƏR CÜTÜN BÖYÜK ELEMENTİNİN cəmi MİNİMUM olsun (greedy: sırala, qonşuları cütlə).",
+    input: "Birinci sətirdə N (cüt, 2 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cütlərin böyük elementlərinin minimum mümkün cəmi.",
+    example: {in:"6\n1 2 3 4 5 6", out:"12"},
+    approach: "Massiv ARTAN sıraya düzülüb QONŞU elementlər cütlənir — hər cütün böyük elementi sıralanmış massivin TƏK İNDEKSLİ (1, 3, 5, ...) elementidir; qonşuları cütləmək böyüklərin cəmini sübut olunmuş şəkildə minimuma endirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+    long long sum = 0;
+    for (int i = 1; i < n; i += 2) sum += a[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "234 məbləğini {100,10,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 10, 1} olan onluq bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"234", out:"9"},
+    approach: "Sikkələr ONLUQ say sisteminə uyğun olduğu üçün (hər biri əvvəlkinin 10 qatıdır) greedy ƏN BÖYÜKDƏN başlayaraq TAM OPTİMAL nəticə verir — bu, A-nın rəqəmlərinin cəminə bərabərdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 10, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "0 məbləğini {100,10,1} sikkələri ilə minimum sayda ödəmək (greedy, baza hal)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 10, 1} olan onluq bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"0", out:"0"},
+    approach: "Sikkələr ONLUQ say sisteminə uyğun olduğu üçün (hər biri əvvəlkinin 10 qatıdır) greedy ƏN BÖYÜKDƏN başlayaraq TAM OPTİMAL nəticə verir — bu, A-nın rəqəmlərinin cəminə bərabərdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 10, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "999 məbləğini {100,10,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 10, 1} olan onluq bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"999", out:"27"},
+    approach: "Sikkələr ONLUQ say sisteminə uyğun olduğu üçün (hər biri əvvəlkinin 10 qatıdır) greedy ƏN BÖYÜKDƏN başlayaraq TAM OPTİMAL nəticə verir — bu, A-nın rəqəmlərinin cəminə bərabərdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 10, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "100 məbləğini {100,10,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 10, 1} olan onluq bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"100", out:"1"},
+    approach: "Sikkələr ONLUQ say sisteminə uyğun olduğu üçün (hər biri əvvəlkinin 10 qatıdır) greedy ƏN BÖYÜKDƏN başlayaraq TAM OPTİMAL nəticə verir — bu, A-nın rəqəmlərinin cəminə bərabərdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 10, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "7 məbləğini {100,10,1} sikkələri ilə minimum sayda ödəmək (greedy)",
+    difficulty: "easy",
+    tags: ["greedy", "sikkə"],
+    statement: "Sikkə dəyərləri {100, 10, 1} olan onluq bir sistemdə, verilmiş MƏBLƏĞİ minimum sayda sikkə ilə ödəyin (greedy).",
+    input: "Bir tam ədəd A (0 ≤ A ≤ 100000).",
+    output: "Minimum sikkə sayı.",
+    example: {in:"7", out:"7"},
+    approach: "Sikkələr ONLUQ say sisteminə uyğun olduğu üçün (hər biri əvvəlkinin 10 qatıdır) greedy ƏN BÖYÜKDƏN başlayaraq TAM OPTİMAL nəticə verir — bu, A-nın rəqəmlərinin cəminə bərabərdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a; cin >> a;
+    int coins[] = {100, 10, 1};
+    int cnt = 0;
+    for (int c : coins) { cnt += a / c; a %= c; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "[0,5] oblastını (0,3),(2,6) intervalları ilə örtmək üçün min say (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "[0, T] oblastını örtmək üçün N interval verilib (hər biri bu oblastın bir hissəsini örtür). Bütün [0, T]-ni örtmək üçün MİNİMUM NEÇƏ interval lazımdır (greedy)? Həmişə örtmək mümkün olduğu təmin edilib.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum interval sayı.",
+    example: {in:"2 5\n0 3\n2 6", out:"2"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır. Hər addımda, hazırkı ÖRTÜLMÜŞ sərhəddən (<b>covered</b>) BAŞLAYA BİLƏN intervallar arasından ən UZAĞA çatanı seçilir (greedy) — bu, ən az sayda intervalla ən çox sahə örtməyə zəmanət verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int covered = 0, cnt = 0, idx = 0;
+    while (covered < t) {
+        int best = covered;
+        while (idx < n && a[idx].first <= covered) { best = max(best, a[idx].second); idx++; }
+        covered = best;
+        cnt++;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "[0,10] oblastını (0,4),(3,7),(6,10) intervalları ilə örtmək üçün min say (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "[0, T] oblastını örtmək üçün N interval verilib (hər biri bu oblastın bir hissəsini örtür). Bütün [0, T]-ni örtmək üçün MİNİMUM NEÇƏ interval lazımdır (greedy)? Həmişə örtmək mümkün olduğu təmin edilib.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum interval sayı.",
+    example: {in:"3 10\n0 4\n3 7\n6 10", out:"3"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır. Hər addımda, hazırkı ÖRTÜLMÜŞ sərhəddən (<b>covered</b>) BAŞLAYA BİLƏN intervallar arasından ən UZAĞA çatanı seçilir (greedy) — bu, ən az sayda intervalla ən çox sahə örtməyə zəmanət verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int covered = 0, cnt = 0, idx = 0;
+    while (covered < t) {
+        int best = covered;
+        while (idx < n && a[idx].first <= covered) { best = max(best, a[idx].second); idx++; }
+        covered = best;
+        cnt++;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "[0,5] oblastını (0,5) intervalı ilə örtmək üçün min say (greedy, tək interval)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "[0, T] oblastını örtmək üçün N interval verilib (hər biri bu oblastın bir hissəsini örtür). Bütün [0, T]-ni örtmək üçün MİNİMUM NEÇƏ interval lazımdır (greedy)? Həmişə örtmək mümkün olduğu təmin edilib.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum interval sayı.",
+    example: {in:"1 5\n0 5", out:"1"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır. Hər addımda, hazırkı ÖRTÜLMÜŞ sərhəddən (<b>covered</b>) BAŞLAYA BİLƏN intervallar arasından ən UZAĞA çatanı seçilir (greedy) — bu, ən az sayda intervalla ən çox sahə örtməyə zəmanət verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int covered = 0, cnt = 0, idx = 0;
+    while (covered < t) {
+        int best = covered;
+        while (idx < n && a[idx].first <= covered) { best = max(best, a[idx].second); idx++; }
+        covered = best;
+        cnt++;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "[0,3] oblastını (0,1),(1,2),(2,3) intervalları ilə örtmək üçün min say (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "[0, T] oblastını örtmək üçün N interval verilib (hər biri bu oblastın bir hissəsini örtür). Bütün [0, T]-ni örtmək üçün MİNİMUM NEÇƏ interval lazımdır (greedy)? Həmişə örtmək mümkün olduğu təmin edilib.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum interval sayı.",
+    example: {in:"3 3\n0 1\n1 2\n2 3", out:"3"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır. Hər addımda, hazırkı ÖRTÜLMÜŞ sərhəddən (<b>covered</b>) BAŞLAYA BİLƏN intervallar arasından ən UZAĞA çatanı seçilir (greedy) — bu, ən az sayda intervalla ən çox sahə örtməyə zəmanət verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int covered = 0, cnt = 0, idx = 0;
+    while (covered < t) {
+        int best = covered;
+        while (idx < n && a[idx].first <= covered) { best = max(best, a[idx].second); idx++; }
+        covered = best;
+        cnt++;
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "[0,8] oblastını (0,5),(4,8) intervalları ilə örtmək üçün min say (greedy)",
+    difficulty: "mid",
+    tags: ["greedy", "interval"],
+    statement: "[0, T] oblastını örtmək üçün N interval verilib (hər biri bu oblastın bir hissəsini örtür). Bütün [0, T]-ni örtmək üçün MİNİMUM NEÇƏ interval lazımdır (greedy)? Həmişə örtmək mümkün olduğu təmin edilib.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"başlama bitmə\".",
+    output: "Minimum interval sayı.",
+    example: {in:"2 8\n0 5\n4 8", out:"2"},
+    approach: "İntervallar BAŞLAMA vaxtına görə sıralanır. Hər addımda, hazırkı ÖRTÜLMÜŞ sərhəddən (<b>covered</b>) BAŞLAYA BİLƏN intervallar arasından ən UZAĞA çatanı seçilir (greedy) — bu, ən az sayda intervalla ən çox sahə örtməyə zəmanət verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<pair<int,int>> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
+    sort(a.begin(), a.end());
+    int covered = 0, cnt = 0, idx = 0;
+    while (covered < t) {
+        int best = covered;
+        while (idx < n && a[idx].first <= covered) { best = max(best, a[idx].second); idx++; }
+        covered = best;
+        cnt++;
+    }
+    cout << cnt << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/001_fealiyyet_sechimi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/002_fealiyyet_sechimi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/003_fealiyyet_sechimi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/004_fealiyyet_sechimi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/005_fealiyyet_sechimi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/006_sikke_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/007_sikke_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/008_sikke_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/009_sikke_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/010_sikke_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/011_interval_birlesdirme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/012_interval_birlesdirme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/013_interval_birlesdirme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/014_interval_birlesdirme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/015_interval_birlesdirme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/016_qisa_is_once_gozleme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/017_qisa_is_once_gozleme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/018_qisa_is_once_gozleme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/019_qisa_is_once_gozleme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/020_qisa_is_once_gozleme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/021_balon_ox_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/022_balon_ox_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/023_balon_ox_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/024_balon_ox_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/025_balon_ox_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/026_qayiqla_kecirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/027_qayiqla_kecirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/028_qayiqla_kecirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/029_qayiqla_kecirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/030_qayiqla_kecirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/031_tapsiriq_vaxtinda_bitirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/032_tapsiriq_vaxtinda_bitirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/033_tapsiriq_vaxtinda_bitirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/034_tapsiriq_vaxtinda_bitirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/035_tapsiriq_vaxtinda_bitirme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/036_menfi_ededi_cevirme_maks_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/037_menfi_ededi_cevirme_maks_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/038_menfi_ededi_cevirme_maks_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/039_menfi_ededi_cevirme_maks_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/040_menfi_ededi_cevirme_maks_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/041_gorus_otaqlari_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/042_gorus_otaqlari_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/043_gorus_otaqlari_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/044_gorus_otaqlari_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/045_gorus_otaqlari_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/046_en_boyuk_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/047_en_boyuk_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/048_en_boyuk_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/049_en_boyuk_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/050_en_boyuk_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/051_en_kicik_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/052_en_kicik_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/053_en_kicik_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/054_en_kicik_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/055_en_kicik_eded_qurma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/056_sade_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/057_sade_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/058_sade_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/059_sade_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/060_sade_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/061_jump_game_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/062_jump_game_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/063_jump_game_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/064_jump_game_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/065_jump_game_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/066_minimum_sicramalar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/067_minimum_sicramalar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/068_minimum_sicramalar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/069_minimum_sicramalar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/070_minimum_sicramalar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/071_maksimum_pulla_alish.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/072_maksimum_pulla_alish.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/073_maksimum_pulla_alish.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/074_maksimum_pulla_alish.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/075_maksimum_pulla_alish.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/076_qrup_bolme_esit.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/077_qrup_bolme_esit.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/078_qrup_bolme_esit.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/079_qrup_bolme_esit.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/080_qrup_bolme_esit.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/081_cutlerin_min_cemi_maks.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/082_cutlerin_min_cemi_maks.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/083_cutlerin_min_cemi_maks.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/084_cutlerin_min_cemi_maks.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/085_cutlerin_min_cemi_maks.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/086_cutlerin_maks_cemi_min.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/087_cutlerin_maks_cemi_min.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/088_cutlerin_maks_cemi_min.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/089_cutlerin_maks_cemi_min.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/090_cutlerin_maks_cemi_min.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/091_onluq_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/092_onluq_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/093_onluq_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/094_onluq_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/095_onluq_sikke_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/096_intervalla_ortme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/097_intervalla_ortme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/098_intervalla_ortme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/099_intervalla_ortme_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu11/100_intervalla_ortme_sayi.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week11/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

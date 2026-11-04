@@ -1,0 +1,3085 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 12 — Test: Dinamik proqramlaşdırma I (fibonacci, pilləkən, memoization/tabulation)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:65vh; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>12</span> — Test Vərəqi</h1>
+    <p>Mövzu: DP-nin əsas fikri (təkrarlanan alt-məsələlər), Fibonacci/pilləkən ilə giriş, memoization və tabulation, Kadane, sikkə dəfişi, grid yolları. Aşağıdakı 100 məsələ yalnız Mövzu 12-nin mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 12 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "Fibonaccinin 10-cu həddini DP (tabulation) ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) TABULATION (DP cədvəli) ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 60).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"10", out:"55"},
+    approach: "<b>dp[i]</b> massivi F(i)-ni saxlayır. <b>dp[0]=0, dp[1]=1</b>; sonra <b>dp[i]=dp[i-1]+dp[i-2]</b> düsturu ilə AŞAĞIDAN-YUXARI (tabulation) hesablanır — hər təkrarlanan alt-məsələ YALNIZ BİR DƏFƏ hesablanır, rekursiyadan fərqli olaraq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 0; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 0-cı həddini DP ilə tapmaq (baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) TABULATION (DP cədvəli) ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 60).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"0", out:"0"},
+    approach: "<b>dp[i]</b> massivi F(i)-ni saxlayır. <b>dp[0]=0, dp[1]=1</b>; sonra <b>dp[i]=dp[i-1]+dp[i-2]</b> düsturu ilə AŞAĞIDAN-YUXARI (tabulation) hesablanır — hər təkrarlanan alt-məsələ YALNIZ BİR DƏFƏ hesablanır, rekursiyadan fərqli olaraq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 0; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 1-ci həddini DP ilə tapmaq (baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) TABULATION (DP cədvəli) ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 60).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"1", out:"1"},
+    approach: "<b>dp[i]</b> massivi F(i)-ni saxlayır. <b>dp[0]=0, dp[1]=1</b>; sonra <b>dp[i]=dp[i-1]+dp[i-2]</b> düsturu ilə AŞAĞIDAN-YUXARI (tabulation) hesablanır — hər təkrarlanan alt-məsələ YALNIZ BİR DƏFƏ hesablanır, rekursiyadan fərqli olaraq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 0; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 30-cu həddini DP ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) TABULATION (DP cədvəli) ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 60).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"30", out:"832040"},
+    approach: "<b>dp[i]</b> massivi F(i)-ni saxlayır. <b>dp[0]=0, dp[1]=1</b>; sonra <b>dp[i]=dp[i-1]+dp[i-2]</b> düsturu ilə AŞAĞIDAN-YUXARI (tabulation) hesablanır — hər təkrarlanan alt-məsələ YALNIZ BİR DƏFƏ hesablanır, rekursiyadan fərqli olaraq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 0; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 50-ci həddini DP ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) TABULATION (DP cədvəli) ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 60).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"50", out:"12586269025"},
+    approach: "<b>dp[i]</b> massivi F(i)-ni saxlayır. <b>dp[0]=0, dp[1]=1</b>; sonra <b>dp[i]=dp[i-1]+dp[i-2]</b> düsturu ilə AŞAĞIDAN-YUXARI (tabulation) hesablanır — hər təkrarlanan alt-məsələ YALNIZ BİR DƏFƏ hesablanır, rekursiyadan fərqli olaraq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 0; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "5 pilləli pilləkəni 1-2 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1 və ya 2 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"5", out:"8"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım ya 1 pillədən (dp[i-1]), ya da 2 pillədən (dp[i-2]) olduğu üçün <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci ilə EYNİ recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "0 pilləli pilləkəni qalxmağın yol sayı (DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1 və ya 2 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"0", out:"1"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım ya 1 pillədən (dp[i-1]), ya da 2 pillədən (dp[i-2]) olduğu üçün <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci ilə EYNİ recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "1 pilləli pilləkəni qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1 və ya 2 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"1", out:"1"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım ya 1 pillədən (dp[i-1]), ya da 2 pillədən (dp[i-2]) olduğu üçün <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci ilə EYNİ recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "10 pilləli pilləkəni 1-2 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1 və ya 2 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"10", out:"89"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım ya 1 pillədən (dp[i-1]), ya da 2 pillədən (dp[i-2]) olduğu üçün <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci ilə EYNİ recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "20 pilləli pilləkəni 1-2 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1 və ya 2 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"20", out:"10946"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım ya 1 pillədən (dp[i-1]), ya da 2 pillədən (dp[i-2]) olduğu üçün <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci ilə EYNİ recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "4 pilləli pilləkəni 1-2-3 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1, 2 və ya 3 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 40).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"4", out:"7"},
+    approach: "<b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b> — son addım 1, 2 və ya 3 pillədən ola bilər, üç variantın cəmi cari pilləyə çatmağın bütün yollarıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        dp[i] = dp[i-1];
+        if (i >= 2) dp[i] += dp[i-2];
+        if (i >= 3) dp[i] += dp[i-3];
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "0 pilləli pilləkəni qalxmağın yol sayı (DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1, 2 və ya 3 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 40).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"0", out:"1"},
+    approach: "<b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b> — son addım 1, 2 və ya 3 pillədən ola bilər, üç variantın cəmi cari pilləyə çatmağın bütün yollarıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        dp[i] = dp[i-1];
+        if (i >= 2) dp[i] += dp[i-2];
+        if (i >= 3) dp[i] += dp[i-3];
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "1 pilləli pilləkəni qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1, 2 və ya 3 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 40).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"1", out:"1"},
+    approach: "<b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b> — son addım 1, 2 və ya 3 pillədən ola bilər, üç variantın cəmi cari pilləyə çatmağın bütün yollarıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        dp[i] = dp[i-1];
+        if (i >= 2) dp[i] += dp[i-2];
+        if (i >= 3) dp[i] += dp[i-3];
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "7 pilləli pilləkəni 1-2-3 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1, 2 və ya 3 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 40).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"7", out:"44"},
+    approach: "<b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b> — son addım 1, 2 və ya 3 pillədən ola bilər, üç variantın cəmi cari pilləyə çatmağın bütün yollarıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        dp[i] = dp[i-1];
+        if (i >= 2) dp[i] += dp[i-2];
+        if (i >= 3) dp[i] += dp[i-3];
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "15 pilləli pilləkəni 1-2-3 addımla qalxmağın yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib. Hər addımda 1, 2 və ya 3 pillə qalxmaq olar. Zirvəyə çatmağın NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 40).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"15", out:"5768"},
+    approach: "<b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b> — son addım 1, 2 və ya 3 pillədən ola bilər, üç variantın cəmi cari pilləyə çatmağın bütün yollarıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        dp[i] = dp[i-1];
+        if (i >= 2) dp[i] += dp[i-2];
+        if (i >= 3) dp[i] += dp[i-3];
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "10, 15, 20 xərcli pilləkəndə minimum xərc (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillənin XƏRCİ var. 0-cı və ya 1-ci pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq (pilləyə çatanda onun xərci ödənilir) zirvədən (N-ci pillədən) kənara çıxmaq üçün MİNİMUM ümumi xərci DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xərc.",
+    output: "Zirvəyə çatmaq üçün minimum ümumi xərc.",
+    example: {in:"3\n10 15 20", out:"15"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın minimum xərci. <b>dp[i] = cost[i] + min(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlinir, HANSI UCUZDURSA o seçilir. Son cavab <b>min(dp[n-1], dp[n-2])</b>-dir (zirvənin özündə xərc yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> cost(n);
+    for (int i = 0; i < n; i++) cin >> cost[i];
+    vector<long long> dp(n);
+    dp[0] = cost[0];
+    if (n > 1) dp[1] = cost[1];
+    for (int i = 2; i < n; i++) dp[i] = cost[i] + min(dp[i-1], dp[i-2]);
+    if (n == 1) cout << dp[0] << "\\n";
+    else cout << min(dp[n-1], dp[n-2]) << "\\n";
+}`},
+  {
+    title: "1, 100, 1, 1, 1, 100, 1, 1, 100, 1 xərcli pilləkəndə minimum xərc (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillənin XƏRCİ var. 0-cı və ya 1-ci pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq (pilləyə çatanda onun xərci ödənilir) zirvədən (N-ci pillədən) kənara çıxmaq üçün MİNİMUM ümumi xərci DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xərc.",
+    output: "Zirvəyə çatmaq üçün minimum ümumi xərc.",
+    example: {in:"10\n1 100 1 1 1 100 1 1 100 1", out:"6"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın minimum xərci. <b>dp[i] = cost[i] + min(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlinir, HANSI UCUZDURSA o seçilir. Son cavab <b>min(dp[n-1], dp[n-2])</b>-dir (zirvənin özündə xərc yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> cost(n);
+    for (int i = 0; i < n; i++) cin >> cost[i];
+    vector<long long> dp(n);
+    dp[0] = cost[0];
+    if (n > 1) dp[1] = cost[1];
+    for (int i = 2; i < n; i++) dp[i] = cost[i] + min(dp[i-1], dp[i-2]);
+    if (n == 1) cout << dp[0] << "\\n";
+    else cout << min(dp[n-1], dp[n-2]) << "\\n";
+}`},
+  {
+    title: "5, 5 xərcli pilləkəndə minimum xərc (DP, iki pillə)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillənin XƏRCİ var. 0-cı və ya 1-ci pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq (pilləyə çatanda onun xərci ödənilir) zirvədən (N-ci pillədən) kənara çıxmaq üçün MİNİMUM ümumi xərci DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xərc.",
+    output: "Zirvəyə çatmaq üçün minimum ümumi xərc.",
+    example: {in:"2\n5 5", out:"5"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın minimum xərci. <b>dp[i] = cost[i] + min(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlinir, HANSI UCUZDURSA o seçilir. Son cavab <b>min(dp[n-1], dp[n-2])</b>-dir (zirvənin özündə xərc yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> cost(n);
+    for (int i = 0; i < n; i++) cin >> cost[i];
+    vector<long long> dp(n);
+    dp[0] = cost[0];
+    if (n > 1) dp[1] = cost[1];
+    for (int i = 2; i < n; i++) dp[i] = cost[i] + min(dp[i-1], dp[i-2]);
+    if (n == 1) cout << dp[0] << "\\n";
+    else cout << min(dp[n-1], dp[n-2]) << "\\n";
+}`},
+  {
+    title: "7 xərcli pilləkəndə minimum xərc (DP, tək pillə)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillənin XƏRCİ var. 0-cı və ya 1-ci pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq (pilləyə çatanda onun xərci ödənilir) zirvədən (N-ci pillədən) kənara çıxmaq üçün MİNİMUM ümumi xərci DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xərc.",
+    output: "Zirvəyə çatmaq üçün minimum ümumi xərc.",
+    example: {in:"1\n7", out:"7"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın minimum xərci. <b>dp[i] = cost[i] + min(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlinir, HANSI UCUZDURSA o seçilir. Son cavab <b>min(dp[n-1], dp[n-2])</b>-dir (zirvənin özündə xərc yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> cost(n);
+    for (int i = 0; i < n; i++) cin >> cost[i];
+    vector<long long> dp(n);
+    dp[0] = cost[0];
+    if (n > 1) dp[1] = cost[1];
+    for (int i = 2; i < n; i++) dp[i] = cost[i] + min(dp[i-1], dp[i-2]);
+    if (n == 1) cout << dp[0] << "\\n";
+    else cout << min(dp[n-1], dp[n-2]) << "\\n";
+}`},
+  {
+    title: "0, 0, 0, 0 xərcli pilləkəndə minimum xərc (DP, hamısı sıfır)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillənin XƏRCİ var. 0-cı və ya 1-ci pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq (pilləyə çatanda onun xərci ödənilir) zirvədən (N-ci pillədən) kənara çıxmaq üçün MİNİMUM ümumi xərci DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xərc.",
+    output: "Zirvəyə çatmaq üçün minimum ümumi xərc.",
+    example: {in:"4\n0 0 0 0", out:"0"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın minimum xərci. <b>dp[i] = cost[i] + min(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlinir, HANSI UCUZDURSA o seçilir. Son cavab <b>min(dp[n-1], dp[n-2])</b>-dir (zirvənin özündə xərc yoxdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> cost(n);
+    for (int i = 0; i < n; i++) cin >> cost[i];
+    vector<long long> dp(n);
+    dp[0] = cost[0];
+    if (n > 1) dp[1] = cost[1];
+    for (int i = 2; i < n; i++) dp[i] = cost[i] + min(dp[i-1], dp[i-2]);
+    if (n == 1) cout << dp[0] << "\\n";
+    else cout << min(dp[n-1], dp[n-2]) << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 1 evlərindən DP ilə maksimum pul toplamaq",
+    difficulty: "mid",
+    tags: ["dp", "ev oğrusu"],
+    statement: "N ev bir cərgədə düzülüb, hər evdə müəyyən məbləğ pul var. Oğru QONŞU İKİ EVİ ARDICIL SOYA BİLMƏZ (siqnalizasiya işə düşər). DP ilə oğrunun toplaya biləcəyi MAKSİMUM pulu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N məbləğ.",
+    output: "Toplana bilən maksimum pul.",
+    example: {in:"4\n1 2 3 1", out:"4"},
+    approach: "<b>dp[i]</b> = ilk i evdən toplana bilən maksimum pul. Hər ev üçün İKİ seçim var: i-ci evi SOYMA (dp[i-1]) və ya SOY (a[i] + dp[i-2], çünki qonşu ev soyula bilməz) — <b>dp[i] = max(dp[i-1], a[i] + dp[i-2])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n + 1, 0);
+    for (int i = 0; i < n; i++) {
+        long long take = a[i] + (i >= 1 ? dp[i-1] : 0);
+        dp[i+1] = max(dp[i], take);
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "2, 7, 9, 3, 1 evlərindən DP ilə maksimum pul toplamaq",
+    difficulty: "mid",
+    tags: ["dp", "ev oğrusu"],
+    statement: "N ev bir cərgədə düzülüb, hər evdə müəyyən məbləğ pul var. Oğru QONŞU İKİ EVİ ARDICIL SOYA BİLMƏZ (siqnalizasiya işə düşər). DP ilə oğrunun toplaya biləcəyi MAKSİMUM pulu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N məbləğ.",
+    output: "Toplana bilən maksimum pul.",
+    example: {in:"5\n2 7 9 3 1", out:"12"},
+    approach: "<b>dp[i]</b> = ilk i evdən toplana bilən maksimum pul. Hər ev üçün İKİ seçim var: i-ci evi SOYMA (dp[i-1]) və ya SOY (a[i] + dp[i-2], çünki qonşu ev soyula bilməz) — <b>dp[i] = max(dp[i-1], a[i] + dp[i-2])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n + 1, 0);
+    for (int i = 0; i < n; i++) {
+        long long take = a[i] + (i >= 1 ? dp[i-1] : 0);
+        dp[i+1] = max(dp[i], take);
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Boş ev siyahısından DP ilə maksimum pul toplamaq (baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "ev oğrusu"],
+    statement: "N ev bir cərgədə düzülüb, hər evdə müəyyən məbləğ pul var. Oğru QONŞU İKİ EVİ ARDICIL SOYA BİLMƏZ (siqnalizasiya işə düşər). DP ilə oğrunun toplaya biləcəyi MAKSİMUM pulu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N məbləğ.",
+    output: "Toplana bilən maksimum pul.",
+    example: {in:"0", out:"0"},
+    approach: "<b>dp[i]</b> = ilk i evdən toplana bilən maksimum pul. Hər ev üçün İKİ seçim var: i-ci evi SOYMA (dp[i-1]) və ya SOY (a[i] + dp[i-2], çünki qonşu ev soyula bilməz) — <b>dp[i] = max(dp[i-1], a[i] + dp[i-2])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n + 1, 0);
+    for (int i = 0; i < n; i++) {
+        long long take = a[i] + (i >= 1 ? dp[i-1] : 0);
+        dp[i+1] = max(dp[i], take);
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "5 evindən DP ilə maksimum pul toplamaq (tək ev)",
+    difficulty: "mid",
+    tags: ["dp", "ev oğrusu"],
+    statement: "N ev bir cərgədə düzülüb, hər evdə müəyyən məbləğ pul var. Oğru QONŞU İKİ EVİ ARDICIL SOYA BİLMƏZ (siqnalizasiya işə düşər). DP ilə oğrunun toplaya biləcəyi MAKSİMUM pulu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N məbləğ.",
+    output: "Toplana bilən maksimum pul.",
+    example: {in:"1\n5", out:"5"},
+    approach: "<b>dp[i]</b> = ilk i evdən toplana bilən maksimum pul. Hər ev üçün İKİ seçim var: i-ci evi SOYMA (dp[i-1]) və ya SOY (a[i] + dp[i-2], çünki qonşu ev soyula bilməz) — <b>dp[i] = max(dp[i-1], a[i] + dp[i-2])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n + 1, 0);
+    for (int i = 0; i < n; i++) {
+        long long take = a[i] + (i >= 1 ? dp[i-1] : 0);
+        dp[i+1] = max(dp[i], take);
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "5, 5, 10, 100, 10, 5 evlərindən DP ilə maksimum pul toplamaq",
+    difficulty: "mid",
+    tags: ["dp", "ev oğrusu"],
+    statement: "N ev bir cərgədə düzülüb, hər evdə müəyyən məbləğ pul var. Oğru QONŞU İKİ EVİ ARDICIL SOYA BİLMƏZ (siqnalizasiya işə düşər). DP ilə oğrunun toplaya biləcəyi MAKSİMUM pulu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N məbləğ.",
+    output: "Toplana bilən maksimum pul.",
+    example: {in:"6\n5 5 10 100 10 5", out:"110"},
+    approach: "<b>dp[i]</b> = ilk i evdən toplana bilən maksimum pul. Hər ev üçün İKİ seçim var: i-ci evi SOYMA (dp[i-1]) və ya SOY (a[i] + dp[i-2], çünki qonşu ev soyula bilməz) — <b>dp[i] = max(dp[i-1], a[i] + dp[i-2])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n + 1, 0);
+    for (int i = 0; i < n; i++) {
+        long long take = a[i] + (i >= 1 ? dp[i-1] : 0);
+        dp[i+1] = max(dp[i], take);
+    }
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "10, 9, 2, 5, 3, 7, 101, 18 massivinin ən uzun artan alt-ardıcıllığı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LIS"],
+    statement: "N ədəd verilib. Ən uzun ARTAN alt-ardıcıllığın (elementlər ardıcıl olmaya bilər) uzunluğunu DP (O(N²)) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+    example: {in:"8\n10 9 2 5 3 7 101 18", out:"4"},
+    approach: "<b>dp[i]</b> = a[i]-lə BİTƏN ən uzun artan alt-ardıcıllığın uzunluğu. Hər i üçün ƏVVƏLKİ bütün j&lt;i yoxlanılır: a[j]&lt;a[i]-dirsə <b>dp[i] = max(dp[i], dp[j]+1)</b>. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<int> dp(n, 1);
+    int best = n > 0 ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+        best = max(best, dp[i]);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "5, 4, 3, 2, 1 massivinin ən uzun artan alt-ardıcıllığı (DP, tam azalan)",
+    difficulty: "mid",
+    tags: ["dp", "LIS"],
+    statement: "N ədəd verilib. Ən uzun ARTAN alt-ardıcıllığın (elementlər ardıcıl olmaya bilər) uzunluğunu DP (O(N²)) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+    example: {in:"5\n5 4 3 2 1", out:"1"},
+    approach: "<b>dp[i]</b> = a[i]-lə BİTƏN ən uzun artan alt-ardıcıllığın uzunluğu. Hər i üçün ƏVVƏLKİ bütün j&lt;i yoxlanılır: a[j]&lt;a[i]-dirsə <b>dp[i] = max(dp[i], dp[j]+1)</b>. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<int> dp(n, 1);
+    int best = n > 0 ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+        best = max(best, dp[i]);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5 massivinin ən uzun artan alt-ardıcıllığı (DP, tam artan)",
+    difficulty: "mid",
+    tags: ["dp", "LIS"],
+    statement: "N ədəd verilib. Ən uzun ARTAN alt-ardıcıllığın (elementlər ardıcıl olmaya bilər) uzunluğunu DP (O(N²)) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+    example: {in:"5\n1 2 3 4 5", out:"5"},
+    approach: "<b>dp[i]</b> = a[i]-lə BİTƏN ən uzun artan alt-ardıcıllığın uzunluğu. Hər i üçün ƏVVƏLKİ bütün j&lt;i yoxlanılır: a[j]&lt;a[i]-dirsə <b>dp[i] = max(dp[i], dp[j]+1)</b>. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<int> dp(n, 1);
+    int best = n > 0 ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+        best = max(best, dp[i]);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "7 massivinin ən uzun artan alt-ardıcıllığı (DP, tək element)",
+    difficulty: "mid",
+    tags: ["dp", "LIS"],
+    statement: "N ədəd verilib. Ən uzun ARTAN alt-ardıcıllığın (elementlər ardıcıl olmaya bilər) uzunluğunu DP (O(N²)) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+    example: {in:"1\n7", out:"1"},
+    approach: "<b>dp[i]</b> = a[i]-lə BİTƏN ən uzun artan alt-ardıcıllığın uzunluğu. Hər i üçün ƏVVƏLKİ bütün j&lt;i yoxlanılır: a[j]&lt;a[i]-dirsə <b>dp[i] = max(dp[i], dp[j]+1)</b>. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<int> dp(n, 1);
+    int best = n > 0 ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+        best = max(best, dp[i]);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "3, 3, 3, 3 massivinin ən uzun artan alt-ardıcıllığı (DP, hamısı bərabər)",
+    difficulty: "mid",
+    tags: ["dp", "LIS"],
+    statement: "N ədəd verilib. Ən uzun ARTAN alt-ardıcıllığın (elementlər ardıcıl olmaya bilər) uzunluğunu DP (O(N²)) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən uzun artan alt-ardıcıllığın uzunluğu.",
+    example: {in:"4\n3 3 3 3", out:"1"},
+    approach: "<b>dp[i]</b> = a[i]-lə BİTƏN ən uzun artan alt-ardıcıllığın uzunluğu. Hər i üçün ƏVVƏLKİ bütün j&lt;i yoxlanılır: a[j]&lt;a[i]-dirsə <b>dp[i] = max(dp[i], dp[j]+1)</b>. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<int> dp(n, 1);
+    int best = n > 0 ? 1 : 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < i; j++) {
+            if (a[j] < a[i]) dp[i] = max(dp[i], dp[j] + 1);
+        }
+        best = max(best, dp[i]);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "-2, 1, -3, 4, -1, 2, 1, -5, 4 massivinin maksimum ardıcıl cəmi (Kadane, DP)",
+    difficulty: "mid",
+    tags: ["dp", "kadane"],
+    statement: "N ədəd verilib (mənfi ola bilər). ARDICIL (boş olmayan) alt-massivin MAKSİMUM cəmini DP (Kadane alqoritmi) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Maksimum ardıcıl alt-massiv cəmi.",
+    example: {in:"9\n-2 1 -3 4 -1 2 1 -5 4", out:"6"},
+    approach: "<b>cur</b> = a[i]-lə BİTƏN maksimum ardıcıl cəm. <b>cur = max(a[i], cur + a[i])</b> — əvvəlki cəm MƏNFİ töhfə verirsə (cur&lt;0), yenidən a[i]-dən başlamaq daha yaxşıdır. <b>best</b> bütün <b>cur</b> dəyərlərinin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long cur = a[0], best = a[0];
+    for (int i = 1; i < n; i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "-1, -2, -3 massivinin maksimum ardıcıl cəmi (Kadane, DP, hamısı mənfi)",
+    difficulty: "mid",
+    tags: ["dp", "kadane"],
+    statement: "N ədəd verilib (mənfi ola bilər). ARDICIL (boş olmayan) alt-massivin MAKSİMUM cəmini DP (Kadane alqoritmi) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Maksimum ardıcıl alt-massiv cəmi.",
+    example: {in:"3\n-1 -2 -3", out:"-1"},
+    approach: "<b>cur</b> = a[i]-lə BİTƏN maksimum ardıcıl cəm. <b>cur = max(a[i], cur + a[i])</b> — əvvəlki cəm MƏNFİ töhfə verirsə (cur&lt;0), yenidən a[i]-dən başlamaq daha yaxşıdır. <b>best</b> bütün <b>cur</b> dəyərlərinin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long cur = a[0], best = a[0];
+    for (int i = 1; i < n; i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "5 massivinin maksimum ardıcıl cəmi (Kadane, DP, tək element)",
+    difficulty: "mid",
+    tags: ["dp", "kadane"],
+    statement: "N ədəd verilib (mənfi ola bilər). ARDICIL (boş olmayan) alt-massivin MAKSİMUM cəmini DP (Kadane alqoritmi) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Maksimum ardıcıl alt-massiv cəmi.",
+    example: {in:"1\n5", out:"5"},
+    approach: "<b>cur</b> = a[i]-lə BİTƏN maksimum ardıcıl cəm. <b>cur = max(a[i], cur + a[i])</b> — əvvəlki cəm MƏNFİ töhfə verirsə (cur&lt;0), yenidən a[i]-dən başlamaq daha yaxşıdır. <b>best</b> bütün <b>cur</b> dəyərlərinin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long cur = a[0], best = a[0];
+    for (int i = 1; i < n; i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4 massivinin maksimum ardıcıl cəmi (Kadane, DP, hamısı müsbət)",
+    difficulty: "mid",
+    tags: ["dp", "kadane"],
+    statement: "N ədəd verilib (mənfi ola bilər). ARDICIL (boş olmayan) alt-massivin MAKSİMUM cəmini DP (Kadane alqoritmi) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Maksimum ardıcıl alt-massiv cəmi.",
+    example: {in:"4\n1 2 3 4", out:"10"},
+    approach: "<b>cur</b> = a[i]-lə BİTƏN maksimum ardıcıl cəm. <b>cur = max(a[i], cur + a[i])</b> — əvvəlki cəm MƏNFİ töhfə verirsə (cur&lt;0), yenidən a[i]-dən başlamaq daha yaxşıdır. <b>best</b> bütün <b>cur</b> dəyərlərinin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long cur = a[0], best = a[0];
+    for (int i = 1; i < n; i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "5, -3, 5 massivinin maksimum ardıcıl cəmi (Kadane, DP)",
+    difficulty: "mid",
+    tags: ["dp", "kadane"],
+    statement: "N ədəd verilib (mənfi ola bilər). ARDICIL (boş olmayan) alt-massivin MAKSİMUM cəmini DP (Kadane alqoritmi) ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Maksimum ardıcıl alt-massiv cəmi.",
+    example: {in:"3\n5 -3 5", out:"7"},
+    approach: "<b>cur</b> = a[i]-lə BİTƏN maksimum ardıcıl cəm. <b>cur = max(a[i], cur + a[i])</b> — əvvəlki cəm MƏNFİ töhfə verirsə (cur&lt;0), yenidən a[i]-dən başlamaq daha yaxşıdır. <b>best</b> bütün <b>cur</b> dəyərlərinin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    long long cur = a[0], best = a[0];
+    for (int i = 1; i < n; i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "{1,3,4} sikkələri ilə 6 məbləğini minimum sikkə ilə ödəmək (DP, qeyri-kanonik)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. MİNİMUM sayda sikkə ilə dəqiq T məbləğini ödəyin (DP — sikkə sistemi KANONİK olmaya bilər, greedy işləməyə bilər). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N (sikkə növü sayı) və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Minimum sikkə sayı, ya da -1.",
+    example: {in:"3 6\n1 3 4", out:"2"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmək üçün minimum sikkə sayı. <b>dp[0]=0</b>; hər məbləğ s üçün, hər sikkə c üçün (c ≤ s) <b>dp[s] = min(dp[s], dp[s-c]+1)</b>. Bu, bütün kombinasiyaları (greedy-dən fərqli olaraq) nəzərə alır, ona görə KANONİK OLMAYAN sistemlərdə də DOĞRU nəticə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<int> dp(t + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= t; s++)
+        for (int x : c)
+            if (x <= s) dp[s] = min(dp[s], dp[s-x] + 1);
+    cout << (dp[t] >= INT_MAX / 2 ? -1 : dp[t]) << "\\n";
+}`},
+  {
+    title: "{2} sikkəsi ilə 3 məbləğini ödəmək (DP, mümkün deyil)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. MİNİMUM sayda sikkə ilə dəqiq T məbləğini ödəyin (DP — sikkə sistemi KANONİK olmaya bilər, greedy işləməyə bilər). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N (sikkə növü sayı) və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Minimum sikkə sayı, ya da -1.",
+    example: {in:"1 3\n2", out:"-1"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmək üçün minimum sikkə sayı. <b>dp[0]=0</b>; hər məbləğ s üçün, hər sikkə c üçün (c ≤ s) <b>dp[s] = min(dp[s], dp[s-c]+1)</b>. Bu, bütün kombinasiyaları (greedy-dən fərqli olaraq) nəzərə alır, ona görə KANONİK OLMAYAN sistemlərdə də DOĞRU nəticə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<int> dp(t + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= t; s++)
+        for (int x : c)
+            if (x <= s) dp[s] = min(dp[s], dp[s-x] + 1);
+    cout << (dp[t] >= INT_MAX / 2 ? -1 : dp[t]) << "\\n";
+}`},
+  {
+    title: "{1} sikkəsi ilə 0 məbləğini ödəmək (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. MİNİMUM sayda sikkə ilə dəqiq T məbləğini ödəyin (DP — sikkə sistemi KANONİK olmaya bilər, greedy işləməyə bilər). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N (sikkə növü sayı) və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Minimum sikkə sayı, ya da -1.",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmək üçün minimum sikkə sayı. <b>dp[0]=0</b>; hər məbləğ s üçün, hər sikkə c üçün (c ≤ s) <b>dp[s] = min(dp[s], dp[s-c]+1)</b>. Bu, bütün kombinasiyaları (greedy-dən fərqli olaraq) nəzərə alır, ona görə KANONİK OLMAYAN sistemlərdə də DOĞRU nəticə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<int> dp(t + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= t; s++)
+        for (int x : c)
+            if (x <= s) dp[s] = min(dp[s], dp[s-x] + 1);
+    cout << (dp[t] >= INT_MAX / 2 ? -1 : dp[t]) << "\\n";
+}`},
+  {
+    title: "{1,5,10} sikkələri ilə 23 məbləğini minimum sikkə ilə ödəmək (DP)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. MİNİMUM sayda sikkə ilə dəqiq T məbləğini ödəyin (DP — sikkə sistemi KANONİK olmaya bilər, greedy işləməyə bilər). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N (sikkə növü sayı) və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Minimum sikkə sayı, ya da -1.",
+    example: {in:"3 23\n1 5 10", out:"5"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmək üçün minimum sikkə sayı. <b>dp[0]=0</b>; hər məbləğ s üçün, hər sikkə c üçün (c ≤ s) <b>dp[s] = min(dp[s], dp[s-c]+1)</b>. Bu, bütün kombinasiyaları (greedy-dən fərqli olaraq) nəzərə alır, ona görə KANONİK OLMAYAN sistemlərdə də DOĞRU nəticə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<int> dp(t + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= t; s++)
+        for (int x : c)
+            if (x <= s) dp[s] = min(dp[s], dp[s-x] + 1);
+    cout << (dp[t] >= INT_MAX / 2 ? -1 : dp[t]) << "\\n";
+}`},
+  {
+    title: "{5} sikkəsi ilə 5 məbləğini ödəmək (DP, tək sikkə)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. MİNİMUM sayda sikkə ilə dəqiq T məbləğini ödəyin (DP — sikkə sistemi KANONİK olmaya bilər, greedy işləməyə bilər). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N (sikkə növü sayı) və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Minimum sikkə sayı, ya da -1.",
+    example: {in:"1 5\n5", out:"1"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmək üçün minimum sikkə sayı. <b>dp[0]=0</b>; hər məbləğ s üçün, hər sikkə c üçün (c ≤ s) <b>dp[s] = min(dp[s], dp[s-c]+1)</b>. Bu, bütün kombinasiyaları (greedy-dən fərqli olaraq) nəzərə alır, ona görə KANONİK OLMAYAN sistemlərdə də DOĞRU nəticə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<int> dp(t + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= t; s++)
+        for (int x : c)
+            if (x <= s) dp[s] = min(dp[s], dp[s-x] + 1);
+    cout << (dp[t] >= INT_MAX / 2 ? -1 : dp[t]) << "\\n";
+}`},
+  {
+    title: "{1,2,5} sikkələri ilə 5 məbləğini ödəməyin yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. T məbləğini ödəməyin NEÇƏ FƏRQLİ (sıra fərq etmir) yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə N və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Fərqli ödəmə yollarının sayı.",
+    example: {in:"3 5\n1 2 5", out:"4"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmənin yol sayı. Hər SİKKƏ növü AYRI-AYRI (xarici dövr) işlənir, hər sikkə üçün məbləğlər ARTAN sırada yenilənir: <b>dp[s] += dp[s-c]</b> — sikkələri XARİCİ dövrdə gəzmək, {1,2} və {2,1} kimi EYNİ kombinasiyaların İKİ DƏFƏ sayılmasının qarşısını alır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<long long> dp(t + 1, 0);
+    dp[0] = 1;
+    for (int x : c)
+        for (int s = x; s <= t; s++)
+            dp[s] += dp[s-x];
+    cout << dp[t] << "\\n";
+}`},
+  {
+    title: "{2} sikkəsi ilə 3 məbləğini ödəməyin yol sayı (DP, mümkün deyil)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. T məbləğini ödəməyin NEÇƏ FƏRQLİ (sıra fərq etmir) yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə N və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Fərqli ödəmə yollarının sayı.",
+    example: {in:"1 3\n2", out:"0"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmənin yol sayı. Hər SİKKƏ növü AYRI-AYRI (xarici dövr) işlənir, hər sikkə üçün məbləğlər ARTAN sırada yenilənir: <b>dp[s] += dp[s-c]</b> — sikkələri XARİCİ dövrdə gəzmək, {1,2} və {2,1} kimi EYNİ kombinasiyaların İKİ DƏFƏ sayılmasının qarşısını alır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<long long> dp(t + 1, 0);
+    dp[0] = 1;
+    for (int x : c)
+        for (int s = x; s <= t; s++)
+            dp[s] += dp[s-x];
+    cout << dp[t] << "\\n";
+}`},
+  {
+    title: "{1} sikkəsi ilə 0 məbləğini ödəməyin yol sayı (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. T məbləğini ödəməyin NEÇƏ FƏRQLİ (sıra fərq etmir) yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə N və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Fərqli ödəmə yollarının sayı.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmənin yol sayı. Hər SİKKƏ növü AYRI-AYRI (xarici dövr) işlənir, hər sikkə üçün məbləğlər ARTAN sırada yenilənir: <b>dp[s] += dp[s-c]</b> — sikkələri XARİCİ dövrdə gəzmək, {1,2} və {2,1} kimi EYNİ kombinasiyaların İKİ DƏFƏ sayılmasının qarşısını alır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<long long> dp(t + 1, 0);
+    dp[0] = 1;
+    for (int x : c)
+        for (int s = x; s <= t; s++)
+            dp[s] += dp[s-x];
+    cout << dp[t] << "\\n";
+}`},
+  {
+    title: "{1,2} sikkələri ilə 4 məbləğini ödəməyin yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. T məbləğini ödəməyin NEÇƏ FƏRQLİ (sıra fərq etmir) yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə N və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Fərqli ödəmə yollarının sayı.",
+    example: {in:"2 4\n1 2", out:"3"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmənin yol sayı. Hər SİKKƏ növü AYRI-AYRI (xarici dövr) işlənir, hər sikkə üçün məbləğlər ARTAN sırada yenilənir: <b>dp[s] += dp[s-c]</b> — sikkələri XARİCİ dövrdə gəzmək, {1,2} və {2,1} kimi EYNİ kombinasiyaların İKİ DƏFƏ sayılmasının qarşısını alır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<long long> dp(t + 1, 0);
+    dp[0] = 1;
+    for (int x : c)
+        for (int s = x; s <= t; s++)
+            dp[s] += dp[s-x];
+    cout << dp[t] << "\\n";
+}`},
+  {
+    title: "{1,5,10} sikkələri ilə 12 məbləğini ödəməyin yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "sikkə"],
+    statement: "Sikkə dəyərləri və hədəf məbləğ T verilib. T məbləğini ödəməyin NEÇƏ FƏRQLİ (sıra fərq etmir) yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə N və T, ikinci sətirdə N sikkə dəyəri.",
+    output: "Fərqli ödəmə yollarının sayı.",
+    example: {in:"3 12\n1 5 10", out:"4"},
+    approach: "<b>dp[s]</b> = s məbləğini ödəmənin yol sayı. Hər SİKKƏ növü AYRI-AYRI (xarici dövr) işlənir, hər sikkə üçün məbləğlər ARTAN sırada yenilənir: <b>dp[s] += dp[s-c]</b> — sikkələri XARİCİ dövrdə gəzmək, {1,2} və {2,1} kimi EYNİ kombinasiyaların İKİ DƏFƏ sayılmasının qarşısını alır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> c(n);
+    for (int i = 0; i < n; i++) cin >> c[i];
+    vector<long long> dp(t + 1, 0);
+    dp[0] = 1;
+    for (int x : c)
+        for (int s = x; s <= t; s++)
+            dp[s] += dp[s-x];
+    cout << dp[t] << "\\n";
+}`},
+  {
+    title: "3x7 grid-də unikal yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa və ya aşağı hərəkət edərək getməyin NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir sətirdə M və N (1 ≤ M, N ≤ 20).",
+    output: "Fərqli yolların sayı.",
+    example: {in:"3 7", out:"28"},
+    approach: "<b>dp[i][j]</b> = (i,j) xanasına çatmağın yol sayı. Hər xanaya ya YUXARIDAN (dp[i-1][j]), ya da SOLDAN (dp[i][j-1]) gəlinir: <b>dp[i][j] = dp[i-1][j] + dp[i][j-1]</b> (ilk sətir/sütun üçün tək yol var — düz xətt).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0) dp[i][j] = 1;
+            else dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "1x1 grid-də unikal yol sayı (DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa və ya aşağı hərəkət edərək getməyin NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir sətirdə M və N (1 ≤ M, N ≤ 20).",
+    output: "Fərqli yolların sayı.",
+    example: {in:"1 1", out:"1"},
+    approach: "<b>dp[i][j]</b> = (i,j) xanasına çatmağın yol sayı. Hər xanaya ya YUXARIDAN (dp[i-1][j]), ya da SOLDAN (dp[i][j-1]) gəlinir: <b>dp[i][j] = dp[i-1][j] + dp[i][j-1]</b> (ilk sətir/sütun üçün tək yol var — düz xətt).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0) dp[i][j] = 1;
+            else dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "3x3 grid-də unikal yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa və ya aşağı hərəkət edərək getməyin NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir sətirdə M və N (1 ≤ M, N ≤ 20).",
+    output: "Fərqli yolların sayı.",
+    example: {in:"3 3", out:"6"},
+    approach: "<b>dp[i][j]</b> = (i,j) xanasına çatmağın yol sayı. Hər xanaya ya YUXARIDAN (dp[i-1][j]), ya da SOLDAN (dp[i][j-1]) gəlinir: <b>dp[i][j] = dp[i-1][j] + dp[i][j-1]</b> (ilk sətir/sütun üçün tək yol var — düz xətt).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0) dp[i][j] = 1;
+            else dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "1x5 grid-də unikal yol sayı (DP, tək sətir)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa və ya aşağı hərəkət edərək getməyin NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir sətirdə M və N (1 ≤ M, N ≤ 20).",
+    output: "Fərqli yolların sayı.",
+    example: {in:"1 5", out:"1"},
+    approach: "<b>dp[i][j]</b> = (i,j) xanasına çatmağın yol sayı. Hər xanaya ya YUXARIDAN (dp[i-1][j]), ya da SOLDAN (dp[i][j-1]) gəlinir: <b>dp[i][j] = dp[i-1][j] + dp[i][j-1]</b> (ilk sətir/sütun üçün tək yol var — düz xətt).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0) dp[i][j] = 1;
+            else dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "10x10 grid-də unikal yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa və ya aşağı hərəkət edərək getməyin NEÇƏ FƏRQLİ yolu olduğunu DP ilə tapın.",
+    input: "Bir sətirdə M və N (1 ≤ M, N ≤ 20).",
+    output: "Fərqli yolların sayı.",
+    example: {in:"10 10", out:"48620"},
+    approach: "<b>dp[i][j]</b> = (i,j) xanasına çatmağın yol sayı. Hər xanaya ya YUXARIDAN (dp[i-1][j]), ya da SOLDAN (dp[i][j-1]) gəlinir: <b>dp[i][j] = dp[i-1][j] + dp[i][j-1]</b> (ilk sətir/sütun üçün tək yol var — düz xətt).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 || j == 0) dp[i][j] = 1;
+            else dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "12-ni tam kvadratların cəmi kimi minimum sayda yazmaq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "tam kvadrat"],
+    statement: "N verilib. N-i TAM KVADRATLARIN (1, 4, 9, 16, ...) cəmi kimi yazmaq üçün lazım olan MİNİMUM ədəd sayını DP ilə tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10000).",
+    output: "Minimum tam kvadrat sayı.",
+    example: {in:"12", out:"3"},
+    approach: "Sikkə dəfişi məsələsinə BƏNZƏYİR: \"sikkələr\" 1², 2², 3², ... kimi tam kvadratlardır. <b>dp[s] = min(dp[s], dp[s-k*k]+1)</b> bütün k*k ≤ s üçün.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> dp(n + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= n; s++)
+        for (int k = 1; k * k <= s; k++)
+            dp[s] = min(dp[s], dp[s - k*k] + 1);
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "13-ü tam kvadratların cəmi kimi minimum sayda yazmaq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "tam kvadrat"],
+    statement: "N verilib. N-i TAM KVADRATLARIN (1, 4, 9, 16, ...) cəmi kimi yazmaq üçün lazım olan MİNİMUM ədəd sayını DP ilə tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10000).",
+    output: "Minimum tam kvadrat sayı.",
+    example: {in:"13", out:"2"},
+    approach: "Sikkə dəfişi məsələsinə BƏNZƏYİR: \"sikkələr\" 1², 2², 3², ... kimi tam kvadratlardır. <b>dp[s] = min(dp[s], dp[s-k*k]+1)</b> bütün k*k ≤ s üçün.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> dp(n + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= n; s++)
+        for (int k = 1; k * k <= s; k++)
+            dp[s] = min(dp[s], dp[s - k*k] + 1);
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "1-i tam kvadratların cəmi kimi minimum sayda yazmaq (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "tam kvadrat"],
+    statement: "N verilib. N-i TAM KVADRATLARIN (1, 4, 9, 16, ...) cəmi kimi yazmaq üçün lazım olan MİNİMUM ədəd sayını DP ilə tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10000).",
+    output: "Minimum tam kvadrat sayı.",
+    example: {in:"1", out:"1"},
+    approach: "Sikkə dəfişi məsələsinə BƏNZƏYİR: \"sikkələr\" 1², 2², 3², ... kimi tam kvadratlardır. <b>dp[s] = min(dp[s], dp[s-k*k]+1)</b> bütün k*k ≤ s üçün.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> dp(n + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= n; s++)
+        for (int k = 1; k * k <= s; k++)
+            dp[s] = min(dp[s], dp[s - k*k] + 1);
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "4-ü tam kvadratların cəmi kimi minimum sayda yazmaq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "tam kvadrat"],
+    statement: "N verilib. N-i TAM KVADRATLARIN (1, 4, 9, 16, ...) cəmi kimi yazmaq üçün lazım olan MİNİMUM ədəd sayını DP ilə tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10000).",
+    output: "Minimum tam kvadrat sayı.",
+    example: {in:"4", out:"1"},
+    approach: "Sikkə dəfişi məsələsinə BƏNZƏYİR: \"sikkələr\" 1², 2², 3², ... kimi tam kvadratlardır. <b>dp[s] = min(dp[s], dp[s-k*k]+1)</b> bütün k*k ≤ s üçün.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> dp(n + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= n; s++)
+        for (int k = 1; k * k <= s; k++)
+            dp[s] = min(dp[s], dp[s - k*k] + 1);
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "100-ü tam kvadratların cəmi kimi minimum sayda yazmaq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "tam kvadrat"],
+    statement: "N verilib. N-i TAM KVADRATLARIN (1, 4, 9, 16, ...) cəmi kimi yazmaq üçün lazım olan MİNİMUM ədəd sayını DP ilə tapın.",
+    input: "Bir tam ədəd N (1 ≤ N ≤ 10000).",
+    output: "Minimum tam kvadrat sayı.",
+    example: {in:"100", out:"1"},
+    approach: "Sikkə dəfişi məsələsinə BƏNZƏYİR: \"sikkələr\" 1², 2², 3², ... kimi tam kvadratlardır. <b>dp[s] = min(dp[s], dp[s-k*k]+1)</b> bütün k*k ≤ s üçün.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> dp(n + 1, INT_MAX / 2);
+    dp[0] = 0;
+    for (int s = 1; s <= n; s++)
+        for (int k = 1; k * k <= s; k++)
+            dp[s] = min(dp[s], dp[s - k*k] + 1);
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "\"babad\" sözünün ən uzun palindromik alt sətri (DP)",
+    difficulty: "mid",
+    tags: ["dp", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT SƏTRİNİN (ardıcıl simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt sətrin uzunluğu.",
+    example: {in:"babad", out:"3"},
+    approach: "<b>dp[l][r]</b> = s[l..r] palindromdurmu? <b>dp[l][r] = (s[l]==s[r]) && (r-l&lt;2 || dp[l+1][r-1])</b> — uzunluqları KİÇİKDƏN BÖYÜYƏ hesablamaq lazımdır, çünki hər hal özündən KİÇİK alt-intervala əsaslanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<bool>> dp(n, vector<bool>(n, false));
+    int best = 1;
+    for (int i = 0; i < n; i++) dp[i][i] = true;
+    for (int len = 2; len <= n; len++) {
+        for (int l = 0; l + len - 1 < n; l++) {
+            int r = l + len - 1;
+            if (s[l] == s[r] && (len == 2 || dp[l+1][r-1])) {
+                dp[l][r] = true;
+                best = max(best, len);
+            }
+        }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"cbbd\" sözünün ən uzun palindromik alt sətri (DP)",
+    difficulty: "mid",
+    tags: ["dp", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT SƏTRİNİN (ardıcıl simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt sətrin uzunluğu.",
+    example: {in:"cbbd", out:"2"},
+    approach: "<b>dp[l][r]</b> = s[l..r] palindromdurmu? <b>dp[l][r] = (s[l]==s[r]) && (r-l&lt;2 || dp[l+1][r-1])</b> — uzunluqları KİÇİKDƏN BÖYÜYƏ hesablamaq lazımdır, çünki hər hal özündən KİÇİK alt-intervala əsaslanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<bool>> dp(n, vector<bool>(n, false));
+    int best = 1;
+    for (int i = 0; i < n; i++) dp[i][i] = true;
+    for (int len = 2; len <= n; len++) {
+        for (int l = 0; l + len - 1 < n; l++) {
+            int r = l + len - 1;
+            if (s[l] == s[r] && (len == 2 || dp[l+1][r-1])) {
+                dp[l][r] = true;
+                best = max(best, len);
+            }
+        }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"a\" sözünün ən uzun palindromik alt sətri (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT SƏTRİNİN (ardıcıl simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt sətrin uzunluğu.",
+    example: {in:"a", out:"1"},
+    approach: "<b>dp[l][r]</b> = s[l..r] palindromdurmu? <b>dp[l][r] = (s[l]==s[r]) && (r-l&lt;2 || dp[l+1][r-1])</b> — uzunluqları KİÇİKDƏN BÖYÜYƏ hesablamaq lazımdır, çünki hər hal özündən KİÇİK alt-intervala əsaslanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<bool>> dp(n, vector<bool>(n, false));
+    int best = 1;
+    for (int i = 0; i < n; i++) dp[i][i] = true;
+    for (int len = 2; len <= n; len++) {
+        for (int l = 0; l + len - 1 < n; l++) {
+            int r = l + len - 1;
+            if (s[l] == s[r] && (len == 2 || dp[l+1][r-1])) {
+                dp[l][r] = true;
+                best = max(best, len);
+            }
+        }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"abccba\" sözünün ən uzun palindromik alt sətri (DP, bütöv palindrom)",
+    difficulty: "mid",
+    tags: ["dp", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT SƏTRİNİN (ardıcıl simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt sətrin uzunluğu.",
+    example: {in:"abccba", out:"6"},
+    approach: "<b>dp[l][r]</b> = s[l..r] palindromdurmu? <b>dp[l][r] = (s[l]==s[r]) && (r-l&lt;2 || dp[l+1][r-1])</b> — uzunluqları KİÇİKDƏN BÖYÜYƏ hesablamaq lazımdır, çünki hər hal özündən KİÇİK alt-intervala əsaslanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<bool>> dp(n, vector<bool>(n, false));
+    int best = 1;
+    for (int i = 0; i < n; i++) dp[i][i] = true;
+    for (int len = 2; len <= n; len++) {
+        for (int l = 0; l + len - 1 < n; l++) {
+            int r = l + len - 1;
+            if (s[l] == s[r] && (len == 2 || dp[l+1][r-1])) {
+                dp[l][r] = true;
+                best = max(best, len);
+            }
+        }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"azercell\" sözünün ən uzun palindromik alt sətri (DP)",
+    difficulty: "mid",
+    tags: ["dp", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT SƏTRİNİN (ardıcıl simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt sətrin uzunluğu.",
+    example: {in:"azercell", out:"2"},
+    approach: "<b>dp[l][r]</b> = s[l..r] palindromdurmu? <b>dp[l][r] = (s[l]==s[r]) && (r-l&lt;2 || dp[l+1][r-1])</b> — uzunluqları KİÇİKDƏN BÖYÜYƏ hesablamaq lazımdır, çünki hər hal özündən KİÇİK alt-intervala əsaslanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<bool>> dp(n, vector<bool>(n, false));
+    int best = 1;
+    for (int i = 0; i < n; i++) dp[i][i] = true;
+    for (int len = 2; len <= n; len++) {
+        for (int l = 0; l + len - 1 < n; l++) {
+            int r = l + len - 1;
+            if (s[l] == s[r] && (len == 2 || dp[l+1][r-1])) {
+                dp[l][r] = true;
+                best = max(best, len);
+            }
+        }
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "2x3 lövhəni domino ilə döşəmənin yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "döşəmə"],
+    statement: "2×N ölçülü lövhəni 1×2 ölçülü domino daşları ilə (üfüqi və ya şaquli) döşəməyin NEÇƏ YOLU olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Döşəmə yollarının sayı.",
+    example: {in:"3", out:"3"},
+    approach: "<b>dp[i]</b> = 2×i lövhəni döşəmənin yol sayı. Sağ kənarı ya 1 ŞAQULI domino (dp[i-1]), ya da 2 ÜFÜQİ domino (dp[i-2]) örtür: <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "2x0 lövhəni döşəmənin yol sayı (DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "döşəmə"],
+    statement: "2×N ölçülü lövhəni 1×2 ölçülü domino daşları ilə (üfüqi və ya şaquli) döşəməyin NEÇƏ YOLU olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Döşəmə yollarının sayı.",
+    example: {in:"0", out:"1"},
+    approach: "<b>dp[i]</b> = 2×i lövhəni döşəmənin yol sayı. Sağ kənarı ya 1 ŞAQULI domino (dp[i-1]), ya da 2 ÜFÜQİ domino (dp[i-2]) örtür: <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "2x1 lövhəni döşəmənin yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "döşəmə"],
+    statement: "2×N ölçülü lövhəni 1×2 ölçülü domino daşları ilə (üfüqi və ya şaquli) döşəməyin NEÇƏ YOLU olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Döşəmə yollarının sayı.",
+    example: {in:"1", out:"1"},
+    approach: "<b>dp[i]</b> = 2×i lövhəni döşəmənin yol sayı. Sağ kənarı ya 1 ŞAQULI domino (dp[i-1]), ya da 2 ÜFÜQİ domino (dp[i-2]) örtür: <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "2x10 lövhəni döşəmənin yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "döşəmə"],
+    statement: "2×N ölçülü lövhəni 1×2 ölçülü domino daşları ilə (üfüqi və ya şaquli) döşəməyin NEÇƏ YOLU olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Döşəmə yollarının sayı.",
+    example: {in:"10", out:"89"},
+    approach: "<b>dp[i]</b> = 2×i lövhəni döşəmənin yol sayı. Sağ kənarı ya 1 ŞAQULI domino (dp[i-1]), ya da 2 ÜFÜQİ domino (dp[i-2]) örtür: <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "2x20 lövhəni döşəmənin yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "döşəmə"],
+    statement: "2×N ölçülü lövhəni 1×2 ölçülü domino daşları ilə (üfüqi və ya şaquli) döşəməyin NEÇƏ YOLU olduğunu DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 50).",
+    output: "Döşəmə yollarının sayı.",
+    example: {in:"20", out:"10946"},
+    approach: "<b>dp[i]</b> = 2×i lövhəni döşəmənin yol sayı. Sağ kənarı ya 1 ŞAQULI domino (dp[i-1]), ya da 2 ÜFÜQİ domino (dp[i-2]) örtür: <b>dp[i] = dp[i-1] + dp[i-2]</b> (Fibonacci recurrence, fərqli məna).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 2, 0);
+    dp[0] = 1; if (n >= 1) dp[1] = 1;
+    for (int i = 2; i <= n; i++) dp[i] = dp[i-1] + dp[i-2];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Tribonaccinin 4-cü həddini DP ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "tribonacci"],
+    statement: "N verilib. \"Tribonacci\" ardıcıllığının (T(0)=0, T(1)=1, T(2)=1, T(n)=T(n-1)+T(n-2)+T(n-3)) N-ci həddini DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 35).",
+    output: "T(N)-in qiyməti.",
+    example: {in:"4", out:"4"},
+    approach: "Fibonacci-yə BƏNZƏR, amma HƏR həd ƏVVƏLKİ ÜÇ həddin cəmidir (iki yox): <b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 0;
+    if (n >= 1) dp[1] = 1;
+    if (n >= 2) dp[2] = 1;
+    for (int i = 3; i <= n; i++) dp[i] = dp[i-1] + dp[i-2] + dp[i-3];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Tribonaccinin 0-cı həddini DP ilə tapmaq (baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "tribonacci"],
+    statement: "N verilib. \"Tribonacci\" ardıcıllığının (T(0)=0, T(1)=1, T(2)=1, T(n)=T(n-1)+T(n-2)+T(n-3)) N-ci həddini DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 35).",
+    output: "T(N)-in qiyməti.",
+    example: {in:"0", out:"0"},
+    approach: "Fibonacci-yə BƏNZƏR, amma HƏR həd ƏVVƏLKİ ÜÇ həddin cəmidir (iki yox): <b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 0;
+    if (n >= 1) dp[1] = 1;
+    if (n >= 2) dp[2] = 1;
+    for (int i = 3; i <= n; i++) dp[i] = dp[i-1] + dp[i-2] + dp[i-3];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Tribonaccinin 2-ci həddini DP ilə tapmaq (baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "tribonacci"],
+    statement: "N verilib. \"Tribonacci\" ardıcıllığının (T(0)=0, T(1)=1, T(2)=1, T(n)=T(n-1)+T(n-2)+T(n-3)) N-ci həddini DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 35).",
+    output: "T(N)-in qiyməti.",
+    example: {in:"2", out:"1"},
+    approach: "Fibonacci-yə BƏNZƏR, amma HƏR həd ƏVVƏLKİ ÜÇ həddin cəmidir (iki yox): <b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 0;
+    if (n >= 1) dp[1] = 1;
+    if (n >= 2) dp[2] = 1;
+    for (int i = 3; i <= n; i++) dp[i] = dp[i-1] + dp[i-2] + dp[i-3];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Tribonaccinin 10-cu həddini DP ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "tribonacci"],
+    statement: "N verilib. \"Tribonacci\" ardıcıllığının (T(0)=0, T(1)=1, T(2)=1, T(n)=T(n-1)+T(n-2)+T(n-3)) N-ci həddini DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 35).",
+    output: "T(N)-in qiyməti.",
+    example: {in:"10", out:"149"},
+    approach: "Fibonacci-yə BƏNZƏR, amma HƏR həd ƏVVƏLKİ ÜÇ həddin cəmidir (iki yox): <b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 0;
+    if (n >= 1) dp[1] = 1;
+    if (n >= 2) dp[2] = 1;
+    for (int i = 3; i <= n; i++) dp[i] = dp[i-1] + dp[i-2] + dp[i-3];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "Tribonaccinin 25-ci həddini DP ilə tapmaq",
+    difficulty: "easy",
+    tags: ["dp", "tribonacci"],
+    statement: "N verilib. \"Tribonacci\" ardıcıllığının (T(0)=0, T(1)=1, T(2)=1, T(n)=T(n-1)+T(n-2)+T(n-3)) N-ci həddini DP ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 35).",
+    output: "T(N)-in qiyməti.",
+    example: {in:"25", out:"1389537"},
+    approach: "Fibonacci-yə BƏNZƏR, amma HƏR həd ƏVVƏLKİ ÜÇ həddin cəmidir (iki yox): <b>dp[i] = dp[i-1] + dp[i-2] + dp[i-3]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> dp(n + 3, 0);
+    dp[0] = 0;
+    if (n >= 1) dp[1] = 1;
+    if (n >= 2) dp[2] = 1;
+    for (int i = 3; i <= n; i++) dp[i] = dp[i-1] + dp[i-2] + dp[i-3];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "5 pilləli pilləkəni maksimum 2 addımla qalxmağın yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən və maksimum addım K verilib. Hər addımda 1-dən K-ya qədər pillə qalxmaq olar. Zirvəyə çatmağın yol sayını DP ilə tapın.",
+    input: "Bir sətirdə N və K (0 ≤ N ≤ 100, 1 ≤ K ≤ N+1).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"5 2", out:"8"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım 1-dən K-ya qədər ola bilər: <b>dp[i] = dp[i-1] + dp[i-2] + ... + dp[i-K]</b> (mövcud olanlar üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int s = 1; s <= k && s <= i; s++)
+            dp[i] += dp[i-s];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "0 pilləli pilləkəni qalxmağın yol sayı (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən və maksimum addım K verilib. Hər addımda 1-dən K-ya qədər pillə qalxmaq olar. Zirvəyə çatmağın yol sayını DP ilə tapın.",
+    input: "Bir sətirdə N və K (0 ≤ N ≤ 100, 1 ≤ K ≤ N+1).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"0 3", out:"1"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım 1-dən K-ya qədər ola bilər: <b>dp[i] = dp[i-1] + dp[i-2] + ... + dp[i-K]</b> (mövcud olanlar üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int s = 1; s <= k && s <= i; s++)
+            dp[i] += dp[i-s];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "4 pilləli pilləkəni maksimum 4 addımla qalxmağın yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən və maksimum addım K verilib. Hər addımda 1-dən K-ya qədər pillə qalxmaq olar. Zirvəyə çatmağın yol sayını DP ilə tapın.",
+    input: "Bir sətirdə N və K (0 ≤ N ≤ 100, 1 ≤ K ≤ N+1).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"4 4", out:"8"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım 1-dən K-ya qədər ola bilər: <b>dp[i] = dp[i-1] + dp[i-2] + ... + dp[i-K]</b> (mövcud olanlar üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int s = 1; s <= k && s <= i; s++)
+            dp[i] += dp[i-s];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "6 pilləli pilləkəni maksimum 1 addımla qalxmağın yol sayı (DP, yalnız 1 yol)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən və maksimum addım K verilib. Hər addımda 1-dən K-ya qədər pillə qalxmaq olar. Zirvəyə çatmağın yol sayını DP ilə tapın.",
+    input: "Bir sətirdə N və K (0 ≤ N ≤ 100, 1 ≤ K ≤ N+1).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"6 1", out:"1"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım 1-dən K-ya qədər ola bilər: <b>dp[i] = dp[i-1] + dp[i-2] + ... + dp[i-K]</b> (mövcud olanlar üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int s = 1; s <= k && s <= i; s++)
+            dp[i] += dp[i-s];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "10 pilləli pilləkəni maksimum 3 addımla qalxmağın yol sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən və maksimum addım K verilib. Hər addımda 1-dən K-ya qədər pillə qalxmaq olar. Zirvəyə çatmağın yol sayını DP ilə tapın.",
+    input: "Bir sətirdə N və K (0 ≤ N ≤ 100, 1 ≤ K ≤ N+1).",
+    output: "Zirvəyə çatmağın yol sayı.",
+    example: {in:"10 3", out:"274"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatmağın yol sayı. Son addım 1-dən K-ya qədər ola bilər: <b>dp[i] = dp[i-1] + dp[i-2] + ... + dp[i-K]</b> (mövcud olanlar üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, k; cin >> n >> k;
+    vector<long long> dp(n + 1, 0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int s = 1; s <= k && s <= i; s++)
+            dp[i] += dp[i-s];
+    cout << dp[n] << "\\n";
+}`},
+  {
+    title: "\"1101110111\" sətrində ən uzun ardıcıl 1-lər (DP)",
+    difficulty: "easy",
+    tags: ["dp", "string"],
+    statement: "Yalnız \"0\" və \"1\" simvollarından ibarət sətir verilib. Ən uzun ARDICIL \"1\"-lər ardıcıllığının uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (yalnız 0 və 1, 1 ≤ |S| ≤ 1000).",
+    output: "Ən uzun ardıcıl \"1\" seriyasının uzunluğu.",
+    example: {in:"1101110111", out:"3"},
+    approach: "<b>dp[i]</b> = i-ci simvolda BİTƏN ardıcıl \"1\" seriyasının uzunluğu. s[i]==\"1\"-dirsə <b>dp[i]=dp[i-1]+1</b>, əks halda <b>dp[i]=0</b> — seriya qırılır. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int cur = 0, best = 0;
+    for (char c : s) {
+        if (c == '1') { cur++; best = max(best, cur); }
+        else cur = 0;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"0000\" sətrində ən uzun ardıcıl 1-lər (DP, heç yoxdur)",
+    difficulty: "easy",
+    tags: ["dp", "string"],
+    statement: "Yalnız \"0\" və \"1\" simvollarından ibarət sətir verilib. Ən uzun ARDICIL \"1\"-lər ardıcıllığının uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (yalnız 0 və 1, 1 ≤ |S| ≤ 1000).",
+    output: "Ən uzun ardıcıl \"1\" seriyasının uzunluğu.",
+    example: {in:"0000", out:"0"},
+    approach: "<b>dp[i]</b> = i-ci simvolda BİTƏN ardıcıl \"1\" seriyasının uzunluğu. s[i]==\"1\"-dirsə <b>dp[i]=dp[i-1]+1</b>, əks halda <b>dp[i]=0</b> — seriya qırılır. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int cur = 0, best = 0;
+    for (char c : s) {
+        if (c == '1') { cur++; best = max(best, cur); }
+        else cur = 0;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"1111\" sətrində ən uzun ardıcıl 1-lər (DP, hamısı 1)",
+    difficulty: "easy",
+    tags: ["dp", "string"],
+    statement: "Yalnız \"0\" və \"1\" simvollarından ibarət sətir verilib. Ən uzun ARDICIL \"1\"-lər ardıcıllığının uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (yalnız 0 və 1, 1 ≤ |S| ≤ 1000).",
+    output: "Ən uzun ardıcıl \"1\" seriyasının uzunluğu.",
+    example: {in:"1111", out:"4"},
+    approach: "<b>dp[i]</b> = i-ci simvolda BİTƏN ardıcıl \"1\" seriyasının uzunluğu. s[i]==\"1\"-dirsə <b>dp[i]=dp[i-1]+1</b>, əks halda <b>dp[i]=0</b> — seriya qırılır. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int cur = 0, best = 0;
+    for (char c : s) {
+        if (c == '1') { cur++; best = max(best, cur); }
+        else cur = 0;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"1\" sətrində ən uzun ardıcıl 1-lər (DP, tək simvol)",
+    difficulty: "easy",
+    tags: ["dp", "string"],
+    statement: "Yalnız \"0\" və \"1\" simvollarından ibarət sətir verilib. Ən uzun ARDICIL \"1\"-lər ardıcıllığının uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (yalnız 0 və 1, 1 ≤ |S| ≤ 1000).",
+    output: "Ən uzun ardıcıl \"1\" seriyasının uzunluğu.",
+    example: {in:"1", out:"1"},
+    approach: "<b>dp[i]</b> = i-ci simvolda BİTƏN ardıcıl \"1\" seriyasının uzunluğu. s[i]==\"1\"-dirsə <b>dp[i]=dp[i-1]+1</b>, əks halda <b>dp[i]=0</b> — seriya qırılır. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int cur = 0, best = 0;
+    for (char c : s) {
+        if (c == '1') { cur++; best = max(best, cur); }
+        else cur = 0;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"110111011110\" sətrində ən uzun ardıcıl 1-lər (DP)",
+    difficulty: "easy",
+    tags: ["dp", "string"],
+    statement: "Yalnız \"0\" və \"1\" simvollarından ibarət sətir verilib. Ən uzun ARDICIL \"1\"-lər ardıcıllığının uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (yalnız 0 və 1, 1 ≤ |S| ≤ 1000).",
+    output: "Ən uzun ardıcıl \"1\" seriyasının uzunluğu.",
+    example: {in:"110111011110", out:"4"},
+    approach: "<b>dp[i]</b> = i-ci simvolda BİTƏN ardıcıl \"1\" seriyasının uzunluğu. s[i]==\"1\"-dirsə <b>dp[i]=dp[i-1]+1</b>, əks halda <b>dp[i]=0</b> — seriya qırılır. Cavab bütün dp[i]-lərin maksimumudur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int cur = 0, best = 0;
+    for (char c : s) {
+        if (c == '1') { cur++; best = max(best, cur); }
+        else cur = 0;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "2, 3, 7, 8 massivində cəmi 10 olan alt çoxluq varmı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "subset-sum"],
+    statement: "N ədəd və hədəf cəm T verilib. Massivdə cəmi dəqiq T olan alt çoxluq varmı? DP cədvəli (boolean massiv) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və T (0 ≤ T ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 10\n2 3 7 8", out:"VAR"},
+    approach: "<b>dp[s]</b> = cəmi s olan alt çoxluq varmı? <b>dp[0]=true</b>; hər element üçün, məbləğlər BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[s] = dp[s] || dp[s-a[i]]</b> — bu, backtracking-dəki eksponensial axtarışı POLİNOMİAL DP cədvəlinə çevirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(t + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = t; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "2, 3, 7, 8 massivində cəmi 100 olan alt çoxluq varmı (DP, yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "subset-sum"],
+    statement: "N ədəd və hədəf cəm T verilib. Massivdə cəmi dəqiq T olan alt çoxluq varmı? DP cədvəli (boolean massiv) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və T (0 ≤ T ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 100\n2 3 7 8", out:"YOX"},
+    approach: "<b>dp[s]</b> = cəmi s olan alt çoxluq varmı? <b>dp[0]=true</b>; hər element üçün, məbləğlər BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[s] = dp[s] || dp[s-a[i]]</b> — bu, backtracking-dəki eksponensial axtarışı POLİNOMİAL DP cədvəlinə çevirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(t + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = t; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Boş massivdə cəmi 0 olan alt çoxluq varmı (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "subset-sum"],
+    statement: "N ədəd və hədəf cəm T verilib. Massivdə cəmi dəqiq T olan alt çoxluq varmı? DP cədvəli (boolean massiv) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və T (0 ≤ T ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"0 0", out:"VAR"},
+    approach: "<b>dp[s]</b> = cəmi s olan alt çoxluq varmı? <b>dp[0]=true</b>; hər element üçün, məbləğlər BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[s] = dp[s] || dp[s-a[i]]</b> — bu, backtracking-dəki eksponensial axtarışı POLİNOMİAL DP cədvəlinə çevirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(t + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = t; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "5, 10, 12, 13, 15 massivində cəmi 30 olan alt çoxluq varmı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "subset-sum"],
+    statement: "N ədəd və hədəf cəm T verilib. Massivdə cəmi dəqiq T olan alt çoxluq varmı? DP cədvəli (boolean massiv) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və T (0 ≤ T ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"5 30\n5 10 12 13 15", out:"VAR"},
+    approach: "<b>dp[s]</b> = cəmi s olan alt çoxluq varmı? <b>dp[0]=true</b>; hər element üçün, məbləğlər BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[s] = dp[s] || dp[s-a[i]]</b> — bu, backtracking-dəki eksponensial axtarışı POLİNOMİAL DP cədvəlinə çevirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(t + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = t; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 2, 3 massivində cəmi 7 olan alt çoxluq varmı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "subset-sum"],
+    statement: "N ədəd və hədəf cəm T verilib. Massivdə cəmi dəqiq T olan alt çoxluq varmı? DP cədvəli (boolean massiv) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və T (0 ≤ T ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 7\n1 2 3", out:"YOX"},
+    approach: "<b>dp[s]</b> = cəmi s olan alt çoxluq varmı? <b>dp[0]=true</b>; hər element üçün, məbləğlər BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[s] = dp[s] || dp[s-a[i]]</b> — bu, backtracking-dəki eksponensial axtarışı POLİNOMİAL DP cədvəlinə çevirir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(t + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = t; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 5, 11, 5 massivini bərabər cəmli iki yarıya bölmək mümkündürmü (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ yarıya elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? DP (subset-sum) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd (0 ≤ ədəd ≤ 100).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4\n1 5 11 5", out:"VAR"},
+    approach: "Ümumi cəm TƏK ədəddirsə dərhal \"YOX\". Cütdürsə, bu, cəmi (ümumi cəm)/2 olan alt çoxluğun DP ilə axtarışına (əvvəlki konseptlə eyni texnika) çevrilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    if (total % 2 != 0) { cout << "YOX" << "\\n"; return 0; }
+    int half = total / 2;
+    vector<bool> dp(half + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = half; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[half] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 5 massivini bərabər cəmli iki yarıya bölmək mümkündürmü (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ yarıya elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? DP (subset-sum) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd (0 ≤ ədəd ≤ 100).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4\n1 2 3 5", out:"YOX"},
+    approach: "Ümumi cəm TƏK ədəddirsə dərhal \"YOX\". Cütdürsə, bu, cəmi (ümumi cəm)/2 olan alt çoxluğun DP ilə axtarışına (əvvəlki konseptlə eyni texnika) çevrilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    if (total % 2 != 0) { cout << "YOX" << "\\n"; return 0; }
+    int half = total / 2;
+    vector<bool> dp(half + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = half; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[half] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "2, 2, 2, 2 massivini bərabər cəmli iki yarıya bölmək mümkündürmü (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ yarıya elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? DP (subset-sum) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd (0 ≤ ədəd ≤ 100).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4\n2 2 2 2", out:"VAR"},
+    approach: "Ümumi cəm TƏK ədəddirsə dərhal \"YOX\". Cütdürsə, bu, cəmi (ümumi cəm)/2 olan alt çoxluğun DP ilə axtarışına (əvvəlki konseptlə eyni texnika) çevrilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    if (total % 2 != 0) { cout << "YOX" << "\\n"; return 0; }
+    int half = total / 2;
+    vector<bool> dp(half + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = half; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[half] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 3 massivini bərabər cəmli iki yarıya bölmək mümkündürmü (DP, tək cəm)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ yarıya elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? DP (subset-sum) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd (0 ≤ ədəd ≤ 100).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"2\n1 3", out:"YOX"},
+    approach: "Ümumi cəm TƏK ədəddirsə dərhal \"YOX\". Cütdürsə, bu, cəmi (ümumi cəm)/2 olan alt çoxluğun DP ilə axtarışına (əvvəlki konseptlə eyni texnika) çevrilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    if (total % 2 != 0) { cout << "YOX" << "\\n"; return 0; }
+    int half = total / 2;
+    vector<bool> dp(half + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = half; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[half] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Boş massivi bərabər cəmli iki yarıya bölmək mümkündürmü (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ yarıya elə bölmək olarmı ki, hər iki yarının cəmi BƏRABƏR olsun? DP (subset-sum) ilə \"VAR\"/\"YOX\" təyin edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N qeyri-mənfi tam ədəd (0 ≤ ədəd ≤ 100).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"0", out:"VAR"},
+    approach: "Ümumi cəm TƏK ədəddirsə dərhal \"YOX\". Cütdürsə, bu, cəmi (ümumi cəm)/2 olan alt çoxluğun DP ilə axtarışına (əvvəlki konseptlə eyni texnika) çevrilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    if (total % 2 != 0) { cout << "YOX" << "\\n"; return 0; }
+    int half = total / 2;
+    vector<bool> dp(half + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = half; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    cout << (dp[half] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, -5, 3, 4, -2 xallı pilləkəndə maksimum xal cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillədə bir XAL var (mənfi ola bilər). 0-cı pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq son pilləyə çatmaqla toplana bilən MAKSİMUM xal cəmini DP ilə tapın (hər keçilən pillənin xalı toplanır).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xal.",
+    output: "Maksimum mümkün xal cəmi.",
+    example: {in:"5\n1 -5 3 4 -2", out:"6"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatanda toplanan maksimum xal. <b>dp[0]=a[0]</b>, <b>dp[1]=a[0]+a[1]</b>; sonra <b>dp[i] = a[i] + max(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlmək, HANSI DAHA ÇOX XAL verirsə o seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n);
+    dp[0] = a[0];
+    if (n > 1) dp[1] = a[0] + a[1];
+    for (int i = 2; i < n; i++) dp[i] = a[i] + max(dp[i-1], dp[i-2]);
+    cout << dp[n-1] << "\\n";
+}`},
+  {
+    title: "5 xallı pilləkəndə maksimum xal cəmi (DP, tək pillə)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillədə bir XAL var (mənfi ola bilər). 0-cı pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq son pilləyə çatmaqla toplana bilən MAKSİMUM xal cəmini DP ilə tapın (hər keçilən pillənin xalı toplanır).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xal.",
+    output: "Maksimum mümkün xal cəmi.",
+    example: {in:"1\n5", out:"5"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatanda toplanan maksimum xal. <b>dp[0]=a[0]</b>, <b>dp[1]=a[0]+a[1]</b>; sonra <b>dp[i] = a[i] + max(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlmək, HANSI DAHA ÇOX XAL verirsə o seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n);
+    dp[0] = a[0];
+    if (n > 1) dp[1] = a[0] + a[1];
+    for (int i = 2; i < n; i++) dp[i] = a[i] + max(dp[i-1], dp[i-2]);
+    cout << dp[n-1] << "\\n";
+}`},
+  {
+    title: "1, 1 xallı pilləkəndə maksimum xal cəmi (DP, iki pillə)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillədə bir XAL var (mənfi ola bilər). 0-cı pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq son pilləyə çatmaqla toplana bilən MAKSİMUM xal cəmini DP ilə tapın (hər keçilən pillənin xalı toplanır).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xal.",
+    output: "Maksimum mümkün xal cəmi.",
+    example: {in:"2\n1 1", out:"2"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatanda toplanan maksimum xal. <b>dp[0]=a[0]</b>, <b>dp[1]=a[0]+a[1]</b>; sonra <b>dp[i] = a[i] + max(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlmək, HANSI DAHA ÇOX XAL verirsə o seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n);
+    dp[0] = a[0];
+    if (n > 1) dp[1] = a[0] + a[1];
+    for (int i = 2; i < n; i++) dp[i] = a[i] + max(dp[i-1], dp[i-2]);
+    cout << dp[n-1] << "\\n";
+}`},
+  {
+    title: "-1, -2, -3 xallı pilləkəndə maksimum xal cəmi (DP, hamısı mənfi)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillədə bir XAL var (mənfi ola bilər). 0-cı pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq son pilləyə çatmaqla toplana bilən MAKSİMUM xal cəmini DP ilə tapın (hər keçilən pillənin xalı toplanır).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xal.",
+    output: "Maksimum mümkün xal cəmi.",
+    example: {in:"3\n-1 -2 -3", out:"-4"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatanda toplanan maksimum xal. <b>dp[0]=a[0]</b>, <b>dp[1]=a[0]+a[1]</b>; sonra <b>dp[i] = a[i] + max(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlmək, HANSI DAHA ÇOX XAL verirsə o seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n);
+    dp[0] = a[0];
+    if (n > 1) dp[1] = a[0] + a[1];
+    for (int i = 2; i < n; i++) dp[i] = a[i] + max(dp[i-1], dp[i-2]);
+    cout << dp[n-1] << "\\n";
+}`},
+  {
+    title: "10, 10, 10, 10, 10 xallı pilləkəndə maksimum xal cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "pilləkən"],
+    statement: "N pilləli pilləkən verilib, hər pillədə bir XAL var (mənfi ola bilər). 0-cı pillədən başlayıb, hər addımda 1 və ya 2 pillə qalxaraq son pilləyə çatmaqla toplana bilən MAKSİMUM xal cəmini DP ilə tapın (hər keçilən pillənin xalı toplanır).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N xal.",
+    output: "Maksimum mümkün xal cəmi.",
+    example: {in:"5\n10 10 10 10 10", out:"50"},
+    approach: "<b>dp[i]</b> = i-ci pilləyə çatanda toplanan maksimum xal. <b>dp[0]=a[0]</b>, <b>dp[1]=a[0]+a[1]</b>; sonra <b>dp[i] = a[i] + max(dp[i-1], dp[i-2])</b> — i-ci pilləyə ya (i-1)-dən, ya (i-2)-dən gəlmək, HANSI DAHA ÇOX XAL verirsə o seçilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(n);
+    dp[0] = a[0];
+    if (n > 1) dp[1] = a[0] + a[1];
+    for (int i = 2; i < n; i++) dp[i] = a[i] + max(dp[i-1], dp[i-2]);
+    cout << dp[n-1] << "\\n";
+}`},
+  {
+    title: "[[1,3,1],[1,5,1],[4,2,1]] grid-də minimum yol cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib, hər xananın bir DƏYƏRİ var. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa/aşağı hərəkət edərək gedərkən, keçilən xanaların DƏYƏRLƏR CƏMİNİN MİNİMUM ola biləcəyini DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər.",
+    output: "Minimum yol cəmi.",
+    example: {in:"3 3\n1 3 1\n1 5 1\n4 2 1", out:"7"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaq üçün minimum cəm. <b>dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])</b> (sərhəddə yalnız bir istiqamətdən gəlmək mümkündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> g(m, vector<long long>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0) dp[i][j] = g[i][j];
+            else if (i == 0) dp[i][j] = dp[i][j-1] + g[i][j];
+            else if (j == 0) dp[i][j] = dp[i-1][j] + g[i][j];
+            else dp[i][j] = g[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "[[1,2,3],[4,5,6]] grid-də minimum yol cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib, hər xananın bir DƏYƏRİ var. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa/aşağı hərəkət edərək gedərkən, keçilən xanaların DƏYƏRLƏR CƏMİNİN MİNİMUM ola biləcəyini DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər.",
+    output: "Minimum yol cəmi.",
+    example: {in:"2 3\n1 2 3\n4 5 6", out:"12"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaq üçün minimum cəm. <b>dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])</b> (sərhəddə yalnız bir istiqamətdən gəlmək mümkündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> g(m, vector<long long>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0) dp[i][j] = g[i][j];
+            else if (i == 0) dp[i][j] = dp[i][j-1] + g[i][j];
+            else if (j == 0) dp[i][j] = dp[i-1][j] + g[i][j];
+            else dp[i][j] = g[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "[[5]] grid-də minimum yol cəmi (DP, tək xana)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib, hər xananın bir DƏYƏRİ var. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa/aşağı hərəkət edərək gedərkən, keçilən xanaların DƏYƏRLƏR CƏMİNİN MİNİMUM ola biləcəyini DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər.",
+    output: "Minimum yol cəmi.",
+    example: {in:"1 1\n5", out:"5"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaq üçün minimum cəm. <b>dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])</b> (sərhəddə yalnız bir istiqamətdən gəlmək mümkündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> g(m, vector<long long>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0) dp[i][j] = g[i][j];
+            else if (i == 0) dp[i][j] = dp[i][j-1] + g[i][j];
+            else if (j == 0) dp[i][j] = dp[i-1][j] + g[i][j];
+            else dp[i][j] = g[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "[[1],[2],[3]] grid-də minimum yol cəmi (DP, tək sütun)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib, hər xananın bir DƏYƏRİ var. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa/aşağı hərəkət edərək gedərkən, keçilən xanaların DƏYƏRLƏR CƏMİNİN MİNİMUM ola biləcəyini DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər.",
+    output: "Minimum yol cəmi.",
+    example: {in:"3 1\n1\n2\n3", out:"6"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaq üçün minimum cəm. <b>dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])</b> (sərhəddə yalnız bir istiqamətdən gəlmək mümkündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> g(m, vector<long long>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0) dp[i][j] = g[i][j];
+            else if (i == 0) dp[i][j] = dp[i][j-1] + g[i][j];
+            else if (j == 0) dp[i][j] = dp[i-1][j] + g[i][j];
+            else dp[i][j] = g[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "[[0,0],[0,0]] grid-də minimum yol cəmi (DP, hamısı sıfır)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N ölçülü grid verilib, hər xananın bir DƏYƏRİ var. Sol-yuxarı küncdən sağ-aşağı küncə YALNIZ sağa/aşağı hərəkət edərək gedərkən, keçilən xanaların DƏYƏRLƏR CƏMİNİN MİNİMUM ola biləcəyini DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər.",
+    output: "Minimum yol cəmi.",
+    example: {in:"2 2\n0 0\n0 0", out:"0"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaq üçün minimum cəm. <b>dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])</b> (sərhəddə yalnız bir istiqamətdən gəlmək mümkündür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<long long>> g(m, vector<long long>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0) dp[i][j] = g[i][j];
+            else if (i == 0) dp[i][j] = dp[i][j-1] + g[i][j];
+            else if (j == 0) dp[i][j] = dp[i-1][j] + g[i][j];
+            else dp[i][j] = g[i][j] + min(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/001_fib_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/002_fib_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/003_fib_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/004_fib_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/005_fib_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/006_pilleken_2_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/007_pilleken_2_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/008_pilleken_2_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/009_pilleken_2_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/010_pilleken_2_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/011_pilleken_3_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/012_pilleken_3_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/013_pilleken_3_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/014_pilleken_3_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/015_pilleken_3_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/016_min_xercle_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/017_min_xercle_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/018_min_xercle_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/019_min_xercle_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/020_min_xercle_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/021_ev_ogrusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/022_ev_ogrusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/023_ev_ogrusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/024_ev_ogrusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/025_ev_ogrusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/026_en_uzun_artan_altcoxluq_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/027_en_uzun_artan_altcoxluq_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/028_en_uzun_artan_altcoxluq_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/029_en_uzun_artan_altcoxluq_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/030_en_uzun_artan_altcoxluq_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/031_maksimum_altcoxluq_cemi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/032_maksimum_altcoxluq_cemi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/033_maksimum_altcoxluq_cemi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/034_maksimum_altcoxluq_cemi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/035_maksimum_altcoxluq_cemi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/036_sikke_defisi_minimum_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/037_sikke_defisi_minimum_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/038_sikke_defisi_minimum_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/039_sikke_defisi_minimum_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/040_sikke_defisi_minimum_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/041_sikke_defisi_yol_sayi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/042_sikke_defisi_yol_sayi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/043_sikke_defisi_yol_sayi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/044_sikke_defisi_yol_sayi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/045_sikke_defisi_yol_sayi_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/046_unikal_yollar_grid.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/047_unikal_yollar_grid.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/048_unikal_yollar_grid.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/049_unikal_yollar_grid.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/050_unikal_yollar_grid.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/051_kvadratlarin_cemi_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/052_kvadratlarin_cemi_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/053_kvadratlarin_cemi_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/054_kvadratlarin_cemi_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/055_kvadratlarin_cemi_minimum.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/056_en_uzun_palindromik_altsetir_uzunluq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/057_en_uzun_palindromik_altsetir_uzunluq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/058_en_uzun_palindromik_altsetir_uzunluq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/059_en_uzun_palindromik_altsetir_uzunluq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/060_en_uzun_palindromik_altsetir_uzunluq.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/061_domino_doseme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/062_domino_doseme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/063_domino_doseme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/064_domino_doseme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/065_domino_doseme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/066_tribonacci_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/067_tribonacci_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/068_tribonacci_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/069_tribonacci_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/070_tribonacci_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/071_pilleken_k_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/072_pilleken_k_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/073_pilleken_k_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/074_pilleken_k_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/075_pilleken_k_addim.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/076_en_uzun_ardicil_bir_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/077_en_uzun_ardicil_bir_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/078_en_uzun_ardicil_bir_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/079_en_uzun_ardicil_bir_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/080_en_uzun_ardicil_bir_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/081_altcoxluq_cemi_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/082_altcoxluq_cemi_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/083_altcoxluq_cemi_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/084_altcoxluq_cemi_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/085_altcoxluq_cemi_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/086_beraber_bolme_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/087_beraber_bolme_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/088_beraber_bolme_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/089_beraber_bolme_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/090_beraber_bolme_var_dp.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/091_max_xalli_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/092_max_xalli_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/093_max_xalli_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/094_max_xalli_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/095_max_xalli_pilleken.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/096_grid_minimum_yol_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/097_grid_minimum_yol_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/098_grid_minimum_yol_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/099_grid_minimum_yol_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu12/100_grid_minimum_yol_cemi.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week12/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
