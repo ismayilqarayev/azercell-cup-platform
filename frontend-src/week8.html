@@ -1,0 +1,2985 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 8 — Test: Rekursiya əsasları (Baza şərti, rekursiv addım, stack məntiqi)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>08</span> — Test Vərəqi</h1>
+    <p>Mövzu: rekursiyanın baza şərti (base case) və rekursiv addımı, faktorial, Fibonacci, massiv/sətir üzərində rekursiya, ƏBOB, qüvvətə yüksəltmə, rekursiv axtarış. Aşağıdakı 100 məsələ yalnız Mövzu 8-in mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 8 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "5! (5 faktorial) rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "faktorial"],
+    statement: "N ədədi verilib. N! (N faktorial) qiymətini REKURSİV funksiya ilə hesablayıb çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 20).",
+    output: "N!-ın qiyməti.",
+    example: {in:"5", out:"120"},
+    approach: "<b>Baza şərti:</b> fact(0) = 1. <b>Rekursiv addım:</b> fact(n) = n * fact(n-1). Hər çağırış problemi BİR KİÇİK versiyasına endirir, nəhayət baza şərtinə çatır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    if (n == 0) return 1;
+    return n * fact(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fact(n) << "\\n";
+}`},
+  {
+    title: "0! (0 faktorial) rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "faktorial"],
+    statement: "N ədədi verilib. N! (N faktorial) qiymətini REKURSİV funksiya ilə hesablayıb çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 20).",
+    output: "N!-ın qiyməti.",
+    example: {in:"0", out:"1"},
+    approach: "<b>Baza şərti:</b> fact(0) = 1. <b>Rekursiv addım:</b> fact(n) = n * fact(n-1). Hər çağırış problemi BİR KİÇİK versiyasına endirir, nəhayət baza şərtinə çatır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    if (n == 0) return 1;
+    return n * fact(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fact(n) << "\\n";
+}`},
+  {
+    title: "1! (1 faktorial) rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "faktorial"],
+    statement: "N ədədi verilib. N! (N faktorial) qiymətini REKURSİV funksiya ilə hesablayıb çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 20).",
+    output: "N!-ın qiyməti.",
+    example: {in:"1", out:"1"},
+    approach: "<b>Baza şərti:</b> fact(0) = 1. <b>Rekursiv addım:</b> fact(n) = n * fact(n-1). Hər çağırış problemi BİR KİÇİK versiyasına endirir, nəhayət baza şərtinə çatır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    if (n == 0) return 1;
+    return n * fact(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fact(n) << "\\n";
+}`},
+  {
+    title: "10! (10 faktorial) rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "faktorial"],
+    statement: "N ədədi verilib. N! (N faktorial) qiymətini REKURSİV funksiya ilə hesablayıb çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 20).",
+    output: "N!-ın qiyməti.",
+    example: {in:"10", out:"3628800"},
+    approach: "<b>Baza şərti:</b> fact(0) = 1. <b>Rekursiv addım:</b> fact(n) = n * fact(n-1). Hər çağırış problemi BİR KİÇİK versiyasına endirir, nəhayət baza şərtinə çatır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    if (n == 0) return 1;
+    return n * fact(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fact(n) << "\\n";
+}`},
+  {
+    title: "7! (7 faktorial) rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "faktorial"],
+    statement: "N ədədi verilib. N! (N faktorial) qiymətini REKURSİV funksiya ilə hesablayıb çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 20).",
+    output: "N!-ın qiyməti.",
+    example: {in:"7", out:"5040"},
+    approach: "<b>Baza şərti:</b> fact(0) = 1. <b>Rekursiv addım:</b> fact(n) = n * fact(n-1). Hər çağırış problemi BİR KİÇİK versiyasına endirir, nəhayət baza şərtinə çatır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fact(int n){
+    if (n == 0) return 1;
+    return n * fact(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fact(n) << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 10-cu həddini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) REKURSİV funksiya ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"10", out:"55"},
+    approach: "<b>İKİ baza şərti</b> var: fib(0)=0, fib(1)=1. <b>Rekursiv addım:</b> fib(n) = fib(n-1) + fib(n-2) — hər addım problemi İKİ kiçik alt-probleme bölür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+int main(){
+    int n; cin >> n;
+    cout << fib(n) << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 0-cı həddini rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "easy",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) REKURSİV funksiya ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"0", out:"0"},
+    approach: "<b>İKİ baza şərti</b> var: fib(0)=0, fib(1)=1. <b>Rekursiv addım:</b> fib(n) = fib(n-1) + fib(n-2) — hər addım problemi İKİ kiçik alt-probleme bölür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+int main(){
+    int n; cin >> n;
+    cout << fib(n) << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 1-ci həddini rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "easy",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) REKURSİV funksiya ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"1", out:"1"},
+    approach: "<b>İKİ baza şərti</b> var: fib(0)=0, fib(1)=1. <b>Rekursiv addım:</b> fib(n) = fib(n-1) + fib(n-2) — hər addım problemi İKİ kiçik alt-probleme bölür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+int main(){
+    int n; cin >> n;
+    cout << fib(n) << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 15-ci həddini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) REKURSİV funksiya ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"15", out:"610"},
+    approach: "<b>İKİ baza şərti</b> var: fib(0)=0, fib(1)=1. <b>Rekursiv addım:</b> fib(n) = fib(n-1) + fib(n-2) — hər addım problemi İKİ kiçik alt-probleme bölür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+int main(){
+    int n; cin >> n;
+    cout << fib(n) << "\\n";
+}`},
+  {
+    title: "Fibonaccinin 20-ci həddini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. Fibonacci ardıcıllığının N-ci həddini (F(0)=0, F(1)=1) REKURSİV funksiya ilə tapın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "F(N)-in qiyməti.",
+    example: {in:"20", out:"6765"},
+    approach: "<b>İKİ baza şərti</b> var: fib(0)=0, fib(1)=1. <b>Rekursiv addım:</b> fib(n) = fib(n-1) + fib(n-2) — hər addım problemi İKİ kiçik alt-probleme bölür.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+int main(){
+    int n; cin >> n;
+    cout << fib(n) << "\\n";
+}`},
+  {
+    title: "1-dən 10-a qədər cəmi rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "cəm"],
+    statement: "N verilib. 1-dən N-ə qədər bütün tam ədədlərin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 100000).",
+    output: "1+2+...+N cəmi.",
+    example: {in:"10", out:"55"},
+    approach: "<b>Baza şərti:</b> sum(0) = 0. <b>Rekursiv addım:</b> sum(n) = n + sum(n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sum1n(int n){
+    if (n == 0) return 0;
+    return n + sum1n(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << sum1n(n) << "\\n";
+}`},
+  {
+    title: "1-dən 5-ə qədər cəmi rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "cəm"],
+    statement: "N verilib. 1-dən N-ə qədər bütün tam ədədlərin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 100000).",
+    output: "1+2+...+N cəmi.",
+    example: {in:"5", out:"15"},
+    approach: "<b>Baza şərti:</b> sum(0) = 0. <b>Rekursiv addım:</b> sum(n) = n + sum(n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sum1n(int n){
+    if (n == 0) return 0;
+    return n + sum1n(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << sum1n(n) << "\\n";
+}`},
+  {
+    title: "1-dən 0-a qədər cəmi rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "easy",
+    tags: ["rekursiya", "cəm"],
+    statement: "N verilib. 1-dən N-ə qədər bütün tam ədədlərin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 100000).",
+    output: "1+2+...+N cəmi.",
+    example: {in:"0", out:"0"},
+    approach: "<b>Baza şərti:</b> sum(0) = 0. <b>Rekursiv addım:</b> sum(n) = n + sum(n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sum1n(int n){
+    if (n == 0) return 0;
+    return n + sum1n(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << sum1n(n) << "\\n";
+}`},
+  {
+    title: "1-dən 100-ə qədər cəmi rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "cəm"],
+    statement: "N verilib. 1-dən N-ə qədər bütün tam ədədlərin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 100000).",
+    output: "1+2+...+N cəmi.",
+    example: {in:"100", out:"5050"},
+    approach: "<b>Baza şərti:</b> sum(0) = 0. <b>Rekursiv addım:</b> sum(n) = n + sum(n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sum1n(int n){
+    if (n == 0) return 0;
+    return n + sum1n(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << sum1n(n) << "\\n";
+}`},
+  {
+    title: "1-dən 1-ə qədər cəmi rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "cəm"],
+    statement: "N verilib. 1-dən N-ə qədər bütün tam ədədlərin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 100000).",
+    output: "1+2+...+N cəmi.",
+    example: {in:"1", out:"1"},
+    approach: "<b>Baza şərti:</b> sum(0) = 0. <b>Rekursiv addım:</b> sum(n) = n + sum(n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sum1n(int n){
+    if (n == 0) return 0;
+    return n + sum1n(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << sum1n(n) << "\\n";
+}`},
+  {
+    title: "12345 ədədinin rəqəmlər cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun rəqəmlərinin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəmlərinin cəmi.",
+    example: {in:"12345", out:"15"},
+    approach: "<b>Baza şərti:</b> digitSum(0) = 0. <b>Rekursiv addım:</b> digitSum(n) = (n%10) + digitSum(n/10) — hər addımda sonuncu rəqəm ayrılır, qalanı ilə rekursiya davam edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long digitSum(long long n){
+    if (n == 0) return 0;
+    return (n % 10) + digitSum(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << digitSum(n) << "\\n";
+}`},
+  {
+    title: "999 ədədinin rəqəmlər cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun rəqəmlərinin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəmlərinin cəmi.",
+    example: {in:"999", out:"27"},
+    approach: "<b>Baza şərti:</b> digitSum(0) = 0. <b>Rekursiv addım:</b> digitSum(n) = (n%10) + digitSum(n/10) — hər addımda sonuncu rəqəm ayrılır, qalanı ilə rekursiya davam edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long digitSum(long long n){
+    if (n == 0) return 0;
+    return (n % 10) + digitSum(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << digitSum(n) << "\\n";
+}`},
+  {
+    title: "0 ədədinin rəqəmlər cəmini rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun rəqəmlərinin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəmlərinin cəmi.",
+    example: {in:"0", out:"0"},
+    approach: "<b>Baza şərti:</b> digitSum(0) = 0. <b>Rekursiv addım:</b> digitSum(n) = (n%10) + digitSum(n/10) — hər addımda sonuncu rəqəm ayrılır, qalanı ilə rekursiya davam edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long digitSum(long long n){
+    if (n == 0) return 0;
+    return (n % 10) + digitSum(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << digitSum(n) << "\\n";
+}`},
+  {
+    title: "7 ədədinin rəqəmlər cəmini rekursiya ilə tapmaq (tək rəqəm)",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun rəqəmlərinin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəmlərinin cəmi.",
+    example: {in:"7", out:"7"},
+    approach: "<b>Baza şərti:</b> digitSum(0) = 0. <b>Rekursiv addım:</b> digitSum(n) = (n%10) + digitSum(n/10) — hər addımda sonuncu rəqəm ayrılır, qalanı ilə rekursiya davam edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long digitSum(long long n){
+    if (n == 0) return 0;
+    return (n % 10) + digitSum(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << digitSum(n) << "\\n";
+}`},
+  {
+    title: "1000000 ədədinin rəqəmlər cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun rəqəmlərinin cəmini REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəmlərinin cəmi.",
+    example: {in:"1000000", out:"1"},
+    approach: "<b>Baza şərti:</b> digitSum(0) = 0. <b>Rekursiv addım:</b> digitSum(n) = (n%10) + digitSum(n/10) — hər addımda sonuncu rəqəm ayrılır, qalanı ilə rekursiya davam edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long digitSum(long long n){
+    if (n == 0) return 0;
+    return (n % 10) + digitSum(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << digitSum(n) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivin bütün elementlərinin cəmini REKURSİV funksiya ilə hesablayın (dövr İŞLƏTMƏDƏN).",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin cəmi.",
+    example: {in:"5\n5 3 8 1 9", out:"26"},
+    approach: "Funksiya massivi VƏ cari indeksi parametr kimi alır. <b>Baza şərti:</b> indeks == n (massiv bitib) — 0 qaytarılır. <b>Rekursiv addım:</b> a[indeks] + qalan hissənin cəmi.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    return a[idx] + sumArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumArr(a, 0) << "\\n";
+}`},
+  {
+    title: "0 massivinin cəmini rekursiya ilə tapmaq (boş massiv)",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivin bütün elementlərinin cəmini REKURSİV funksiya ilə hesablayın (dövr İŞLƏTMƏDƏN).",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin cəmi.",
+    example: {in:"0", out:"0"},
+    approach: "Funksiya massivi VƏ cari indeksi parametr kimi alır. <b>Baza şərti:</b> indeks == n (massiv bitib) — 0 qaytarılır. <b>Rekursiv addım:</b> a[indeks] + qalan hissənin cəmi.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    return a[idx] + sumArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumArr(a, 0) << "\\n";
+}`},
+  {
+    title: "7 massivinin cəmini rekursiya ilə tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivin bütün elementlərinin cəmini REKURSİV funksiya ilə hesablayın (dövr İŞLƏTMƏDƏN).",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin cəmi.",
+    example: {in:"1\n7", out:"7"},
+    approach: "Funksiya massivi VƏ cari indeksi parametr kimi alır. <b>Baza şərti:</b> indeks == n (massiv bitib) — 0 qaytarılır. <b>Rekursiv addım:</b> a[indeks] + qalan hissənin cəmi.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    return a[idx] + sumArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumArr(a, 0) << "\\n";
+}`},
+  {
+    title: "-1, -2, -3, -4 massivinin cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivin bütün elementlərinin cəmini REKURSİV funksiya ilə hesablayın (dövr İŞLƏTMƏDƏN).",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin cəmi.",
+    example: {in:"4\n-1 -2 -3 -4", out:"-10"},
+    approach: "Funksiya massivi VƏ cari indeksi parametr kimi alır. <b>Baza şərti:</b> indeks == n (massiv bitib) — 0 qaytarılır. <b>Rekursiv addım:</b> a[indeks] + qalan hissənin cəmi.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    return a[idx] + sumArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumArr(a, 0) << "\\n";
+}`},
+  {
+    title: "10, 20, 30, 40, 50 massivinin cəmini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivin bütün elementlərinin cəmini REKURSİV funksiya ilə hesablayın (dövr İŞLƏTMƏDƏN).",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin cəmi.",
+    example: {in:"5\n10 20 30 40 50", out:"150"},
+    approach: "Funksiya massivi VƏ cari indeksi parametr kimi alır. <b>Baza şərti:</b> indeks == n (massiv bitib) — 0 qaytarılır. <b>Rekursiv addım:</b> a[indeks] + qalan hissənin cəmi.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long sumArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    return a[idx] + sumArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << sumArr(a, 0) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin maksimumunu rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük ədədi REKURSİV funksiya ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd.",
+    example: {in:"5\n5 3 8 1 9", out:"9"},
+    approach: "<b>Baza şərti:</b> yalnız 1 element qalıbsa, o elementin özü maksimumdur. <b>Rekursiv addım:</b> cari elementi qalan hissənin (rekursiv tapılmış) maksimumu ilə müqayisə et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxArr(vector<int>& a, int idx){
+    if (idx == (int)a.size() - 1) return a[idx];
+    int restMax = maxArr(a, idx + 1);
+    return max(a[idx], restMax);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << maxArr(a, 0) << "\\n";
+}`},
+  {
+    title: "4 massivinin maksimumunu rekursiya ilə tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük ədədi REKURSİV funksiya ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd.",
+    example: {in:"1\n4", out:"4"},
+    approach: "<b>Baza şərti:</b> yalnız 1 element qalıbsa, o elementin özü maksimumdur. <b>Rekursiv addım:</b> cari elementi qalan hissənin (rekursiv tapılmış) maksimumu ilə müqayisə et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxArr(vector<int>& a, int idx){
+    if (idx == (int)a.size() - 1) return a[idx];
+    int restMax = maxArr(a, idx + 1);
+    return max(a[idx], restMax);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << maxArr(a, 0) << "\\n";
+}`},
+  {
+    title: "-5, -1, -10, -3 massivinin maksimumunu rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük ədədi REKURSİV funksiya ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd.",
+    example: {in:"4\n-5 -1 -10 -3", out:"-1"},
+    approach: "<b>Baza şərti:</b> yalnız 1 element qalıbsa, o elementin özü maksimumdur. <b>Rekursiv addım:</b> cari elementi qalan hissənin (rekursiv tapılmış) maksimumu ilə müqayisə et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxArr(vector<int>& a, int idx){
+    if (idx == (int)a.size() - 1) return a[idx];
+    int restMax = maxArr(a, idx + 1);
+    return max(a[idx], restMax);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << maxArr(a, 0) << "\\n";
+}`},
+  {
+    title: "100, 100, 100 massivinin maksimumunu rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük ədədi REKURSİV funksiya ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd.",
+    example: {in:"3\n100 100 100", out:"100"},
+    approach: "<b>Baza şərti:</b> yalnız 1 element qalıbsa, o elementin özü maksimumdur. <b>Rekursiv addım:</b> cari elementi qalan hissənin (rekursiv tapılmış) maksimumu ilə müqayisə et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxArr(vector<int>& a, int idx){
+    if (idx == (int)a.size() - 1) return a[idx];
+    int restMax = maxArr(a, idx + 1);
+    return max(a[idx], restMax);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << maxArr(a, 0) << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5, 6, 7 massivinin maksimumunu rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük ədədi REKURSİV funksiya ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd.",
+    example: {in:"7\n1 2 3 4 5 6 7", out:"7"},
+    approach: "<b>Baza şərti:</b> yalnız 1 element qalıbsa, o elementin özü maksimumdur. <b>Rekursiv addım:</b> cari elementi qalan hissənin (rekursiv tapılmış) maksimumu ilə müqayisə et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int maxArr(vector<int>& a, int idx){
+    if (idx == (int)a.size() - 1) return a[idx];
+    int restMax = maxArr(a, idx + 1);
+    return max(a[idx], restMax);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << maxArr(a, 0) << "\\n";
+}`},
+  {
+    title: "\"salam\" sözünü rekursiya ilə tərsinə çevirmək",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir verilib. Onu REKURSİV funksiya ilə tərsinə çevirib çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "S-in tərsi.",
+    example: {in:"salam", out:"malas"},
+    approach: "<b>Baza şərti:</b> boş sətrin tərsi boş sətirdir. <b>Rekursiv addım:</b> sətrin tərsi = (sondan 1-ci simvoldan sonrakı hissənin tərsi) + (sondan 1-ci simvol) — ya da sadəcə, ilk simvolu ayırıb qalanının tərsinin SONUNA əlavə etmək.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+string rev(const string& s){
+    if (s.empty()) return s;
+    return rev(s.substr(1)) + s[0];
+}
+int main(){
+    string s; cin >> s;
+    cout << rev(s) << "\\n";
+}`},
+  {
+    title: "\"azercell\" sözünü rekursiya ilə tərsinə çevirmək",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir verilib. Onu REKURSİV funksiya ilə tərsinə çevirib çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "S-in tərsi.",
+    example: {in:"azercell", out:"llecreza"},
+    approach: "<b>Baza şərti:</b> boş sətrin tərsi boş sətirdir. <b>Rekursiv addım:</b> sətrin tərsi = (sondan 1-ci simvoldan sonrakı hissənin tərsi) + (sondan 1-ci simvol) — ya da sadəcə, ilk simvolu ayırıb qalanının tərsinin SONUNA əlavə etmək.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+string rev(const string& s){
+    if (s.empty()) return s;
+    return rev(s.substr(1)) + s[0];
+}
+int main(){
+    string s; cin >> s;
+    cout << rev(s) << "\\n";
+}`},
+  {
+    title: "\"a\" sözünü rekursiya ilə tərsinə çevirmək (tək hərf)",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir verilib. Onu REKURSİV funksiya ilə tərsinə çevirib çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "S-in tərsi.",
+    example: {in:"a", out:"a"},
+    approach: "<b>Baza şərti:</b> boş sətrin tərsi boş sətirdir. <b>Rekursiv addım:</b> sətrin tərsi = (sondan 1-ci simvoldan sonrakı hissənin tərsi) + (sondan 1-ci simvol) — ya da sadəcə, ilk simvolu ayırıb qalanının tərsinin SONUNA əlavə etmək.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+string rev(const string& s){
+    if (s.empty()) return s;
+    return rev(s.substr(1)) + s[0];
+}
+int main(){
+    string s; cin >> s;
+    cout << rev(s) << "\\n";
+}`},
+  {
+    title: "\"abcd\" sözünü rekursiya ilə tərsinə çevirmək",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir verilib. Onu REKURSİV funksiya ilə tərsinə çevirib çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "S-in tərsi.",
+    example: {in:"abcd", out:"dcba"},
+    approach: "<b>Baza şərti:</b> boş sətrin tərsi boş sətirdir. <b>Rekursiv addım:</b> sətrin tərsi = (sondan 1-ci simvoldan sonrakı hissənin tərsi) + (sondan 1-ci simvol) — ya da sadəcə, ilk simvolu ayırıb qalanının tərsinin SONUNA əlavə etmək.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+string rev(const string& s){
+    if (s.empty()) return s;
+    return rev(s.substr(1)) + s[0];
+}
+int main(){
+    string s; cin >> s;
+    cout << rev(s) << "\\n";
+}`},
+  {
+    title: "\"cup\" sözünü rekursiya ilə tərsinə çevirmək",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir verilib. Onu REKURSİV funksiya ilə tərsinə çevirib çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "S-in tərsi.",
+    example: {in:"cup", out:"puc"},
+    approach: "<b>Baza şərti:</b> boş sətrin tərsi boş sətirdir. <b>Rekursiv addım:</b> sətrin tərsi = (sondan 1-ci simvoldan sonrakı hissənin tərsi) + (sondan 1-ci simvol) — ya da sadəcə, ilk simvolu ayırıb qalanının tərsinin SONUNA əlavə etmək.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+string rev(const string& s){
+    if (s.empty()) return s;
+    return rev(s.substr(1)) + s[0];
+}
+int main(){
+    string s; cin >> s;
+    cout << rev(s) << "\\n";
+}`},
+  {
+    title: "\"abcba\" sözünün palindrom olub-olmadığını rekursiya ilə yoxlamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "palindrome"],
+    statement: "Bir sətir verilib. Onun palindrom olub-olmadığını REKURSİV funksiya ilə yoxlayın: \"BƏLİ\" və ya \"XEYR\" çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "\"BƏLİ\" və ya \"XEYR\".",
+    example: {in:"abcba", out:"BELI"},
+    approach: "<b>Baza şərti:</b> uzunluğu 0 və ya 1 olan sətir həmişə palindromdur. <b>Rekursiv addım:</b> ilk və son simvollar bərabərdirsə, ARADAKI hissənin palindrom olub-olmadığına baxılır (eyni funksiya, kiçilmiş sətirlə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPal(const string& s, int l, int r){
+    if (l >= r) return true;
+    if (s[l] != s[r]) return false;
+    return isPal(s, l + 1, r - 1);
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPal(s, 0, (int)s.size() - 1) ? "BELI" : "XEYR") << "\\n";
+}`},
+  {
+    title: "\"salam\" sözünün palindrom olub-olmadığını rekursiya ilə yoxlamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "palindrome"],
+    statement: "Bir sətir verilib. Onun palindrom olub-olmadığını REKURSİV funksiya ilə yoxlayın: \"BƏLİ\" və ya \"XEYR\" çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "\"BƏLİ\" və ya \"XEYR\".",
+    example: {in:"salam", out:"XEYR"},
+    approach: "<b>Baza şərti:</b> uzunluğu 0 və ya 1 olan sətir həmişə palindromdur. <b>Rekursiv addım:</b> ilk və son simvollar bərabərdirsə, ARADAKI hissənin palindrom olub-olmadığına baxılır (eyni funksiya, kiçilmiş sətirlə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPal(const string& s, int l, int r){
+    if (l >= r) return true;
+    if (s[l] != s[r]) return false;
+    return isPal(s, l + 1, r - 1);
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPal(s, 0, (int)s.size() - 1) ? "BELI" : "XEYR") << "\\n";
+}`},
+  {
+    title: "\"a\" sözünün palindrom olub-olmadığını rekursiya ilə yoxlamaq (tək hərf)",
+    difficulty: "mid",
+    tags: ["rekursiya", "palindrome"],
+    statement: "Bir sətir verilib. Onun palindrom olub-olmadığını REKURSİV funksiya ilə yoxlayın: \"BƏLİ\" və ya \"XEYR\" çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "\"BƏLİ\" və ya \"XEYR\".",
+    example: {in:"a", out:"BELI"},
+    approach: "<b>Baza şərti:</b> uzunluğu 0 və ya 1 olan sətir həmişə palindromdur. <b>Rekursiv addım:</b> ilk və son simvollar bərabərdirsə, ARADAKI hissənin palindrom olub-olmadığına baxılır (eyni funksiya, kiçilmiş sətirlə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPal(const string& s, int l, int r){
+    if (l >= r) return true;
+    if (s[l] != s[r]) return false;
+    return isPal(s, l + 1, r - 1);
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPal(s, 0, (int)s.size() - 1) ? "BELI" : "XEYR") << "\\n";
+}`},
+  {
+    title: "\"otto\" sözünün palindrom olub-olmadığını rekursiya ilə yoxlamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "palindrome"],
+    statement: "Bir sətir verilib. Onun palindrom olub-olmadığını REKURSİV funksiya ilə yoxlayın: \"BƏLİ\" və ya \"XEYR\" çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "\"BƏLİ\" və ya \"XEYR\".",
+    example: {in:"otto", out:"BELI"},
+    approach: "<b>Baza şərti:</b> uzunluğu 0 və ya 1 olan sətir həmişə palindromdur. <b>Rekursiv addım:</b> ilk və son simvollar bərabərdirsə, ARADAKI hissənin palindrom olub-olmadığına baxılır (eyni funksiya, kiçilmiş sətirlə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPal(const string& s, int l, int r){
+    if (l >= r) return true;
+    if (s[l] != s[r]) return false;
+    return isPal(s, l + 1, r - 1);
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPal(s, 0, (int)s.size() - 1) ? "BELI" : "XEYR") << "\\n";
+}`},
+  {
+    title: "\"azercell\" sözünün palindrom olub-olmadığını rekursiya ilə yoxlamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "palindrome"],
+    statement: "Bir sətir verilib. Onun palindrom olub-olmadığını REKURSİV funksiya ilə yoxlayın: \"BƏLİ\" və ya \"XEYR\" çap edin.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 1000, boşluqsuz).",
+    output: "\"BƏLİ\" və ya \"XEYR\".",
+    example: {in:"azercell", out:"XEYR"},
+    approach: "<b>Baza şərti:</b> uzunluğu 0 və ya 1 olan sətir həmişə palindromdur. <b>Rekursiv addım:</b> ilk və son simvollar bərabərdirsə, ARADAKI hissənin palindrom olub-olmadığına baxılır (eyni funksiya, kiçilmiş sətirlə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool isPal(const string& s, int l, int r){
+    if (l >= r) return true;
+    if (s[l] != s[r]) return false;
+    return isPal(s, l + 1, r - 1);
+}
+int main(){
+    string s; cin >> s;
+    cout << (isPal(s, 0, (int)s.size() - 1) ? "BELI" : "XEYR") << "\\n";
+}`},
+  {
+    title: "2-nin 10-cu qüvvətini rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "qüvvət"],
+    statement: "A və N verilib. A-nın N-ci qüvvətini (A^N) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir sətirdə A və N (1 ≤ A ≤ 20, 0 ≤ N ≤ 15).",
+    output: "A^N-in qiyməti.",
+    example: {in:"2 10", out:"1024"},
+    approach: "<b>Baza şərti:</b> hər hansı ədədin 0-cı qüvvəti 1-dir. <b>Rekursiv addım:</b> power(a, n) = a * power(a, n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long a, int n){
+    if (n == 0) return 1;
+    return a * power(a, n - 1);
+}
+int main(){
+    long long a; int n; cin >> a >> n;
+    cout << power(a, n) << "\\n";
+}`},
+  {
+    title: "5-in 0-cı qüvvətini rekursiya ilə hesablamaq (baza şərti)",
+    difficulty: "easy",
+    tags: ["rekursiya", "qüvvət"],
+    statement: "A və N verilib. A-nın N-ci qüvvətini (A^N) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir sətirdə A və N (1 ≤ A ≤ 20, 0 ≤ N ≤ 15).",
+    output: "A^N-in qiyməti.",
+    example: {in:"5 0", out:"1"},
+    approach: "<b>Baza şərti:</b> hər hansı ədədin 0-cı qüvvəti 1-dir. <b>Rekursiv addım:</b> power(a, n) = a * power(a, n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long a, int n){
+    if (n == 0) return 1;
+    return a * power(a, n - 1);
+}
+int main(){
+    long long a; int n; cin >> a >> n;
+    cout << power(a, n) << "\\n";
+}`},
+  {
+    title: "3-ün 4-cü qüvvətini rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "qüvvət"],
+    statement: "A və N verilib. A-nın N-ci qüvvətini (A^N) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir sətirdə A və N (1 ≤ A ≤ 20, 0 ≤ N ≤ 15).",
+    output: "A^N-in qiyməti.",
+    example: {in:"3 4", out:"81"},
+    approach: "<b>Baza şərti:</b> hər hansı ədədin 0-cı qüvvəti 1-dir. <b>Rekursiv addım:</b> power(a, n) = a * power(a, n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long a, int n){
+    if (n == 0) return 1;
+    return a * power(a, n - 1);
+}
+int main(){
+    long long a; int n; cin >> a >> n;
+    cout << power(a, n) << "\\n";
+}`},
+  {
+    title: "1-in 15-ci qüvvətini rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "qüvvət"],
+    statement: "A və N verilib. A-nın N-ci qüvvətini (A^N) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir sətirdə A və N (1 ≤ A ≤ 20, 0 ≤ N ≤ 15).",
+    output: "A^N-in qiyməti.",
+    example: {in:"1 15", out:"1"},
+    approach: "<b>Baza şərti:</b> hər hansı ədədin 0-cı qüvvəti 1-dir. <b>Rekursiv addım:</b> power(a, n) = a * power(a, n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long a, int n){
+    if (n == 0) return 1;
+    return a * power(a, n - 1);
+}
+int main(){
+    long long a; int n; cin >> a >> n;
+    cout << power(a, n) << "\\n";
+}`},
+  {
+    title: "10-un 5-ci qüvvətini rekursiya ilə hesablamaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "qüvvət"],
+    statement: "A və N verilib. A-nın N-ci qüvvətini (A^N) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir sətirdə A və N (1 ≤ A ≤ 20, 0 ≤ N ≤ 15).",
+    output: "A^N-in qiyməti.",
+    example: {in:"10 5", out:"100000"},
+    approach: "<b>Baza şərti:</b> hər hansı ədədin 0-cı qüvvəti 1-dir. <b>Rekursiv addım:</b> power(a, n) = a * power(a, n-1).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long power(long long a, int n){
+    if (n == 0) return 1;
+    return a * power(a, n - 1);
+}
+int main(){
+    long long a; int n; cin >> a >> n;
+    cout << power(a, n) << "\\n";
+}`},
+  {
+    title: "24 və 36 ədədlərinin ƏBOB-unu rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ƏBOB"],
+    statement: "A və B verilib. Onların ƏN BÖYÜK ORTAQ BÖLƏNİNİ (ƏBOB) Evklid alqoritmi ilə, REKURSİV olaraq tapın.",
+    input: "Bir sətirdə A və B (1 ≤ A, B ≤ 10^9).",
+    output: "ƏBOB(A, B).",
+    example: {in:"24 36", out:"12"},
+    approach: "Evklid alqoritmi: <b>Baza şərti:</b> gcd(a, 0) = a. <b>Rekursiv addım:</b> gcd(a, b) = gcd(b, a mod b) — bu, ƏBOB-un dəyişmədiyi riyazi xassəyə əsaslanır və çox sürətli (loqarifmik) yaxınlaşır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long gcdRec(long long a, long long b){
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << gcdRec(a, b) << "\\n";
+}`},
+  {
+    title: "17 və 5 ədədlərinin ƏBOB-unu rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ƏBOB"],
+    statement: "A və B verilib. Onların ƏN BÖYÜK ORTAQ BÖLƏNİNİ (ƏBOB) Evklid alqoritmi ilə, REKURSİV olaraq tapın.",
+    input: "Bir sətirdə A və B (1 ≤ A, B ≤ 10^9).",
+    output: "ƏBOB(A, B).",
+    example: {in:"17 5", out:"1"},
+    approach: "Evklid alqoritmi: <b>Baza şərti:</b> gcd(a, 0) = a. <b>Rekursiv addım:</b> gcd(a, b) = gcd(b, a mod b) — bu, ƏBOB-un dəyişmədiyi riyazi xassəyə əsaslanır və çox sürətli (loqarifmik) yaxınlaşır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long gcdRec(long long a, long long b){
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << gcdRec(a, b) << "\\n";
+}`},
+  {
+    title: "100 və 75 ədədlərinin ƏBOB-unu rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ƏBOB"],
+    statement: "A və B verilib. Onların ƏN BÖYÜK ORTAQ BÖLƏNİNİ (ƏBOB) Evklid alqoritmi ilə, REKURSİV olaraq tapın.",
+    input: "Bir sətirdə A və B (1 ≤ A, B ≤ 10^9).",
+    output: "ƏBOB(A, B).",
+    example: {in:"100 75", out:"25"},
+    approach: "Evklid alqoritmi: <b>Baza şərti:</b> gcd(a, 0) = a. <b>Rekursiv addım:</b> gcd(a, b) = gcd(b, a mod b) — bu, ƏBOB-un dəyişmədiyi riyazi xassəyə əsaslanır və çox sürətli (loqarifmik) yaxınlaşır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long gcdRec(long long a, long long b){
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << gcdRec(a, b) << "\\n";
+}`},
+  {
+    title: "7 və 7 ədədlərinin ƏBOB-unu rekursiya ilə tapmaq (bərabər ədədlər)",
+    difficulty: "mid",
+    tags: ["rekursiya", "ƏBOB"],
+    statement: "A və B verilib. Onların ƏN BÖYÜK ORTAQ BÖLƏNİNİ (ƏBOB) Evklid alqoritmi ilə, REKURSİV olaraq tapın.",
+    input: "Bir sətirdə A və B (1 ≤ A, B ≤ 10^9).",
+    output: "ƏBOB(A, B).",
+    example: {in:"7 7", out:"7"},
+    approach: "Evklid alqoritmi: <b>Baza şərti:</b> gcd(a, 0) = a. <b>Rekursiv addım:</b> gcd(a, b) = gcd(b, a mod b) — bu, ƏBOB-un dəyişmədiyi riyazi xassəyə əsaslanır və çox sürətli (loqarifmik) yaxınlaşır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long gcdRec(long long a, long long b){
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << gcdRec(a, b) << "\\n";
+}`},
+  {
+    title: "1 və 999 ədədlərinin ƏBOB-unu rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ƏBOB"],
+    statement: "A və B verilib. Onların ƏN BÖYÜK ORTAQ BÖLƏNİNİ (ƏBOB) Evklid alqoritmi ilə, REKURSİV olaraq tapın.",
+    input: "Bir sətirdə A və B (1 ≤ A, B ≤ 10^9).",
+    output: "ƏBOB(A, B).",
+    example: {in:"1 999", out:"1"},
+    approach: "Evklid alqoritmi: <b>Baza şərti:</b> gcd(a, 0) = a. <b>Rekursiv addım:</b> gcd(a, b) = gcd(b, a mod b) — bu, ƏBOB-un dəyişmədiyi riyazi xassəyə əsaslanır və çox sürətli (loqarifmik) yaxınlaşır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long gcdRec(long long a, long long b){
+    if (b == 0) return a;
+    return gcdRec(b, a % b);
+}
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << gcdRec(a, b) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivində 8-i rekursiya ilə axtarmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "axtarış"],
+    statement: "N ədəd və axtarılan X verilib. X massivdə varsa \"VAR\", yoxdursa \"YOX\" çap edin — axtarışı REKURSİV funksiya ilə aparın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd, üçüncü sətirdə X.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"5\n5 3 8 1 9\n8", out:"VAR"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa — tapılmayıb. <b>Rekursiv addım:</b> cari element X-ə bərabərdirsə tapılıb, əks halda növbəti indekslə davam et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool search(vector<int>& a, int idx, int x){
+    if (idx == (int)a.size()) return false;
+    if (a[idx] == x) return true;
+    return search(a, idx + 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    cout << (search(a, 0, x) ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivində 4-ü rekursiya ilə axtarmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "axtarış"],
+    statement: "N ədəd və axtarılan X verilib. X massivdə varsa \"VAR\", yoxdursa \"YOX\" çap edin — axtarışı REKURSİV funksiya ilə aparın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd, üçüncü sətirdə X.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"5\n5 3 8 1 9\n4", out:"YOX"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa — tapılmayıb. <b>Rekursiv addım:</b> cari element X-ə bərabərdirsə tapılıb, əks halda növbəti indekslə davam et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool search(vector<int>& a, int idx, int x){
+    if (idx == (int)a.size()) return false;
+    if (a[idx] == x) return true;
+    return search(a, idx + 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    cout << (search(a, 0, x) ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "0 massivində 1-i rekursiya ilə axtarmaq (boş massiv)",
+    difficulty: "mid",
+    tags: ["rekursiya", "axtarış"],
+    statement: "N ədəd və axtarılan X verilib. X massivdə varsa \"VAR\", yoxdursa \"YOX\" çap edin — axtarışı REKURSİV funksiya ilə aparın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd, üçüncü sətirdə X.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"0\n\n1", out:"YOX"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa — tapılmayıb. <b>Rekursiv addım:</b> cari element X-ə bərabərdirsə tapılıb, əks halda növbəti indekslə davam et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool search(vector<int>& a, int idx, int x){
+    if (idx == (int)a.size()) return false;
+    if (a[idx] == x) return true;
+    return search(a, idx + 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    cout << (search(a, 0, x) ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "7 massivində 7-ni rekursiya ilə axtarmaq (tək element)",
+    difficulty: "mid",
+    tags: ["rekursiya", "axtarış"],
+    statement: "N ədəd və axtarılan X verilib. X massivdə varsa \"VAR\", yoxdursa \"YOX\" çap edin — axtarışı REKURSİV funksiya ilə aparın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd, üçüncü sətirdə X.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"1\n7\n7", out:"VAR"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa — tapılmayıb. <b>Rekursiv addım:</b> cari element X-ə bərabərdirsə tapılıb, əks halda növbəti indekslə davam et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool search(vector<int>& a, int idx, int x){
+    if (idx == (int)a.size()) return false;
+    if (a[idx] == x) return true;
+    return search(a, idx + 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    cout << (search(a, 0, x) ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "10, 20, 30 massivində 30-u rekursiya ilə axtarmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "axtarış"],
+    statement: "N ədəd və axtarılan X verilib. X massivdə varsa \"VAR\", yoxdursa \"YOX\" çap edin — axtarışı REKURSİV funksiya ilə aparın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd, üçüncü sətirdə X.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3\n10 20 30\n30", out:"VAR"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa — tapılmayıb. <b>Rekursiv addım:</b> cari element X-ə bərabərdirsə tapılıb, əks halda növbəti indekslə davam et.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+bool search(vector<int>& a, int idx, int x){
+    if (idx == (int)a.size()) return false;
+    if (a[idx] == x) return true;
+    return search(a, idx + 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    cout << (search(a, 0, x) ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7, 9 massivində 7-ni rekursiv binar axtarışla tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "binary search"],
+    statement: "Artan sıraya düzülmüş N ədəd və axtarılan X verilib. X massivdə varsa onun mövqeyini (1-indeksli), yoxdursa -1 çap edin — axtarışı REKURSİV binar axtarışla aparın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi və ya -1.",
+    example: {in:"5\n1 3 5 7 9\n7", out:"4"},
+    approach: "<b>Baza şərti:</b> axtarış oblastı (lo &gt; hi) boşdursa, tapılmayıb. <b>Rekursiv addım:</b> orta elementə bax; X ona bərabərdirsə tapılıb, kiçikdirsə SOL yarıda, böyükdürsə SAĞ yarıda eyni funksiyanı rekursiv çağır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int bsearch(vector<int>& a, int lo, int hi, int x){
+    if (lo > hi) return -1;
+    int mid = (lo + hi) / 2;
+    if (a[mid] == x) return mid;
+    if (a[mid] < x) return bsearch(a, mid + 1, hi, x);
+    return bsearch(a, lo, mid - 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    int pos = bsearch(a, 0, n - 1, x);
+    cout << (pos == -1 ? -1 : pos + 1) << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7, 9 massivində 4-ü rekursiv binar axtarışla axtarmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "binary search"],
+    statement: "Artan sıraya düzülmüş N ədəd və axtarılan X verilib. X massivdə varsa onun mövqeyini (1-indeksli), yoxdursa -1 çap edin — axtarışı REKURSİV binar axtarışla aparın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi və ya -1.",
+    example: {in:"5\n1 3 5 7 9\n4", out:"-1"},
+    approach: "<b>Baza şərti:</b> axtarış oblastı (lo &gt; hi) boşdursa, tapılmayıb. <b>Rekursiv addım:</b> orta elementə bax; X ona bərabərdirsə tapılıb, kiçikdirsə SOL yarıda, böyükdürsə SAĞ yarıda eyni funksiyanı rekursiv çağır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int bsearch(vector<int>& a, int lo, int hi, int x){
+    if (lo > hi) return -1;
+    int mid = (lo + hi) / 2;
+    if (a[mid] == x) return mid;
+    if (a[mid] < x) return bsearch(a, mid + 1, hi, x);
+    return bsearch(a, lo, mid - 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    int pos = bsearch(a, 0, n - 1, x);
+    cout << (pos == -1 ? -1 : pos + 1) << "\\n";
+}`},
+  {
+    title: "2, 4, 6, 8, 10, 12 massivində 2-ni rekursiv binar axtarışla tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "binary search"],
+    statement: "Artan sıraya düzülmüş N ədəd və axtarılan X verilib. X massivdə varsa onun mövqeyini (1-indeksli), yoxdursa -1 çap edin — axtarışı REKURSİV binar axtarışla aparın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi və ya -1.",
+    example: {in:"6\n2 4 6 8 10 12\n2", out:"1"},
+    approach: "<b>Baza şərti:</b> axtarış oblastı (lo &gt; hi) boşdursa, tapılmayıb. <b>Rekursiv addım:</b> orta elementə bax; X ona bərabərdirsə tapılıb, kiçikdirsə SOL yarıda, böyükdürsə SAĞ yarıda eyni funksiyanı rekursiv çağır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int bsearch(vector<int>& a, int lo, int hi, int x){
+    if (lo > hi) return -1;
+    int mid = (lo + hi) / 2;
+    if (a[mid] == x) return mid;
+    if (a[mid] < x) return bsearch(a, mid + 1, hi, x);
+    return bsearch(a, lo, mid - 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    int pos = bsearch(a, 0, n - 1, x);
+    cout << (pos == -1 ? -1 : pos + 1) << "\\n";
+}`},
+  {
+    title: "2, 4, 6, 8, 10, 12 massivində 12-ni rekursiv binar axtarışla tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "binary search"],
+    statement: "Artan sıraya düzülmüş N ədəd və axtarılan X verilib. X massivdə varsa onun mövqeyini (1-indeksli), yoxdursa -1 çap edin — axtarışı REKURSİV binar axtarışla aparın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi və ya -1.",
+    example: {in:"6\n2 4 6 8 10 12\n12", out:"6"},
+    approach: "<b>Baza şərti:</b> axtarış oblastı (lo &gt; hi) boşdursa, tapılmayıb. <b>Rekursiv addım:</b> orta elementə bax; X ona bərabərdirsə tapılıb, kiçikdirsə SOL yarıda, böyükdürsə SAĞ yarıda eyni funksiyanı rekursiv çağır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int bsearch(vector<int>& a, int lo, int hi, int x){
+    if (lo > hi) return -1;
+    int mid = (lo + hi) / 2;
+    if (a[mid] == x) return mid;
+    if (a[mid] < x) return bsearch(a, mid + 1, hi, x);
+    return bsearch(a, lo, mid - 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    int pos = bsearch(a, 0, n - 1, x);
+    cout << (pos == -1 ? -1 : pos + 1) << "\\n";
+}`},
+  {
+    title: "-5, -1, 0, 3, 8 massivində 0-ı rekursiv binar axtarışla tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "binary search"],
+    statement: "Artan sıraya düzülmüş N ədəd və axtarılan X verilib. X massivdə varsa onun mövqeyini (1-indeksli), yoxdursa -1 çap edin — axtarışı REKURSİV binar axtarışla aparın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi və ya -1.",
+    example: {in:"5\n-5 -1 0 3 8\n0", out:"3"},
+    approach: "<b>Baza şərti:</b> axtarış oblastı (lo &gt; hi) boşdursa, tapılmayıb. <b>Rekursiv addım:</b> orta elementə bax; X ona bərabərdirsə tapılıb, kiçikdirsə SOL yarıda, böyükdürsə SAĞ yarıda eyni funksiyanı rekursiv çağır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int bsearch(vector<int>& a, int lo, int hi, int x){
+    if (lo > hi) return -1;
+    int mid = (lo + hi) / 2;
+    if (a[mid] == x) return mid;
+    if (a[mid] < x) return bsearch(a, mid + 1, hi, x);
+    return bsearch(a, lo, mid - 1, x);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    int pos = bsearch(a, 0, n - 1, x);
+    cout << (pos == -1 ? -1 : pos + 1) << "\\n";
+}`},
+  {
+    title: "12345 ədədinin rəqəm sayını rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun neçə rəqəmdən ibarət olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəm sayı.",
+    example: {in:"12345", out:"5"},
+    approach: "<b>Baza şərti:</b> N 0-dan kiçikdirsə (bölmədən sonra), 0 qaytarılır. <b>Rekursiv addım:</b> count(n) = 1 + count(n/10) — hər addımda bir rəqəm \"atılır\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int digitCount(long long n){
+    if (n == 0) return 0;
+    return 1 + digitCount(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << (n == 0 ? 1 : digitCount(n)) << "\\n";
+}`},
+  {
+    title: "0 ədədinin rəqəm sayını rekursiya ilə tapmaq (xüsusi hal)",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun neçə rəqəmdən ibarət olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəm sayı.",
+    example: {in:"0", out:"1"},
+    approach: "<b>Baza şərti:</b> N 0-dan kiçikdirsə (bölmədən sonra), 0 qaytarılır. <b>Rekursiv addım:</b> count(n) = 1 + count(n/10) — hər addımda bir rəqəm \"atılır\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int digitCount(long long n){
+    if (n == 0) return 0;
+    return 1 + digitCount(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << (n == 0 ? 1 : digitCount(n)) << "\\n";
+}`},
+  {
+    title: "7 ədədinin rəqəm sayını rekursiya ilə tapmaq (tək rəqəm)",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun neçə rəqəmdən ibarət olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəm sayı.",
+    example: {in:"7", out:"1"},
+    approach: "<b>Baza şərti:</b> N 0-dan kiçikdirsə (bölmədən sonra), 0 qaytarılır. <b>Rekursiv addım:</b> count(n) = 1 + count(n/10) — hər addımda bir rəqəm \"atılır\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int digitCount(long long n){
+    if (n == 0) return 0;
+    return 1 + digitCount(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << (n == 0 ? 1 : digitCount(n)) << "\\n";
+}`},
+  {
+    title: "1000000000 ədədinin rəqəm sayını rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun neçə rəqəmdən ibarət olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəm sayı.",
+    example: {in:"1000000000", out:"10"},
+    approach: "<b>Baza şərti:</b> N 0-dan kiçikdirsə (bölmədən sonra), 0 qaytarılır. <b>Rekursiv addım:</b> count(n) = 1 + count(n/10) — hər addımda bir rəqəm \"atılır\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int digitCount(long long n){
+    if (n == 0) return 0;
+    return 1 + digitCount(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << (n == 0 ? 1 : digitCount(n)) << "\\n";
+}`},
+  {
+    title: "42 ədədinin rəqəm sayını rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "rəqəm"],
+    statement: "N ədədi verilib. Onun neçə rəqəmdən ibarət olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^9).",
+    output: "N-in rəqəm sayı.",
+    example: {in:"42", out:"2"},
+    approach: "<b>Baza şərti:</b> N 0-dan kiçikdirsə (bölmədən sonra), 0 qaytarılır. <b>Rekursiv addım:</b> count(n) = 1 + count(n/10) — hər addımda bir rəqəm \"atılır\".",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int digitCount(long long n){
+    if (n == 0) return 0;
+    return 1 + digitCount(n / 10);
+}
+int main(){
+    long long n; cin >> n;
+    cout << (n == 0 ? 1 : digitCount(n)) << "\\n";
+}`},
+  {
+    title: "10 ədədinin ikilik görünüşünü rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ikilik"],
+    statement: "N ədədi verilib. Onun İKİLİK (2-lik) sistemdəki görünüşünü REKURSİV funksiya ilə çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^6).",
+    output: "N-in ikilik görünüşü (aparıcı sıfırlarsız).",
+    example: {in:"10", out:"1010"},
+    approach: "<b>Baza şərti:</b> N 1-dən kiçikdirsə heç nə çap olunmur. <b>Rekursiv addım:</b> ƏVVƏLCƏ n/2-ni rekursiv çap et, SONRA n%2-ni çap et — bu sıra rəqəmlərin düzgün (soldan sağa) görünməsini təmin edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printBinary(int n){
+    if (n == 0) return;
+    printBinary(n / 2);
+    cout << (n % 2);
+}
+int main(){
+    int n; cin >> n;
+    if (n == 0) cout << 0;
+    else printBinary(n);
+    cout << "\\n";
+}`},
+  {
+    title: "0 ədədinin ikilik görünüşünü rekursiya ilə tapmaq (xüsusi hal)",
+    difficulty: "mid",
+    tags: ["rekursiya", "ikilik"],
+    statement: "N ədədi verilib. Onun İKİLİK (2-lik) sistemdəki görünüşünü REKURSİV funksiya ilə çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^6).",
+    output: "N-in ikilik görünüşü (aparıcı sıfırlarsız).",
+    example: {in:"0", out:"0"},
+    approach: "<b>Baza şərti:</b> N 1-dən kiçikdirsə heç nə çap olunmur. <b>Rekursiv addım:</b> ƏVVƏLCƏ n/2-ni rekursiv çap et, SONRA n%2-ni çap et — bu sıra rəqəmlərin düzgün (soldan sağa) görünməsini təmin edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printBinary(int n){
+    if (n == 0) return;
+    printBinary(n / 2);
+    cout << (n % 2);
+}
+int main(){
+    int n; cin >> n;
+    if (n == 0) cout << 0;
+    else printBinary(n);
+    cout << "\\n";
+}`},
+  {
+    title: "1 ədədinin ikilik görünüşünü rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ikilik"],
+    statement: "N ədədi verilib. Onun İKİLİK (2-lik) sistemdəki görünüşünü REKURSİV funksiya ilə çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^6).",
+    output: "N-in ikilik görünüşü (aparıcı sıfırlarsız).",
+    example: {in:"1", out:"1"},
+    approach: "<b>Baza şərti:</b> N 1-dən kiçikdirsə heç nə çap olunmur. <b>Rekursiv addım:</b> ƏVVƏLCƏ n/2-ni rekursiv çap et, SONRA n%2-ni çap et — bu sıra rəqəmlərin düzgün (soldan sağa) görünməsini təmin edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printBinary(int n){
+    if (n == 0) return;
+    printBinary(n / 2);
+    cout << (n % 2);
+}
+int main(){
+    int n; cin >> n;
+    if (n == 0) cout << 0;
+    else printBinary(n);
+    cout << "\\n";
+}`},
+  {
+    title: "255 ədədinin ikilik görünüşünü rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ikilik"],
+    statement: "N ədədi verilib. Onun İKİLİK (2-lik) sistemdəki görünüşünü REKURSİV funksiya ilə çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^6).",
+    output: "N-in ikilik görünüşü (aparıcı sıfırlarsız).",
+    example: {in:"255", out:"11111111"},
+    approach: "<b>Baza şərti:</b> N 1-dən kiçikdirsə heç nə çap olunmur. <b>Rekursiv addım:</b> ƏVVƏLCƏ n/2-ni rekursiv çap et, SONRA n%2-ni çap et — bu sıra rəqəmlərin düzgün (soldan sağa) görünməsini təmin edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printBinary(int n){
+    if (n == 0) return;
+    printBinary(n / 2);
+    cout << (n % 2);
+}
+int main(){
+    int n; cin >> n;
+    if (n == 0) cout << 0;
+    else printBinary(n);
+    cout << "\\n";
+}`},
+  {
+    title: "42 ədədinin ikilik görünüşünü rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "ikilik"],
+    statement: "N ədədi verilib. Onun İKİLİK (2-lik) sistemdəki görünüşünü REKURSİV funksiya ilə çap edin.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 10^6).",
+    output: "N-in ikilik görünüşü (aparıcı sıfırlarsız).",
+    example: {in:"42", out:"101010"},
+    approach: "<b>Baza şərti:</b> N 1-dən kiçikdirsə heç nə çap olunmur. <b>Rekursiv addım:</b> ƏVVƏLCƏ n/2-ni rekursiv çap et, SONRA n%2-ni çap et — bu sıra rəqəmlərin düzgün (soldan sağa) görünməsini təmin edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+void printBinary(int n){
+    if (n == 0) return;
+    printBinary(n / 2);
+    cout << (n % 2);
+}
+int main(){
+    int n; cin >> n;
+    if (n == 0) cout << 0;
+    else printBinary(n);
+    cout << "\\n";
+}`},
+  {
+    title: "F(0)-dan F(5)-ə qədər Fibonacci cəmini rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. F(0)-dan F(N)-ə qədər bütün Fibonacci ədədlərinin CƏMİNİ REKURSİV olaraq hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 25).",
+    output: "F(0)+F(1)+...+F(N) cəmi.",
+    example: {in:"5", out:"12"},
+    approach: "Əvvəlcə <b>fib(n)</b> rekursiv funksiyası yazılır (F(0)=0, F(1)=1, fib(n)=fib(n-1)+fib(n-2)), sonra <b>fibSum(n)</b> funksiyası da rekursiv şəkildə fibSum(n) = fib(n) + fibSum(n-1) olaraq cəmi toplayır (baza şərti: fibSum(0)=F(0)=0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+long long fibSum(int n){
+    if (n == 0) return 0;
+    return fib(n) + fibSum(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fibSum(n) << "\\n";
+}`},
+  {
+    title: "F(0)-dan F(0)-a qədər Fibonacci cəmini rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "mid",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. F(0)-dan F(N)-ə qədər bütün Fibonacci ədədlərinin CƏMİNİ REKURSİV olaraq hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 25).",
+    output: "F(0)+F(1)+...+F(N) cəmi.",
+    example: {in:"0", out:"0"},
+    approach: "Əvvəlcə <b>fib(n)</b> rekursiv funksiyası yazılır (F(0)=0, F(1)=1, fib(n)=fib(n-1)+fib(n-2)), sonra <b>fibSum(n)</b> funksiyası da rekursiv şəkildə fibSum(n) = fib(n) + fibSum(n-1) olaraq cəmi toplayır (baza şərti: fibSum(0)=F(0)=0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+long long fibSum(int n){
+    if (n == 0) return 0;
+    return fib(n) + fibSum(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fibSum(n) << "\\n";
+}`},
+  {
+    title: "F(0)-dan F(10)-a qədər Fibonacci cəmini rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. F(0)-dan F(N)-ə qədər bütün Fibonacci ədədlərinin CƏMİNİ REKURSİV olaraq hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 25).",
+    output: "F(0)+F(1)+...+F(N) cəmi.",
+    example: {in:"10", out:"143"},
+    approach: "Əvvəlcə <b>fib(n)</b> rekursiv funksiyası yazılır (F(0)=0, F(1)=1, fib(n)=fib(n-1)+fib(n-2)), sonra <b>fibSum(n)</b> funksiyası da rekursiv şəkildə fibSum(n) = fib(n) + fibSum(n-1) olaraq cəmi toplayır (baza şərti: fibSum(0)=F(0)=0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+long long fibSum(int n){
+    if (n == 0) return 0;
+    return fib(n) + fibSum(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fibSum(n) << "\\n";
+}`},
+  {
+    title: "F(0)-dan F(1)-ə qədər Fibonacci cəmini rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. F(0)-dan F(N)-ə qədər bütün Fibonacci ədədlərinin CƏMİNİ REKURSİV olaraq hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 25).",
+    output: "F(0)+F(1)+...+F(N) cəmi.",
+    example: {in:"1", out:"1"},
+    approach: "Əvvəlcə <b>fib(n)</b> rekursiv funksiyası yazılır (F(0)=0, F(1)=1, fib(n)=fib(n-1)+fib(n-2)), sonra <b>fibSum(n)</b> funksiyası da rekursiv şəkildə fibSum(n) = fib(n) + fibSum(n-1) olaraq cəmi toplayır (baza şərti: fibSum(0)=F(0)=0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+long long fibSum(int n){
+    if (n == 0) return 0;
+    return fib(n) + fibSum(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fibSum(n) << "\\n";
+}`},
+  {
+    title: "F(0)-dan F(15)-ə qədər Fibonacci cəmini rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "fibonacci"],
+    statement: "N verilib. F(0)-dan F(N)-ə qədər bütün Fibonacci ədədlərinin CƏMİNİ REKURSİV olaraq hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 25).",
+    output: "F(0)+F(1)+...+F(N) cəmi.",
+    example: {in:"15", out:"1596"},
+    approach: "Əvvəlcə <b>fib(n)</b> rekursiv funksiyası yazılır (F(0)=0, F(1)=1, fib(n)=fib(n-1)+fib(n-2)), sonra <b>fibSum(n)</b> funksiyası da rekursiv şəkildə fibSum(n) = fib(n) + fibSum(n-1) olaraq cəmi toplayır (baza şərti: fibSum(0)=F(0)=0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long fib(int n){
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+long long fibSum(int n){
+    if (n == 0) return 0;
+    return fib(n) + fibSum(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << fibSum(n) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9, 4 massivində cüt ədədlərin sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivdə neçə CÜT ədəd olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"6\n5 3 8 1 9 4", out:"2"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, 0 qaytarılır. <b>Rekursiv addım:</b> cari elementin cüt olub-olmamasına görə (0 və ya 1) qalan hissənin nəticəsinə əlavə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countEven(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    int rest = countEven(a, idx + 1);
+    return (a[idx] % 2 == 0 ? 1 : 0) + rest;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << countEven(a, 0) << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7 massivində cüt ədədlərin sayını rekursiya ilə tapmaq (heç biri cüt deyil)",
+    difficulty: "mid",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivdə neçə CÜT ədəd olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"4\n1 3 5 7", out:"0"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, 0 qaytarılır. <b>Rekursiv addım:</b> cari elementin cüt olub-olmamasına görə (0 və ya 1) qalan hissənin nəticəsinə əlavə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countEven(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    int rest = countEven(a, idx + 1);
+    return (a[idx] % 2 == 0 ? 1 : 0) + rest;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << countEven(a, 0) << "\\n";
+}`},
+  {
+    title: "2, 4, 6, 8 massivində cüt ədədlərin sayını rekursiya ilə tapmaq (hamısı cüt)",
+    difficulty: "mid",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivdə neçə CÜT ədəd olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"4\n2 4 6 8", out:"4"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, 0 qaytarılır. <b>Rekursiv addım:</b> cari elementin cüt olub-olmamasına görə (0 və ya 1) qalan hissənin nəticəsinə əlavə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countEven(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    int rest = countEven(a, idx + 1);
+    return (a[idx] % 2 == 0 ? 1 : 0) + rest;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << countEven(a, 0) << "\\n";
+}`},
+  {
+    title: "0 massivində cüt ədədlərin sayını rekursiya ilə tapmaq (boş massiv)",
+    difficulty: "mid",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivdə neçə CÜT ədəd olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"0", out:"0"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, 0 qaytarılır. <b>Rekursiv addım:</b> cari elementin cüt olub-olmamasına görə (0 və ya 1) qalan hissənin nəticəsinə əlavə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countEven(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    int rest = countEven(a, idx + 1);
+    return (a[idx] % 2 == 0 ? 1 : 0) + rest;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << countEven(a, 0) << "\\n";
+}`},
+  {
+    title: "-2, -3, -4, 5 massivində cüt ədədlərin sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "massiv"],
+    statement: "N ədəd verilib. Massivdə neçə CÜT ədəd olduğunu REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı.",
+    example: {in:"4\n-2 -3 -4 5", out:"2"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, 0 qaytarılır. <b>Rekursiv addım:</b> cari elementin cüt olub-olmamasına görə (0 və ya 1) qalan hissənin nəticəsinə əlavə edilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countEven(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 0;
+    int rest = countEven(a, idx + 1);
+    return (a[idx] % 2 == 0 ? 1 : 0) + rest;
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << countEven(a, 0) << "\\n";
+}`},
+  {
+    title: "\"azercell\" sözündə \"e\" hərfinin sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir və bir hərf (C) verilib. Sətirdə C hərfinin neçə dəfə rast gəlindiyini REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə S (boşluqsuz, 1 ≤ |S| ≤ 1000), ikinci sətirdə C (tək hərf).",
+    output: "C hərfinin S-də neçə dəfə rast gəldiyi.",
+    example: {in:"azercell\ne", out:"2"},
+    approach: "<b>Baza şərti:</b> sətir boşdursa, 0 qaytarılır. <b>Rekursiv addım:</b> ilk simvol C-yə bərabərdirsə 1, deyilsə 0, + qalan hissədə (sətrin 1-ci simvoldan sonrakı hissəsi) C-nin sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countChar(const string& s, char c){
+    if (s.empty()) return 0;
+    int first = (s[0] == c) ? 1 : 0;
+    return first + countChar(s.substr(1), c);
+}
+int main(){
+    string s; cin >> s;
+    char c; cin >> c;
+    cout << countChar(s, c) << "\\n";
+}`},
+  {
+    title: "\"salam\" sözündə \"a\" hərfinin sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir və bir hərf (C) verilib. Sətirdə C hərfinin neçə dəfə rast gəlindiyini REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə S (boşluqsuz, 1 ≤ |S| ≤ 1000), ikinci sətirdə C (tək hərf).",
+    output: "C hərfinin S-də neçə dəfə rast gəldiyi.",
+    example: {in:"salam\na", out:"2"},
+    approach: "<b>Baza şərti:</b> sətir boşdursa, 0 qaytarılır. <b>Rekursiv addım:</b> ilk simvol C-yə bərabərdirsə 1, deyilsə 0, + qalan hissədə (sətrin 1-ci simvoldan sonrakı hissəsi) C-nin sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countChar(const string& s, char c){
+    if (s.empty()) return 0;
+    int first = (s[0] == c) ? 1 : 0;
+    return first + countChar(s.substr(1), c);
+}
+int main(){
+    string s; cin >> s;
+    char c; cin >> c;
+    cout << countChar(s, c) << "\\n";
+}`},
+  {
+    title: "\"programming\" sözündə \"m\" hərfinin sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir və bir hərf (C) verilib. Sətirdə C hərfinin neçə dəfə rast gəlindiyini REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə S (boşluqsuz, 1 ≤ |S| ≤ 1000), ikinci sətirdə C (tək hərf).",
+    output: "C hərfinin S-də neçə dəfə rast gəldiyi.",
+    example: {in:"programming\nm", out:"2"},
+    approach: "<b>Baza şərti:</b> sətir boşdursa, 0 qaytarılır. <b>Rekursiv addım:</b> ilk simvol C-yə bərabərdirsə 1, deyilsə 0, + qalan hissədə (sətrin 1-ci simvoldan sonrakı hissəsi) C-nin sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countChar(const string& s, char c){
+    if (s.empty()) return 0;
+    int first = (s[0] == c) ? 1 : 0;
+    return first + countChar(s.substr(1), c);
+}
+int main(){
+    string s; cin >> s;
+    char c; cin >> c;
+    cout << countChar(s, c) << "\\n";
+}`},
+  {
+    title: "\"test\" sözündə \"z\" hərfinin sayını rekursiya ilə tapmaq (rast gəlinmir)",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir və bir hərf (C) verilib. Sətirdə C hərfinin neçə dəfə rast gəlindiyini REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə S (boşluqsuz, 1 ≤ |S| ≤ 1000), ikinci sətirdə C (tək hərf).",
+    output: "C hərfinin S-də neçə dəfə rast gəldiyi.",
+    example: {in:"test\nz", out:"0"},
+    approach: "<b>Baza şərti:</b> sətir boşdursa, 0 qaytarılır. <b>Rekursiv addım:</b> ilk simvol C-yə bərabərdirsə 1, deyilsə 0, + qalan hissədə (sətrin 1-ci simvoldan sonrakı hissəsi) C-nin sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countChar(const string& s, char c){
+    if (s.empty()) return 0;
+    int first = (s[0] == c) ? 1 : 0;
+    return first + countChar(s.substr(1), c);
+}
+int main(){
+    string s; cin >> s;
+    char c; cin >> c;
+    cout << countChar(s, c) << "\\n";
+}`},
+  {
+    title: "\"aaa\" sözündə \"a\" hərfinin sayını rekursiya ilə tapmaq (hamısı eyni)",
+    difficulty: "mid",
+    tags: ["rekursiya", "string"],
+    statement: "Bir sətir və bir hərf (C) verilib. Sətirdə C hərfinin neçə dəfə rast gəlindiyini REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə S (boşluqsuz, 1 ≤ |S| ≤ 1000), ikinci sətirdə C (tək hərf).",
+    output: "C hərfinin S-də neçə dəfə rast gəldiyi.",
+    example: {in:"aaa\na", out:"3"},
+    approach: "<b>Baza şərti:</b> sətir boşdursa, 0 qaytarılır. <b>Rekursiv addım:</b> ilk simvol C-yə bərabərdirsə 1, deyilsə 0, + qalan hissədə (sətrin 1-ci simvoldan sonrakı hissəsi) C-nin sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int countChar(const string& s, char c){
+    if (s.empty()) return 0;
+    int first = (s[0] == c) ? 1 : 0;
+    return first + countChar(s.substr(1), c);
+}
+int main(){
+    string s; cin >> s;
+    char c; cin >> c;
+    cout << countChar(s, c) << "\\n";
+}`},
+  {
+    title: "3 elementli çoxluğun alt çoxluqlarının sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "alt-çoxluq"],
+    statement: "N elementdən ibarət çoxluq verilib (elementlərin özü vacib deyil, yalnız sayı N). Onun bütün ALT ÇOXLUQLARININ sayını (boş çoxluq və çoxluğun özü daxil) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "Alt çoxluqların sayı (2^N).",
+    example: {in:"3", out:"8"},
+    approach: "Hər element ya alt çoxluğa DAXİLDİR, ya da DEYİL — bu İKİ seçim var. <b>Baza şərti:</b> subsets(0) = 1 (yalnız boş çoxluq). <b>Rekursiv addım:</b> subsets(n) = 2 * subsets(n-1) — bir elementin əlavəsi hər mövcud alt çoxluğu İKİ versiyaya (o elementlə və onsuz) ayırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long subsets(int n){
+    if (n == 0) return 1;
+    return 2 * subsets(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << subsets(n) << "\\n";
+}`},
+  {
+    title: "0 elementli çoxluğun alt çoxluqlarının sayını rekursiya ilə tapmaq (baza şərti)",
+    difficulty: "mid",
+    tags: ["rekursiya", "alt-çoxluq"],
+    statement: "N elementdən ibarət çoxluq verilib (elementlərin özü vacib deyil, yalnız sayı N). Onun bütün ALT ÇOXLUQLARININ sayını (boş çoxluq və çoxluğun özü daxil) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "Alt çoxluqların sayı (2^N).",
+    example: {in:"0", out:"1"},
+    approach: "Hər element ya alt çoxluğa DAXİLDİR, ya da DEYİL — bu İKİ seçim var. <b>Baza şərti:</b> subsets(0) = 1 (yalnız boş çoxluq). <b>Rekursiv addım:</b> subsets(n) = 2 * subsets(n-1) — bir elementin əlavəsi hər mövcud alt çoxluğu İKİ versiyaya (o elementlə və onsuz) ayırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long subsets(int n){
+    if (n == 0) return 1;
+    return 2 * subsets(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << subsets(n) << "\\n";
+}`},
+  {
+    title: "1 elementli çoxluğun alt çoxluqlarının sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "alt-çoxluq"],
+    statement: "N elementdən ibarət çoxluq verilib (elementlərin özü vacib deyil, yalnız sayı N). Onun bütün ALT ÇOXLUQLARININ sayını (boş çoxluq və çoxluğun özü daxil) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "Alt çoxluqların sayı (2^N).",
+    example: {in:"1", out:"2"},
+    approach: "Hər element ya alt çoxluğa DAXİLDİR, ya da DEYİL — bu İKİ seçim var. <b>Baza şərti:</b> subsets(0) = 1 (yalnız boş çoxluq). <b>Rekursiv addım:</b> subsets(n) = 2 * subsets(n-1) — bir elementin əlavəsi hər mövcud alt çoxluğu İKİ versiyaya (o elementlə və onsuz) ayırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long subsets(int n){
+    if (n == 0) return 1;
+    return 2 * subsets(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << subsets(n) << "\\n";
+}`},
+  {
+    title: "5 elementli çoxluğun alt çoxluqlarının sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "alt-çoxluq"],
+    statement: "N elementdən ibarət çoxluq verilib (elementlərin özü vacib deyil, yalnız sayı N). Onun bütün ALT ÇOXLUQLARININ sayını (boş çoxluq və çoxluğun özü daxil) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "Alt çoxluqların sayı (2^N).",
+    example: {in:"5", out:"32"},
+    approach: "Hər element ya alt çoxluğa DAXİLDİR, ya da DEYİL — bu İKİ seçim var. <b>Baza şərti:</b> subsets(0) = 1 (yalnız boş çoxluq). <b>Rekursiv addım:</b> subsets(n) = 2 * subsets(n-1) — bir elementin əlavəsi hər mövcud alt çoxluğu İKİ versiyaya (o elementlə və onsuz) ayırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long subsets(int n){
+    if (n == 0) return 1;
+    return 2 * subsets(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << subsets(n) << "\\n";
+}`},
+  {
+    title: "10 elementli çoxluğun alt çoxluqlarının sayını rekursiya ilə tapmaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "alt-çoxluq"],
+    statement: "N elementdən ibarət çoxluq verilib (elementlərin özü vacib deyil, yalnız sayı N). Onun bütün ALT ÇOXLUQLARININ sayını (boş çoxluq və çoxluğun özü daxil) REKURSİV funksiya ilə hesablayın.",
+    input: "Bir tam ədəd N (0 ≤ N ≤ 30).",
+    output: "Alt çoxluqların sayı (2^N).",
+    example: {in:"10", out:"1024"},
+    approach: "Hər element ya alt çoxluğa DAXİLDİR, ya da DEYİL — bu İKİ seçim var. <b>Baza şərti:</b> subsets(0) = 1 (yalnız boş çoxluq). <b>Rekursiv addım:</b> subsets(n) = 2 * subsets(n-1) — bir elementin əlavəsi hər mövcud alt çoxluğu İKİ versiyaya (o elementlə və onsuz) ayırır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long subsets(int n){
+    if (n == 0) return 1;
+    return 2 * subsets(n - 1);
+}
+int main(){
+    int n; cin >> n;
+    cout << subsets(n) << "\\n";
+}`},
+  {
+    title: "C(5, 2) qiymətini rekursiya ilə hesablamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "kombinatorika"],
+    statement: "N və K verilib. C(N, K) (N elementdən K-nı seçmənin yolları sayı) qiymətini Paskal üçbucağının REKURSİV düsturu ilə hesablayın.",
+    input: "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+    output: "C(N, K)-nın qiyməti.",
+    example: {in:"5 2", out:"10"},
+    approach: "Paskal üçbucağının qaydası: <b>Baza şərtləri:</b> C(n, 0) = 1 və C(n, n) = 1. <b>Rekursiv addım:</b> C(n, k) = C(n-1, k-1) + C(n-1, k) — N-ci elementi ya seçirik, ya da seçmirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long C(int n, int k){
+    if (k == 0 || k == n) return 1;
+    return C(n - 1, k - 1) + C(n - 1, k);
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << C(n, k) << "\\n";
+}`},
+  {
+    title: "C(4, 0) qiymətini rekursiya ilə hesablamaq (baza şərti)",
+    difficulty: "mid",
+    tags: ["rekursiya", "kombinatorika"],
+    statement: "N və K verilib. C(N, K) (N elementdən K-nı seçmənin yolları sayı) qiymətini Paskal üçbucağının REKURSİV düsturu ilə hesablayın.",
+    input: "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+    output: "C(N, K)-nın qiyməti.",
+    example: {in:"4 0", out:"1"},
+    approach: "Paskal üçbucağının qaydası: <b>Baza şərtləri:</b> C(n, 0) = 1 və C(n, n) = 1. <b>Rekursiv addım:</b> C(n, k) = C(n-1, k-1) + C(n-1, k) — N-ci elementi ya seçirik, ya da seçmirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long C(int n, int k){
+    if (k == 0 || k == n) return 1;
+    return C(n - 1, k - 1) + C(n - 1, k);
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << C(n, k) << "\\n";
+}`},
+  {
+    title: "C(6, 6) qiymətini rekursiya ilə hesablamaq (baza şərti)",
+    difficulty: "mid",
+    tags: ["rekursiya", "kombinatorika"],
+    statement: "N və K verilib. C(N, K) (N elementdən K-nı seçmənin yolları sayı) qiymətini Paskal üçbucağının REKURSİV düsturu ilə hesablayın.",
+    input: "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+    output: "C(N, K)-nın qiyməti.",
+    example: {in:"6 6", out:"1"},
+    approach: "Paskal üçbucağının qaydası: <b>Baza şərtləri:</b> C(n, 0) = 1 və C(n, n) = 1. <b>Rekursiv addım:</b> C(n, k) = C(n-1, k-1) + C(n-1, k) — N-ci elementi ya seçirik, ya da seçmirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long C(int n, int k){
+    if (k == 0 || k == n) return 1;
+    return C(n - 1, k - 1) + C(n - 1, k);
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << C(n, k) << "\\n";
+}`},
+  {
+    title: "C(10, 3) qiymətini rekursiya ilə hesablamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "kombinatorika"],
+    statement: "N və K verilib. C(N, K) (N elementdən K-nı seçmənin yolları sayı) qiymətini Paskal üçbucağının REKURSİV düsturu ilə hesablayın.",
+    input: "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+    output: "C(N, K)-nın qiyməti.",
+    example: {in:"10 3", out:"120"},
+    approach: "Paskal üçbucağının qaydası: <b>Baza şərtləri:</b> C(n, 0) = 1 və C(n, n) = 1. <b>Rekursiv addım:</b> C(n, k) = C(n-1, k-1) + C(n-1, k) — N-ci elementi ya seçirik, ya da seçmirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long C(int n, int k){
+    if (k == 0 || k == n) return 1;
+    return C(n - 1, k - 1) + C(n - 1, k);
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << C(n, k) << "\\n";
+}`},
+  {
+    title: "C(7, 4) qiymətini rekursiya ilə hesablamaq",
+    difficulty: "mid",
+    tags: ["rekursiya", "kombinatorika"],
+    statement: "N və K verilib. C(N, K) (N elementdən K-nı seçmənin yolları sayı) qiymətini Paskal üçbucağının REKURSİV düsturu ilə hesablayın.",
+    input: "Bir sətirdə N və K (0 ≤ K ≤ N ≤ 20).",
+    output: "C(N, K)-nın qiyməti.",
+    example: {in:"7 4", out:"35"},
+    approach: "Paskal üçbucağının qaydası: <b>Baza şərtləri:</b> C(n, 0) = 1 və C(n, n) = 1. <b>Rekursiv addım:</b> C(n, k) = C(n-1, k-1) + C(n-1, k) — N-ci elementi ya seçirik, ya da seçmirik.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long C(int n, int k){
+    if (k == 0 || k == n) return 1;
+    return C(n - 1, k - 1) + C(n - 1, k);
+}
+int main(){
+    int n, k; cin >> n >> k;
+    cout << C(n, k) << "\\n";
+}`},
+  {
+    title: "2, 3, 4 massivinin hasilini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin bütün elementlərinin HASİLİNİ (vurma nəticəsini) REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+    output: "Massivin bütün elementlərinin hasili.",
+    example: {in:"3\n2 3 4", out:"24"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, hasilin \"neytral\" elementi 1 qaytarılır (1 ilə vurmaq heç nəyi dəyişmir). <b>Rekursiv addım:</b> a[indeks] * qalan hissənin hasili.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long prodArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 1;
+    return a[idx] * prodArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << prodArr(a, 0) << "\\n";
+}`},
+  {
+    title: "5 massivinin hasilini rekursiya ilə tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin bütün elementlərinin HASİLİNİ (vurma nəticəsini) REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+    output: "Massivin bütün elementlərinin hasili.",
+    example: {in:"1\n5", out:"5"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, hasilin \"neytral\" elementi 1 qaytarılır (1 ilə vurmaq heç nəyi dəyişmir). <b>Rekursiv addım:</b> a[indeks] * qalan hissənin hasili.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long prodArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 1;
+    return a[idx] * prodArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << prodArr(a, 0) << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 massivinin hasilini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin bütün elementlərinin HASİLİNİ (vurma nəticəsini) REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+    output: "Massivin bütün elementlərinin hasili.",
+    example: {in:"4\n1 1 1 1", out:"1"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, hasilin \"neytral\" elementi 1 qaytarılır (1 ilə vurmaq heç nəyi dəyişmir). <b>Rekursiv addım:</b> a[indeks] * qalan hissənin hasili.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long prodArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 1;
+    return a[idx] * prodArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << prodArr(a, 0) << "\\n";
+}`},
+  {
+    title: "-2, 3, -1 massivinin hasilini rekursiya ilə tapmaq (mənfi ədədlər)",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin bütün elementlərinin HASİLİNİ (vurma nəticəsini) REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+    output: "Massivin bütün elementlərinin hasili.",
+    example: {in:"3\n-2 3 -1", out:"6"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, hasilin \"neytral\" elementi 1 qaytarılır (1 ilə vurmaq heç nəyi dəyişmir). <b>Rekursiv addım:</b> a[indeks] * qalan hissənin hasili.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long prodArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 1;
+    return a[idx] * prodArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << prodArr(a, 0) << "\\n";
+}`},
+  {
+    title: "2, 2, 2, 2, 2 massivinin hasilini rekursiya ilə tapmaq",
+    difficulty: "easy",
+    tags: ["rekursiya", "massiv"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin bütün elementlərinin HASİLİNİ (vurma nəticəsini) REKURSİV funksiya ilə hesablayın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 15), ikinci sətirdə N tam ədəd.",
+    output: "Massivin bütün elementlərinin hasili.",
+    example: {in:"5\n2 2 2 2 2", out:"32"},
+    approach: "<b>Baza şərti:</b> indeks massivin sonuna çatıbsa, hasilin \"neytral\" elementi 1 qaytarılır (1 ilə vurmaq heç nəyi dəyişmir). <b>Rekursiv addım:</b> a[indeks] * qalan hissənin hasili.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+long long prodArr(vector<int>& a, int idx){
+    if (idx == (int)a.size()) return 1;
+    return a[idx] * prodArr(a, idx + 1);
+}
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << prodArr(a, 0) << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/001_faktorial.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/002_faktorial.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/003_faktorial.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/004_faktorial.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/005_faktorial.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/006_fibonacci.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/007_fibonacci.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/008_fibonacci.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/009_fibonacci.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/010_fibonacci.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/011_cem_1_n.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/012_cem_1_n.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/013_cem_1_n.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/014_cem_1_n.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/015_cem_1_n.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/016_reqem_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/017_reqem_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/018_reqem_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/019_reqem_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/020_reqem_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/021_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/022_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/023_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/024_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/025_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/026_massiv_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/027_massiv_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/028_massiv_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/029_massiv_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/030_massiv_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/031_setri_tersine.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/032_setri_tersine.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/033_setri_tersine.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/034_setri_tersine.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/035_setri_tersine.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/036_palindrom_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/037_palindrom_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/038_palindrom_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/039_palindrom_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/040_palindrom_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/041_quvvet.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/042_quvvet.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/043_quvvet.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/044_quvvet.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/045_quvvet.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/046_ebob.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/047_ebob.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/048_ebob.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/049_ebob.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/050_ebob.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/051_xetti_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/052_xetti_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/053_xetti_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/054_xetti_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/055_xetti_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/056_binar_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/057_binar_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/058_binar_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/059_binar_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/060_binar_axtaris_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/061_reqem_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/062_reqem_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/063_reqem_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/064_reqem_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/065_reqem_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/066_ikilik_gorunus.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/067_ikilik_gorunus.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/068_ikilik_gorunus.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/069_ikilik_gorunus.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/070_ikilik_gorunus.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/071_fib_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/072_fib_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/073_fib_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/074_fib_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/075_fib_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/076_cut_say_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/077_cut_say_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/078_cut_say_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/079_cut_say_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/080_cut_say_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/081_herf_sayi_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/082_herf_sayi_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/083_herf_sayi_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/084_herf_sayi_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/085_herf_sayi_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/086_altcoxluq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/087_altcoxluq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/088_altcoxluq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/089_altcoxluq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/090_altcoxluq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/091_kombinasiya_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/092_kombinasiya_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/093_kombinasiya_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/094_kombinasiya_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/095_kombinasiya_rek.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/096_massiv_hasili.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/097_massiv_hasili.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/098_massiv_hasili.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/099_massiv_hasili.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu08/100_massiv_hasili.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week8/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

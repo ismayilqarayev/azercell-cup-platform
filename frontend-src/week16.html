@@ -1,0 +1,2675 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 16 — Test: Debug və sərhəd halları (edge cases, overflow, sıfıra bölmə, off-by-one)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:160px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>16</span> — Test Vərəqi</h1>
+    <p>Mövzu: sərhəd halları (boş giriş, tək elementli massiv), mənfi ədədlər və sıfır, təkrarlanan dəyərlər, int daşması (overflow), sıfıra bölmə, off-by-one səhvləri, kodun diqqətlə izlənməsi. Aşağıdakı 100 məsələ yalnız Mövzu 16-nın mövzularına əsaslanır — hər məsələdə "naiv" həllin niyə sınacağına diqqət edin.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 16 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "Boş massivin (N=0) cəmini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "boş giriş"],
+    statement: "N ədəd verilib (N SIFIR da ola bilər!). Massivin cəmini çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd (N=0 olduqda bu sətir boş ola bilər).",
+    output: "Massivin cəmi (boş massivin cəmi 0-dır).",
+    example: {in:"0", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=0 olduqda dövr SIFIR dəfə işləyir və cəm dəyişəni başlanğıc qiymətində (0) qalır — bu, ƏLAVƏ YOXLAMAYA EHTİYAC OLMADAN düzgün nəticə verir, çünki dövr özü təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin cəmini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "boş giriş"],
+    statement: "N ədəd verilib (N SIFIR da ola bilər!). Massivin cəmini çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd (N=0 olduqda bu sətir boş ola bilər).",
+    output: "Massivin cəmi (boş massivin cəmi 0-dır).",
+    example: {in:"5\n5 3 8 1 9", out:"26"},
+    approach: "<b>Sərhəd hal:</b> N=0 olduqda dövr SIFIR dəfə işləyir və cəm dəyişəni başlanğıc qiymətində (0) qalır — bu, ƏLAVƏ YOXLAMAYA EHTİYAC OLMADAN düzgün nəticə verir, çünki dövr özü təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "7 massivinin cəmini tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["edge-case", "boş giriş"],
+    statement: "N ədəd verilib (N SIFIR da ola bilər!). Massivin cəmini çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd (N=0 olduqda bu sətir boş ola bilər).",
+    output: "Massivin cəmi (boş massivin cəmi 0-dır).",
+    example: {in:"1\n7", out:"7"},
+    approach: "<b>Sərhəd hal:</b> N=0 olduqda dövr SIFIR dəfə işləyir və cəm dəyişəni başlanğıc qiymətində (0) qalır — bu, ƏLAVƏ YOXLAMAYA EHTİYAC OLMADAN düzgün nəticə verir, çünki dövr özü təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "0, 0, 0 massivinin cəmini tapmaq (hamısı sıfır)",
+    difficulty: "easy",
+    tags: ["edge-case", "boş giriş"],
+    statement: "N ədəd verilib (N SIFIR da ola bilər!). Massivin cəmini çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd (N=0 olduqda bu sətir boş ola bilər).",
+    output: "Massivin cəmi (boş massivin cəmi 0-dır).",
+    example: {in:"3\n0 0 0", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=0 olduqda dövr SIFIR dəfə işləyir və cəm dəyişəni başlanğıc qiymətində (0) qalır — bu, ƏLAVƏ YOXLAMAYA EHTİYAC OLMADAN düzgün nəticə verir, çünki dövr özü təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-5, -3, -8 massivinin cəmini tapmaq (hamısı mənfi)",
+    difficulty: "easy",
+    tags: ["edge-case", "boş giriş"],
+    statement: "N ədəd verilib (N SIFIR da ola bilər!). Massivin cəmini çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd (N=0 olduqda bu sətir boş ola bilər).",
+    output: "Massivin cəmi (boş massivin cəmi 0-dır).",
+    example: {in:"3\n-5 -3 -8", out:"-16"},
+    approach: "<b>Sərhəd hal:</b> N=0 olduqda dövr SIFIR dəfə işləyir və cəm dəyişəni başlanğıc qiymətində (0) qalır — bu, ƏLAVƏ YOXLAMAYA EHTİYAC OLMADAN düzgün nəticə verir, çünki dövr özü təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x; cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5 massivinin max-min fərqini tapmaq (tək element, cavab 0)",
+    difficulty: "easy",
+    tags: ["edge-case", "min-max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük və ən kiçik ədəd arasındakı FƏRQİ çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "max - min qiyməti.",
+    example: {in:"1\n5", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda massivdə YALNIZ BİR ELEMENT var — həm min, həm max elə o elementdir, fərq 0-dır. Kodun bu halda \"boş massiv\" səhvinə düşməməsi üçün min/max BAŞLANĞICDA birbaşa a[0]-a bərabər təyin edilir (sonsuzluqla yox!).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int mn = a[0], mx = a[0];
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
+    }
+    cout << (mx - mn) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin max-min fərqini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "min-max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük və ən kiçik ədəd arasındakı FƏRQİ çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "max - min qiyməti.",
+    example: {in:"5\n5 3 8 1 9", out:"8"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda massivdə YALNIZ BİR ELEMENT var — həm min, həm max elə o elementdir, fərq 0-dır. Kodun bu halda \"boş massiv\" səhvinə düşməməsi üçün min/max BAŞLANĞICDA birbaşa a[0]-a bərabər təyin edilir (sonsuzluqla yox!).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int mn = a[0], mx = a[0];
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
+    }
+    cout << (mx - mn) << "\\n";
+}`},
+  {
+    title: "7, 7, 7 massivinin max-min fərqini tapmaq (hamısı eyni, cavab 0)",
+    difficulty: "easy",
+    tags: ["edge-case", "min-max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük və ən kiçik ədəd arasındakı FƏRQİ çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "max - min qiyməti.",
+    example: {in:"3\n7 7 7", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda massivdə YALNIZ BİR ELEMENT var — həm min, həm max elə o elementdir, fərq 0-dır. Kodun bu halda \"boş massiv\" səhvinə düşməməsi üçün min/max BAŞLANĞICDA birbaşa a[0]-a bərabər təyin edilir (sonsuzluqla yox!).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int mn = a[0], mx = a[0];
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
+    }
+    cout << (mx - mn) << "\\n";
+}`},
+  {
+    title: "-10, -5, -20 massivinin max-min fərqini tapmaq (hamısı mənfi)",
+    difficulty: "easy",
+    tags: ["edge-case", "min-max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük və ən kiçik ədəd arasındakı FƏRQİ çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "max - min qiyməti.",
+    example: {in:"3\n-10 -5 -20", out:"15"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda massivdə YALNIZ BİR ELEMENT var — həm min, həm max elə o elementdir, fərq 0-dır. Kodun bu halda \"boş massiv\" səhvinə düşməməsi üçün min/max BAŞLANĞICDA birbaşa a[0]-a bərabər təyin edilir (sonsuzluqla yox!).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int mn = a[0], mx = a[0];
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
+    }
+    cout << (mx - mn) << "\\n";
+}`},
+  {
+    title: "0 massivinin max-min fərqini tapmaq (tək element, sıfır)",
+    difficulty: "easy",
+    tags: ["edge-case", "min-max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki ən böyük və ən kiçik ədəd arasındakı FƏRQİ çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "max - min qiyməti.",
+    example: {in:"1\n0", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda massivdə YALNIZ BİR ELEMENT var — həm min, həm max elə o elementdir, fərq 0-dır. Kodun bu halda \"boş massiv\" səhvinə düşməməsi üçün min/max BAŞLANĞICDA birbaşa a[0]-a bərabər təyin edilir (sonsuzluqla yox!).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int mn = a[0], mx = a[0];
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, a[i]);
+        mx = max(mx, a[i]);
+    }
+    cout << (mx - mn) << "\\n";
+}`},
+  {
+    title: "1500000000 və 1800000000 ədədlərinin cəmini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki böyük tam ədəd (hər biri 10^9-a qədər) verilib. Onların CƏMİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (-10^9 ≤ A, B ≤ 10^9).",
+    output: "A+B-nin dəqiq qiyməti.",
+    example: {in:"1500000000 1800000000", out:"3300000000"},
+    approach: "<b>Təhlükə:</b> adi <b>int</b> tipi təxminən ±2.1 milyarda qədər tutur — iki 10^9-luq ədədin cəmi (2×10^9) bu sərhədə YAXINDIR və overflow baş verə bilər. Ona görə dəyişənlər <b>long long</b> tipində saxlanılır — bu tip ~9.2×10^18-ə qədər tutur, tam təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a + b) << "\\n";
+}`},
+  {
+    title: "1000000000 və 1000000000 ədədlərinin cəmini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki böyük tam ədəd (hər biri 10^9-a qədər) verilib. Onların CƏMİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (-10^9 ≤ A, B ≤ 10^9).",
+    output: "A+B-nin dəqiq qiyməti.",
+    example: {in:"1000000000 1000000000", out:"2000000000"},
+    approach: "<b>Təhlükə:</b> adi <b>int</b> tipi təxminən ±2.1 milyarda qədər tutur — iki 10^9-luq ədədin cəmi (2×10^9) bu sərhədə YAXINDIR və overflow baş verə bilər. Ona görə dəyişənlər <b>long long</b> tipində saxlanılır — bu tip ~9.2×10^18-ə qədər tutur, tam təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a + b) << "\\n";
+}`},
+  {
+    title: "-1000000000 və -1000000000 ədədlərinin cəmini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki böyük tam ədəd (hər biri 10^9-a qədər) verilib. Onların CƏMİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (-10^9 ≤ A, B ≤ 10^9).",
+    output: "A+B-nin dəqiq qiyməti.",
+    example: {in:"-1000000000 -1000000000", out:"-2000000000"},
+    approach: "<b>Təhlükə:</b> adi <b>int</b> tipi təxminən ±2.1 milyarda qədər tutur — iki 10^9-luq ədədin cəmi (2×10^9) bu sərhədə YAXINDIR və overflow baş verə bilər. Ona görə dəyişənlər <b>long long</b> tipində saxlanılır — bu tip ~9.2×10^18-ə qədər tutur, tam təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a + b) << "\\n";
+}`},
+  {
+    title: "0 və 1000000000 ədədlərinin cəmini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki böyük tam ədəd (hər biri 10^9-a qədər) verilib. Onların CƏMİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (-10^9 ≤ A, B ≤ 10^9).",
+    output: "A+B-nin dəqiq qiyməti.",
+    example: {in:"0 1000000000", out:"1000000000"},
+    approach: "<b>Təhlükə:</b> adi <b>int</b> tipi təxminən ±2.1 milyarda qədər tutur — iki 10^9-luq ədədin cəmi (2×10^9) bu sərhədə YAXINDIR və overflow baş verə bilər. Ona görə dəyişənlər <b>long long</b> tipində saxlanılır — bu tip ~9.2×10^18-ə qədər tutur, tam təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a + b) << "\\n";
+}`},
+  {
+    title: "999999999 və 999999999 ədədlərinin cəmini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki böyük tam ədəd (hər biri 10^9-a qədər) verilib. Onların CƏMİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (-10^9 ≤ A, B ≤ 10^9).",
+    output: "A+B-nin dəqiq qiyməti.",
+    example: {in:"999999999 999999999", out:"1999999998"},
+    approach: "<b>Təhlükə:</b> adi <b>int</b> tipi təxminən ±2.1 milyarda qədər tutur — iki 10^9-luq ədədin cəmi (2×10^9) bu sərhədə YAXINDIR və overflow baş verə bilər. Ona görə dəyişənlər <b>long long</b> tipində saxlanılır — bu tip ~9.2×10^18-ə qədər tutur, tam təhlükəsizdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a + b) << "\\n";
+}`},
+  {
+    title: "10 və 0 ədədlərini bölmək (sıfıra bölmə xətası)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "İki tam ədəd A və B verilib. Əgər B SIFIR deyilsə A/B-nin tam hissəsini çap edin; B sıfırdırsa \"XƏTA: sıfıra bölmə\" çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000).",
+    output: "A/B-nin tam hissəsi, ya da \"XƏTA: sıfıra bölmə\".",
+    example: {in:"10 0", out:"XETA: sifira bolme"},
+    approach: "<b>Təhlükə:</b> B=0 olduqda bölmə əməliyyatı PROQRAMI ÇÖKDÜRƏR (runtime error). Ona görə bölmədən ƏVVƏL B-nin sıfır olub-olmadığı YOXLANILMALIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    if (b == 0) cout << "XETA: sifira bolme" << "\\n";
+    else cout << (a / b) << "\\n";
+}`},
+  {
+    title: "20 və 4 ədədlərini bölmək",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "İki tam ədəd A və B verilib. Əgər B SIFIR deyilsə A/B-nin tam hissəsini çap edin; B sıfırdırsa \"XƏTA: sıfıra bölmə\" çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000).",
+    output: "A/B-nin tam hissəsi, ya da \"XƏTA: sıfıra bölmə\".",
+    example: {in:"20 4", out:"5"},
+    approach: "<b>Təhlükə:</b> B=0 olduqda bölmə əməliyyatı PROQRAMI ÇÖKDÜRƏR (runtime error). Ona görə bölmədən ƏVVƏL B-nin sıfır olub-olmadığı YOXLANILMALIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    if (b == 0) cout << "XETA: sifira bolme" << "\\n";
+    else cout << (a / b) << "\\n";
+}`},
+  {
+    title: "-15 və 3 ədədlərini bölmək (mənfi ədəd)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "İki tam ədəd A və B verilib. Əgər B SIFIR deyilsə A/B-nin tam hissəsini çap edin; B sıfırdırsa \"XƏTA: sıfıra bölmə\" çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000).",
+    output: "A/B-nin tam hissəsi, ya da \"XƏTA: sıfıra bölmə\".",
+    example: {in:"-15 3", out:"-5"},
+    approach: "<b>Təhlükə:</b> B=0 olduqda bölmə əməliyyatı PROQRAMI ÇÖKDÜRƏR (runtime error). Ona görə bölmədən ƏVVƏL B-nin sıfır olub-olmadığı YOXLANILMALIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    if (b == 0) cout << "XETA: sifira bolme" << "\\n";
+    else cout << (a / b) << "\\n";
+}`},
+  {
+    title: "0 və 5 ədədlərini bölmək (sıfırı bölmək, xəta deyil)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "İki tam ədəd A və B verilib. Əgər B SIFIR deyilsə A/B-nin tam hissəsini çap edin; B sıfırdırsa \"XƏTA: sıfıra bölmə\" çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000).",
+    output: "A/B-nin tam hissəsi, ya da \"XƏTA: sıfıra bölmə\".",
+    example: {in:"0 5", out:"0"},
+    approach: "<b>Təhlükə:</b> B=0 olduqda bölmə əməliyyatı PROQRAMI ÇÖKDÜRƏR (runtime error). Ona görə bölmədən ƏVVƏL B-nin sıfır olub-olmadığı YOXLANILMALIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    if (b == 0) cout << "XETA: sifira bolme" << "\\n";
+    else cout << (a / b) << "\\n";
+}`},
+  {
+    title: "100 və 0 ədədlərini bölmək (sıfıra bölmə xətası)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "İki tam ədəd A və B verilib. Əgər B SIFIR deyilsə A/B-nin tam hissəsini çap edin; B sıfırdırsa \"XƏTA: sıfıra bölmə\" çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000).",
+    output: "A/B-nin tam hissəsi, ya da \"XƏTA: sıfıra bölmə\".",
+    example: {in:"100 0", out:"XETA: sifira bolme"},
+    approach: "<b>Təhlükə:</b> B=0 olduqda bölmə əməliyyatı PROQRAMI ÇÖKDÜRƏR (runtime error). Ona görə bölmədən ƏVVƏL B-nin sıfır olub-olmadığı YOXLANILMALIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    if (b == 0) cout << "XETA: sifira bolme" << "\\n";
+    else cout << (a / b) << "\\n";
+}`},
+  {
+    title: "5, 5, 5, 5 massivində unikal ədəd sayı (hamısı eyni)",
+    difficulty: "easy",
+    tags: ["edge-case", "təkrar"],
+    statement: "N ədəd verilib (hamısı EYNİ ola bilər). Massivdə neçə FƏRQLİ (unikal) ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Unikal ədədlərin sayı.",
+    example: {in:"4\n5 5 5 5", out:"1"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər EYNİ ola bilər (unikal say = 1) — <b>set&lt;int&gt;</b> istifadə etmək bu halı da, adi hallı da eyni düzgünlüklə idarə edir, çünki set avtomatik olaraq təkrarları saxlamır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    cout << s.size() << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5 massivində unikal ədəd sayı (təkrar yoxdur)",
+    difficulty: "easy",
+    tags: ["edge-case", "təkrar"],
+    statement: "N ədəd verilib (hamısı EYNİ ola bilər). Massivdə neçə FƏRQLİ (unikal) ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Unikal ədədlərin sayı.",
+    example: {in:"5\n1 2 3 4 5", out:"5"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər EYNİ ola bilər (unikal say = 1) — <b>set&lt;int&gt;</b> istifadə etmək bu halı da, adi hallı da eyni düzgünlüklə idarə edir, çünki set avtomatik olaraq təkrarları saxlamır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    cout << s.size() << "\\n";
+}`},
+  {
+    title: "7 massivində unikal ədəd sayı (tək element)",
+    difficulty: "easy",
+    tags: ["edge-case", "təkrar"],
+    statement: "N ədəd verilib (hamısı EYNİ ola bilər). Massivdə neçə FƏRQLİ (unikal) ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Unikal ədədlərin sayı.",
+    example: {in:"1\n7", out:"1"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər EYNİ ola bilər (unikal say = 1) — <b>set&lt;int&gt;</b> istifadə etmək bu halı da, adi hallı da eyni düzgünlüklə idarə edir, çünki set avtomatik olaraq təkrarları saxlamır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    cout << s.size() << "\\n";
+}`},
+  {
+    title: "4, 2, 4, 1, 2, 4 massivində unikal ədəd sayı (qarışıq təkrar)",
+    difficulty: "easy",
+    tags: ["edge-case", "təkrar"],
+    statement: "N ədəd verilib (hamısı EYNİ ola bilər). Massivdə neçə FƏRQLİ (unikal) ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Unikal ədədlərin sayı.",
+    example: {in:"6\n4 2 4 1 2 4", out:"3"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər EYNİ ola bilər (unikal say = 1) — <b>set&lt;int&gt;</b> istifadə etmək bu halı da, adi hallı da eyni düzgünlüklə idarə edir, çünki set avtomatik olaraq təkrarları saxlamır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    cout << s.size() << "\\n";
+}`},
+  {
+    title: "-1, -1, 0, 0, 1 massivində unikal ədəd sayı",
+    difficulty: "easy",
+    tags: ["edge-case", "təkrar"],
+    statement: "N ədəd verilib (hamısı EYNİ ola bilər). Massivdə neçə FƏRQLİ (unikal) ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Unikal ədədlərin sayı.",
+    example: {in:"5\n-1 -1 0 0 1", out:"3"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər EYNİ ola bilər (unikal say = 1) — <b>set&lt;int&gt;</b> istifadə etmək bu halı da, adi hallı da eyni düzgünlüklə idarə edir, çünki set avtomatik olaraq təkrarları saxlamır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    cout << s.size() << "\\n";
+}`},
+  {
+    title: "100000 və 100000 ədədlərinin hasilini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki tam ədəd A və B (hər biri 100000-ə qədər) verilib. Onların HASİLİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (0 ≤ A, B ≤ 100000).",
+    output: "A*B-nin dəqiq qiyməti.",
+    example: {in:"100000 100000", out:"10000000000"},
+    approach: "<b>Təhlükə:</b> 100000 × 100000 = 10 milyard — bu, <b>int</b>-in tutumunu (~2.1 milyard) AŞIR. Çarpmadan ƏVVƏL heç olmasa bir operandı <b>long long</b>-a çevirmək lazımdır ki, C++ bütün əməliyyatı 64-bitlik tipdə aparsın.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a * b) << "\\n";
+}`},
+  {
+    title: "0 və 100000 ədədlərinin hasilini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki tam ədəd A və B (hər biri 100000-ə qədər) verilib. Onların HASİLİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (0 ≤ A, B ≤ 100000).",
+    output: "A*B-nin dəqiq qiyməti.",
+    example: {in:"0 100000", out:"0"},
+    approach: "<b>Təhlükə:</b> 100000 × 100000 = 10 milyard — bu, <b>int</b>-in tutumunu (~2.1 milyard) AŞIR. Çarpmadan ƏVVƏL heç olmasa bir operandı <b>long long</b>-a çevirmək lazımdır ki, C++ bütün əməliyyatı 64-bitlik tipdə aparsın.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a * b) << "\\n";
+}`},
+  {
+    title: "50000 və 60000 ədədlərinin hasilini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki tam ədəd A və B (hər biri 100000-ə qədər) verilib. Onların HASİLİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (0 ≤ A, B ≤ 100000).",
+    output: "A*B-nin dəqiq qiyməti.",
+    example: {in:"50000 60000", out:"3000000000"},
+    approach: "<b>Təhlükə:</b> 100000 × 100000 = 10 milyard — bu, <b>int</b>-in tutumunu (~2.1 milyard) AŞIR. Çarpmadan ƏVVƏL heç olmasa bir operandı <b>long long</b>-a çevirmək lazımdır ki, C++ bütün əməliyyatı 64-bitlik tipdə aparsın.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a * b) << "\\n";
+}`},
+  {
+    title: "1 və 1 ədədlərinin hasilini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki tam ədəd A və B (hər biri 100000-ə qədər) verilib. Onların HASİLİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (0 ≤ A, B ≤ 100000).",
+    output: "A*B-nin dəqiq qiyməti.",
+    example: {in:"1 1", out:"1"},
+    approach: "<b>Təhlükə:</b> 100000 × 100000 = 10 milyard — bu, <b>int</b>-in tutumunu (~2.1 milyard) AŞIR. Çarpmadan ƏVVƏL heç olmasa bir operandı <b>long long</b>-a çevirmək lazımdır ki, C++ bütün əməliyyatı 64-bitlik tipdə aparsın.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a * b) << "\\n";
+}`},
+  {
+    title: "99999 və 99999 ədədlərinin hasilini overflow-suz tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "İki tam ədəd A və B (hər biri 100000-ə qədər) verilib. Onların HASİLİNİ düzgün çap edin.",
+    input: "Bir sətirdə A və B (0 ≤ A, B ≤ 100000).",
+    output: "A*B-nin dəqiq qiyməti.",
+    example: {in:"99999 99999", out:"9999800001"},
+    approach: "<b>Təhlükə:</b> 100000 × 100000 = 10 milyard — bu, <b>int</b>-in tutumunu (~2.1 milyard) AŞIR. Çarpmadan ƏVVƏL heç olmasa bir operandı <b>long long</b>-a çevirmək lazımdır ki, C++ bütün əməliyyatı 64-bitlik tipdə aparsın.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, b; cin >> a >> b;
+    cout << (a * b) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin son elementini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N ədəd verilib. Massivin SON elementini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin son elementi (a[N-1]).",
+    example: {in:"5\n5 3 8 1 9", out:"9"},
+    approach: "<b>Təhlükə (off-by-one):</b> massivin indeksləri 0-dan N-1-ə qədərdir — \"son element\" <b>a[N]</b> DEYİL (bu, massivdən KƏNARA çıxar və təsadüfi/səhv dəyər oxuyar), düzgün indeks <b>a[N-1]</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << a[n - 1] << "\\n";
+}`},
+  {
+    title: "7 massivinin son elementini tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N ədəd verilib. Massivin SON elementini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin son elementi (a[N-1]).",
+    example: {in:"1\n7", out:"7"},
+    approach: "<b>Təhlükə (off-by-one):</b> massivin indeksləri 0-dan N-1-ə qədərdir — \"son element\" <b>a[N]</b> DEYİL (bu, massivdən KƏNARA çıxar və təsadüfi/səhv dəyər oxuyar), düzgün indeks <b>a[N-1]</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << a[n - 1] << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5, 6, 7, 8 massivinin son elementini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N ədəd verilib. Massivin SON elementini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin son elementi (a[N-1]).",
+    example: {in:"8\n1 2 3 4 5 6 7 8", out:"8"},
+    approach: "<b>Təhlükə (off-by-one):</b> massivin indeksləri 0-dan N-1-ə qədərdir — \"son element\" <b>a[N]</b> DEYİL (bu, massivdən KƏNARA çıxar və təsadüfi/səhv dəyər oxuyar), düzgün indeks <b>a[N-1]</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << a[n - 1] << "\\n";
+}`},
+  {
+    title: "-5, -10 massivinin son elementini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N ədəd verilib. Massivin SON elementini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin son elementi (a[N-1]).",
+    example: {in:"2\n-5 -10", out:"-10"},
+    approach: "<b>Təhlükə (off-by-one):</b> massivin indeksləri 0-dan N-1-ə qədərdir — \"son element\" <b>a[N]</b> DEYİL (bu, massivdən KƏNARA çıxar və təsadüfi/səhv dəyər oxuyar), düzgün indeks <b>a[N-1]</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << a[n - 1] << "\\n";
+}`},
+  {
+    title: "100 massivinin son elementini tapmaq (tək element)",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N ədəd verilib. Massivin SON elementini çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivin son elementi (a[N-1]).",
+    example: {in:"1\n100", out:"100"},
+    approach: "<b>Təhlükə (off-by-one):</b> massivin indeksləri 0-dan N-1-ə qədərdir — \"son element\" <b>a[N]</b> DEYİL (bu, massivdən KƏNARA çıxar və təsadüfi/səhv dəyər oxuyar), düzgün indeks <b>a[N-1]</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << a[n - 1] << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7, 9 massivində 100-ü axtarmaq (hamısından böyük, -1)",
+    difficulty: "mid",
+    tags: ["edge-case", "axtarış"],
+    statement: "Artan sıraya düzülmüş N ədəd və X verilib. X massivdə varsa 1-indeksli mövqeyini, YOXDURSA \"-1\" çap edin (X massivin bütün elementlərindən BÖYÜK VƏ YA KİÇİK ola bilər).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi, ya da -1.",
+    example: {in:"5\n1 3 5 7 9\n100", out:"-1"},
+    approach: "<b>Sərhəd hal:</b> <b>lower_bound</b> X-dən kiçik olmayan ilk elementi tapır, amma bu POZİSİYA massivin SONUNA (a.end()) çıxa bilər — X bütün elementlərdən BÖYÜKDÜRSƏ. Bu hal yoxlanmasa, <b>a.end()</b>-dən dəyər oxumaq (undefined behavior) baş verər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    auto it = lower_bound(a.begin(), a.end(), x);
+    if (it == a.end() || *it != x) cout << -1 << "\\n";
+    else cout << (it - a.begin() + 1) << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7, 9 massivində -100-ü axtarmaq (hamısından kiçik, -1)",
+    difficulty: "mid",
+    tags: ["edge-case", "axtarış"],
+    statement: "Artan sıraya düzülmüş N ədəd və X verilib. X massivdə varsa 1-indeksli mövqeyini, YOXDURSA \"-1\" çap edin (X massivin bütün elementlərindən BÖYÜK VƏ YA KİÇİK ola bilər).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi, ya da -1.",
+    example: {in:"5\n1 3 5 7 9\n-100", out:"-1"},
+    approach: "<b>Sərhəd hal:</b> <b>lower_bound</b> X-dən kiçik olmayan ilk elementi tapır, amma bu POZİSİYA massivin SONUNA (a.end()) çıxa bilər — X bütün elementlərdən BÖYÜKDÜRSƏ. Bu hal yoxlanmasa, <b>a.end()</b>-dən dəyər oxumaq (undefined behavior) baş verər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    auto it = lower_bound(a.begin(), a.end(), x);
+    if (it == a.end() || *it != x) cout << -1 << "\\n";
+    else cout << (it - a.begin() + 1) << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7, 9 massivində 5-i axtarmaq (tapılır)",
+    difficulty: "mid",
+    tags: ["edge-case", "axtarış"],
+    statement: "Artan sıraya düzülmüş N ədəd və X verilib. X massivdə varsa 1-indeksli mövqeyini, YOXDURSA \"-1\" çap edin (X massivin bütün elementlərindən BÖYÜK VƏ YA KİÇİK ola bilər).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi, ya da -1.",
+    example: {in:"5\n1 3 5 7 9\n5", out:"3"},
+    approach: "<b>Sərhəd hal:</b> <b>lower_bound</b> X-dən kiçik olmayan ilk elementi tapır, amma bu POZİSİYA massivin SONUNA (a.end()) çıxa bilər — X bütün elementlərdən BÖYÜKDÜRSƏ. Bu hal yoxlanmasa, <b>a.end()</b>-dən dəyər oxumaq (undefined behavior) baş verər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    auto it = lower_bound(a.begin(), a.end(), x);
+    if (it == a.end() || *it != x) cout << -1 << "\\n";
+    else cout << (it - a.begin() + 1) << "\\n";
+}`},
+  {
+    title: "5 massivində 5-i axtarmaq (tək elementli massiv, tapılır)",
+    difficulty: "mid",
+    tags: ["edge-case", "axtarış"],
+    statement: "Artan sıraya düzülmüş N ədəd və X verilib. X massivdə varsa 1-indeksli mövqeyini, YOXDURSA \"-1\" çap edin (X massivin bütün elementlərindən BÖYÜK VƏ YA KİÇİK ola bilər).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi, ya da -1.",
+    example: {in:"1\n5\n5", out:"1"},
+    approach: "<b>Sərhəd hal:</b> <b>lower_bound</b> X-dən kiçik olmayan ilk elementi tapır, amma bu POZİSİYA massivin SONUNA (a.end()) çıxa bilər — X bütün elementlərdən BÖYÜKDÜRSƏ. Bu hal yoxlanmasa, <b>a.end()</b>-dən dəyər oxumaq (undefined behavior) baş verər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    auto it = lower_bound(a.begin(), a.end(), x);
+    if (it == a.end() || *it != x) cout << -1 << "\\n";
+    else cout << (it - a.begin() + 1) << "\\n";
+}`},
+  {
+    title: "5 massivində 9-u axtarmaq (tək elementli massiv, -1)",
+    difficulty: "mid",
+    tags: ["edge-case", "axtarış"],
+    statement: "Artan sıraya düzülmüş N ədəd və X verilib. X massivdə varsa 1-indeksli mövqeyini, YOXDURSA \"-1\" çap edin (X massivin bütün elementlərindən BÖYÜK VƏ YA KİÇİK ola bilər).",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə ARTAN sıraya düzülmüş N tam ədəd, üçüncü sətirdə X.",
+    output: "X-in 1-indeksli mövqeyi, ya da -1.",
+    example: {in:"1\n5\n9", out:"-1"},
+    approach: "<b>Sərhəd hal:</b> <b>lower_bound</b> X-dən kiçik olmayan ilk elementi tapır, amma bu POZİSİYA massivin SONUNA (a.end()) çıxa bilər — X bütün elementlərdən BÖYÜKDÜRSƏ. Bu hal yoxlanmasa, <b>a.end()</b>-dən dəyər oxumaq (undefined behavior) baş verər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int x; cin >> x;
+    auto it = lower_bound(a.begin(), a.end(), x);
+    if (it == a.end() || *it != x) cout << -1 << "\\n";
+    else cout << (it - a.begin() + 1) << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5 massivində ən çox təkrar sayı (hamısı fərqli, cavab 1)",
+    difficulty: "mid",
+    tags: ["edge-case", "say"],
+    statement: "N ədəd verilib. Massivdə ən çox təkrarlanan ədədin NEÇƏ DƏFƏ təkrarlandığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən çox təkrarlanan ədədin təkrar sayı.",
+    example: {in:"5\n1 2 3 4 5", out:"1"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər FƏRQLİ ola bilər (cavab 1) və ya bütün elementlər EYNİ ola bilər (cavab N) — <b>map&lt;int,int&gt;</b> ilə hər ədədin tezliyi sayılır, sonra bu tezliklərin maksimumu tapılır; hər iki sərhəd hal avtomatik düzgün işləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; freq[x]++; }
+    int best = 0;
+    for (auto& p : freq) best = max(best, p.second);
+    cout << best << "\\n";
+}`},
+  {
+    title: "7, 7, 7, 7 massivində ən çox təkrar sayı (hamısı eyni, cavab N)",
+    difficulty: "mid",
+    tags: ["edge-case", "say"],
+    statement: "N ədəd verilib. Massivdə ən çox təkrarlanan ədədin NEÇƏ DƏFƏ təkrarlandığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən çox təkrarlanan ədədin təkrar sayı.",
+    example: {in:"4\n7 7 7 7", out:"4"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər FƏRQLİ ola bilər (cavab 1) və ya bütün elementlər EYNİ ola bilər (cavab N) — <b>map&lt;int,int&gt;</b> ilə hər ədədin tezliyi sayılır, sonra bu tezliklərin maksimumu tapılır; hər iki sərhəd hal avtomatik düzgün işləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; freq[x]++; }
+    int best = 0;
+    for (auto& p : freq) best = max(best, p.second);
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 1, 2, 3, 1 massivində ən çox təkrar sayı",
+    difficulty: "mid",
+    tags: ["edge-case", "say"],
+    statement: "N ədəd verilib. Massivdə ən çox təkrarlanan ədədin NEÇƏ DƏFƏ təkrarlandığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən çox təkrarlanan ədədin təkrar sayı.",
+    example: {in:"5\n1 1 2 3 1", out:"3"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər FƏRQLİ ola bilər (cavab 1) və ya bütün elementlər EYNİ ola bilər (cavab N) — <b>map&lt;int,int&gt;</b> ilə hər ədədin tezliyi sayılır, sonra bu tezliklərin maksimumu tapılır; hər iki sərhəd hal avtomatik düzgün işləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; freq[x]++; }
+    int best = 0;
+    for (auto& p : freq) best = max(best, p.second);
+    cout << best << "\\n";
+}`},
+  {
+    title: "9 massivində ən çox təkrar sayı (tək element, cavab 1)",
+    difficulty: "mid",
+    tags: ["edge-case", "say"],
+    statement: "N ədəd verilib. Massivdə ən çox təkrarlanan ədədin NEÇƏ DƏFƏ təkrarlandığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən çox təkrarlanan ədədin təkrar sayı.",
+    example: {in:"1\n9", out:"1"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər FƏRQLİ ola bilər (cavab 1) və ya bütün elementlər EYNİ ola bilər (cavab N) — <b>map&lt;int,int&gt;</b> ilə hər ədədin tezliyi sayılır, sonra bu tezliklərin maksimumu tapılır; hər iki sərhəd hal avtomatik düzgün işləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; freq[x]++; }
+    int best = 0;
+    for (auto& p : freq) best = max(best, p.second);
+    cout << best << "\\n";
+}`},
+  {
+    title: "2, 2, 3, 3, 3, 1 massivində ən çox təkrar sayı",
+    difficulty: "mid",
+    tags: ["edge-case", "say"],
+    statement: "N ədəd verilib. Massivdə ən çox təkrarlanan ədədin NEÇƏ DƏFƏ təkrarlandığını tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ən çox təkrarlanan ədədin təkrar sayı.",
+    example: {in:"6\n2 2 3 3 3 1", out:"3"},
+    approach: "<b>Sərhəd hal:</b> bütün elementlər FƏRQLİ ola bilər (cavab 1) və ya bütün elementlər EYNİ ola bilər (cavab N) — <b>map&lt;int,int&gt;</b> ilə hər ədədin tezliyi sayılır, sonra bu tezliklərin maksimumu tapılır; hər iki sərhəd hal avtomatik düzgün işləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    map<int,int> freq;
+    for (int i = 0; i < n; i++) { int x; cin >> x; freq[x]++; }
+    int best = 0;
+    for (auto& p : freq) best = max(best, p.second);
+    cout << best << "\\n";
+}`},
+  {
+    title: "-5, 3, -8, 1, -9 massivinin mütləq qiymətlər cəmini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "mütləq qiymət"],
+    statement: "N ədəd verilib (mənfi, sıfır və ya müsbət ola bilər). Hər bir ədədin MÜTLƏQ QİYMƏTİNİN cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Mütləq qiymətlərin cəmi.",
+    example: {in:"5\n-5 3 -8 1 -9", out:"26"},
+    approach: "<b>Diqqət:</b> <b>abs()</b> funksiyası mənfi ədədi müsbətə çevirir, sıfırı dəyişmir — hər üç halı (mənfi/sıfır/müsbət) düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += abs(x); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "0, 0, 0 massivinin mütləq qiymətlər cəmini tapmaq (hamısı sıfır)",
+    difficulty: "easy",
+    tags: ["edge-case", "mütləq qiymət"],
+    statement: "N ədəd verilib (mənfi, sıfır və ya müsbət ola bilər). Hər bir ədədin MÜTLƏQ QİYMƏTİNİN cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Mütləq qiymətlərin cəmi.",
+    example: {in:"3\n0 0 0", out:"0"},
+    approach: "<b>Diqqət:</b> <b>abs()</b> funksiyası mənfi ədədi müsbətə çevirir, sıfırı dəyişmir — hər üç halı (mənfi/sıfır/müsbət) düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += abs(x); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-7 massivinin mütləq qiymətlər cəmini tapmaq (tək mənfi element)",
+    difficulty: "easy",
+    tags: ["edge-case", "mütləq qiymət"],
+    statement: "N ədəd verilib (mənfi, sıfır və ya müsbət ola bilər). Hər bir ədədin MÜTLƏQ QİYMƏTİNİN cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Mütləq qiymətlərin cəmi.",
+    example: {in:"1\n-7", out:"7"},
+    approach: "<b>Diqqət:</b> <b>abs()</b> funksiyası mənfi ədədi müsbətə çevirir, sıfırı dəyişmir — hər üç halı (mənfi/sıfır/müsbət) düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += abs(x); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "5, 5, 5 massivinin mütləq qiymətlər cəmini tapmaq (hamısı müsbət)",
+    difficulty: "easy",
+    tags: ["edge-case", "mütləq qiymət"],
+    statement: "N ədəd verilib (mənfi, sıfır və ya müsbət ola bilər). Hər bir ədədin MÜTLƏQ QİYMƏTİNİN cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Mütləq qiymətlərin cəmi.",
+    example: {in:"3\n5 5 5", out:"15"},
+    approach: "<b>Diqqət:</b> <b>abs()</b> funksiyası mənfi ədədi müsbətə çevirir, sıfırı dəyişmir — hər üç halı (mənfi/sıfır/müsbət) düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += abs(x); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "-100, 100 massivinin mütləq qiymətlər cəmini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "mütləq qiymət"],
+    statement: "N ədəd verilib (mənfi, sıfır və ya müsbət ola bilər). Hər bir ədədin MÜTLƏQ QİYMƏTİNİN cəmini tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Mütləq qiymətlərin cəmi.",
+    example: {in:"2\n-100 100", out:"200"},
+    approach: "<b>Diqqət:</b> <b>abs()</b> funksiyası mənfi ədədi müsbətə çevirir, sıfırı dəyişmir — hər üç halı (mənfi/sıfır/müsbət) düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += abs(x); }
+    cout << sum << "\\n";
+}`},
+  {
+    title: "2, 3, 0, 4 massivinin hasilini tapmaq (içində sıfır var)",
+    difficulty: "mid",
+    tags: ["edge-case", "hasil"],
+    statement: "N ədəd verilib (bəziləri SIFIR ola bilər). Massivin bütün elementlərinin HASİLİNİ tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin hasili.",
+    example: {in:"4\n2 3 0 4", out:"0"},
+    approach: "<b>Təhlükə:</b> hasili 1-dən BAŞLAMAQ vacibdir (0-dan yox!) — əks halda bütün hasil həmişə 0 olardı. Massivdə BİR DƏNƏ belə sıfır varsa, nəticə düzgün olaraq 0 çıxmalıdır — bu, \"sərhəd hal\" deyil, DÜZGÜN NƏTİCƏDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long prod = 1;
+    for (int i = 0; i < n; i++) { int x; cin >> x; prod *= x; }
+    cout << prod << "\\n";
+}`},
+  {
+    title: "2, 3, 4 massivinin hasilini tapmaq (sıfır yoxdur)",
+    difficulty: "mid",
+    tags: ["edge-case", "hasil"],
+    statement: "N ədəd verilib (bəziləri SIFIR ola bilər). Massivin bütün elementlərinin HASİLİNİ tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin hasili.",
+    example: {in:"3\n2 3 4", out:"24"},
+    approach: "<b>Təhlükə:</b> hasili 1-dən BAŞLAMAQ vacibdir (0-dan yox!) — əks halda bütün hasil həmişə 0 olardı. Massivdə BİR DƏNƏ belə sıfır varsa, nəticə düzgün olaraq 0 çıxmalıdır — bu, \"sərhəd hal\" deyil, DÜZGÜN NƏTİCƏDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long prod = 1;
+    for (int i = 0; i < n; i++) { int x; cin >> x; prod *= x; }
+    cout << prod << "\\n";
+}`},
+  {
+    title: "0 massivinin hasilini tapmaq (tək element, sıfır)",
+    difficulty: "mid",
+    tags: ["edge-case", "hasil"],
+    statement: "N ədəd verilib (bəziləri SIFIR ola bilər). Massivin bütün elementlərinin HASİLİNİ tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin hasili.",
+    example: {in:"1\n0", out:"0"},
+    approach: "<b>Təhlükə:</b> hasili 1-dən BAŞLAMAQ vacibdir (0-dan yox!) — əks halda bütün hasil həmişə 0 olardı. Massivdə BİR DƏNƏ belə sıfır varsa, nəticə düzgün olaraq 0 çıxmalıdır — bu, \"sərhəd hal\" deyil, DÜZGÜN NƏTİCƏDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long prod = 1;
+    for (int i = 0; i < n; i++) { int x; cin >> x; prod *= x; }
+    cout << prod << "\\n";
+}`},
+  {
+    title: "5 massivinin hasilini tapmaq (tək element)",
+    difficulty: "mid",
+    tags: ["edge-case", "hasil"],
+    statement: "N ədəd verilib (bəziləri SIFIR ola bilər). Massivin bütün elementlərinin HASİLİNİ tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin hasili.",
+    example: {in:"1\n5", out:"5"},
+    approach: "<b>Təhlükə:</b> hasili 1-dən BAŞLAMAQ vacibdir (0-dan yox!) — əks halda bütün hasil həmişə 0 olardı. Massivdə BİR DƏNƏ belə sıfır varsa, nəticə düzgün olaraq 0 çıxmalıdır — bu, \"sərhəd hal\" deyil, DÜZGÜN NƏTİCƏDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long prod = 1;
+    for (int i = 0; i < n; i++) { int x; cin >> x; prod *= x; }
+    cout << prod << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 0, 1 massivinin hasilini tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "hasil"],
+    statement: "N ədəd verilib (bəziləri SIFIR ola bilər). Massivin bütün elementlərinin HASİLİNİ tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 20), ikinci sətirdə N tam ədəd.",
+    output: "Bütün elementlərin hasili.",
+    example: {in:"5\n1 1 1 0 1", out:"0"},
+    approach: "<b>Təhlükə:</b> hasili 1-dən BAŞLAMAQ vacibdir (0-dan yox!) — əks halda bütün hasil həmişə 0 olardı. Massivdə BİR DƏNƏ belə sıfır varsa, nəticə düzgün olaraq 0 çıxmalıdır — bu, \"sərhəd hal\" deyil, DÜZGÜN NƏTİCƏDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    long long prod = 1;
+    for (int i = 0; i < n; i++) { int x; cin >> x; prod *= x; }
+    cout << prod << "\\n";
+}`},
+  {
+    title: "-5 ədədinin kvadratını tapmaq (mənfi ədəd)",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "Bir tam ədəd A verilib (mənfi ola bilər, |A| ≤ 100000). A-nın kvadratını (A²) düzgün çap edin.",
+    input: "Bir tam ədəd A (-100000 ≤ A ≤ 100000).",
+    output: "A²-nin qiyməti.",
+    example: {in:"-5", out:"25"},
+    approach: "<b>Diqqət:</b> mənfi ədədin kvadratı HƏMİŞƏ müsbətdir (mənfi × mənfi = müsbət) — bu riyazi qaydanı unutmaq səhvə səbəb olmur, çünki C++ onu avtomatik düzgün hesablayır, amma 100000² = 10 milyard <b>int</b>-i aşdığı üçün <b>long long</b> lazımdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a; cin >> a;
+    cout << (a * a) << "\\n";
+}`},
+  {
+    title: "100000 ədədinin kvadratını tapmaq (overflow riski)",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "Bir tam ədəd A verilib (mənfi ola bilər, |A| ≤ 100000). A-nın kvadratını (A²) düzgün çap edin.",
+    input: "Bir tam ədəd A (-100000 ≤ A ≤ 100000).",
+    output: "A²-nin qiyməti.",
+    example: {in:"100000", out:"10000000000"},
+    approach: "<b>Diqqət:</b> mənfi ədədin kvadratı HƏMİŞƏ müsbətdir (mənfi × mənfi = müsbət) — bu riyazi qaydanı unutmaq səhvə səbəb olmur, çünki C++ onu avtomatik düzgün hesablayır, amma 100000² = 10 milyard <b>int</b>-i aşdığı üçün <b>long long</b> lazımdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a; cin >> a;
+    cout << (a * a) << "\\n";
+}`},
+  {
+    title: "-100000 ədədinin kvadratını tapmaq (mənfi, overflow riski)",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "Bir tam ədəd A verilib (mənfi ola bilər, |A| ≤ 100000). A-nın kvadratını (A²) düzgün çap edin.",
+    input: "Bir tam ədəd A (-100000 ≤ A ≤ 100000).",
+    output: "A²-nin qiyməti.",
+    example: {in:"-100000", out:"10000000000"},
+    approach: "<b>Diqqət:</b> mənfi ədədin kvadratı HƏMİŞƏ müsbətdir (mənfi × mənfi = müsbət) — bu riyazi qaydanı unutmaq səhvə səbəb olmur, çünki C++ onu avtomatik düzgün hesablayır, amma 100000² = 10 milyard <b>int</b>-i aşdığı üçün <b>long long</b> lazımdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a; cin >> a;
+    cout << (a * a) << "\\n";
+}`},
+  {
+    title: "0 ədədinin kvadratını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "Bir tam ədəd A verilib (mənfi ola bilər, |A| ≤ 100000). A-nın kvadratını (A²) düzgün çap edin.",
+    input: "Bir tam ədəd A (-100000 ≤ A ≤ 100000).",
+    output: "A²-nin qiyməti.",
+    example: {in:"0", out:"0"},
+    approach: "<b>Diqqət:</b> mənfi ədədin kvadratı HƏMİŞƏ müsbətdir (mənfi × mənfi = müsbət) — bu riyazi qaydanı unutmaq səhvə səbəb olmur, çünki C++ onu avtomatik düzgün hesablayır, amma 100000² = 10 milyard <b>int</b>-i aşdığı üçün <b>long long</b> lazımdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a; cin >> a;
+    cout << (a * a) << "\\n";
+}`},
+  {
+    title: "7 ədədinin kvadratını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "overflow"],
+    statement: "Bir tam ədəd A verilib (mənfi ola bilər, |A| ≤ 100000). A-nın kvadratını (A²) düzgün çap edin.",
+    input: "Bir tam ədəd A (-100000 ≤ A ≤ 100000).",
+    output: "A²-nin qiyməti.",
+    example: {in:"7", out:"49"},
+    approach: "<b>Diqqət:</b> mənfi ədədin kvadratı HƏMİŞƏ müsbətdir (mənfi × mənfi = müsbət) — bu riyazi qaydanı unutmaq səhvə səbəb olmur, çünki C++ onu avtomatik düzgün hesablayır, amma 100000² = 10 milyard <b>int</b>-i aşdığı üçün <b>long long</b> lazımdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a; cin >> a;
+    cout << (a * a) << "\\n";
+}`},
+  {
+    title: "Boş massivin (N=0) ortalamasını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "N (N SIFIR da ola bilər!) ədəd verilib. Massivin ORTA qiymətini (iki onluq rəqəmlə) çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ortalama (2 onluqla) və ya \"YOX\".",
+    example: {in:"0", out:"YOX"},
+    approach: "<b>Təhlükə:</b> orta qiymət cəmi N-ə BÖLMƏKLƏ tapılır — N=0-dırsa bu, SIFIRA BÖLMƏDİR (çökmə). Ona görə bölmədən ƏVVƏL N=0 yoxlanılmalıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += x; }
+    cout << fixed << setprecision(2) << (double)sum / n << "\\n";
+}`},
+  {
+    title: "4, 8, 10, 2 massivinin ortalamasını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "N (N SIFIR da ola bilər!) ədəd verilib. Massivin ORTA qiymətini (iki onluq rəqəmlə) çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ortalama (2 onluqla) və ya \"YOX\".",
+    example: {in:"4\n4 8 10 2", out:"6.00"},
+    approach: "<b>Təhlükə:</b> orta qiymət cəmi N-ə BÖLMƏKLƏ tapılır — N=0-dırsa bu, SIFIRA BÖLMƏDİR (çökmə). Ona görə bölmədən ƏVVƏL N=0 yoxlanılmalıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += x; }
+    cout << fixed << setprecision(2) << (double)sum / n << "\\n";
+}`},
+  {
+    title: "5 massivinin ortalamasını tapmaq (tək element)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "N (N SIFIR da ola bilər!) ədəd verilib. Massivin ORTA qiymətini (iki onluq rəqəmlə) çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ortalama (2 onluqla) və ya \"YOX\".",
+    example: {in:"1\n5", out:"5.00"},
+    approach: "<b>Təhlükə:</b> orta qiymət cəmi N-ə BÖLMƏKLƏ tapılır — N=0-dırsa bu, SIFIRA BÖLMƏDİR (çökmə). Ona görə bölmədən ƏVVƏL N=0 yoxlanılmalıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += x; }
+    cout << fixed << setprecision(2) << (double)sum / n << "\\n";
+}`},
+  {
+    title: "1, 2 massivinin ortalamasını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "N (N SIFIR da ola bilər!) ədəd verilib. Massivin ORTA qiymətini (iki onluq rəqəmlə) çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ortalama (2 onluqla) və ya \"YOX\".",
+    example: {in:"2\n1 2", out:"1.50"},
+    approach: "<b>Təhlükə:</b> orta qiymət cəmi N-ə BÖLMƏKLƏ tapılır — N=0-dırsa bu, SIFIRA BÖLMƏDİR (çökmə). Ona görə bölmədən ƏVVƏL N=0 yoxlanılmalıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += x; }
+    cout << fixed << setprecision(2) << (double)sum / n << "\\n";
+}`},
+  {
+    title: "-4, -8 massivinin ortalamasını tapmaq (mənfi ədədlər)",
+    difficulty: "mid",
+    tags: ["edge-case", "sıfıra bölmə"],
+    statement: "N (N SIFIR da ola bilər!) ədəd verilib. Massivin ORTA qiymətini (iki onluq rəqəmlə) çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Ortalama (2 onluqla) və ya \"YOX\".",
+    example: {in:"2\n-4 -8", out:"-6.00"},
+    approach: "<b>Təhlükə:</b> orta qiymət cəmi N-ə BÖLMƏKLƏ tapılır — N=0-dırsa bu, SIFIRA BÖLMƏDİR (çökmə). Ona görə bölmədən ƏVVƏL N=0 yoxlanılmalıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    long long sum = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; sum += x; }
+    cout << fixed << setprecision(2) << (double)sum / n << "\\n";
+}`},
+  {
+    title: "-7 ədədinin 3 üzrə riyazi qalığını tapmaq (mənfi ədəd)",
+    difficulty: "mid",
+    tags: ["edge-case", "modulo"],
+    statement: "Mənfi ola bilən bir A ədədi və müsbət bir M ədədi verilib. A-nın M üzrə RİYAZİ (HƏMİŞƏ QEYRİ-MƏNFİ) qalığını tapın.",
+    input: "Bir sətirdə A və M (-1000 ≤ A ≤ 1000, 1 ≤ M ≤ 1000).",
+    output: "A mod M-in riyazi (qeyri-mənfi) qiyməti.",
+    example: {in:"-7 3", out:"2"},
+    approach: "<b>Təhlükə:</b> C++-da <b>%</b> operatoru mənfi ədədlər üçün MƏNFİ nəticə verə bilər (məs. -7 % 3 == -1, riyazi olaraq gözlənilən 2 yox). Düzgün qeyri-mənfi nəticə üçün: <b>((a % m) + m) % m</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, m; cin >> a >> m;
+    long long r = ((a % m) + m) % m;
+    cout << r << "\\n";
+}`},
+  {
+    title: "7 ədədinin 3 üzrə riyazi qalığını tapmaq (müsbət ədəd)",
+    difficulty: "mid",
+    tags: ["edge-case", "modulo"],
+    statement: "Mənfi ola bilən bir A ədədi və müsbət bir M ədədi verilib. A-nın M üzrə RİYAZİ (HƏMİŞƏ QEYRİ-MƏNFİ) qalığını tapın.",
+    input: "Bir sətirdə A və M (-1000 ≤ A ≤ 1000, 1 ≤ M ≤ 1000).",
+    output: "A mod M-in riyazi (qeyri-mənfi) qiyməti.",
+    example: {in:"7 3", out:"1"},
+    approach: "<b>Təhlükə:</b> C++-da <b>%</b> operatoru mənfi ədədlər üçün MƏNFİ nəticə verə bilər (məs. -7 % 3 == -1, riyazi olaraq gözlənilən 2 yox). Düzgün qeyri-mənfi nəticə üçün: <b>((a % m) + m) % m</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, m; cin >> a >> m;
+    long long r = ((a % m) + m) % m;
+    cout << r << "\\n";
+}`},
+  {
+    title: "-1 ədədinin 5 üzrə riyazi qalığını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "modulo"],
+    statement: "Mənfi ola bilən bir A ədədi və müsbət bir M ədədi verilib. A-nın M üzrə RİYAZİ (HƏMİŞƏ QEYRİ-MƏNFİ) qalığını tapın.",
+    input: "Bir sətirdə A və M (-1000 ≤ A ≤ 1000, 1 ≤ M ≤ 1000).",
+    output: "A mod M-in riyazi (qeyri-mənfi) qiyməti.",
+    example: {in:"-1 5", out:"4"},
+    approach: "<b>Təhlükə:</b> C++-da <b>%</b> operatoru mənfi ədədlər üçün MƏNFİ nəticə verə bilər (məs. -7 % 3 == -1, riyazi olaraq gözlənilən 2 yox). Düzgün qeyri-mənfi nəticə üçün: <b>((a % m) + m) % m</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, m; cin >> a >> m;
+    long long r = ((a % m) + m) % m;
+    cout << r << "\\n";
+}`},
+  {
+    title: "0 ədədinin 4 üzrə riyazi qalığını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "modulo"],
+    statement: "Mənfi ola bilən bir A ədədi və müsbət bir M ədədi verilib. A-nın M üzrə RİYAZİ (HƏMİŞƏ QEYRİ-MƏNFİ) qalığını tapın.",
+    input: "Bir sətirdə A və M (-1000 ≤ A ≤ 1000, 1 ≤ M ≤ 1000).",
+    output: "A mod M-in riyazi (qeyri-mənfi) qiyməti.",
+    example: {in:"0 4", out:"0"},
+    approach: "<b>Təhlükə:</b> C++-da <b>%</b> operatoru mənfi ədədlər üçün MƏNFİ nəticə verə bilər (məs. -7 % 3 == -1, riyazi olaraq gözlənilən 2 yox). Düzgün qeyri-mənfi nəticə üçün: <b>((a % m) + m) % m</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, m; cin >> a >> m;
+    long long r = ((a % m) + m) % m;
+    cout << r << "\\n";
+}`},
+  {
+    title: "-100 ədədinin 7 üzrə riyazi qalığını tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "modulo"],
+    statement: "Mənfi ola bilən bir A ədədi və müsbət bir M ədədi verilib. A-nın M üzrə RİYAZİ (HƏMİŞƏ QEYRİ-MƏNFİ) qalığını tapın.",
+    input: "Bir sətirdə A və M (-1000 ≤ A ≤ 1000, 1 ≤ M ≤ 1000).",
+    output: "A mod M-in riyazi (qeyri-mənfi) qiyməti.",
+    example: {in:"-100 7", out:"5"},
+    approach: "<b>Təhlükə:</b> C++-da <b>%</b> operatoru mənfi ədədlər üçün MƏNFİ nəticə verə bilər (məs. -7 % 3 == -1, riyazi olaraq gözlənilən 2 yox). Düzgün qeyri-mənfi nəticə üçün: <b>((a % m) + m) % m</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    long long a, m; cin >> a >> m;
+    long long r = ((a % m) + m) % m;
+    cout << r << "\\n";
+}`},
+  {
+    title: "Boş massivdə (N=0) cüt ədəd sayını tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "say"],
+    statement: "N (N SIFIR da ola bilər) ədəd verilib. Massivdə neçə CÜT ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı (N=0 olduqda 0).",
+    example: {in:"0", out:"0"},
+    approach: "<b>Diqqət:</b> MƏNFİ cüt ədədlər (məs. -4) də cütdür — C++-da <b>x % 2 == 0</b> şərti mənfi cüt ədədlər üçün də DOĞRU işləyir (-4 % 2 == 0), ona görə əlavə yoxlamaya ehtiyac yoxdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; if (x % 2 == 0) cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5, 6 massivində cüt ədəd sayını tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "say"],
+    statement: "N (N SIFIR da ola bilər) ədəd verilib. Massivdə neçə CÜT ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı (N=0 olduqda 0).",
+    example: {in:"6\n1 2 3 4 5 6", out:"3"},
+    approach: "<b>Diqqət:</b> MƏNFİ cüt ədədlər (məs. -4) də cütdür — C++-da <b>x % 2 == 0</b> şərti mənfi cüt ədədlər üçün də DOĞRU işləyir (-4 % 2 == 0), ona görə əlavə yoxlamaya ehtiyac yoxdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; if (x % 2 == 0) cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "-4, -3, -2, -1 massivində cüt ədəd sayını tapmaq (mənfi ədədlər)",
+    difficulty: "easy",
+    tags: ["edge-case", "say"],
+    statement: "N (N SIFIR da ola bilər) ədəd verilib. Massivdə neçə CÜT ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı (N=0 olduqda 0).",
+    example: {in:"4\n-4 -3 -2 -1", out:"2"},
+    approach: "<b>Diqqət:</b> MƏNFİ cüt ədədlər (məs. -4) də cütdür — C++-da <b>x % 2 == 0</b> şərti mənfi cüt ədədlər üçün də DOĞRU işləyir (-4 % 2 == 0), ona görə əlavə yoxlamaya ehtiyac yoxdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; if (x % 2 == 0) cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "1, 3, 5, 7 massivində cüt ədəd sayını tapmaq (heç biri cüt deyil)",
+    difficulty: "easy",
+    tags: ["edge-case", "say"],
+    statement: "N (N SIFIR da ola bilər) ədəd verilib. Massivdə neçə CÜT ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı (N=0 olduqda 0).",
+    example: {in:"4\n1 3 5 7", out:"0"},
+    approach: "<b>Diqqət:</b> MƏNFİ cüt ədədlər (məs. -4) də cütdür — C++-da <b>x % 2 == 0</b> şərti mənfi cüt ədədlər üçün də DOĞRU işləyir (-4 % 2 == 0), ona görə əlavə yoxlamaya ehtiyac yoxdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; if (x % 2 == 0) cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "0 massivində cüt ədəd sayını tapmaq (tək element, sıfır cütdür)",
+    difficulty: "easy",
+    tags: ["edge-case", "say"],
+    statement: "N (N SIFIR da ola bilər) ədəd verilib. Massivdə neçə CÜT ədəd olduğunu tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Cüt ədədlərin sayı (N=0 olduqda 0).",
+    example: {in:"1\n0", out:"1"},
+    approach: "<b>Diqqət:</b> MƏNFİ cüt ədədlər (məs. -4) də cütdür — C++-da <b>x % 2 == 0</b> şərti mənfi cüt ədədlər üçün də DOĞRU işləyir (-4 % 2 == 0), ona görə əlavə yoxlamaya ehtiyac yoxdur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int cnt = 0;
+    for (int i = 0; i < n; i++) { int x; cin >> x; if (x % 2 == 0) cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivində son-ilk fərqini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin BİRİNCİ və SON elementi arasındakı fərqi (son - ilk) tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "a[N-1] - a[0].",
+    example: {in:"5\n5 3 8 1 9", out:"4"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda ilk VƏ son element EYNİ elementdir (a[0] == a[N-1] == a[0]) — fərq həmişə 0 olur. Kod N-in dəyərindən asılı olmadan eyni formulla (a[n-1]-a[0]) işləyir, xüsusi hal yoxlamasına EHTİYAC YOXDUR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << (a[n - 1] - a[0]) << "\\n";
+}`},
+  {
+    title: "7 massivində son-ilk fərqini tapmaq (tək element, cavab 0)",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin BİRİNCİ və SON elementi arasındakı fərqi (son - ilk) tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "a[N-1] - a[0].",
+    example: {in:"1\n7", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda ilk VƏ son element EYNİ elementdir (a[0] == a[N-1] == a[0]) — fərq həmişə 0 olur. Kod N-in dəyərindən asılı olmadan eyni formulla (a[n-1]-a[0]) işləyir, xüsusi hal yoxlamasına EHTİYAC YOXDUR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << (a[n - 1] - a[0]) << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 4, 5 massivində son-ilk fərqini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin BİRİNCİ və SON elementi arasındakı fərqi (son - ilk) tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "a[N-1] - a[0].",
+    example: {in:"5\n1 2 3 4 5", out:"4"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda ilk VƏ son element EYNİ elementdir (a[0] == a[N-1] == a[0]) — fərq həmişə 0 olur. Kod N-in dəyərindən asılı olmadan eyni formulla (a[n-1]-a[0]) işləyir, xüsusi hal yoxlamasına EHTİYAC YOXDUR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << (a[n - 1] - a[0]) << "\\n";
+}`},
+  {
+    title: "10, 10, 10 massivində son-ilk fərqini tapmaq (ilk/son eyni)",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin BİRİNCİ və SON elementi arasındakı fərqi (son - ilk) tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "a[N-1] - a[0].",
+    example: {in:"3\n10 10 10", out:"0"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda ilk VƏ son element EYNİ elementdir (a[0] == a[N-1] == a[0]) — fərq həmişə 0 olur. Kod N-in dəyərindən asılı olmadan eyni formulla (a[n-1]-a[0]) işləyir, xüsusi hal yoxlamasına EHTİYAC YOXDUR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << (a[n - 1] - a[0]) << "\\n";
+}`},
+  {
+    title: "-5, 5 massivində son-ilk fərqini tapmaq",
+    difficulty: "easy",
+    tags: ["edge-case", "off-by-one"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivin BİRİNCİ və SON elementi arasındakı fərqi (son - ilk) tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "a[N-1] - a[0].",
+    example: {in:"2\n-5 5", out:"10"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda ilk VƏ son element EYNİ elementdir (a[0] == a[N-1] == a[0]) — fərq həmişə 0 olur. Kod N-in dəyərindən asılı olmadan eyni formulla (a[n-1]-a[0]) işləyir, xüsusi hal yoxlamasına EHTİYAC YOXDUR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    cout << (a[n - 1] - a[0]) << "\\n";
+}`},
+  {
+    title: "Boş siyahıda (N=0) ən uzun sözü tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "string"],
+    statement: "N (N SIFIR da ola bilər) söz verilib. Ən uzun sözü çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 100), növbəti N sətirdə sözlər (N=0-dırsa bu sətirlər yoxdur).",
+    output: "Ən uzun söz, ya da \"YOX\".",
+    example: {in:"0", out:"YOX"},
+    approach: "<b>Təhlükə:</b> N=0 olduqda siyahı BOŞDUR — \"ən uzun söz\" dəyişənini massivin İLK elementi ilə başlatmaq (N&gt;0 fərz edərək) bu halda ÇÖKMƏYƏ səbəb olar. Ona görə N=0 ayrıca, ƏN ƏVVƏL yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    string best;
+    for (int i = 0; i < n; i++) {
+        string w; cin >> w;
+        if (w.size() > best.size()) best = w;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"kod\", \"test\", \"azercell\" sözləri arasında ən uzunu tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "string"],
+    statement: "N (N SIFIR da ola bilər) söz verilib. Ən uzun sözü çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 100), növbəti N sətirdə sözlər (N=0-dırsa bu sətirlər yoxdur).",
+    output: "Ən uzun söz, ya da \"YOX\".",
+    example: {in:"3\nkod test azercell", out:"azercell"},
+    approach: "<b>Təhlükə:</b> N=0 olduqda siyahı BOŞDUR — \"ən uzun söz\" dəyişənini massivin İLK elementi ilə başlatmaq (N&gt;0 fərz edərək) bu halda ÇÖKMƏYƏ səbəb olar. Ona görə N=0 ayrıca, ƏN ƏVVƏL yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    string best;
+    for (int i = 0; i < n; i++) {
+        string w; cin >> w;
+        if (w.size() > best.size()) best = w;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"salam\" sözü arasında ən uzunu tapmaq (tək söz)",
+    difficulty: "mid",
+    tags: ["edge-case", "string"],
+    statement: "N (N SIFIR da ola bilər) söz verilib. Ən uzun sözü çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 100), növbəti N sətirdə sözlər (N=0-dırsa bu sətirlər yoxdur).",
+    output: "Ən uzun söz, ya da \"YOX\".",
+    example: {in:"1\nsalam", out:"salam"},
+    approach: "<b>Təhlükə:</b> N=0 olduqda siyahı BOŞDUR — \"ən uzun söz\" dəyişənini massivin İLK elementi ilə başlatmaq (N&gt;0 fərz edərək) bu halda ÇÖKMƏYƏ səbəb olar. Ona görə N=0 ayrıca, ƏN ƏVVƏL yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    string best;
+    for (int i = 0; i < n; i++) {
+        string w; cin >> w;
+        if (w.size() > best.size()) best = w;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"a\", \"bb\", \"ccc\" sözləri arasında ən uzunu tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "string"],
+    statement: "N (N SIFIR da ola bilər) söz verilib. Ən uzun sözü çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 100), növbəti N sətirdə sözlər (N=0-dırsa bu sətirlər yoxdur).",
+    output: "Ən uzun söz, ya da \"YOX\".",
+    example: {in:"3\na bb ccc", out:"ccc"},
+    approach: "<b>Təhlükə:</b> N=0 olduqda siyahı BOŞDUR — \"ən uzun söz\" dəyişənini massivin İLK elementi ilə başlatmaq (N&gt;0 fərz edərək) bu halda ÇÖKMƏYƏ səbəb olar. Ona görə N=0 ayrıca, ƏN ƏVVƏL yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    string best;
+    for (int i = 0; i < n; i++) {
+        string w; cin >> w;
+        if (w.size() > best.size()) best = w;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"eyni\", \"eyni\" sözləri arasında ən uzunu tapmaq (bərabər uzunluq)",
+    difficulty: "mid",
+    tags: ["edge-case", "string"],
+    statement: "N (N SIFIR da ola bilər) söz verilib. Ən uzun sözü çap edin; N=0-dırsa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 100), növbəti N sətirdə sözlər (N=0-dırsa bu sətirlər yoxdur).",
+    output: "Ən uzun söz, ya da \"YOX\".",
+    example: {in:"2\neyni eyni", out:"eyni"},
+    approach: "<b>Təhlükə:</b> N=0 olduqda siyahı BOŞDUR — \"ən uzun söz\" dəyişənini massivin İLK elementi ilə başlatmaq (N&gt;0 fərz edərək) bu halda ÇÖKMƏYƏ səbəb olar. Ona görə N=0 ayrıca, ƏN ƏVVƏL yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    if (n == 0) { cout << "YOX" << "\\n"; return 0; }
+    string best;
+    for (int i = 0; i < n; i++) {
+        string w; cin >> w;
+        if (w.size() > best.size()) best = w;
+    }
+    cout << best << "\\n";
+}`},
+  {
+    title: "-5, -3, -8, -1, -9 massivinin maksimumunu tapmaq (hamısı mənfi)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib (HAMISI MƏNFİ ola bilər). Massivdəki ƏN BÖYÜK ədədi tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd (mənfi ola bilər!).",
+    example: {in:"5\n-5 -3 -8 -1 -9", out:"-1"},
+    approach: "<b>Təhlükə:</b> maksimumu 0-dan BAŞLATMAQ (ən geniş yayılmış səhv) massiv TAMAMILƏ MƏNFİ ədədlərdən ibarət olduqda SƏHV nəticə verər (0, massivdə olmayan bir dəyər, \"maksimum\" kimi çap olunar). Düzgün üsul: maksimumu BİRİNCİ ELEMENTLƏ (a[0]) başlatmaq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int mx = INT_MIN;
+    for (int i = 0; i < n; i++) { int x; cin >> x; mx = max(mx, x); }
+    cout << mx << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin maksimumunu tapmaq (hamısı müsbət)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib (HAMISI MƏNFİ ola bilər). Massivdəki ƏN BÖYÜK ədədi tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd (mənfi ola bilər!).",
+    example: {in:"5\n5 3 8 1 9", out:"9"},
+    approach: "<b>Təhlükə:</b> maksimumu 0-dan BAŞLATMAQ (ən geniş yayılmış səhv) massiv TAMAMILƏ MƏNFİ ədədlərdən ibarət olduqda SƏHV nəticə verər (0, massivdə olmayan bir dəyər, \"maksimum\" kimi çap olunar). Düzgün üsul: maksimumu BİRİNCİ ELEMENTLƏ (a[0]) başlatmaq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int mx = INT_MIN;
+    for (int i = 0; i < n; i++) { int x; cin >> x; mx = max(mx, x); }
+    cout << mx << "\\n";
+}`},
+  {
+    title: "-7 massivinin maksimumunu tapmaq (tək mənfi element)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib (HAMISI MƏNFİ ola bilər). Massivdəki ƏN BÖYÜK ədədi tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd (mənfi ola bilər!).",
+    example: {in:"1\n-7", out:"-7"},
+    approach: "<b>Təhlükə:</b> maksimumu 0-dan BAŞLATMAQ (ən geniş yayılmış səhv) massiv TAMAMILƏ MƏNFİ ədədlərdən ibarət olduqda SƏHV nəticə verər (0, massivdə olmayan bir dəyər, \"maksimum\" kimi çap olunar). Düzgün üsul: maksimumu BİRİNCİ ELEMENTLƏ (a[0]) başlatmaq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int mx = INT_MIN;
+    for (int i = 0; i < n; i++) { int x; cin >> x; mx = max(mx, x); }
+    cout << mx << "\\n";
+}`},
+  {
+    title: "-1, -1, -1 massivinin maksimumunu tapmaq (hamısı eyni mənfi)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib (HAMISI MƏNFİ ola bilər). Massivdəki ƏN BÖYÜK ədədi tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd (mənfi ola bilər!).",
+    example: {in:"3\n-1 -1 -1", out:"-1"},
+    approach: "<b>Təhlükə:</b> maksimumu 0-dan BAŞLATMAQ (ən geniş yayılmış səhv) massiv TAMAMILƏ MƏNFİ ədədlərdən ibarət olduqda SƏHV nəticə verər (0, massivdə olmayan bir dəyər, \"maksimum\" kimi çap olunar). Düzgün üsul: maksimumu BİRİNCİ ELEMENTLƏ (a[0]) başlatmaq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int mx = INT_MIN;
+    for (int i = 0; i < n; i++) { int x; cin >> x; mx = max(mx, x); }
+    cout << mx << "\\n";
+}`},
+  {
+    title: "-100, 50, -20 massivinin maksimumunu tapmaq (qarışıq işarələr)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib (HAMISI MƏNFİ ola bilər). Massivdəki ƏN BÖYÜK ədədi tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "Massivdəki ən böyük ədəd (mənfi ola bilər!).",
+    example: {in:"3\n-100 50 -20", out:"50"},
+    approach: "<b>Təhlükə:</b> maksimumu 0-dan BAŞLATMAQ (ən geniş yayılmış səhv) massiv TAMAMILƏ MƏNFİ ədədlərdən ibarət olduqda SƏHV nəticə verər (0, massivdə olmayan bir dəyər, \"maksimum\" kimi çap olunar). Düzgün üsul: maksimumu BİRİNCİ ELEMENTLƏ (a[0]) başlatmaq.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    int mx = INT_MIN;
+    for (int i = 0; i < n; i++) { int x; cin >> x; mx = max(mx, x); }
+    cout << mx << "\\n";
+}`},
+  {
+    title: "8 və 3 ədədlərini kiçikdən böyüyə sıralamaq",
+    difficulty: "easy",
+    tags: ["edge-case", "sıralama"],
+    statement: "İki tam ədəd A və B verilib (A, B HƏR HANSI SIRADA ola bilər). Onları KİÇİKDƏN BÖYÜYƏ \"A B\" formatında çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000, A = B ola bilər).",
+    output: "Kiçik və böyük ədəd, bu sırada, boşluqla ayrılmış.",
+    example: {in:"8 3", out:"3 8"},
+    approach: "<b>Sərhəd hal:</b> A VƏ B BƏRABƏR ola bilər — bu halda \"kiçik\" və \"böyük\" fərqi yoxdur, sadəcə ikisi də eyni dəyəri çap edir. <b>min</b>/<b>max</b> funksiyaları bu halı da avtomatik düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    cout << min(a, b) << " " << max(a, b) << "\\n";
+}`},
+  {
+    title: "3 və 8 ədədlərini kiçikdən böyüyə sıralamaq (artıq sıralı)",
+    difficulty: "easy",
+    tags: ["edge-case", "sıralama"],
+    statement: "İki tam ədəd A və B verilib (A, B HƏR HANSI SIRADA ola bilər). Onları KİÇİKDƏN BÖYÜYƏ \"A B\" formatında çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000, A = B ola bilər).",
+    output: "Kiçik və böyük ədəd, bu sırada, boşluqla ayrılmış.",
+    example: {in:"3 8", out:"3 8"},
+    approach: "<b>Sərhəd hal:</b> A VƏ B BƏRABƏR ola bilər — bu halda \"kiçik\" və \"böyük\" fərqi yoxdur, sadəcə ikisi də eyni dəyəri çap edir. <b>min</b>/<b>max</b> funksiyaları bu halı da avtomatik düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    cout << min(a, b) << " " << max(a, b) << "\\n";
+}`},
+  {
+    title: "5 və 5 ədədlərini kiçikdən böyüyə sıralamaq (bərabər)",
+    difficulty: "easy",
+    tags: ["edge-case", "sıralama"],
+    statement: "İki tam ədəd A və B verilib (A, B HƏR HANSI SIRADA ola bilər). Onları KİÇİKDƏN BÖYÜYƏ \"A B\" formatında çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000, A = B ola bilər).",
+    output: "Kiçik və böyük ədəd, bu sırada, boşluqla ayrılmış.",
+    example: {in:"5 5", out:"5 5"},
+    approach: "<b>Sərhəd hal:</b> A VƏ B BƏRABƏR ola bilər — bu halda \"kiçik\" və \"böyük\" fərqi yoxdur, sadəcə ikisi də eyni dəyəri çap edir. <b>min</b>/<b>max</b> funksiyaları bu halı da avtomatik düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    cout << min(a, b) << " " << max(a, b) << "\\n";
+}`},
+  {
+    title: "-10 və 10 ədədlərini kiçikdən böyüyə sıralamaq",
+    difficulty: "easy",
+    tags: ["edge-case", "sıralama"],
+    statement: "İki tam ədəd A və B verilib (A, B HƏR HANSI SIRADA ola bilər). Onları KİÇİKDƏN BÖYÜYƏ \"A B\" formatında çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000, A = B ola bilər).",
+    output: "Kiçik və böyük ədəd, bu sırada, boşluqla ayrılmış.",
+    example: {in:"-10 10", out:"-10 10"},
+    approach: "<b>Sərhəd hal:</b> A VƏ B BƏRABƏR ola bilər — bu halda \"kiçik\" və \"böyük\" fərqi yoxdur, sadəcə ikisi də eyni dəyəri çap edir. <b>min</b>/<b>max</b> funksiyaları bu halı da avtomatik düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    cout << min(a, b) << " " << max(a, b) << "\\n";
+}`},
+  {
+    title: "0 və -1 ədədlərini kiçikdən böyüyə sıralamaq",
+    difficulty: "easy",
+    tags: ["edge-case", "sıralama"],
+    statement: "İki tam ədəd A və B verilib (A, B HƏR HANSI SIRADA ola bilər). Onları KİÇİKDƏN BÖYÜYƏ \"A B\" formatında çap edin.",
+    input: "Bir sətirdə A və B (-1000 ≤ A, B ≤ 1000, A = B ola bilər).",
+    output: "Kiçik və böyük ədəd, bu sırada, boşluqla ayrılmış.",
+    example: {in:"0 -1", out:"-1 0"},
+    approach: "<b>Sərhəd hal:</b> A VƏ B BƏRABƏR ola bilər — bu halda \"kiçik\" və \"böyük\" fərqi yoxdur, sadəcə ikisi də eyni dəyəri çap edir. <b>min</b>/<b>max</b> funksiyaları bu halı da avtomatik düzgün idarə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int a, b; cin >> a >> b;
+    cout << min(a, b) << " " << max(a, b) << "\\n";
+}`},
+  {
+    title: "5, 3, 8, 1, 9 massivinin ikinci ən böyük ədədini tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki (fərqli dəyərli) İKİNCİ ƏN BÖYÜK ədədi tapın; belə ədəd yoxdursa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli ədəd, ya da \"YOX\".",
+    example: {in:"5\n5 3 8 1 9", out:"8"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    if (s.size() < 2) { cout << "YOX" << "\\n"; return 0; }
+    auto it = s.rbegin();
+    it++;
+    cout << *it << "\\n";
+}`},
+  {
+    title: "7 massivinin ikinci ən böyük ədədini tapmaq (tək element, YOX)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki (fərqli dəyərli) İKİNCİ ƏN BÖYÜK ədədi tapın; belə ədəd yoxdursa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli ədəd, ya da \"YOX\".",
+    example: {in:"1\n7", out:"YOX"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    if (s.size() < 2) { cout << "YOX" << "\\n"; return 0; }
+    auto it = s.rbegin();
+    it++;
+    cout << *it << "\\n";
+}`},
+  {
+    title: "5, 5, 5 massivinin ikinci ən böyük ədədini tapmaq (hamısı eyni, YOX)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki (fərqli dəyərli) İKİNCİ ƏN BÖYÜK ədədi tapın; belə ədəd yoxdursa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli ədəd, ya da \"YOX\".",
+    example: {in:"3\n5 5 5", out:"YOX"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    if (s.size() < 2) { cout << "YOX" << "\\n"; return 0; }
+    auto it = s.rbegin();
+    it++;
+    cout << *it << "\\n";
+}`},
+  {
+    title: "10, 20 massivinin ikinci ən böyük ədədini tapmaq",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki (fərqli dəyərli) İKİNCİ ƏN BÖYÜK ədədi tapın; belə ədəd yoxdursa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli ədəd, ya da \"YOX\".",
+    example: {in:"2\n10 20", out:"10"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    if (s.size() < 2) { cout << "YOX" << "\\n"; return 0; }
+    auto it = s.rbegin();
+    it++;
+    cout << *it << "\\n";
+}`},
+  {
+    title: "-5, -1, -3 massivinin ikinci ən böyük ədədini tapmaq (mənfi ədədlər)",
+    difficulty: "mid",
+    tags: ["edge-case", "max"],
+    statement: "N (N ≥ 1) ədəd verilib. Massivdəki (fərqli dəyərli) İKİNCİ ƏN BÖYÜK ədədi tapın; belə ədəd yoxdursa \"YOX\" çap edin.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 1000), ikinci sətirdə N tam ədəd.",
+    output: "İkinci ən böyük fərqli ədəd, ya da \"YOX\".",
+    example: {in:"3\n-5 -1 -3", out:"-3"},
+    approach: "<b>Sərhəd hal:</b> N=1 olduqda, YA DA massivdəki BÜTÜN elementlər EYNİ olduqda, \"ikinci ən böyük fərqli ədəd\" YOXDUR. <b>set</b> təkrarları avtomatik aradan qaldırır — unikal dəyərlərin sayı 2-dən azdırsa \"YOX\" çap olunur, əks halda ən böyükdən sonrakı (ikinci) unikal dəyər cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    set<int> s;
+    for (int i = 0; i < n; i++) { int x; cin >> x; s.insert(x); }
+    if (s.size() < 2) { cout << "YOX" << "\\n"; return 0; }
+    auto it = s.rbegin();
+    it++;
+    cout << *it << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/001_bos_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/002_bos_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/003_bos_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/004_bos_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/005_bos_massiv_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/006_tek_elementli_minmax.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/007_tek_elementli_minmax.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/008_tek_elementli_minmax.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/009_tek_elementli_minmax.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/010_tek_elementli_minmax.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/011_overflow_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/012_overflow_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/013_overflow_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/014_overflow_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/015_overflow_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/016_sifira_bolme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/017_sifira_bolme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/018_sifira_bolme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/019_sifira_bolme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/020_sifira_bolme.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/021_unikal_sayi_duplicate.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/022_unikal_sayi_duplicate.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/023_unikal_sayi_duplicate.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/024_unikal_sayi_duplicate.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/025_unikal_sayi_duplicate.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/026_overflow_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/027_overflow_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/028_overflow_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/029_overflow_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/030_overflow_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/031_off_by_one_son.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/032_off_by_one_son.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/033_off_by_one_son.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/034_off_by_one_son.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/035_off_by_one_son.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/036_sinir_axtaris.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/037_sinir_axtaris.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/038_sinir_axtaris.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/039_sinir_axtaris.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/040_sinir_axtaris.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/041_hamisi_beraber_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/042_hamisi_beraber_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/043_hamisi_beraber_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/044_hamisi_beraber_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/045_hamisi_beraber_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/046_menfi_mutleq_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/047_menfi_mutleq_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/048_menfi_mutleq_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/049_menfi_mutleq_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/050_menfi_mutleq_cem.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/051_sifirli_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/052_sifirli_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/053_sifirli_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/054_sifirli_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/055_sifirli_hasil.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/056_menfi_kvadrat.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/057_menfi_kvadrat.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/058_menfi_kvadrat.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/059_menfi_kvadrat.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/060_menfi_kvadrat.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/061_orta_sifir_qorunma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/062_orta_sifir_qorunma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/063_orta_sifir_qorunma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/064_orta_sifir_qorunma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/065_orta_sifir_qorunma.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/066_menfi_modulo.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/067_menfi_modulo.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/068_menfi_modulo.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/069_menfi_modulo.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/070_menfi_modulo.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/071_cut_massiv_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/072_cut_massiv_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/073_cut_massiv_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/074_cut_massiv_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/075_cut_massiv_say.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/076_ilk_son_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/077_ilk_son_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/078_ilk_son_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/079_ilk_son_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/080_ilk_son_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/081_sozler_bos_siyahi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/082_sozler_bos_siyahi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/083_sozler_bos_siyahi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/084_sozler_bos_siyahi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/085_sozler_bos_siyahi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/086_hamisi_mensfi_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/087_hamisi_mensfi_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/088_hamisi_mensfi_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/089_hamisi_mensfi_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/090_hamisi_mensfi_max.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/091_kicik_boyuk_siralama.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/092_kicik_boyuk_siralama.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/093_kicik_boyuk_siralama.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/094_kicik_boyuk_siralama.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/095_kicik_boyuk_siralama.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/096_ikinci_boyuk.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/097_ikinci_boyuk.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/098_ikinci_boyuk.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/099_ikinci_boyuk.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu16/100_ikinci_boyuk.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week16/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
