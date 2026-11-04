@@ -1,0 +1,3615 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 14 — Test: Qraf əsasları I (adjacency list, BFS, minimum məsafə)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:65vh; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>14</span> — Test Vərəqi</h1>
+    <p>Mövzu: qrafın qonşuluq siyahısı ilə təsviri, BFS (enlik üzrə axtarış), BFS ilə minimum məsafə (kənar sayı), yönəlmiş/yönəlməmiş qraf, dərəcə. Aşağıdakı 100 məsələ yalnız Mövzu 14-ün mövzularına əsaslanır. Təpələr 1-dən N-ə qədər nömrələnib.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADwAPADASIAAhEBAxEB/8QAHQAAAgIDAQEBAAAAAAAAAAAAAAEDBQIEBgcICf/EAD0QAAEDAgQEBQEGBQMDBQAAAAEAAgMEEQUSITEGIkFRBxNhcYEyFCNCkbHBCBVSodFigvAzQ+EXNHKSov/EABoBAQEAAwEBAAAAAAAAAAAAAAABAgMEBQb/xAArEQACAgEEAAUEAQUAAAAAAAAAAQIRAwQSITETFDJBUQUiI2EzQnGxwfD/2gAMAwEAAhEDEQA/APqOyEIuFgYDCD3RdK+qAaRGqL90IAKN0ihACEIQB0Qo55o4InSSvaxo3LjYLy/xC8beGeGs9NQPbitc36mRH7tvu8fso2l2Em+j1TRRVNTT00RlqZ44YwLlz3BoHyV8q45/ETxLVxPgoY6OkJ2c2Ml3sCf1XB1PiHjeK1LosUxKaSbKXMDnlzR8FYPIvY2LG2fY1Rx3wpFOYG4zBNKBfJAHSO/JoK1meInDEkzom1cge2188Tmb+4XxrNj+IwTGRtXMw7kiQ3af8KxoOK8ca37R9tkL2jM5r7HMO/dTxGXwj7PouJ8CrIg+nxGF2trX1v7Kypaumqml1PPHKBvlcDZfHlF4hV0DRVNqW38sNeAwWkb6+vqrvDeOaqjq48RpayoY9x1c7m17EdQqsg8Jn1emvL+DuOP59SGSSpZHUQuayRrXaEE6Ef8AOi9HoJzNTB7zzglrvcLZaZraa7Nn2QNkrg7apqkAbppIQDPonqkjogGEBAshQAmkjogMEbJIQDvZFkroQDA1RokhAB3QhNAJUPGvFGH8LYUa2ue25B8thNsxCviV8vfxjcTluJYfg9JN5ckLC6fuA76VjJ0jKKt0ch4i+KeK8VYlIJ6ySmoRcRxxuytA9ev5rzjF6gUzcz3ufEbc7HXyjuqFsdfi1SKeme92fQ3j6+916Vwd4WYm+naa2aR8bh9FrgXXLOaXMmduHDLJxFHHywsnhilpprSB1yc2kg/YpYhQzzYjFJA0xutmGv4l7TReGEcEWRjb9LFun/hWMXh+Y42ERA5NBmFzbqtPmY+x2LRSs8ZxGkndTsDwcxaWvbfQqOOjqbFpY4NMdjrqCdF7VJwXc2fCBoRoL2W1QcCl1QWmEOu22Zw2HZVZ0PJNM8GFFW08Ac6GTMGFjTbT3t6IoK2rgeGuD8lwDfppqV9IngaHISY25suVul7eqrZ/DWjkj8p8THBw5jl3WPmop8leifseGYNxlUYfXRva94zdAbX1vZe7eHfjNikdG6Kqo4qymBzOe55a4E9L9VwnFfhJLBmqKNmYAEaHVvsvPM9dgGICGV4hANrkOJ/wt8MqfMTjzaeUPUj7g4P49wPiHLDFOKeqtrBKQHfHQj2XXA3Fwvh/CMc8qpp6g1RD73a7JY+3qvobwx8R2VApqDFqlkkMpyQ1IPMx39Eg6ejl0RyXwzkljpWj1sJhYtILQQQQeoWXVbDUMJboQqAR+6DdCAaCkg2UBgkhCAaEkIBoSQUADdNIIQGtitW2hw2qrX2y08L5Tc6coJX5/wDHuPVWO4nV43iAE9RUSlwJ2I6C3b9l9peOlc+g8LcaljZmc+EQ2vb6jZfGGG4N/MsSoqJ/NncHEA6Zb91oyvk34Y3wd74CcHuqKEY3icY5z9yy2gHde40sUcTbRx7bAKs4fpYaHC4KaNjWNY0ANAV1Tt10I9l5GR75Wz38MVCKRnG1zhzAA+gWwyMHcXUkUbdtz6rYbHZvusFGzpUkQCnYXC7BdbbICwbfkFlExuYEhWELmC4IA91vjAwlOiu8gkXykKF0etiFdPDXAm4stGeMZyQFjKBFOzQdTscw8oOnZeS+N3BLJ8JlxKhiyyM1dlGo9QvZcpA037LXxmjjrsOmpZAC2RhbZYwTi7RhOpJpnxtSR1DqYeZJKXMd/wBzXXuP8FdBwric9JitLNI8sdFI2Qg3AcARceqm4lwKahxOso3uu2Bxyg68pVbhvnMqY4HNJcTdhcb+o17r1ItNWeLOG1tH3Rg1RHVYXTVMQsyWJrwO1wttU3BUc8fCmGMqRaYUzMw9bK5uupHCMIQhACEk+tlQPZJG6CoCNCRTQAhCEAIKEigDoglBSQHl/wDFDWCl8Ja4ZhmkmjaAeut/2Xz34VUzqnFo6yRuZzWBjLjT4Xrv8ZE87eD8JpGMDop6t2e5I1Dbj91wPg7C1xaG6iNt7dtFyajpnbpV9yPVadrmhoOysoHOBAAHuqsSAytaNOpC2P5jSwus6RpIOwK81Qd8HtxdIu4y7cDZbEbjl2uVV0uJwS2DbAe6soKqnkPI8XPqtii0beKNqN1iCb2CkbJclQDV1riyjMoaTnIAG3qsjHbZvB7joonXBN/zWnJidLFqZWj3PVQMxuleQPMab7WIKri30YOkWGa79LWWTxnaW6LXhqIZxnhe19t7HZTRuGe3datrsxfJ434o4W2TFfPay5cC15HX3XmkbHQYtFKWEsdIBl6tsd17X4lxMhqi4i+YZgvJOII2wyh8AcHXvou3F6aPM1C5PsjBXtkwmjkbs6BhH/1C21U8GSCbhLCZRs+jiP8A+QrYldx5g0JXQgGE791infRANCV0we6oIkJ/CFACEJIAQboQUAkISu0C7nNaBuSbAIU8G/jAv/LMA5hYTzcpPXKNVyPg1Tuioql1gXaNGi9W8ceHcN4hx/A6LFalsNJBG+bSQAykm2UdgALkqoq5cPwzhhpocscbqjy2OgcCMoH+n41XNkjus6sMnBrg47i/iasinOF4JC+asJtI8A2YO1+64vEsF4/qI/NjsCTezSbj3Nl2s1WKNjp53NlLiCNLucTtv1WlW8ajDoiajFqWicf+00GST5DdLrni0nSO5tzVs82f/wColBUOZJJUOGwLXkldXwLxPjhlfDWSzmVkgHOdR6eoUNXxxNNNmo8Sp6gO5m54jESPcrf4fxplbVs+1gRhx5iWNJ+NNVk38oQnsVo9lw3F5JaITXFyL77LieLeJcUf5jKd2QgGxB2XR8HimLPJnacjZOfaxb2XP8bsgwmeatYyOaJxtHyjckm3wFqVJ9nXLPa4R5DiNVxfieJTCmdPyOs12Y5SFf8ADHCHiHVZPLmqXNJDriJxt7FMcTVz6kNppGU7QbmR4Aawei67hfjfCWRtZXcbzCRzsrMhAZ6jZbfE/RxZKXLN3D+GfEvCJWVDY5y4DUuiIuP3Xo3D9fVVdNauw+ooqtn1tfGQ13q0n9Fxv87xGpY2ppMUbi1MCS7I/naPa9irOlLMSoPtELnB7exsVrc4y4N0VOKtOzb8RsMFbhQqY2Xkh1OmuVeQ4xTh9QBKTbWx7XGy9bx/PHwpK6nfldJUQkxxvNyzKQ7S+191xlfTYJU4e+etkjo2xts6drxYG/UH1XRjxfDOLLm3do9v8LZRN4e4I4EnLStYb9wSF0hXLeFsuHRcBYc2Cvp5IWZoxKJNHnMb2G66pw13uutHDJNcgEJJhUgIQEIQEIQEBii6xQoBoJSKSAd0XSR0SwPdcz4mSVEXCNS6nylwc0uDtnAG5C6ULkfFep8vh6OkZrJUzBoHp/whac/8cjr0Mb1EP7nhviczEcU4So3AyCnY/wAxsLnXLbi1r9vRWvDGG/ZuFMNiIZmEVyCLgrd4wkMGHOo4m5nFojaAfglWtNCGU1PD+GONrbj2XBGT20ezlxp5Lrs4riXBamulAnZJBTfidAQ0qrp+FcKbSNgjrXeW15fzOGYk6Hm3/NesxUvmjnAcNhfYLXm4Zw+R+Z9KwknUnW61qUo9Dy8Zdo8qh4Zwqk8yKgzOL2GMi4k0JudxYLLAuC20s+cTSsjJvle7lAvrbsvVBg9FSghsbR2G1lrthjmqmx5GCNmth191Xlk+zOOmilSVFjwRRNgpjPM37yZxdZ2th0stbi3A4Zi7bLI8PEZboe9j31VthzmNltuG66dFZVEcNbAWk6jbTYoo8WjbLCttHgWM8KUdHjQqw6pEoOYNms5nwNlqO4KwWtnNRI4MkzOc3msGlx10svdpMNgqY/Jq2Qy26OGy128GYbI/QFgPTQrKOWS6NE8MJepHmeD8IwsfHWUuJVFJNGwMaKd1muA2uDv8rvOHqGppnZpmG7m8xzcp9bLpMN4ZoqH7yCFpcDqTrf4SrmOMmVoy9CANFg1J8syqKVI1pKVjqKUEDM5h2XleF8NHHaqoo2xkRMN5HHa5OnyvZYIc0FngCy53BmtweTHKyeIMghtIHAb2BK2J7eTU47mka9TBUcJ8IeRg8QaWWjkqXDM6MHrZen8HSGXhageXl58u2Ym5Oq41tbh+NcK1gpGvBnp3OLXjW+W66/gRgj4Pw9rXZuTc/C2aZ3mu+0ZfUYpaKmqal/ouU0uqd16R84CChCAEwkEKEIwhHylogGl0QhCgkgpEoQd/VcV4mFpqMMDhoJSQuxJN1yniTTulw6Cqa27oZP8An6LRqE3jZ3fTpKOoj/3seUz2qsYfJcuMUbj83C6SkGeONxOhaLqsjwuGOrfiLJnWlaQWHYXU+G1HlRllxmZe2nRedFUj29TJb00X0T2ACwtZSSzNjjDnE+3ZUDa67rXAA9dVV8TY0YqfyY5Od/KAqzZCSSN3FcbjfK6CHQA2c7db9OKeOM2cCSOi42mkjjpS1vMT9RPUqlxyPGJBE6mr5WBmzAdPzCsYPsSyKj1uhq6OFrM5uTuraKaB4JYbNcvEKLiTEY4Wtq6N80kZsHsflze4KxlfxPjrhP5k1NGDyMZI4Nb+RFz7qxTTI8qPYuLIo2Yc2oikeJGuAaWnUXVbw9xDO2byKmQSZevVUHD7cVhpRHitW6ot9NxboocYH2erbV0pPmM+tv8AUEfDsyjKLVM9XhxFkjWlrxqL2QGtnc1xIK4vBsTZU0rSDqRbRdBh9Z5Rtcn3RSTOfLSXBZ1BbDE8HTTstOnpW1WE1dPKGkVAc3m1GosLpYjOS5rWnQqaBl4WRSB2Qi5Le4UkzXiTckyq4aw2XC3y0s5jd5LHEmM3FrLu+E4/K4bpGWsMpIHbX/wqGoja8eXTxgebYEjd3outpIfs9HFBpyNA/wArfpIVJk+q5bxJPtv/AAZkppFHRd54A0JBF/RCDQkCmEIRphJCAEIQhaEViT0WRWBQGLtTdQV9LFW0clLMOSQWuOh6FTHZCjVqiptO0eYYvw1ilLVObHST1EYPI6Jt2u7bbKixHDK/CKhsNeAyd8WfI11wAb2F+/de13K4nxWoM9LSYmwc0Z8mQjsdW/3v+a456eMU5I9Ja+eVqMkebCRxmIJJIFrKrr6WSfFj5mVrY4swJ6HurRlmVLn8oa82yg9VuYxRwzU0cjdQ6zXW3cFxPhnbF/bRQRYjhFLEftlZALG2XMLqZuM4ZI2NsdOXhwuwkaOA6iwXPcQ+G1HLicXEGHAMq4nh0jHczXgEEXHwu54bxplHTUUdVgXmNhEl3QkHLf6coPfW+1lvik12bEprqNlKK/BpHiSfDmkkaPa4gFXVFxJg9LC2J9GyJgGgN7rrqPGeGZMKpYJcPliLHNd5T6YnIb33Gn5KbFsT4dmMwZhEtTI+nyhzYAA7X6bm1isnBV2Y+NJunjZzJx7h+tIH2pkT7fS9VVfUU/2oMZNE55HIWuCl4/4Zj4uz0+H0EdNnDW+e5tiwAW0A91Bgnh5hPDGF+VTOmqJB9c00hc5x+dh6BapPauB2uVRv8NU8gmqGbNFnDTTXcLoqS4lGn0t/UqCghjpqYhhBJGvopqV3O8kXBAHytK5ZhOXSLOKOaprGRtALnuDRfoV0sPDtZTXihro5ISb/AHgOZvfbdaPBlMJa2Sqc2/lCwJ7ldgF34MKlG5HFk1U8UqgaOHYZFRnPmMknciwHsFvEpEpErrjFRVI4smWWSW6T5ApIQsjWAQhCAAsgVimEIR9U0kIQYQlqgFCicVidQsisCoBFYlMlIkIBFauMUMWJYXUUEtsszCAf6T0PwVtE3SulWLo8Ar2TU1VLRVEYZJA4xu7ggqKWtkf92H8o202XW+MeHNix2DEG5WMniAlNvxNNgf0C4UF8Tg55Dri9rarzJ49sqPWx5LimdJQVN6UWsXAW0SNXReYdDC4a3AWjgsud4aSAD3NtVay4VFUOF3a3tp3WLW1ndim+0J2LUrCA6fMT2YCrOhxOjqCI3yl2uwFlTwcKxtmu6U/VpcWVzhGB0cDzISXuGlwdVlZtlOTLtk8TIxHEA0WVTxA/NCGMcbnrZbshjYxzibW2BCoa6o8x5EMmYu1N9bX2Wl8nM2Omq7RtBLnvPLqNFuRTiNgAZzE3IVVTD74ukddgdYkC1rKxwWI1FWZnfSDZgvcHXdEjW3Z6dwnT/ZsFiuOaS73fKtSVFRx+VSRRjZrAP7KRexBVFI8ect0mx9EJIWRgNMpBCgAI6oR0VAC100k+qhCP4QhHW6oGl8IScUAnHRRlyb3aKJzkA3OWDnrB77dVE56AlL0s+qgL0B6FOW8Tomz0tKHC4OZp/sV5VVwuF43tcejXHS4C9a8QCfsFNa31n9F53XMZLC5paXEC9uoXBmaWRnpYIt4kyjY8xRmRlxlIJNuiu6TFi0Dy3ZteWypqimkjYXRm9tSCN7fotaOraxwiljdFfoBdYtJm7HJwfJ2kWMtLhqPRpKnlx5jA1unU3C4r7bCG3u8EDlzMOi15aoSFpZ5p0ubDdYbToedM7aLFjPKNeVwNz3UMxdnuw2B1Nui57D6yUN8tjDrcEkD8lbwNkdH95qTp7+qjSNHMmbwHnubHFnA636rp8DhcxrW210uqPCox5lmtBPe66iiZlynY/wBlrvk2KNHfttlA9EdUmfSPYItovYPDZkhIJ+ypAQdUIUAHZCSaoH8oSTCEI0ISJQASFg82CZO6ikKAwe5QvenIdCtaR6Ayc9ROfvqo3vUZchSUv63QH2UYZI7UNKloYhPO5m7WfUVLLRz3G5z0cAP9Z/RcPKC03AuCbX2IXf8AH7Sz7JHlDYjmsQPxdvyXEVEJa7Pqbdl5uof5WevpI/iRXSU4Jc4OAzHToq+sw7zmc4FxoCRqrkMJFxe1uo6rJsdm2c3Mtafwb3Hk4ianmZMA1x5TYNt/fVTUdHVPlLnGwG2mq6WoomOdmYACVsR07I4wC309FlbRNqNHD6UNbdjRfuRZWMULQwNuQ6+ykia5oOVrTrq4aKenjvqQTfS97LXfBkkWGENLWBr2kdl0VMByk3KqKCF9ri5HdXlOLWv0WHuUv8MxaOSspcNfHKJZWkMfa7SQNj20Vw4Fri0ggjdavCeEETtxOdpBDS2EH13cujnp4phzNse43XrYNzhcjxc6gp1EpQE1sz0UjHclnD+613sezRzS33W40mJ2SCZQFAPohCCqB9EJJoYkROiikzE6GyzJJ6XKkjpZH6uIaEBruKhkJOwVoyjjB5gXe6l8lrRygBC0UT4Z5G3bG6x+Fruo6gauAAPcroXsOyhmizgBQpRtonOBLngD0CxaxgfljGvVxVrUsszKFpw0+t7dUKkYSMDITbQlSYRGGl3+rVYVWrstrKWF3lhjm90oyfRsV1FTVtO6mqoWyRu6OH9x2K5TEuCLgmgrSOobM29v9w1XatLXtuEGPsSFhPDGfaMseWeP0s8kxHhrHKM3dh7qht/qgdn/ALbqsnimgsKmnmg0/HGW/qva3MdbQhRSsDmlssYe07hwuFoekXszqjrZf1I8LmcSTkcOyzieMrWPde269dqMCwSoJ87CqQm97+Xb9FFFwvw4Hhwwimv21/ytflZfJuWth7o8wiaxwDQQQO52VthkBlLWRRve89GC5P5L1CjwnCogBFhlI2233IVzTRlgtHGyMf6WgJHRN9swlrlXEThcK4bxWoaL0/2Zh6zG39t11eFcNUVI5ss7nVMg1GYWaD7f5Vw1jjupWtsNV0w00Ifs5Z6mc+Oht202WR0SJACxJuug5zE8xWDwNiLj1Ug3WMuyhTWkomP5ozkPbotWSlmZ+G47tVpF9KbrBSiFJqDYoVu+OOQc7Gn4UElExw5CWn12SgaAQth9HKwXADh6KAgg2Oh9VCE9LFC9gfGPQ33CleAx4voDt6JFogqBKNGScr/Q9Cp5488ZHXcKlMA3lN0BtwiA54Gu9NVK0aBUELorrB8Vhe2q2SsTqVAVksJJ23WDYbA6K0cwWuozHodFKBRVEBzk/kiVhbC0gXVrJDrsopIM0fyqZGiC8R5mEhwCmhneW3c0f7T+yy8vIT2WDmZHZwNOoRAkE7Dvdv8A8hZZCRh/ED7FYsOYaahZimbJuxp+FbJQZGE6tP5KeGKO4tp/tWMdDH1bb2JC24qOEfhJ93FASxMY0d/hSh8Y6gfIWLYYW7Rt/JSANA0aB8IQA8H6Rf4T5j1shHVUBa2upPqmkmoDFYTGzSpCopfwju4IVEjeVo7pht9TumB3Q7ZUhi49AhgvqdkiCTYKTYKAR12UcsMcos8X9eqk2GpAA6rAF7jdtmN7kalAQyMD2lrhykWITpsxjLHm72aE9+xTBuAehSByztd0cMp/ZEDGmblpmj1P6qQBZxt+7CRCAxAvugDVZixRZARuCYaLJuWXRAQyMB6LBkfIp3BYxDlIQGq+C50UYp+hVgW63TDQULZVikyXAvY7KelFnljh7LdABFlDUNyESAfSdUoXZMGgJgIYQ5oKdlSAgd0LIbIBH2QgoQAmkE0AnbqN3/VjB6u/ZZuUUo++hPZ/7KA2Vi42Qw3v6FG7lQDBpc7rLQC5RsFiTfU7dEAWzG526BNY5r7AlZC/UIDVhla8lpGR3Ypz/wDTd3bqFlJG14v17pPaXwOG7rEBQE0JvCwjqLrF26VL/wC2jv8A0hEhtqqAYbi6aI/oCCoDFwWXRI72TKAVljHo4hZjZYj6kBkfRIJn2SFroAG+6JBdpHdM7hDtkBHSnkyHduilUMBu53QgqboqACaB3QgDVCE0AICElAOyjkFyz0cCpAsXfUFQEP0k93FZBDRZoCxc636IBvPRAHV35JAgauOqM5P0tJUBmhYjOewWQv6Kg//Z" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 14 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "5 təpəli qrafda 1-ci təpənin dərəcəsi (adjacency list)",
+    difficulty: "easy",
+    tags: ["qraf", "adjacency list"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və bir təpə V verilib. V təpəsinin DƏRƏCƏSİNİ (qonşu sayını) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə V.",
+    output: "V təpəsinin dərəcəsi.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n2 3\n1", out:"3"},
+    approach: "Qonşuluq siyahısı (<b>adj[u]</b> vektorları) qurulur: hər \"u v\" kənarı HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edir (yönəlməmiş). V-nin dərəcəsi <b>adj[V].size()</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "5 təpəli qrafda 5-ci təpənin dərəcəsi (adjacency list, izolə)",
+    difficulty: "easy",
+    tags: ["qraf", "adjacency list"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və bir təpə V verilib. V təpəsinin DƏRƏCƏSİNİ (qonşu sayını) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə V.",
+    output: "V təpəsinin dərəcəsi.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n2 3\n5", out:"0"},
+    approach: "Qonşuluq siyahısı (<b>adj[u]</b> vektorları) qurulur: hər \"u v\" kənarı HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edir (yönəlməmiş). V-nin dərəcəsi <b>adj[V].size()</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "3 təpəli üçbucaq qrafda 2-ci təpənin dərəcəsi (adjacency list)",
+    difficulty: "easy",
+    tags: ["qraf", "adjacency list"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və bir təpə V verilib. V təpəsinin DƏRƏCƏSİNİ (qonşu sayını) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə V.",
+    output: "V təpəsinin dərəcəsi.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n2", out:"2"},
+    approach: "Qonşuluq siyahısı (<b>adj[u]</b> vektorları) qurulur: hər \"u v\" kənarı HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edir (yönəlməmiş). V-nin dərəcəsi <b>adj[V].size()</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "2 təpəli, 1 kənarlı qrafda 1-ci təpənin dərəcəsi (adjacency list)",
+    difficulty: "easy",
+    tags: ["qraf", "adjacency list"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və bir təpə V verilib. V təpəsinin DƏRƏCƏSİNİ (qonşu sayını) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə V.",
+    output: "V təpəsinin dərəcəsi.",
+    example: {in:"2 1\n1 2\n1", out:"1"},
+    approach: "Qonşuluq siyahısı (<b>adj[u]</b> vektorları) qurulur: hər \"u v\" kənarı HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edir (yönəlməmiş). V-nin dərəcəsi <b>adj[V].size()</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "1 təpəli, kənarsız qrafda 1-ci təpənin dərəcəsi (adjacency list, baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "adjacency list"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və bir təpə V verilib. V təpəsinin DƏRƏCƏSİNİ (qonşu sayını) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə V.",
+    output: "V təpəsinin dərəcəsi.",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "Qonşuluq siyahısı (<b>adj[u]</b> vektorları) qurulur: hər \"u v\" kənarı HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edir (yönəlməmiş). V-nin dərəcəsi <b>adj[V].size()</b>-dir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "1-5 təpəli qrafda 1-dən başlayan BFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc təpə S verilib. BFS (enlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "BFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"5 4\n1 2\n1 3\n2 4\n3 5\n1", out:"1 2 3 4 5"},
+    approach: "BFS <b>queue</b> istifadə edir: S növbəyə qoyulur və ziyarət edilmiş işarələnir; hər çıxarılan təpənin ZİYARƏT OLUNMAMIŞ qonşuları (artan sırada, çünki adjacency siyahısı kənar daxiletmə sırasında qurulur) növbəyə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    vector<int> order;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Üçbucaq qrafda 2-dən başlayan BFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc təpə S verilib. BFS (enlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "BFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n2", out:"2 1 3"},
+    approach: "BFS <b>queue</b> istifadə edir: S növbəyə qoyulur və ziyarət edilmiş işarələnir; hər çıxarılan təpənin ZİYARƏT OLUNMAMIŞ qonşuları (artan sırada, çünki adjacency siyahısı kənar daxiletmə sırasında qurulur) növbəyə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    vector<int> order;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Tək təpəli qrafda BFS gəzinti sırası (baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc təpə S verilib. BFS (enlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "BFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "BFS <b>queue</b> istifadə edir: S növbəyə qoyulur və ziyarət edilmiş işarələnir; hər çıxarılan təpənin ZİYARƏT OLUNMAMIŞ qonşuları (artan sırada, çünki adjacency siyahısı kənar daxiletmə sırasında qurulur) növbəyə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    vector<int> order;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) 1-dən başlayan BFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc təpə S verilib. BFS (enlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "BFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1", out:"1 2 3 4"},
+    approach: "BFS <b>queue</b> istifadə edir: S növbəyə qoyulur və ziyarət edilmiş işarələnir; hər çıxarılan təpənin ZİYARƏT OLUNMAMIŞ qonşuları (artan sırada, çünki adjacency siyahısı kənar daxiletmə sırasında qurulur) növbəyə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    vector<int> order;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Ulduz qrafda (1 mərkəz) 1-dən başlayan BFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc təpə S verilib. BFS (enlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "BFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"1 2 3 4 5"},
+    approach: "BFS <b>queue</b> istifadə edir: S növbəyə qoyulur və ziyarət edilmiş işarələnir; hər çıxarılan təpənin ZİYARƏT OLUNMAMIŞ qonşuları (artan sırada, çünki adjacency siyahısı kənar daxiletmə sırasında qurulur) növbəyə əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    vector<int> order;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        order.push_back(u);
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4-5) 1-dən 5-ə minimum məsafə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. S-dən T-yə ən qısa yolun (kənar sayı) uzunluğunu BFS ilə tapın (əlaqəsizdirsə -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "S-dən T-yə minimum kənar sayı, ya da -1.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 5", out:"4"},
+    approach: "BFS hər təpəni YALNIZ İLK DƏFƏ ziyarət edəndə onun S-dən məsafəsini (dist[v] = dist[u]+1) təyin edir — BFS-in \"dalğa-dalğa\" genişlənməsi sayəsində bu, HƏMİŞƏ minimum məsafədir (yönəlməmiş, çəkisiz qraf üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən 3-ə minimum məsafə (BFS, -1)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. S-dən T-yə ən qısa yolun (kənar sayı) uzunluğunu BFS ilə tapın (əlaqəsizdirsə -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "S-dən T-yə minimum kənar sayı, ya da -1.",
+    example: {in:"4 1\n1 2\n1 3", out:"-1"},
+    approach: "BFS hər təpəni YALNIZ İLK DƏFƏ ziyarət edəndə onun S-dən məsafəsini (dist[v] = dist[u]+1) təyin edir — BFS-in \"dalğa-dalğa\" genişlənməsi sayəsində bu, HƏMİŞƏ minimum məsafədir (yönəlməmiş, çəkisiz qraf üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə minimum məsafə (BFS, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. S-dən T-yə ən qısa yolun (kənar sayı) uzunluğunu BFS ilə tapın (əlaqəsizdirsə -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "S-dən T-yə minimum kənar sayı, ya da -1.",
+    example: {in:"3 2\n1 2\n2 3\n1 1", out:"0"},
+    approach: "BFS hər təpəni YALNIZ İLK DƏFƏ ziyarət edəndə onun S-dən məsafəsini (dist[v] = dist[u]+1) təyin edir — BFS-in \"dalğa-dalğa\" genişlənməsi sayəsində bu, HƏMİŞƏ minimum məsafədir (yönəlməmiş, çəkisiz qraf üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən 3-ə minimum məsafə (BFS, qısa yol var)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. S-dən T-yə ən qısa yolun (kənar sayı) uzunluğunu BFS ilə tapın (əlaqəsizdirsə -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "S-dən T-yə minimum kənar sayı, ya da -1.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1 3", out:"1"},
+    approach: "BFS hər təpəni YALNIZ İLK DƏFƏ ziyarət edəndə onun S-dən məsafəsini (dist[v] = dist[u]+1) təyin edir — BFS-in \"dalğa-dalğa\" genişlənməsi sayəsində bu, HƏMİŞƏ minimum məsafədir (yönəlməmiş, çəkisiz qraf üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 2-dən 3-ə minimum məsafə (BFS, mərkəz vasitəsilə)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. S-dən T-yə ən qısa yolun (kənar sayı) uzunluğunu BFS ilə tapın (əlaqəsizdirsə -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "S-dən T-yə minimum kənar sayı, ya da -1.",
+    example: {in:"4 3\n1 2\n1 3\n1 4\n2 3", out:"2"},
+    approach: "BFS hər təpəni YALNIZ İLK DƏFƏ ziyarət edəndə onun S-dən məsafəsini (dist[v] = dist[u]+1) təyin edir — BFS-in \"dalğa-dalğa\" genişlənməsi sayəsində bu, HƏMİŞƏ minimum məsafədir (yönəlməmiş, çəkisiz qraf üçün).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) 1-dən bütün məsafələr cəmi (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən BÜTÜN ÇATA BİLDİYİ təpələrə olan məsafələrin (kənar sayı) CƏMİNİ BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Bütün çatıla bilən təpələrə məsafələrin cəmi (S-in özü 0 məsafəli sayılır).",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1", out:"6"},
+    approach: "Standart BFS ilə <b>dist[]</b> massivi doldurulur (çatıla bilməyən təpələr -1 qalır); sonda yalnız <b>dist[v] != -1</b> olan dəyərlər cəmlənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    long long sum = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] != -1) sum += dist[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 1-dən bütün məsafələr cəmi (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən BÜTÜN ÇATA BİLDİYİ təpələrə olan məsafələrin (kənar sayı) CƏMİNİ BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Bütün çatıla bilən təpələrə məsafələrin cəmi (S-in özü 0 məsafəli sayılır).",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"4"},
+    approach: "Standart BFS ilə <b>dist[]</b> massivi doldurulur (çatıla bilməyən təpələr -1 qalır); sonda yalnız <b>dist[v] != -1</b> olan dəyərlər cəmlənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    long long sum = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] != -1) sum += dist[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən bütün məsafələr cəmi (BFS, izolə təpə sayılmır)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən BÜTÜN ÇATA BİLDİYİ təpələrə olan məsafələrin (kənar sayı) CƏMİNİ BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Bütün çatıla bilən təpələrə məsafələrin cəmi (S-in özü 0 məsafəli sayılır).",
+    example: {in:"3 1\n1 2\n1", out:"1"},
+    approach: "Standart BFS ilə <b>dist[]</b> massivi doldurulur (çatıla bilməyən təpələr -1 qalır); sonda yalnız <b>dist[v] != -1</b> olan dəyərlər cəmlənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    long long sum = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] != -1) sum += dist[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda məsafələr cəmi (BFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən BÜTÜN ÇATA BİLDİYİ təpələrə olan məsafələrin (kənar sayı) CƏMİNİ BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Bütün çatıla bilən təpələrə məsafələrin cəmi (S-in özü 0 məsafəli sayılır).",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "Standart BFS ilə <b>dist[]</b> massivi doldurulur (çatıla bilməyən təpələr -1 qalır); sonda yalnız <b>dist[v] != -1</b> olan dəyərlər cəmlənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    long long sum = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] != -1) sum += dist[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən bütün məsafələr cəmi (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən BÜTÜN ÇATA BİLDİYİ təpələrə olan məsafələrin (kənar sayı) CƏMİNİ BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Bütün çatıla bilən təpələrə məsafələrin cəmi (S-in özü 0 məsafəli sayılır).",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1", out:"2"},
+    approach: "Standart BFS ilə <b>dist[]</b> massivi doldurulur (çatıla bilməyən təpələr -1 qalır); sonda yalnız <b>dist[v] != -1</b> olan dəyərlər cəmlənir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    long long sum = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] != -1) sum += dist[i];
+    cout << sum << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4-5) 1-dən ən uzaq təpə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən ƏN UZAQ (BFS məsafəsinə görə, bərabərlikdə NÖMRƏSİ KİÇİK) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən ən uzaq təpənin nömrəsi.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1", out:"5"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır; təpələr NÖMRƏYƏ görə artan sırada gəzilərkən ƏN BÖYÜK dist dəyərinə malik İLK (deməli, ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int best = s, bestD = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] > bestD) { bestD = dist[i]; best = i; }
+    cout << best << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 1-dən ən uzaq təpə (BFS, bərabərlikdə kiçik nömrə)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən ƏN UZAQ (BFS məsafəsinə görə, bərabərlikdə NÖMRƏSİ KİÇİK) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən ən uzaq təpənin nömrəsi.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"2"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır; təpələr NÖMRƏYƏ görə artan sırada gəzilərkən ƏN BÖYÜK dist dəyərinə malik İLK (deməli, ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int best = s, bestD = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] > bestD) { bestD = dist[i]; best = i; }
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ən uzaq təpə (BFS, özü)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən ƏN UZAQ (BFS məsafəsinə görə, bərabərlikdə NÖMRƏSİ KİÇİK) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən ən uzaq təpənin nömrəsi.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır; təpələr NÖMRƏYƏ görə artan sırada gəzilərkən ƏN BÖYÜK dist dəyərinə malik İLK (deməli, ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int best = s, bestD = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] > bestD) { bestD = dist[i]; best = i; }
+    cout << best << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən ən uzaq təpə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən ƏN UZAQ (BFS məsafəsinə görə, bərabərlikdə NÖMRƏSİ KİÇİK) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən ən uzaq təpənin nömrəsi.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1", out:"2"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır; təpələr NÖMRƏYƏ görə artan sırada gəzilərkən ƏN BÖYÜK dist dəyərinə malik İLK (deməli, ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int best = s, bestD = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] > bestD) { bestD = dist[i]; best = i; }
+    cout << best << "\\n";
+}`},
+  {
+    title: "İki ayrı zəncirli qrafda 1-dən ən uzaq təpə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. S-dən ƏN UZAQ (BFS məsafəsinə görə, bərabərlikdə NÖMRƏSİ KİÇİK) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən ən uzaq təpənin nömrəsi.",
+    example: {in:"6 4\n1 2\n2 3\n4 5\n5 6\n1", out:"3"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır; təpələr NÖMRƏYƏ görə artan sırada gəzilərkən ƏN BÖYÜK dist dəyərinə malik İLK (deməli, ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int best = s, bestD = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] > bestD) { bestD = dist[i]; best = i; }
+    cout << best << "\\n";
+}`},
+  {
+    title: "5 təpəli, 4 kənarlı qrafda dərəcələr cəmi (handshake lemması)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. BÜTÜN təpələrin dərəcələrinin CƏMİNİ tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bütün dərəcələrin cəmi.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n2 3", out:"8"},
+    approach: "\"Əl sıxma lemması\" (handshake lemma): yönəlməmiş qrafda bütün dərəcələrin cəmi HƏMİŞƏ <b>2×(kənar sayı)</b>-dir — hər kənar İKİ təpənin dərəcəsinə 1 əlavə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; }
+    cout << (2 * m) << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda dərəcələr cəmi (handshake lemması, 0)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. BÜTÜN təpələrin dərəcələrinin CƏMİNİ tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bütün dərəcələrin cəmi.",
+    example: {in:"3 0", out:"0"},
+    approach: "\"Əl sıxma lemması\" (handshake lemma): yönəlməmiş qrafda bütün dərəcələrin cəmi HƏMİŞƏ <b>2×(kənar sayı)</b>-dir — hər kənar İKİ təpənin dərəcəsinə 1 əlavə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; }
+    cout << (2 * m) << "\\n";
+}`},
+  {
+    title: "Tək kənarlı qrafda dərəcələr cəmi (handshake lemması)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. BÜTÜN təpələrin dərəcələrinin CƏMİNİ tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bütün dərəcələrin cəmi.",
+    example: {in:"2 1\n1 2", out:"2"},
+    approach: "\"Əl sıxma lemması\" (handshake lemma): yönəlməmiş qrafda bütün dərəcələrin cəmi HƏMİŞƏ <b>2×(kənar sayı)</b>-dir — hər kənar İKİ təpənin dərəcəsinə 1 əlavə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; }
+    cout << (2 * m) << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K4) dərəcələr cəmi (handshake lemması)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. BÜTÜN təpələrin dərəcələrinin CƏMİNİ tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bütün dərəcələrin cəmi.",
+    example: {in:"4 6\n1 2\n1 3\n1 4\n2 3\n2 4\n3 4", out:"12"},
+    approach: "\"Əl sıxma lemması\" (handshake lemma): yönəlməmiş qrafda bütün dərəcələrin cəmi HƏMİŞƏ <b>2×(kənar sayı)</b>-dir — hər kənar İKİ təpənin dərəcəsinə 1 əlavə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; }
+    cout << (2 * m) << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (5 təpə) dərəcələr cəmi (handshake lemması)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. BÜTÜN təpələrin dərəcələrinin CƏMİNİ tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bütün dərəcələrin cəmi.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5", out:"8"},
+    approach: "\"Əl sıxma lemması\" (handshake lemma): yönəlməmiş qrafda bütün dərəcələrin cəmi HƏMİŞƏ <b>2×(kənar sayı)</b>-dir — hər kənar İKİ təpənin dərəcəsinə 1 əlavə edir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; }
+    cout << (2 * m) << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda (1 mərkəz) ən böyük dərəcəli təpə",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK DƏRƏCƏLİ (bərabərlikdə nömrəsi kiçik) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük dərəcəli təpənin nömrəsi.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5", out:"1"},
+    approach: "Hər təpənin dərəcəsi (<b>adj[i].size()</b>) hesablanır, təpələr 1-dən N-ə artan sırada gəzilərkən ƏN BÖYÜK dərəcəyə malik İLK (ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int best = 1;
+    for (int i = 2; i <= n; i++) if (deg[i] > deg[best]) best = i;
+    cout << best << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda ən böyük dərəcəli təpə (bərabərlikdə kiçik nömrə)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK DƏRƏCƏLİ (bərabərlikdə nömrəsi kiçik) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük dərəcəli təpənin nömrəsi.",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"2"},
+    approach: "Hər təpənin dərəcəsi (<b>adj[i].size()</b>) hesablanır, təpələr 1-dən N-ə artan sırada gəzilərkən ƏN BÖYÜK dərəcəyə malik İLK (ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int best = 1;
+    for (int i = 2; i <= n; i++) if (deg[i] > deg[best]) best = i;
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ən böyük dərəcəli təpə (baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK DƏRƏCƏLİ (bərabərlikdə nömrəsi kiçik) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük dərəcəli təpənin nömrəsi.",
+    example: {in:"1 0", out:"1"},
+    approach: "Hər təpənin dərəcəsi (<b>adj[i].size()</b>) hesablanır, təpələr 1-dən N-ə artan sırada gəzilərkən ƏN BÖYÜK dərəcəyə malik İLK (ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int best = 1;
+    for (int i = 2; i <= n; i++) if (deg[i] > deg[best]) best = i;
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K4) ən böyük dərəcəli təpə (hamısı bərabər)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK DƏRƏCƏLİ (bərabərlikdə nömrəsi kiçik) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük dərəcəli təpənin nömrəsi.",
+    example: {in:"4 6\n1 2\n1 3\n1 4\n2 3\n2 4\n3 4", out:"1"},
+    approach: "Hər təpənin dərəcəsi (<b>adj[i].size()</b>) hesablanır, təpələr 1-dən N-ə artan sırada gəzilərkən ƏN BÖYÜK dərəcəyə malik İLK (ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int best = 1;
+    for (int i = 2; i <= n; i++) if (deg[i] > deg[best]) best = i;
+    cout << best << "\\n";
+}`},
+  {
+    title: "3-cü təpə mərkəzli ulduz qrafda ən böyük dərəcəli təpə",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK DƏRƏCƏLİ (bərabərlikdə nömrəsi kiçik) təpəni tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük dərəcəli təpənin nömrəsi.",
+    example: {in:"4 3\n3 1\n3 2\n3 4", out:"3"},
+    approach: "Hər təpənin dərəcəsi (<b>adj[i].size()</b>) hesablanır, təpələr 1-dən N-ə artan sırada gəzilərkən ƏN BÖYÜK dərəcəyə malik İLK (ən kiçik nömrəli) təpə saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int best = 1;
+    for (int i = 2; i <= n; i++) if (deg[i] > deg[best]) best = i;
+    cout << best << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən 4-ə yol varmı (BFS)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1 4", out:"VAR"},
+    approach: "BFS S-dən BAŞLAYARAQ çatıla bilən bütün təpələri ziyarət edir; sonda T ziyarət olunubmu (<b>visited[T]</b>) yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən 4-ə yol varmı (BFS, yoxdur)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 2\n1 2\n3 4\n1 4", out:"YOX"},
+    approach: "BFS S-dən BAŞLAYARAQ çatıla bilən bütün təpələri ziyarət edir; sonda T ziyarət olunubmu (<b>visited[T]</b>) yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə yol varmı (BFS, həmişə var)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 1\n1 2\n2 2", out:"VAR"},
+    approach: "BFS S-dən BAŞLAYARAQ çatıla bilən bütün təpələri ziyarət edir; sonda T ziyarət olunubmu (<b>visited[T]</b>) yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K3) 1-dən 3-ə yol varmı (BFS)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1 3", out:"VAR"},
+    approach: "BFS S-dən BAŞLAYARAQ çatıla bilən bütün təpələri ziyarət edir; sonda T ziyarət olunubmu (<b>visited[T]</b>) yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda yol varmı (BFS, baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"1 0\n1 1", out:"VAR"},
+    approach: "BFS S-dən BAŞLAYARAQ çatıla bilən bütün təpələri ziyarət edir; sonda T ziyarət olunubmu (<b>visited[T]</b>) yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (5 təpə) 1-dən BFS qat sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. BFS-in NEÇƏ QAT (səviyyə) apardığını (S-in özü də daxil, S-dən çatıla bilən ən uzaq məsafə + 1) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS səviyyə sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1", out:"5"},
+    approach: "BFS-dən sonra S-dən çatıla bilən ƏN BÖYÜK <b>dist</b> dəyəri tapılır; qat sayı bu dəyərdən <b>+1</b>-dir (0-cı qat S-in özüdür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    int maxD = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; maxD = max(maxD, dist[v]); q.push(v); }
+    }
+    cout << (maxD + 1) << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 1-dən BFS qat sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. BFS-in NEÇƏ QAT (səviyyə) apardığını (S-in özü də daxil, S-dən çatıla bilən ən uzaq məsafə + 1) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS səviyyə sayı.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"2"},
+    approach: "BFS-dən sonra S-dən çatıla bilən ƏN BÖYÜK <b>dist</b> dəyəri tapılır; qat sayı bu dəyərdən <b>+1</b>-dir (0-cı qat S-in özüdür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    int maxD = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; maxD = max(maxD, dist[v]); q.push(v); }
+    }
+    cout << (maxD + 1) << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda BFS qat sayı (baza hal, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. BFS-in NEÇƏ QAT (səviyyə) apardığını (S-in özü də daxil, S-dən çatıla bilən ən uzaq məsafə + 1) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS səviyyə sayı.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "BFS-dən sonra S-dən çatıla bilən ƏN BÖYÜK <b>dist</b> dəyəri tapılır; qat sayı bu dəyərdən <b>+1</b>-dir (0-cı qat S-in özüdür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    int maxD = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; maxD = max(maxD, dist[v]); q.push(v); }
+    }
+    cout << (maxD + 1) << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən BFS qat sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. BFS-in NEÇƏ QAT (səviyyə) apardığını (S-in özü də daxil, S-dən çatıla bilən ən uzaq məsafə + 1) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS səviyyə sayı.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1", out:"2"},
+    approach: "BFS-dən sonra S-dən çatıla bilən ƏN BÖYÜK <b>dist</b> dəyəri tapılır; qat sayı bu dəyərdən <b>+1</b>-dir (0-cı qat S-in özüdür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    int maxD = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; maxD = max(maxD, dist[v]); q.push(v); }
+    }
+    cout << (maxD + 1) << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən BFS qat sayı (yalnız öz komponenti)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. BFS-in NEÇƏ QAT (səviyyə) apardığını (S-in özü də daxil, S-dən çatıla bilən ən uzaq məsafə + 1) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS səviyyə sayı.",
+    example: {in:"4 1\n1 2\n1", out:"2"},
+    approach: "BFS-dən sonra S-dən çatıla bilən ƏN BÖYÜK <b>dist</b> dəyəri tapılır; qat sayı bu dəyərdən <b>+1</b>-dir (0-cı qat S-in özüdür).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    int maxD = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; maxD = max(maxD, dist[v]); q.push(v); }
+    }
+    cout << (maxD + 1) << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 1-dən dəqiq 1 məsafədə olan təpə sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və K verilib. S-dən DƏQİQ K məsafədə (kənar sayı) olan təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S K\".",
+    output: "S-dən dəqiq K məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1 1", out:"4"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır, sonra <b>dist[i]==K</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, k; cin >> s >> k;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == k) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən dəqiq 2 məsafədə olan təpə sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və K verilib. S-dən DƏQİQ K məsafədə (kənar sayı) olan təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S K\".",
+    output: "S-dən dəqiq K məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 2", out:"1"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır, sonra <b>dist[i]==K</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, k; cin >> s >> k;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == k) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən dəqiq 0 məsafədə olan təpə sayı (BFS, yalnız özü)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və K verilib. S-dən DƏQİQ K məsafədə (kənar sayı) olan təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S K\".",
+    output: "S-dən dəqiq K məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 0", out:"1"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır, sonra <b>dist[i]==K</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, k; cin >> s >> k;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == k) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən dəqiq 10 məsafədə olan təpə sayı (BFS, heç biri)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və K verilib. S-dən DƏQİQ K məsafədə (kənar sayı) olan təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S K\".",
+    output: "S-dən dəqiq K məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 10", out:"0"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır, sonra <b>dist[i]==K</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, k; cin >> s >> k;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == k) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "İki ulduzlu komponentdə 1-dən dəqiq 1 məsafədə olan təpə sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və K verilib. S-dən DƏQİQ K məsafədə (kənar sayı) olan təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S K\".",
+    output: "S-dən dəqiq K məsafədə olan təpələrin sayı.",
+    example: {in:"6 4\n1 2\n1 3\n4 5\n4 6\n1 1", out:"2"},
+    approach: "BFS ilə bütün <b>dist[]</b> hesablanır, sonra <b>dist[i]==K</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, k; cin >> s >> k;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == k) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 1-dən 3-ə yol varmı (1→2→3, BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ (directed) qraf, S və T verilib. S-dən T-yə (kənarların İSTİQAMƏTİNƏ RİAYƏT edərək) yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (u-dan v-yə YÖNLÜ kənar), son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n2 3\n1 3", out:"VAR"},
+    approach: "YÖNLÜ qrafda hər \"u v\" kənarı YALNIZ <b>adj[u]</b>-ya əlavə olunur (əksinə yox!) — BFS eyni qaydada işləyir, amma yalnız kənarların İSTİQAMƏTİ üzrə irəliləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 3-dən 1-ə yol varmı (yalnız 1→2→3 istiqaməti var, BFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ (directed) qraf, S və T verilib. S-dən T-yə (kənarların İSTİQAMƏTİNƏ RİAYƏT edərək) yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (u-dan v-yə YÖNLÜ kənar), son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n2 3\n3 1", out:"YOX"},
+    approach: "YÖNLÜ qrafda hər \"u v\" kənarı YALNIZ <b>adj[u]</b>-ya əlavə olunur (əksinə yox!) — BFS eyni qaydada işləyir, amma yalnız kənarların İSTİQAMƏTİ üzrə irəliləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) 2-dən 1-ə yol varmı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ (directed) qraf, S və T verilib. S-dən T-yə (kənarların İSTİQAMƏTİNƏ RİAYƏT edərək) yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (u-dan v-yə YÖNLÜ kənar), son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n3 1\n2 1", out:"VAR"},
+    approach: "YÖNLÜ qrafda hər \"u v\" kənarı YALNIZ <b>adj[u]</b>-ya əlavə olunur (əksinə yox!) — BFS eyni qaydada işləyir, amma yalnız kənarların İSTİQAMƏTİ üzrə irəliləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli yönlü qrafda yol varmı (BFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ (directed) qraf, S və T verilib. S-dən T-yə (kənarların İSTİQAMƏTİNƏ RİAYƏT edərək) yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (u-dan v-yə YÖNLÜ kənar), son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"1 0\n1 1", out:"VAR"},
+    approach: "YÖNLÜ qrafda hər \"u v\" kənarı YALNIZ <b>adj[u]</b>-ya əlavə olunur (əksinə yox!) — BFS eyni qaydada işləyir, amma yalnız kənarların İSTİQAMƏTİ üzrə irəliləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda əlaqəsiz təpəyə yol varmı (BFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ (directed) qraf, S və T verilib. S-dən T-yə (kənarların İSTİQAMƏTİNƏ RİAYƏT edərək) yol varmı? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (u-dan v-yə YÖNLÜ kənar), son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 2\n1 2\n2 3\n1 4", out:"YOX"},
+    approach: "YÖNLÜ qrafda hər \"u v\" kənarı YALNIZ <b>adj[u]</b>-ya əlavə olunur (əksinə yox!) — BFS eyni qaydada işləyir, amma yalnız kənarların İSTİQAMƏTİ üzrə irəliləyir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; q.push(v); }
+    }
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü zəncirdə (1→2→3→4) 1-dən 4-ə minimum məsafə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf, S və T verilib. S-dən T-yə (kənarların istiqamətinə riayət edərək) ən qısa yolun uzunluğunu BFS ilə tapın (yoxdursa -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə \"S T\".",
+    output: "Minimum kənar sayı, ya da -1.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1 4", out:"3"},
+    approach: "Yönəlməmiş versiyadakı eyni BFS məsafə alqoritmi, AMMA qonşuluq siyahısı YALNIZ YÖNLÜ kənarlarla (<b>adj[u].push_back(v)</b>, əksinə yox) qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 4-dən 1-ə minimum məsafə (əks istiqamət yoxdur, BFS, -1)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf, S və T verilib. S-dən T-yə (kənarların istiqamətinə riayət edərək) ən qısa yolun uzunluğunu BFS ilə tapın (yoxdursa -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə \"S T\".",
+    output: "Minimum kənar sayı, ya da -1.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n4 1", out:"-1"},
+    approach: "Yönəlməmiş versiyadakı eyni BFS məsafə alqoritmi, AMMA qonşuluq siyahısı YALNIZ YÖNLÜ kənarlarla (<b>adj[u].push_back(v)</b>, əksinə yox) qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Yönlü sürətlə (1→3 qısa yol) 1-dən 3-ə minimum məsafə (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf, S və T verilib. S-dən T-yə (kənarların istiqamətinə riayət edərək) ən qısa yolun uzunluğunu BFS ilə tapın (yoxdursa -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə \"S T\".",
+    output: "Minimum kənar sayı, ya da -1.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1 3", out:"1"},
+    approach: "Yönəlməmiş versiyadakı eyni BFS məsafə alqoritmi, AMMA qonşuluq siyahısı YALNIZ YÖNLÜ kənarlarla (<b>adj[u].push_back(v)</b>, əksinə yox) qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə minimum məsafə (BFS, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf, S və T verilib. S-dən T-yə (kənarların istiqamətinə riayət edərək) ən qısa yolun uzunluğunu BFS ilə tapın (yoxdursa -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə \"S T\".",
+    output: "Minimum kənar sayı, ya da -1.",
+    example: {in:"2 1\n1 2\n1 1", out:"0"},
+    approach: "Yönəlməmiş versiyadakı eyni BFS məsafə alqoritmi, AMMA qonşuluq siyahısı YALNIZ YÖNLÜ kənarlarla (<b>adj[u].push_back(v)</b>, əksinə yox) qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "Tək təpəli yönlü qrafda minimum məsafə (BFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf, S və T verilib. S-dən T-yə (kənarların istiqamətinə riayət edərək) ən qısa yolun uzunluğunu BFS ilə tapın (yoxdursa -1).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə \"S T\".",
+    output: "Minimum kənar sayı, ya da -1.",
+    example: {in:"1 0\n1 1", out:"0"},
+    approach: "Yönəlməmiş versiyadakı eyni BFS məsafə alqoritmi, AMMA qonşuluq siyahısı YALNIZ YÖNLÜ kənarlarla (<b>adj[u].push_back(v)</b>, əksinə yox) qurulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    cout << dist[t] << "\\n";
+}`},
+  {
+    title: "5 təpəli qrafda tənha təpə sayı (3-4-5 izolə)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Dərəcəsi 0 olan (TƏNHA/izolə) təpələrin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Tənha təpələrin sayı.",
+    example: {in:"5 2\n1 2\n1 3", out:"2"},
+    approach: "Hər təpənin dərəcəsi hesablanır; dərəcəsi DƏQİQ 0 olan (heç bir kənarı olmayan) təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (deg[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda tənha təpə sayı (hamısı tənha)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Dərəcəsi 0 olan (TƏNHA/izolə) təpələrin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Tənha təpələrin sayı.",
+    example: {in:"4 0", out:"4"},
+    approach: "Hər təpənin dərəcəsi hesablanır; dərəcəsi DƏQİQ 0 olan (heç bir kənarı olmayan) təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (deg[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tam bağlı qrafda tənha təpə sayı (heç biri tənha deyil)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Dərəcəsi 0 olan (TƏNHA/izolə) təpələrin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Tənha təpələrin sayı.",
+    example: {in:"3 3\n1 2\n2 3\n1 3", out:"0"},
+    approach: "Hər təpənin dərəcəsi hesablanır; dərəcəsi DƏQİQ 0 olan (heç bir kənarı olmayan) təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (deg[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda tənha təpə sayı (baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Dərəcəsi 0 olan (TƏNHA/izolə) təpələrin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Tənha təpələrin sayı.",
+    example: {in:"1 0", out:"1"},
+    approach: "Hər təpənin dərəcəsi hesablanır; dərəcəsi DƏQİQ 0 olan (heç bir kənarı olmayan) təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (deg[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Zəncir + izolə təpəli qrafda tənha təpə sayı",
+    difficulty: "easy",
+    tags: ["qraf", "dərəcə"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Dərəcəsi 0 olan (TƏNHA/izolə) təpələrin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Tənha təpələrin sayı.",
+    example: {in:"5 2\n1 2\n2 3", out:"2"},
+    approach: "Hər təpənin dərəcəsi hesablanır; dərəcəsi DƏQİQ 0 olan (heç bir kənarı olmayan) təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> deg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; deg[u]++; deg[v]++; }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (deg[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (maneəsiz) minimum addım sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən (0,0) sağ-aşağı küncə ((R-1,C-1)) 4 istiqamətdə (yuxarı/aşağı/sağ/sol) hərəkət edərək minimum neçə ADDIM lazım olduğunu BFS ilə tapın (yol yoxdursa -1).",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "Minimum addım sayı, ya da -1.",
+    example: {in:"3 3\n000\n000\n000", out:"4"},
+    approach: "Grid-in hər XANASI bir \"təpə\" kimi düşünülür, 4 qonşu istiqamət isə \"kənarlar\"dır. Adi BFS ilə (0,0)-dan (R-1,C-1)-ə minimum məsafə tapılır, MANEƏLİ xanalardan keçilmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<int>> dist(r, vector<int>(c, -1));
+    if (g[0][0] == '1') { cout << -1 << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    dist[0][0] = 0; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+    cout << dist[r-1][c-1] << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (divar) minimum addım sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən (0,0) sağ-aşağı küncə ((R-1,C-1)) 4 istiqamətdə (yuxarı/aşağı/sağ/sol) hərəkət edərək minimum neçə ADDIM lazım olduğunu BFS ilə tapın (yol yoxdursa -1).",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "Minimum addım sayı, ya da -1.",
+    example: {in:"3 3\n000\n111\n000", out:"-1"},
+    approach: "Grid-in hər XANASI bir \"təpə\" kimi düşünülür, 4 qonşu istiqamət isə \"kənarlar\"dır. Adi BFS ilə (0,0)-dan (R-1,C-1)-ə minimum məsafə tapılır, MANEƏLİ xanalardan keçilmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<int>> dist(r, vector<int>(c, -1));
+    if (g[0][0] == '1') { cout << -1 << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    dist[0][0] = 0; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+    cout << dist[r-1][c-1] << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (tam bağlı divar) minimum addım sayı (BFS, -1)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən (0,0) sağ-aşağı küncə ((R-1,C-1)) 4 istiqamətdə (yuxarı/aşağı/sağ/sol) hərəkət edərək minimum neçə ADDIM lazım olduğunu BFS ilə tapın (yol yoxdursa -1).",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "Minimum addım sayı, ya da -1.",
+    example: {in:"3 3\n010\n111\n000", out:"-1"},
+    approach: "Grid-in hər XANASI bir \"təpə\" kimi düşünülür, 4 qonşu istiqamət isə \"kənarlar\"dır. Adi BFS ilə (0,0)-dan (R-1,C-1)-ə minimum məsafə tapılır, MANEƏLİ xanalardan keçilmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<int>> dist(r, vector<int>(c, -1));
+    if (g[0][0] == '1') { cout << -1 << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    dist[0][0] = 0; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+    cout << dist[r-1][c-1] << "\\n";
+}`},
+  {
+    title: "1x1 grid-də minimum addım sayı (BFS, baza hal, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən (0,0) sağ-aşağı küncə ((R-1,C-1)) 4 istiqamətdə (yuxarı/aşağı/sağ/sol) hərəkət edərək minimum neçə ADDIM lazım olduğunu BFS ilə tapın (yol yoxdursa -1).",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "Minimum addım sayı, ya da -1.",
+    example: {in:"1 1\n0", out:"0"},
+    approach: "Grid-in hər XANASI bir \"təpə\" kimi düşünülür, 4 qonşu istiqamət isə \"kənarlar\"dır. Adi BFS ilə (0,0)-dan (R-1,C-1)-ə minimum məsafə tapılır, MANEƏLİ xanalardan keçilmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<int>> dist(r, vector<int>(c, -1));
+    if (g[0][0] == '1') { cout << -1 << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    dist[0][0] = 0; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+    cout << dist[r-1][c-1] << "\\n";
+}`},
+  {
+    title: "2x2 grid-də (maneəsiz) minimum addım sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən (0,0) sağ-aşağı küncə ((R-1,C-1)) 4 istiqamətdə (yuxarı/aşağı/sağ/sol) hərəkət edərək minimum neçə ADDIM lazım olduğunu BFS ilə tapın (yol yoxdursa -1).",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "Minimum addım sayı, ya da -1.",
+    example: {in:"2 2\n00\n00", out:"2"},
+    approach: "Grid-in hər XANASI bir \"təpə\" kimi düşünülür, 4 qonşu istiqamət isə \"kənarlar\"dır. Adi BFS ilə (0,0)-dan (R-1,C-1)-ə minimum məsafə tapılır, MANEƏLİ xanalardan keçilmir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<int>> dist(r, vector<int>(c, -1));
+    if (g[0][0] == '1') { cout << -1 << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    dist[0][0] = 0; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || dist[nx][ny] != -1) continue;
+            dist[nx][ny] = dist[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+    cout << dist[r-1][c-1] << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (maneəsiz) (0,0)-dan (2,2)-yə yol varmı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). (0,0)-dan (R-1,C-1)-ə 4 istiqamətdə hərəkət edərək çatmaq mümkündürmü? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n000\n000\n000", out:"VAR"},
+    approach: "Əvvəlki grid BFS alqoritmi işlədilir, cavab yalnız (R-1,C-1)-ə çatıb-çatmamaqdan asılıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<bool>> visited(r, vector<bool>(c, false));
+    if (g[0][0] == '1') { cout << "YOX" << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    visited[0][0] = true; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || visited[nx][ny]) continue;
+            visited[nx][ny] = true;
+            q.push({nx, ny});
+        }
+    }
+    cout << (visited[r-1][c-1] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (tam bağlı divar) yol varmı (BFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). (0,0)-dan (R-1,C-1)-ə 4 istiqamətdə hərəkət edərək çatmaq mümkündürmü? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n010\n111\n000", out:"YOX"},
+    approach: "Əvvəlki grid BFS alqoritmi işlədilir, cavab yalnız (R-1,C-1)-ə çatıb-çatmamaqdan asılıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<bool>> visited(r, vector<bool>(c, false));
+    if (g[0][0] == '1') { cout << "YOX" << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    visited[0][0] = true; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || visited[nx][ny]) continue;
+            visited[nx][ny] = true;
+            q.push({nx, ny});
+        }
+    }
+    cout << (visited[r-1][c-1] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1x1 grid-də yol varmı (BFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). (0,0)-dan (R-1,C-1)-ə 4 istiqamətdə hərəkət edərək çatmaq mümkündürmü? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"1 1\n0", out:"VAR"},
+    approach: "Əvvəlki grid BFS alqoritmi işlədilir, cavab yalnız (R-1,C-1)-ə çatıb-çatmamaqdan asılıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<bool>> visited(r, vector<bool>(c, false));
+    if (g[0][0] == '1') { cout << "YOX" << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    visited[0][0] = true; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || visited[nx][ny]) continue;
+            visited[nx][ny] = true;
+            q.push({nx, ny});
+        }
+    }
+    cout << (visited[r-1][c-1] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "2x2 grid-də (başlanğıc maneəli) yol varmı (BFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). (0,0)-dan (R-1,C-1)-ə 4 istiqamətdə hərəkət edərək çatmaq mümkündürmü? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"2 2\n10\n00", out:"YOX"},
+    approach: "Əvvəlki grid BFS alqoritmi işlədilir, cavab yalnız (R-1,C-1)-ə çatıb-çatmamaqdan asılıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<bool>> visited(r, vector<bool>(c, false));
+    if (g[0][0] == '1') { cout << "YOX" << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    visited[0][0] = true; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || visited[nx][ny]) continue;
+            visited[nx][ny] = true;
+            q.push({nx, ny});
+        }
+    }
+    cout << (visited[r-1][c-1] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (keçid olan divar) yol varmı (BFS, var)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs", "grid"],
+    statement: "R×C ölçülü grid verilib (0 — boş, 1 — maneə). (0,0)-dan (R-1,C-1)-ə 4 istiqamətdə hərəkət edərək çatmaq mümkündürmü? BFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə R və C, növbəti R sətirdə hər birində C rəqəm (0/1, boşluqsuz).",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n000\n110\n000", out:"VAR"},
+    approach: "Əvvəlki grid BFS alqoritmi işlədilir, cavab yalnız (R-1,C-1)-ə çatıb-çatmamaqdan asılıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int r, c; cin >> r >> c;
+    vector<string> g(r);
+    for (int i = 0; i < r; i++) cin >> g[i];
+    vector<vector<bool>> visited(r, vector<bool>(c, false));
+    if (g[0][0] == '1') { cout << "YOX" << "\\n"; return 0; }
+    queue<pair<int,int>> q;
+    visited[0][0] = true; q.push({0,0});
+    int dr[] = {-1,1,0,0}, dc[] = {0,0,-1,1};
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d = 0; d < 4; d++) {
+            int nx = x + dr[d], ny = y + dc[d];
+            if (nx < 0 || nx >= r || ny < 0 || ny >= c) continue;
+            if (g[nx][ny] == '1' || visited[nx][ny]) continue;
+            visited[nx][ny] = true;
+            q.push({nx, ny});
+        }
+    }
+    cout << (visited[r-1][c-1] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4-5) 1-dən dəqiq 2 məsafədə təpə sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. S-dən DƏQİQ 2 məsafədə olan (\"qonşunun qonşusu\") təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən dəqiq 2 məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1", out:"1"},
+    approach: "BFS ilə <b>dist[]</b> hesablanır, <b>dist[i]==2</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == 2) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "İki səviyyəli ulduzda 1-dən dəqiq 2 məsafədə təpə sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. S-dən DƏQİQ 2 məsafədə olan (\"qonşunun qonşusu\") təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən dəqiq 2 məsafədə olan təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n2 4\n2 5\n1", out:"3"},
+    approach: "BFS ilə <b>dist[]</b> hesablanır, <b>dist[i]==2</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == 2) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda (dərinlik 1) 1-dən dəqiq 2 məsafədə təpə sayı (BFS, heç biri)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. S-dən DƏQİQ 2 məsafədə olan (\"qonşunun qonşusu\") təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən dəqiq 2 məsafədə olan təpələrin sayı.",
+    example: {in:"4 3\n1 2\n1 3\n1 4\n1", out:"0"},
+    approach: "BFS ilə <b>dist[]</b> hesablanır, <b>dist[i]==2</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == 2) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda dəqiq 2 məsafədə təpə sayı (BFS, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. S-dən DƏQİQ 2 məsafədə olan (\"qonşunun qonşusu\") təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən dəqiq 2 məsafədə olan təpələrin sayı.",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "BFS ilə <b>dist[]</b> hesablanır, <b>dist[i]==2</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == 2) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən dəqiq 2 məsafədə təpə sayı (BFS, 0, hamısı 1-ə qonşu)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. S-dən DƏQİQ 2 məsafədə olan (\"qonşunun qonşusu\") təpələrin sayını BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "S-dən dəqiq 2 məsafədə olan təpələrin sayı.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1", out:"0"},
+    approach: "BFS ilə <b>dist[]</b> hesablanır, <b>dist[i]==2</b> olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<int> dist(n + 1, -1);
+    queue<int> q;
+    dist[s] = 0; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (dist[v] == -1) { dist[v] = dist[u] + 1; q.push(v); }
+    }
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (dist[i] == 2) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Romb qrafda (1-2-4, 1-3-4) 1-dən 4-ə ən qısa yol sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə olan ən qısa (minimum kənar sayılı) yolların NEÇƏ FƏRQLİ olduğunu BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "Ən qısa yolların sayı.",
+    example: {in:"4 4\n1 2\n1 3\n2 4\n3 4\n1 4", out:"2"},
+    approach: "<b>ways[v]</b> = S-dən v-yə ən qısa yolların sayı. BFS zamanı v-ni İLK DƏFƏ kəşf edəndə <b>ways[v] = ways[u]</b>; v ARTIQ EYNİ (minimum) məsafədə başqa bir u-dan da kəşf olunarsa, <b>ways[v] += ways[u]</b> (eyni qatdakı bütün töhfələr toplanır).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    vector<long long> ways(n + 1, 0);
+    queue<int> q;
+    dist[s] = 0; ways[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) { dist[v] = dist[u] + 1; ways[v] = ways[u]; q.push(v); }
+            else if (dist[v] == dist[u] + 1) { ways[v] += ways[u]; }
+        }
+    }
+    cout << ways[t] << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən 4-ə ən qısa yol sayı (BFS, tək yol)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə olan ən qısa (minimum kənar sayılı) yolların NEÇƏ FƏRQLİ olduğunu BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "Ən qısa yolların sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1 4", out:"1"},
+    approach: "<b>ways[v]</b> = S-dən v-yə ən qısa yolların sayı. BFS zamanı v-ni İLK DƏFƏ kəşf edəndə <b>ways[v] = ways[u]</b>; v ARTIQ EYNİ (minimum) məsafədə başqa bir u-dan da kəşf olunarsa, <b>ways[v] += ways[u]</b> (eyni qatdakı bütün töhfələr toplanır).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    vector<long long> ways(n + 1, 0);
+    queue<int> q;
+    dist[s] = 0; ways[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) { dist[v] = dist[u] + 1; ways[v] = ways[u]; q.push(v); }
+            else if (dist[v] == dist[u] + 1) { ways[v] += ways[u]; }
+        }
+    }
+    cout << ways[t] << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə ən qısa yol sayı (BFS, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə olan ən qısa (minimum kənar sayılı) yolların NEÇƏ FƏRQLİ olduğunu BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "Ən qısa yolların sayı.",
+    example: {in:"2 1\n1 2\n1 1", out:"1"},
+    approach: "<b>ways[v]</b> = S-dən v-yə ən qısa yolların sayı. BFS zamanı v-ni İLK DƏFƏ kəşf edəndə <b>ways[v] = ways[u]</b>; v ARTIQ EYNİ (minimum) məsafədə başqa bir u-dan da kəşf olunarsa, <b>ways[v] += ways[u]</b> (eyni qatdakı bütün töhfələr toplanır).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    vector<long long> ways(n + 1, 0);
+    queue<int> q;
+    dist[s] = 0; ways[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) { dist[v] = dist[u] + 1; ways[v] = ways[u]; q.push(v); }
+            else if (dist[v] == dist[u] + 1) { ways[v] += ways[u]; }
+        }
+    }
+    cout << ways[t] << "\\n";
+}`},
+  {
+    title: "Üç paralel yollu qrafda 1-dən 5-ə ən qısa yol sayı (BFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə olan ən qısa (minimum kənar sayılı) yolların NEÇƏ FƏRQLİ olduğunu BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "Ən qısa yolların sayı.",
+    example: {in:"5 6\n1 2\n1 3\n1 4\n2 5\n3 5\n4 5", out:"0"},
+    approach: "<b>ways[v]</b> = S-dən v-yə ən qısa yolların sayı. BFS zamanı v-ni İLK DƏFƏ kəşf edəndə <b>ways[v] = ways[u]</b>; v ARTIQ EYNİ (minimum) məsafədə başqa bir u-dan da kəşf olunarsa, <b>ways[v] += ways[u]</b> (eyni qatdakı bütün töhfələr toplanır).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    vector<long long> ways(n + 1, 0);
+    queue<int> q;
+    dist[s] = 0; ways[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) { dist[v] = dist[u] + 1; ways[v] = ways[u]; q.push(v); }
+            else if (dist[v] == dist[u] + 1) { ways[v] += ways[u]; }
+        }
+    }
+    cout << ways[t] << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ən qısa yol sayı (BFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə olan ən qısa (minimum kənar sayılı) yolların NEÇƏ FƏRQLİ olduğunu BFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "Ən qısa yolların sayı.",
+    example: {in:"1 0\n1 1", out:"1"},
+    approach: "<b>ways[v]</b> = S-dən v-yə ən qısa yolların sayı. BFS zamanı v-ni İLK DƏFƏ kəşf edəndə <b>ways[v] = ways[u]</b>; v ARTIQ EYNİ (minimum) məsafədə başqa bir u-dan da kəşf olunarsa, <b>ways[v] += ways[u]</b> (eyni qatdakı bütün töhfələr toplanır).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    vector<int> dist(n + 1, -1);
+    vector<long long> ways(n + 1, 0);
+    queue<int> q;
+    dist[s] = 0; ways[s] = 1; q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (dist[v] == -1) { dist[v] = dist[u] + 1; ways[v] = ways[u]; q.push(v); }
+            else if (dist[v] == dist[u] + 1) { ways[v] += ways[u]; }
+        }
+    }
+    cout << ways[t] << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən BFS ağacı kənar sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. BFS gəzintisi zamanı İSTİFADƏ OLUNAN (yeni təpə kəşf edən) kənarların sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS ağacındakı kənar sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1", out:"4"},
+    approach: "BFS ağacının kənar sayı HƏMİŞƏ (S-dən ÇATILA BİLƏN təpə sayı − 1)-ə bərabərdir — çünki ağacda hər yeni təpə DƏQİQ bir kənarla qoşulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    int reached = 1;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; reached++; q.push(v); }
+    }
+    cout << (reached - 1) << "\\n";
+}`},
+  {
+    title: "Dövrlü qrafda (1-2-3-1) BFS ağacı kənar sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. BFS gəzintisi zamanı İSTİFADƏ OLUNAN (yeni təpə kəşf edən) kənarların sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS ağacındakı kənar sayı.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1", out:"2"},
+    approach: "BFS ağacının kənar sayı HƏMİŞƏ (S-dən ÇATILA BİLƏN təpə sayı − 1)-ə bərabərdir — çünki ağacda hər yeni təpə DƏQİQ bir kənarla qoşulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    int reached = 1;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; reached++; q.push(v); }
+    }
+    cout << (reached - 1) << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən BFS ağacı kənar sayı (yalnız öz komponenti)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. BFS gəzintisi zamanı İSTİFADƏ OLUNAN (yeni təpə kəşf edən) kənarların sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS ağacındakı kənar sayı.",
+    example: {in:"5 1\n1 2\n1", out:"1"},
+    approach: "BFS ağacının kənar sayı HƏMİŞƏ (S-dən ÇATILA BİLƏN təpə sayı − 1)-ə bərabərdir — çünki ağacda hər yeni təpə DƏQİQ bir kənarla qoşulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    int reached = 1;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; reached++; q.push(v); }
+    }
+    cout << (reached - 1) << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda BFS ağacı kənar sayı (baza hal, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. BFS gəzintisi zamanı İSTİFADƏ OLUNAN (yeni təpə kəşf edən) kənarların sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS ağacındakı kənar sayı.",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "BFS ağacının kənar sayı HƏMİŞƏ (S-dən ÇATILA BİLƏN təpə sayı − 1)-ə bərabərdir — çünki ağacda hər yeni təpə DƏQİQ bir kənarla qoşulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    int reached = 1;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; reached++; q.push(v); }
+    }
+    cout << (reached - 1) << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K4) 1-dən BFS ağacı kənar sayı",
+    difficulty: "mid",
+    tags: ["qraf", "bfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və S verilib. BFS gəzintisi zamanı İSTİFADƏ OLUNAN (yeni təpə kəşf edən) kənarların sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "BFS ağacındakı kənar sayı.",
+    example: {in:"4 6\n1 2\n1 3\n1 4\n2 3\n2 4\n3 4\n1", out:"3"},
+    approach: "BFS ağacının kənar sayı HƏMİŞƏ (S-dən ÇATILA BİLƏN təpə sayı − 1)-ə bərabərdir — çünki ağacda hər yeni təpə DƏQİQ bir kənarla qoşulur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    vector<bool> visited(n + 1, false);
+    queue<int> q;
+    q.push(s); visited[s] = true;
+    int reached = 1;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) if (!visited[v]) { visited[v] = true; reached++; q.push(v); }
+    }
+    cout << (reached - 1) << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 3-cü təpənin giriş dərəcəsi (1→3, 2→3)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin GİRİŞ DƏRƏCƏSİNİ (ona daxil olan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin giriş dərəcəsi.",
+    example: {in:"3 2\n1 3\n2 3\n3", out:"2"},
+    approach: "Hər \"u v\" kənarı V-nin giriş dərəcəsinə (<b>indeg[v]</b>) 1 əlavə edir — yalnız V HƏDƏF olanda sayılır, mənbə olanda yox.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> indeg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; indeg[v]++; }
+    int vtx; cin >> vtx;
+    cout << indeg[vtx] << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 1-ci təpənin giriş dərəcəsi (heç bir kənar daxil olmur)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin GİRİŞ DƏRƏCƏSİNİ (ona daxil olan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin giriş dərəcəsi.",
+    example: {in:"3 2\n1 3\n2 3\n1", out:"0"},
+    approach: "Hər \"u v\" kənarı V-nin giriş dərəcəsinə (<b>indeg[v]</b>) 1 əlavə edir — yalnız V HƏDƏF olanda sayılır, mənbə olanda yox.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> indeg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; indeg[v]++; }
+    int vtx; cin >> vtx;
+    cout << indeg[vtx] << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) 1-ci təpənin giriş dərəcəsi",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin GİRİŞ DƏRƏCƏSİNİ (ona daxil olan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin giriş dərəcəsi.",
+    example: {in:"3 3\n1 2\n2 3\n3 1\n1", out:"1"},
+    approach: "Hər \"u v\" kənarı V-nin giriş dərəcəsinə (<b>indeg[v]</b>) 1 əlavə edir — yalnız V HƏDƏF olanda sayılır, mənbə olanda yox.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> indeg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; indeg[v]++; }
+    int vtx; cin >> vtx;
+    cout << indeg[vtx] << "\\n";
+}`},
+  {
+    title: "Kənarsız yönlü qrafda giriş dərəcəsi (baza hal, 0)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin GİRİŞ DƏRƏCƏSİNİ (ona daxil olan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin giriş dərəcəsi.",
+    example: {in:"2 0\n1", out:"0"},
+    approach: "Hər \"u v\" kənarı V-nin giriş dərəcəsinə (<b>indeg[v]</b>) 1 əlavə edir — yalnız V HƏDƏF olanda sayılır, mənbə olanda yox.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> indeg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; indeg[v]++; }
+    int vtx; cin >> vtx;
+    cout << indeg[vtx] << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 2-ci təpənin giriş dərəcəsi (1→2, 3→2, 4→2)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin GİRİŞ DƏRƏCƏSİNİ (ona daxil olan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin giriş dərəcəsi.",
+    example: {in:"4 3\n1 2\n3 2\n4 2\n2", out:"3"},
+    approach: "Hər \"u v\" kənarı V-nin giriş dərəcəsinə (<b>indeg[v]</b>) 1 əlavə edir — yalnız V HƏDƏF olanda sayılır, mənbə olanda yox.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<int> indeg(n + 1, 0);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; indeg[v]++; }
+    int vtx; cin >> vtx;
+    cout << indeg[vtx] << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 1-ci təpənin çıxış dərəcəsi (1→2, 1→3)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin ÇIXIŞ DƏRƏCƏSİNİ (ondan çıxan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin çıxış dərəcəsi.",
+    example: {in:"3 2\n1 2\n1 3\n1", out:"2"},
+    approach: "Çıxış dərəcəsi <b>adj[V].size()</b>-ə bərabərdir — V MƏNBƏ olan bütün kənarların sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 3-cü təpənin çıxış dərəcəsi (heç bir kənar çıxmır)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin ÇIXIŞ DƏRƏCƏSİNİ (ondan çıxan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin çıxış dərəcəsi.",
+    example: {in:"3 2\n1 2\n1 3\n3", out:"0"},
+    approach: "Çıxış dərəcəsi <b>adj[V].size()</b>-ə bərabərdir — V MƏNBƏ olan bütün kənarların sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) 2-ci təpənin çıxış dərəcəsi",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin ÇIXIŞ DƏRƏCƏSİNİ (ondan çıxan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin çıxış dərəcəsi.",
+    example: {in:"3 3\n1 2\n2 3\n3 1\n2", out:"1"},
+    approach: "Çıxış dərəcəsi <b>adj[V].size()</b>-ə bərabərdir — V MƏNBƏ olan bütün kənarların sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "Kənarsız yönlü qrafda çıxış dərəcəsi (baza hal, 0)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin ÇIXIŞ DƏRƏCƏSİNİ (ondan çıxan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin çıxış dərəcəsi.",
+    example: {in:"2 0\n1", out:"0"},
+    approach: "Çıxış dərəcəsi <b>adj[V].size()</b>-ə bərabərdir — V MƏNBƏ olan bütün kənarların sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda 1-ci təpənin çıxış dərəcəsi (1→2, 1→3, 1→4)",
+    difficulty: "easy",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf və təpə V verilib. V-nin ÇIXIŞ DƏRƏCƏSİNİ (ondan çıxan kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar), son sətirdə V.",
+    output: "V-nin çıxış dərəcəsi.",
+    example: {in:"4 3\n1 2\n1 3\n1 4\n1", out:"3"},
+    approach: "Çıxış dərəcəsi <b>adj[V].size()</b>-ə bərabərdir — V MƏNBƏ olan bütün kənarların sayı.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, m; cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    int vtx; cin >> vtx;
+    cout << adj[vtx].size() << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/001_adjacency_list_derece.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/002_adjacency_list_derece.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/003_adjacency_list_derece.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/004_adjacency_list_derece.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/005_adjacency_list_derece.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/006_bfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/007_bfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/008_bfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/009_bfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/010_bfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/011_bfs_minimum_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/012_bfs_minimum_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/013_bfs_minimum_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/014_bfs_minimum_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/015_bfs_minimum_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/016_bfs_butun_mesafeler_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/017_bfs_butun_mesafeler_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/018_bfs_butun_mesafeler_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/019_bfs_butun_mesafeler_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/020_bfs_butun_mesafeler_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/021_bfs_en_uzaq_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/022_bfs_en_uzaq_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/023_bfs_en_uzaq_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/024_bfs_en_uzaq_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/025_bfs_en_uzaq_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/026_derece_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/027_derece_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/028_derece_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/029_derece_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/030_derece_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/031_maksimum_derece_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/032_maksimum_derece_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/033_maksimum_derece_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/034_maksimum_derece_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/035_maksimum_derece_teepe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/036_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/037_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/038_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/039_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/040_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/041_bfs_qat_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/042_bfs_qat_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/043_bfs_qat_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/044_bfs_qat_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/045_bfs_qat_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/046_bfs_sabit_mesafedeki_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/047_bfs_sabit_mesafedeki_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/048_bfs_sabit_mesafedeki_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/049_bfs_sabit_mesafedeki_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/050_bfs_sabit_mesafedeki_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/051_qraf_yonlu_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/052_qraf_yonlu_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/053_qraf_yonlu_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/054_qraf_yonlu_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/055_qraf_yonlu_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/056_qraf_yonlu_bfs_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/057_qraf_yonlu_bfs_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/058_qraf_yonlu_bfs_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/059_qraf_yonlu_bfs_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/060_qraf_yonlu_bfs_mesafe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/061_tenha_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/062_tenha_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/063_tenha_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/064_tenha_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/065_tenha_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/066_grid_bfs_qisa_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/067_grid_bfs_qisa_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/068_grid_bfs_qisa_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/069_grid_bfs_qisa_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/070_grid_bfs_qisa_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/071_grid_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/072_grid_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/073_grid_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/074_grid_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/075_grid_bfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/076_bfs_ikinci_qonsu_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/077_bfs_ikinci_qonsu_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/078_bfs_ikinci_qonsu_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/079_bfs_ikinci_qonsu_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/080_bfs_ikinci_qonsu_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/081_bfs_qisa_yol_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/082_bfs_qisa_yol_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/083_bfs_qisa_yol_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/084_bfs_qisa_yol_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/085_bfs_qisa_yol_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/086_bfs_agac_kenar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/087_bfs_agac_kenar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/088_bfs_agac_kenar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/089_bfs_agac_kenar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/090_bfs_agac_kenar_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/091_yonlu_giris_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/092_yonlu_giris_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/093_yonlu_giris_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/094_yonlu_giris_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/095_yonlu_giris_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/096_yonlu_cixis_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/097_yonlu_cixis_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/098_yonlu_cixis_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/099_yonlu_cixis_derecesi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu14/100_yonlu_cixis_derecesi.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week14/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

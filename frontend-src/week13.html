@@ -1,0 +1,3230 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 13 — Test: Dinamik proqramlaşdırma II (0/1 çanta, DP cədvəli, LCS, edit distance)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:65vh; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>13</span> — Test Vərəqi</h1>
+    <p>Mövzu: 0/1 çanta (knapsack) məsələsi, DP cədvəlinin mənası, keçid düsturu, ortaq alt-ardıcıllıq (LCS), redaktə məsafəsi (edit distance). Aşağıdakı 100 məsələ yalnız Mövzu 13-ün mövzularına əsaslanır.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,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" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 13 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "(1,1),(3,4),(4,5),(5,7) əşyaları, tutum 7 — maksimum dəyər (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın ÇƏKİSİ və DƏYƏRİ, çanta tutumu W verilib. Hər əşyanı YALNIZ BİR DƏFƏ götürmək şərti ilə (0/1 çanta) ÇƏKİ TUTUMUNU aşmadan maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"4 7\n1 1\n3 4\n4 5\n5 7", out:"9"},
+    approach: "<b>dp[w]</b> = tutum w ilə əldə edilə bilən maksimum dəyər. Hər əşya üçün çəkilər BÖYÜKDƏN KİÇİYƏ (W-dən əşyanın çəkisinə qədər) yenilənir: <b>dp[w] = max(dp[w], dp[w-weight]+value)</b> — bu sıra əşyanın İKİ DƏFƏ istifadəsinin qarşısını alır (0/1 şərti).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(2,3),(3,4),(4,5),(5,6) əşyaları, tutum 5 — maksimum dəyər (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın ÇƏKİSİ və DƏYƏRİ, çanta tutumu W verilib. Hər əşyanı YALNIZ BİR DƏFƏ götürmək şərti ilə (0/1 çanta) ÇƏKİ TUTUMUNU aşmadan maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"4 5\n2 3\n3 4\n4 5\n5 6", out:"7"},
+    approach: "<b>dp[w]</b> = tutum w ilə əldə edilə bilən maksimum dəyər. Hər əşya üçün çəkilər BÖYÜKDƏN KİÇİYƏ (W-dən əşyanın çəkisinə qədər) yenilənir: <b>dp[w] = max(dp[w], dp[w-weight]+value)</b> — bu sıra əşyanın İKİ DƏFƏ istifadəsinin qarşısını alır (0/1 şərti).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(10,60) əşyası, tutum 5 — maksimum dəyər (0/1 çanta DP, sığmır)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın ÇƏKİSİ və DƏYƏRİ, çanta tutumu W verilib. Hər əşyanı YALNIZ BİR DƏFƏ götürmək şərti ilə (0/1 çanta) ÇƏKİ TUTUMUNU aşmadan maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 5\n10 60", out:"0"},
+    approach: "<b>dp[w]</b> = tutum w ilə əldə edilə bilən maksimum dəyər. Hər əşya üçün çəkilər BÖYÜKDƏN KİÇİYƏ (W-dən əşyanın çəkisinə qədər) yenilənir: <b>dp[w] = max(dp[w], dp[w-weight]+value)</b> — bu sıra əşyanın İKİ DƏFƏ istifadəsinin qarşısını alır (0/1 şərti).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(1,10) əşyası, tutum 1 — maksimum dəyər (0/1 çanta DP, tək əşya)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın ÇƏKİSİ və DƏYƏRİ, çanta tutumu W verilib. Hər əşyanı YALNIZ BİR DƏFƏ götürmək şərti ilə (0/1 çanta) ÇƏKİ TUTUMUNU aşmadan maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 1\n1 10", out:"10"},
+    approach: "<b>dp[w]</b> = tutum w ilə əldə edilə bilən maksimum dəyər. Hər əşya üçün çəkilər BÖYÜKDƏN KİÇİYƏ (W-dən əşyanın çəkisinə qədər) yenilənir: <b>dp[w] = max(dp[w], dp[w-weight]+value)</b> — bu sıra əşyanın İKİ DƏFƏ istifadəsinin qarşısını alır (0/1 şərti).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "Tutum 0 ilə maksimum dəyər (0/1 çanta DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın ÇƏKİSİ və DƏYƏRİ, çanta tutumu W verilib. Hər əşyanı YALNIZ BİR DƏFƏ götürmək şərti ilə (0/1 çanta) ÇƏKİ TUTUMUNU aşmadan maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"2 0\n1 5\n2 10", out:"0"},
+    approach: "<b>dp[w]</b> = tutum w ilə əldə edilə bilən maksimum dəyər. Hər əşya üçün çəkilər BÖYÜKDƏN KİÇİYƏ (W-dən əşyanın çəkisinə qədər) yenilənir: <b>dp[w] = max(dp[w], dp[w-weight]+value)</b> — bu sıra əşyanın İKİ DƏFƏ istifadəsinin qarşısını alır (0/1 şərti).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "2, 3, 7, 8 çəkiləri ilə tutum 10-u tam doldurmaq mümkündürmü (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni DƏQİQ (artıqsız-əskiksiz) dolduran bir alt çoxluq varmı? DP ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və W, ikinci sətirdə N çəki.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 10\n2 3 7 8", out:"VAR"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluq varmı? Hər əşya üçün BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[c] = dp[c] || dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    cout << (dp[w] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "2, 3, 7, 8 çəkiləri ilə tutum 100-ü tam doldurmaq mümkündürmü (0/1 çanta DP, yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni DƏQİQ (artıqsız-əskiksiz) dolduran bir alt çoxluq varmı? DP ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və W, ikinci sətirdə N çəki.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 100\n2 3 7 8", out:"YOX"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluq varmı? Hər əşya üçün BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[c] = dp[c] || dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    cout << (dp[w] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Boş çəki siyahısı ilə tutum 0-ı doldurmaq (0/1 çanta DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni DƏQİQ (artıqsız-əskiksiz) dolduran bir alt çoxluq varmı? DP ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və W, ikinci sətirdə N çəki.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"0 0", out:"VAR"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluq varmı? Hər əşya üçün BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[c] = dp[c] || dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    cout << (dp[w] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "5, 10, 12, 13, 15 çəkiləri ilə tutum 30-u doldurmaq mümkündürmü (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni DƏQİQ (artıqsız-əskiksiz) dolduran bir alt çoxluq varmı? DP ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və W, ikinci sətirdə N çəki.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"5 30\n5 10 12 13 15", out:"VAR"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluq varmı? Hər əşya üçün BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[c] = dp[c] || dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    cout << (dp[w] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 2, 3 çəkiləri ilə tutum 7-ni doldurmaq mümkündürmü (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni DƏQİQ (artıqsız-əskiksiz) dolduran bir alt çoxluq varmı? DP ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N (0 ≤ N ≤ 1000) və W, ikinci sətirdə N çəki.",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 7\n1 2 3", out:"YOX"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluq varmı? Hər əşya üçün BÖYÜKDƏN KİÇİYƏ yenilənir: <b>dp[c] = dp[c] || dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    cout << (dp[w] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "1, 2, 3 çəkiləri ilə tutum 3-ü dolduran alt çoxluq sayı (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çanta tutumu W-ni DƏQİQ dolduran NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (0/1 — hər əşya bir dəfə).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu dəqiq dolduran alt çoxluqların sayı.",
+    example: {in:"3 3\n1 2 3", out:"2"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluqların sayı. Hər əşya üçün BÖYÜKDƏN KİÇİYƏ: <b>dp[c] += dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 çəkiləri ilə tutum 2-ni dolduran alt çoxluq sayı (0/1 çanta DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çanta tutumu W-ni DƏQİQ dolduran NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (0/1 — hər əşya bir dəfə).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu dəqiq dolduran alt çoxluqların sayı.",
+    example: {in:"4 2\n1 1 1 1", out:"6"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluqların sayı. Hər əşya üçün BÖYÜKDƏN KİÇİYƏ: <b>dp[c] += dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "5 çəkisi ilə tutum 5-i dolduran alt çoxluq sayı (0/1 çanta DP, tək əşya)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çanta tutumu W-ni DƏQİQ dolduran NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (0/1 — hər əşya bir dəfə).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu dəqiq dolduran alt çoxluqların sayı.",
+    example: {in:"1 5\n5", out:"1"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluqların sayı. Hər əşya üçün BÖYÜKDƏN KİÇİYƏ: <b>dp[c] += dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "Boş çəki siyahısı ilə tutum 0-ı dolduran alt çoxluq sayı (0/1 çanta DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çanta tutumu W-ni DƏQİQ dolduran NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (0/1 — hər əşya bir dəfə).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu dəqiq dolduran alt çoxluqların sayı.",
+    example: {in:"0 0", out:"1"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluqların sayı. Hər əşya üçün BÖYÜKDƏN KİÇİYƏ: <b>dp[c] += dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "2, 4, 6, 8 çəkiləri ilə tutum 1-i dolduran alt çoxluq sayı (0/1 çanta DP, heç biri)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çanta tutumu W-ni DƏQİQ dolduran NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (0/1 — hər əşya bir dəfə).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu dəqiq dolduran alt çoxluqların sayı.",
+    example: {in:"4 1\n2 4 6 8", out:"0"},
+    approach: "<b>dp[c]</b> = çəkisi dəqiq c olan alt çoxluqların sayı. Hər əşya üçün BÖYÜKDƏN KİÇİYƏ: <b>dp[c] += dp[c-weight]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "\"abcde\" və \"ace\" sətirlərinin LCS uzunluğu (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt-ardıcıllığın uzunluğu.",
+    example: {in:"abcde\nace", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunun LCS uzunluğu. <b>s1[i-1]==s2[j-1]</b>-dirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, əks halda <b>dp[i][j]=max(dp[i-1][j], dp[i][j-1])</b> (hər iki sətirdən BİR simvolu \"nəzərə almamaq\" seçimi).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"abc\" sətirlərinin LCS uzunluğu (DP, eynidir)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt-ardıcıllığın uzunluğu.",
+    example: {in:"abc\nabc", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunun LCS uzunluğu. <b>s1[i-1]==s2[j-1]</b>-dirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, əks halda <b>dp[i][j]=max(dp[i-1][j], dp[i][j-1])</b> (hər iki sətirdən BİR simvolu \"nəzərə almamaq\" seçimi).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"def\" sətirlərinin LCS uzunluğu (DP, ortaq yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt-ardıcıllığın uzunluğu.",
+    example: {in:"abc\ndef", out:"0"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunun LCS uzunluğu. <b>s1[i-1]==s2[j-1]</b>-dirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, əks halda <b>dp[i][j]=max(dp[i-1][j], dp[i][j-1])</b> (hər iki sətirdən BİR simvolu \"nəzərə almamaq\" seçimi).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"a\" və \"a\" sətirlərinin LCS uzunluğu (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt-ardıcıllığın uzunluğu.",
+    example: {in:"a\na", out:"1"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunun LCS uzunluğu. <b>s1[i-1]==s2[j-1]</b>-dirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, əks halda <b>dp[i][j]=max(dp[i-1][j], dp[i][j-1])</b> (hər iki sətirdən BİR simvolu \"nəzərə almamaq\" seçimi).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"azercell\" və \"excel\" sətirlərinin LCS uzunluğu (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt-ardıcıllığın uzunluğu.",
+    example: {in:"azercell\nexcel", out:"4"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunun LCS uzunluğu. <b>s1[i-1]==s2[j-1]</b>-dirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, əks halda <b>dp[i][j]=max(dp[i-1][j], dp[i][j-1])</b> (hər iki sətirdən BİR simvolu \"nəzərə almamaq\" seçimi).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"abcdxyz\" və \"xyzabcd\" sətirlərinin ən uzun ortaq alt sətri (DP)",
+    difficulty: "mid",
+    tags: ["dp", "substring"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT SƏTRİNİN (ARDICIL simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt sətrin uzunluğu.",
+    example: {in:"abcdxyz\nxyzabcd", out:"4"},
+    approach: "<b>dp[i][j]</b> = S1[i-1] və S2[j-1]-lə BİTƏN ortaq alt sətrin uzunluğu. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, ƏKS HALDA <b>dp[i][j]=0</b> (LCS-dən fərqli olaraq, ardıcıllıq QIRILMAMALIDIR).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) { dp[i][j] = dp[i-1][j-1] + 1; best = max(best, dp[i][j]); }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"abc\" sətirlərinin ən uzun ortaq alt sətri (DP, eynidir)",
+    difficulty: "mid",
+    tags: ["dp", "substring"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT SƏTRİNİN (ARDICIL simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt sətrin uzunluğu.",
+    example: {in:"abc\nabc", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1[i-1] və S2[j-1]-lə BİTƏN ortaq alt sətrin uzunluğu. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, ƏKS HALDA <b>dp[i][j]=0</b> (LCS-dən fərqli olaraq, ardıcıllıq QIRILMAMALIDIR).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) { dp[i][j] = dp[i-1][j-1] + 1; best = max(best, dp[i][j]); }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"def\" sətirlərinin ən uzun ortaq alt sətri (DP, ortaq yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "substring"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT SƏTRİNİN (ARDICIL simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt sətrin uzunluğu.",
+    example: {in:"abc\ndef", out:"0"},
+    approach: "<b>dp[i][j]</b> = S1[i-1] və S2[j-1]-lə BİTƏN ortaq alt sətrin uzunluğu. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, ƏKS HALDA <b>dp[i][j]=0</b> (LCS-dən fərqli olaraq, ardıcıllıq QIRILMAMALIDIR).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) { dp[i][j] = dp[i-1][j-1] + 1; best = max(best, dp[i][j]); }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"a\" və \"a\" sətirlərinin ən uzun ortaq alt sətri (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "substring"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT SƏTRİNİN (ARDICIL simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt sətrin uzunluğu.",
+    example: {in:"a\na", out:"1"},
+    approach: "<b>dp[i][j]</b> = S1[i-1] və S2[j-1]-lə BİTƏN ortaq alt sətrin uzunluğu. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, ƏKS HALDA <b>dp[i][j]=0</b> (LCS-dən fərqli olaraq, ardıcıllıq QIRILMAMALIDIR).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) { dp[i][j] = dp[i-1][j-1] + 1; best = max(best, dp[i][j]); }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"azercell\" və \"excel\" sətirlərinin ən uzun ortaq alt sətri (DP)",
+    difficulty: "mid",
+    tags: ["dp", "substring"],
+    statement: "İki sətir verilib. Onların ən uzun ORTAQ ALT SƏTRİNİN (ARDICIL simvollardan ibarət) uzunluğunu DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən uzun ortaq alt sətrin uzunluğu.",
+    example: {in:"azercell\nexcel", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1[i-1] və S2[j-1]-lə BİTƏN ortaq alt sətrin uzunluğu. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]+1</b>, ƏKS HALDA <b>dp[i][j]=0</b> (LCS-dən fərqli olaraq, ardıcıllıq QIRILMAMALIDIR).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) { dp[i][j] = dp[i-1][j-1] + 1; best = max(best, dp[i][j]); }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"horse\" sətrini \"ros\" sətrinə çevirmək üçün min əməliyyat (edit distance, DP)",
+    difficulty: "mid",
+    tags: ["dp", "edit distance"],
+    statement: "İki sətir verilib. Birincini İKİNCİYƏ çevirmək üçün lazım olan MİNİMUM əməliyyat sayını (əlavə, silmə, əvəzetmə — hər biri 1 xərc) DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum redaktə məsafəsi.",
+    example: {in:"horse\nros", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunu bərabərləşdirmək üçün minimum əməliyyat. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]</b>, əks halda <b>dp[i][j]=1+min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> (silmə, əlavə, əvəzetmə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        }
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"intention\" sətrini \"execution\" sətrinə çevirmək üçün min əməliyyat (edit distance, DP)",
+    difficulty: "mid",
+    tags: ["dp", "edit distance"],
+    statement: "İki sətir verilib. Birincini İKİNCİYƏ çevirmək üçün lazım olan MİNİMUM əməliyyat sayını (əlavə, silmə, əvəzetmə — hər biri 1 xərc) DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum redaktə məsafəsi.",
+    example: {in:"intention\nexecution", out:"5"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunu bərabərləşdirmək üçün minimum əməliyyat. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]</b>, əks halda <b>dp[i][j]=1+min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> (silmə, əlavə, əvəzetmə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        }
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"abc\" sətrini \"abc\" sətrinə çevirmək üçün min əməliyyat (edit distance, DP, eynidir)",
+    difficulty: "mid",
+    tags: ["dp", "edit distance"],
+    statement: "İki sətir verilib. Birincini İKİNCİYƏ çevirmək üçün lazım olan MİNİMUM əməliyyat sayını (əlavə, silmə, əvəzetmə — hər biri 1 xərc) DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum redaktə məsafəsi.",
+    example: {in:"abc\nabc", out:"0"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunu bərabərləşdirmək üçün minimum əməliyyat. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]</b>, əks halda <b>dp[i][j]=1+min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> (silmə, əlavə, əvəzetmə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        }
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"kitten\" sətrini \"sitting\" sətrinə çevirmək üçün min əməliyyat (edit distance, DP)",
+    difficulty: "mid",
+    tags: ["dp", "edit distance"],
+    statement: "İki sətir verilib. Birincini İKİNCİYƏ çevirmək üçün lazım olan MİNİMUM əməliyyat sayını (əlavə, silmə, əvəzetmə — hər biri 1 xərc) DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum redaktə məsafəsi.",
+    example: {in:"kitten\nsitting", out:"3"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunu bərabərləşdirmək üçün minimum əməliyyat. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]</b>, əks halda <b>dp[i][j]=1+min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> (silmə, əlavə, əvəzetmə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        }
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "\"azercell\" sətrini \"excel\" sətrinə çevirmək üçün min əməliyyat (edit distance, DP)",
+    difficulty: "mid",
+    tags: ["dp", "edit distance"],
+    statement: "İki sətir verilib. Birincini İKİNCİYƏ çevirmək üçün lazım olan MİNİMUM əməliyyat sayını (əlavə, silmə, əvəzetmə — hər biri 1 xərc) DP ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum redaktə məsafəsi.",
+    example: {in:"azercell\nexcel", out:"4"},
+    approach: "<b>dp[i][j]</b> = S1-in ilk i, S2-nin ilk j simvolunu bərabərləşdirmək üçün minimum əməliyyat. Simvollar bərabərdirsə <b>dp[i][j]=dp[i-1][j-1]</b>, əks halda <b>dp[i][j]=1+min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> (silmə, əlavə, əvəzetmə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 0; i <= n; i++) dp[i][0] = i;
+    for (int j = 0; j <= m; j++) dp[0][j] = j;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (a[i-1] == b[j-1]) dp[i][j] = dp[i-1][j-1];
+            else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        }
+    cout << dp[n][m] << "\\n";
+}`},
+  {
+    title: "4x5 matrisdə ən böyük \"1\" kvadratının tərəfi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "matris"],
+    statement: "0/1-lərdən ibarət M×N matris verilib. Yalnız \"1\"-lərdən ibarət ƏN BÖYÜK KVADRAT alt-matrisin TƏRƏF UZUNLUĞUNU DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0 və ya 1, boşluqsuz).",
+    output: "Ən böyük \"1\" kvadratının tərəf uzunluğu.",
+    example: {in:"4 5\n10100\n10111\n11111\n10010", out:"2"},
+    approach: "<b>dp[i][j]</b> = (i,j)-də sağ-aşağı küncü olan ən böyük \"1\" kvadratının tərəfi. matris[i][j]==\"1\"-dirsə <b>dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> — kvadrat YALNIZ hər üç qonşu istiqamətdə də eyni ölçüdə \"1\" varsa böyüyə bilər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    int best = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') {
+                if (i == 0 || j == 0) dp[i][j] = 1;
+                else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                best = max(best, dp[i][j]);
+            }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "2x2 matrisdə ən böyük \"1\" kvadratının tərəfi (DP, hamısı 1)",
+    difficulty: "mid",
+    tags: ["dp", "matris"],
+    statement: "0/1-lərdən ibarət M×N matris verilib. Yalnız \"1\"-lərdən ibarət ƏN BÖYÜK KVADRAT alt-matrisin TƏRƏF UZUNLUĞUNU DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0 və ya 1, boşluqsuz).",
+    output: "Ən böyük \"1\" kvadratının tərəf uzunluğu.",
+    example: {in:"2 2\n11\n11", out:"2"},
+    approach: "<b>dp[i][j]</b> = (i,j)-də sağ-aşağı küncü olan ən böyük \"1\" kvadratının tərəfi. matris[i][j]==\"1\"-dirsə <b>dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> — kvadrat YALNIZ hər üç qonşu istiqamətdə də eyni ölçüdə \"1\" varsa böyüyə bilər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    int best = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') {
+                if (i == 0 || j == 0) dp[i][j] = 1;
+                else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                best = max(best, dp[i][j]);
+            }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "2x2 matrisdə ən böyük \"1\" kvadratının tərəfi (DP, heç biri 1 deyil)",
+    difficulty: "mid",
+    tags: ["dp", "matris"],
+    statement: "0/1-lərdən ibarət M×N matris verilib. Yalnız \"1\"-lərdən ibarət ƏN BÖYÜK KVADRAT alt-matrisin TƏRƏF UZUNLUĞUNU DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0 və ya 1, boşluqsuz).",
+    output: "Ən böyük \"1\" kvadratının tərəf uzunluğu.",
+    example: {in:"2 2\n00\n00", out:"0"},
+    approach: "<b>dp[i][j]</b> = (i,j)-də sağ-aşağı küncü olan ən böyük \"1\" kvadratının tərəfi. matris[i][j]==\"1\"-dirsə <b>dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> — kvadrat YALNIZ hər üç qonşu istiqamətdə də eyni ölçüdə \"1\" varsa böyüyə bilər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    int best = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') {
+                if (i == 0 || j == 0) dp[i][j] = 1;
+                else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                best = max(best, dp[i][j]);
+            }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "1x1 matrisdə ən böyük \"1\" kvadratının tərəfi (DP, tək xana)",
+    difficulty: "mid",
+    tags: ["dp", "matris"],
+    statement: "0/1-lərdən ibarət M×N matris verilib. Yalnız \"1\"-lərdən ibarət ƏN BÖYÜK KVADRAT alt-matrisin TƏRƏF UZUNLUĞUNU DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0 və ya 1, boşluqsuz).",
+    output: "Ən böyük \"1\" kvadratının tərəf uzunluğu.",
+    example: {in:"1 1\n1", out:"1"},
+    approach: "<b>dp[i][j]</b> = (i,j)-də sağ-aşağı küncü olan ən böyük \"1\" kvadratının tərəfi. matris[i][j]==\"1\"-dirsə <b>dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> — kvadrat YALNIZ hər üç qonşu istiqamətdə də eyni ölçüdə \"1\" varsa böyüyə bilər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    int best = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') {
+                if (i == 0 || j == 0) dp[i][j] = 1;
+                else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                best = max(best, dp[i][j]);
+            }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "3x3 matrisdə ən böyük \"1\" kvadratının tərəfi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "matris"],
+    statement: "0/1-lərdən ibarət M×N matris verilib. Yalnız \"1\"-lərdən ibarət ƏN BÖYÜK KVADRAT alt-matrisin TƏRƏF UZUNLUĞUNU DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0 və ya 1, boşluqsuz).",
+    output: "Ən böyük \"1\" kvadratının tərəf uzunluğu.",
+    example: {in:"3 3\n111\n111\n111", out:"3"},
+    approach: "<b>dp[i][j]</b> = (i,j)-də sağ-aşağı küncü olan ən böyük \"1\" kvadratının tərəfi. matris[i][j]==\"1\"-dirsə <b>dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])</b> — kvadrat YALNIZ hər üç qonşu istiqamətdə də eyni ölçüdə \"1\" varsa böyüyə bilər.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<int>> dp(m, vector<int>(n, 0));
+    int best = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') {
+                if (i == 0 || j == 0) dp[i][j] = 1;
+                else dp[i][j] = 1 + min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                best = max(best, dp[i][j]);
+            }
+        }
+    cout << best << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (ortada maneə) maneəsiz yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən sağ-aşağı küncə yalnız sağa/aşağı hərəkətlə MANEƏLƏRDƏN QAÇARAQ getməyin NEÇƏ yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0/1, boşluqsuz).",
+    output: "Maneəsiz yolların sayı.",
+    example: {in:"3 3\n000\n010\n000", out:"2"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə maneəsiz çatmağın yol sayı. Xana MANEƏDİRSƏ <b>dp[i][j]=0</b> (oradan keçmək olmaz); əks halda adi grid-yol DP-si: <b>dp[i][j]=dp[i-1][j]+dp[i][j-1]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') { dp[i][j] = 0; continue; }
+            if (i == 0 && j == 0) dp[i][j] = 1;
+            else {
+                long long up = (i > 0) ? dp[i-1][j] : 0;
+                long long left = (j > 0) ? dp[i][j-1] : 0;
+                dp[i][j] = up + left;
+            }
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "2x2 grid-də (maneəsiz) yol sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən sağ-aşağı küncə yalnız sağa/aşağı hərəkətlə MANEƏLƏRDƏN QAÇARAQ getməyin NEÇƏ yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0/1, boşluqsuz).",
+    output: "Maneəsiz yolların sayı.",
+    example: {in:"2 2\n00\n00", out:"2"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə maneəsiz çatmağın yol sayı. Xana MANEƏDİRSƏ <b>dp[i][j]=0</b> (oradan keçmək olmaz); əks halda adi grid-yol DP-si: <b>dp[i][j]=dp[i-1][j]+dp[i][j-1]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') { dp[i][j] = 0; continue; }
+            if (i == 0 && j == 0) dp[i][j] = 1;
+            else {
+                long long up = (i > 0) ? dp[i-1][j] : 0;
+                long long left = (j > 0) ? dp[i][j-1] : 0;
+                dp[i][j] = up + left;
+            }
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "1x1 grid-də yol sayı (DP, tək xana)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən sağ-aşağı küncə yalnız sağa/aşağı hərəkətlə MANEƏLƏRDƏN QAÇARAQ getməyin NEÇƏ yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0/1, boşluqsuz).",
+    output: "Maneəsiz yolların sayı.",
+    example: {in:"1 1\n0", out:"1"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə maneəsiz çatmağın yol sayı. Xana MANEƏDİRSƏ <b>dp[i][j]=0</b> (oradan keçmək olmaz); əks halda adi grid-yol DP-si: <b>dp[i][j]=dp[i-1][j]+dp[i][j-1]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') { dp[i][j] = 0; continue; }
+            if (i == 0 && j == 0) dp[i][j] = 1;
+            else {
+                long long up = (i > 0) ? dp[i-1][j] : 0;
+                long long left = (j > 0) ? dp[i][j-1] : 0;
+                dp[i][j] = up + left;
+            }
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "1x3 grid-də (başlanğıc maneəli) yol sayı (DP, 0 yol)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən sağ-aşağı küncə yalnız sağa/aşağı hərəkətlə MANEƏLƏRDƏN QAÇARAQ getməyin NEÇƏ yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0/1, boşluqsuz).",
+    output: "Maneəsiz yolların sayı.",
+    example: {in:"1 3\n010", out:"0"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə maneəsiz çatmağın yol sayı. Xana MANEƏDİRSƏ <b>dp[i][j]=0</b> (oradan keçmək olmaz); əks halda adi grid-yol DP-si: <b>dp[i][j]=dp[i-1][j]+dp[i][j-1]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') { dp[i][j] = 0; continue; }
+            if (i == 0 && j == 0) dp[i][j] = 1;
+            else {
+                long long up = (i > 0) ? dp[i-1][j] : 0;
+                long long left = (j > 0) ? dp[i][j-1] : 0;
+                dp[i][j] = up + left;
+            }
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "3x1 grid-də (maneəsiz) yol sayı (DP, tək sütun)",
+    difficulty: "easy",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib (0 — boş, 1 — maneə). Sol-yuxarı küncdən sağ-aşağı küncə yalnız sağa/aşağı hərəkətlə MANEƏLƏRDƏN QAÇARAQ getməyin NEÇƏ yolu olduğunu DP ilə tapın.",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N rəqəm (0/1, boşluqsuz).",
+    output: "Maneəsiz yolların sayı.",
+    example: {in:"3 1\n0\n0\n0", out:"1"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə maneəsiz çatmağın yol sayı. Xana MANEƏDİRSƏ <b>dp[i][j]=0</b> (oradan keçmək olmaz); əks halda adi grid-yol DP-si: <b>dp[i][j]=dp[i-1][j]+dp[i][j-1]</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<string> g(m);
+    for (int i = 0; i < m; i++) cin >> g[i];
+    vector<vector<long long>> dp(m, vector<long long>(n, 0));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == '1') { dp[i][j] = 0; continue; }
+            if (i == 0 && j == 0) dp[i][j] = 1;
+            else {
+                long long up = (i > 0) ? dp[i-1][j] : 0;
+                long long left = (j > 0) ? dp[i][j-1] : 0;
+                dp[i][j] = up + left;
+            }
+        }
+    cout << dp[m-1][n-1] << "\\n";
+}`},
+  {
+    title: "\"bbbab\" sözünün ən uzun palindromik alt-ardıcıllığı (LCS-dən istifadə, DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt-ardıcıllığın uzunluğu.",
+    example: {in:"bbbab", out:"4"},
+    approach: "Sətrin ən uzun palindromik alt-ardıcıllığı, sətirlə ONUN TƏRSİ arasındakı LCS-ə BƏRABƏRDİR — çünki hər ortaq alt-ardıcıllıq eyni zamanda simmetrikdir (palindromdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    string r = s; reverse(r.begin(), r.end());
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            dp[i][j] = (s[i-1] == r[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"cbbd\" sözünün ən uzun palindromik alt-ardıcıllığı (LCS-dən istifadə, DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt-ardıcıllığın uzunluğu.",
+    example: {in:"cbbd", out:"2"},
+    approach: "Sətrin ən uzun palindromik alt-ardıcıllığı, sətirlə ONUN TƏRSİ arasındakı LCS-ə BƏRABƏRDİR — çünki hər ortaq alt-ardıcıllıq eyni zamanda simmetrikdir (palindromdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    string r = s; reverse(r.begin(), r.end());
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            dp[i][j] = (s[i-1] == r[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"a\" sözünün ən uzun palindromik alt-ardıcıllığı (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "LCS", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt-ardıcıllığın uzunluğu.",
+    example: {in:"a", out:"1"},
+    approach: "Sətrin ən uzun palindromik alt-ardıcıllığı, sətirlə ONUN TƏRSİ arasındakı LCS-ə BƏRABƏRDİR — çünki hər ortaq alt-ardıcıllıq eyni zamanda simmetrikdir (palindromdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    string r = s; reverse(r.begin(), r.end());
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            dp[i][j] = (s[i-1] == r[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"abcde\" sözünün ən uzun palindromik alt-ardıcıllığı (DP, təkrar yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "LCS", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt-ardıcıllığın uzunluğu.",
+    example: {in:"abcde", out:"1"},
+    approach: "Sətrin ən uzun palindromik alt-ardıcıllığı, sətirlə ONUN TƏRSİ arasındakı LCS-ə BƏRABƏRDİR — çünki hər ortaq alt-ardıcıllıq eyni zamanda simmetrikdir (palindromdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    string r = s; reverse(r.begin(), r.end());
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            dp[i][j] = (s[i-1] == r[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"azercell\" sözünün ən uzun palindromik alt-ardıcıllığı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS", "palindrome"],
+    statement: "Bir sətir verilib. Onun ən uzun PALİNDROMİK ALT-ARDICILLIĞININ (sıra qorunur, ardıcıl olmaya bilər) uzunluğunu DP ilə tapın.",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun palindromik alt-ardıcıllığın uzunluğu.",
+    example: {in:"azercell", out:"3"},
+    approach: "Sətrin ən uzun palindromik alt-ardıcıllığı, sətirlə ONUN TƏRSİ arasındakı LCS-ə BƏRABƏRDİR — çünki hər ortaq alt-ardıcıllıq eyni zamanda simmetrikdir (palindromdur).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    string r = s; reverse(r.begin(), r.end());
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            dp[i][j] = (s[i-1] == r[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"sea\" və \"eat\" sətirlərini silmə ilə bərabərləşdirmənin min sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. YALNIZ SİLMƏ əməliyyatı ilə onları BƏRABƏR etmək üçün lazım olan MİNİMUM silmə sayını DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum silmə sayı.",
+    example: {in:"sea\neat", out:"2"},
+    approach: "İki sətri YALNIZ silməklə bərabərləşdirmək üçün onların ORTAQ OLMAYAN hissələri silinməlidir — bu, <b>|S1| + |S2| - 2×LCS(S1,S2)</b> düsturu ilə hesablanır (LCS hissəsi hər iki tərəfdə saxlanılır, qalanı silinir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - 2 * dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"leetcode\" və \"etco\" sətirlərini silmə ilə bərabərləşdirmənin min sayı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. YALNIZ SİLMƏ əməliyyatı ilə onları BƏRABƏR etmək üçün lazım olan MİNİMUM silmə sayını DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum silmə sayı.",
+    example: {in:"leetcode\netco", out:"4"},
+    approach: "İki sətri YALNIZ silməklə bərabərləşdirmək üçün onların ORTAQ OLMAYAN hissələri silinməlidir — bu, <b>|S1| + |S2| - 2×LCS(S1,S2)</b> düsturu ilə hesablanır (LCS hissəsi hər iki tərəfdə saxlanılır, qalanı silinir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - 2 * dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"abc\" sətirlərini silmə ilə bərabərləşdirmənin min sayı (DP, eynidir)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. YALNIZ SİLMƏ əməliyyatı ilə onları BƏRABƏR etmək üçün lazım olan MİNİMUM silmə sayını DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum silmə sayı.",
+    example: {in:"abc\nabc", out:"0"},
+    approach: "İki sətri YALNIZ silməklə bərabərləşdirmək üçün onların ORTAQ OLMAYAN hissələri silinməlidir — bu, <b>|S1| + |S2| - 2×LCS(S1,S2)</b> düsturu ilə hesablanır (LCS hissəsi hər iki tərəfdə saxlanılır, qalanı silinir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - 2 * dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"def\" sətirlərini silmə ilə bərabərləşdirmənin min sayı (DP, ortaq yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. YALNIZ SİLMƏ əməliyyatı ilə onları BƏRABƏR etmək üçün lazım olan MİNİMUM silmə sayını DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum silmə sayı.",
+    example: {in:"abc\ndef", out:"6"},
+    approach: "İki sətri YALNIZ silməklə bərabərləşdirmək üçün onların ORTAQ OLMAYAN hissələri silinməlidir — bu, <b>|S1| + |S2| - 2×LCS(S1,S2)</b> düsturu ilə hesablanır (LCS hissəsi hər iki tərəfdə saxlanılır, qalanı silinir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - 2 * dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"a\" və \"a\" sətirlərini silmə ilə bərabərləşdirmənin min sayı (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. YALNIZ SİLMƏ əməliyyatı ilə onları BƏRABƏR etmək üçün lazım olan MİNİMUM silmə sayını DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Minimum silmə sayı.",
+    example: {in:"a\na", out:"0"},
+    approach: "İki sətri YALNIZ silməklə bərabərləşdirmək üçün onların ORTAQ OLMAYAN hissələri silinməlidir — bu, <b>|S1| + |S2| - 2×LCS(S1,S2)</b> düsturu ilə hesablanır (LCS hissəsi hər iki tərəfdə saxlanılır, qalanı silinir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - 2 * dp[n][m]) << "\\n";
+}`},
+  {
+    title: "(1,1),(3,4),(4,5),(5,7) əşyaları, tutum 7, dəqiq 2 əşya — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri, çanta tutumu W və DƏQİQ K ədəd əşya seçmə şərti verilib. Tutum daxilində DƏQİQ K əşya seçərək maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N, W və K, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum dəyər (mümkün deyilsə -1).",
+    example: {in:"4 7 2\n1 1\n3 4\n4 5\n5 7", out:"9"},
+    approach: "<b>dp[c][k]</b> = tutum c-yə, DƏQİQ k əşya ilə əldə olunan maksimum dəyər — DP-yə ƏLAVƏ bir ölçü (seçilən əşya sayı) əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w, k; cin >> n >> w >> k;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<vector<long long>> dp(w + 1, vector<long long>(k + 1, LLONG_MIN / 2));
+    dp[0][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            for (int kk = k; kk >= 1; kk--)
+                dp[c][kk] = max(dp[c][kk], dp[c - wt[i]][kk - 1] + val[i]);
+    cout << (dp[w][k] < 0 ? -1 : dp[w][k]) << "\\n";
+}`},
+  {
+    title: "(1,10) əşyası, tutum 5, dəqiq 1 əşya — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri, çanta tutumu W və DƏQİQ K ədəd əşya seçmə şərti verilib. Tutum daxilində DƏQİQ K əşya seçərək maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N, W və K, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum dəyər (mümkün deyilsə -1).",
+    example: {in:"1 5 1\n1 10", out:"-1"},
+    approach: "<b>dp[c][k]</b> = tutum c-yə, DƏQİQ k əşya ilə əldə olunan maksimum dəyər — DP-yə ƏLAVƏ bir ölçü (seçilən əşya sayı) əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w, k; cin >> n >> w >> k;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<vector<long long>> dp(w + 1, vector<long long>(k + 1, LLONG_MIN / 2));
+    dp[0][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            for (int kk = k; kk >= 1; kk--)
+                dp[c][kk] = max(dp[c][kk], dp[c - wt[i]][kk - 1] + val[i]);
+    cout << (dp[w][k] < 0 ? -1 : dp[w][k]) << "\\n";
+}`},
+  {
+    title: "(1,10) əşyası, tutum 5, dəqiq 2 əşya — maksimum dəyər (DP, mümkün deyil)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri, çanta tutumu W və DƏQİQ K ədəd əşya seçmə şərti verilib. Tutum daxilində DƏQİQ K əşya seçərək maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N, W və K, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum dəyər (mümkün deyilsə -1).",
+    example: {in:"1 5 2\n1 10", out:"-1"},
+    approach: "<b>dp[c][k]</b> = tutum c-yə, DƏQİQ k əşya ilə əldə olunan maksimum dəyər — DP-yə ƏLAVƏ bir ölçü (seçilən əşya sayı) əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w, k; cin >> n >> w >> k;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<vector<long long>> dp(w + 1, vector<long long>(k + 1, LLONG_MIN / 2));
+    dp[0][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            for (int kk = k; kk >= 1; kk--)
+                dp[c][kk] = max(dp[c][kk], dp[c - wt[i]][kk - 1] + val[i]);
+    cout << (dp[w][k] < 0 ? -1 : dp[w][k]) << "\\n";
+}`},
+  {
+    title: "Tutum 0, dəqiq 0 əşya — maksimum dəyər (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri, çanta tutumu W və DƏQİQ K ədəd əşya seçmə şərti verilib. Tutum daxilində DƏQİQ K əşya seçərək maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N, W və K, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum dəyər (mümkün deyilsə -1).",
+    example: {in:"2 0 0\n1 5\n2 10", out:"0"},
+    approach: "<b>dp[c][k]</b> = tutum c-yə, DƏQİQ k əşya ilə əldə olunan maksimum dəyər — DP-yə ƏLAVƏ bir ölçü (seçilən əşya sayı) əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w, k; cin >> n >> w >> k;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<vector<long long>> dp(w + 1, vector<long long>(k + 1, LLONG_MIN / 2));
+    dp[0][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            for (int kk = k; kk >= 1; kk--)
+                dp[c][kk] = max(dp[c][kk], dp[c - wt[i]][kk - 1] + val[i]);
+    cout << (dp[w][k] < 0 ? -1 : dp[w][k]) << "\\n";
+}`},
+  {
+    title: "(2,3),(3,4),(4,5) əşyaları, tutum 10, dəqiq 2 əşya — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri, çanta tutumu W və DƏQİQ K ədəd əşya seçmə şərti verilib. Tutum daxilində DƏQİQ K əşya seçərək maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N, W və K, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum dəyər (mümkün deyilsə -1).",
+    example: {in:"3 10 2\n2 3\n3 4\n4 5", out:"-1"},
+    approach: "<b>dp[c][k]</b> = tutum c-yə, DƏQİQ k əşya ilə əldə olunan maksimum dəyər — DP-yə ƏLAVƏ bir ölçü (seçilən əşya sayı) əlavə olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w, k; cin >> n >> w >> k;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<vector<long long>> dp(w + 1, vector<long long>(k + 1, LLONG_MIN / 2));
+    dp[0][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int c = w; c >= wt[i]; c--)
+            for (int kk = k; kk >= 1; kk--)
+                dp[c][kk] = max(dp[c][kk], dp[c - wt[i]][kk - 1] + val[i]);
+    cout << (dp[w][k] < 0 ? -1 : dp[w][k]) << "\\n";
+}`},
+  {
+    title: "1, 6, 11, 5 massivini iki hissəyə bölərək minimum fərq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ alt çoxluğa bölün (hər element bir yerdə) ki, bu iki alt çoxluğun CƏMLƏRİ ARASINDAKI FƏRQ MİNİMUM olsun. Bu minimum fərqi DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N qeyri-mənfi tam ədəd (≤ 100).",
+    output: "Minimum mümkün fərq.",
+    example: {in:"4\n1 6 11 5", out:"1"},
+    approach: "Əvvəlcə ÜMUMİ CƏM (total) hesablanır. Sonra DP (subset-sum) ilə, 0-dan total/2-yə qədər HANSI CƏMLƏRİN alt çoxluqla əldə edilə biləcəyi müəyyənləşdirilir; ƏN YAXIN olan cəm S seçilir, cavab <b>total - 2×S</b>-dir (S bir yarı, total-S digər yarı).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    vector<bool> dp(total + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = total; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    int best = total;
+    for (int s = 0; s <= total / 2; s++)
+        if (dp[s]) best = min(best, total - 2 * s);
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 2, 3, 9 massivini iki hissəyə bölərək minimum fərq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ alt çoxluğa bölün (hər element bir yerdə) ki, bu iki alt çoxluğun CƏMLƏRİ ARASINDAKI FƏRQ MİNİMUM olsun. Bu minimum fərqi DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N qeyri-mənfi tam ədəd (≤ 100).",
+    output: "Minimum mümkün fərq.",
+    example: {in:"4\n1 2 3 9", out:"3"},
+    approach: "Əvvəlcə ÜMUMİ CƏM (total) hesablanır. Sonra DP (subset-sum) ilə, 0-dan total/2-yə qədər HANSI CƏMLƏRİN alt çoxluqla əldə edilə biləcəyi müəyyənləşdirilir; ƏN YAXIN olan cəm S seçilir, cavab <b>total - 2×S</b>-dir (S bir yarı, total-S digər yarı).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    vector<bool> dp(total + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = total; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    int best = total;
+    for (int s = 0; s <= total / 2; s++)
+        if (dp[s]) best = min(best, total - 2 * s);
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 1, 1, 1 massivini iki hissəyə bölərək minimum fərq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ alt çoxluğa bölün (hər element bir yerdə) ki, bu iki alt çoxluğun CƏMLƏRİ ARASINDAKI FƏRQ MİNİMUM olsun. Bu minimum fərqi DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N qeyri-mənfi tam ədəd (≤ 100).",
+    output: "Minimum mümkün fərq.",
+    example: {in:"4\n1 1 1 1", out:"0"},
+    approach: "Əvvəlcə ÜMUMİ CƏM (total) hesablanır. Sonra DP (subset-sum) ilə, 0-dan total/2-yə qədər HANSI CƏMLƏRİN alt çoxluqla əldə edilə biləcəyi müəyyənləşdirilir; ƏN YAXIN olan cəm S seçilir, cavab <b>total - 2×S</b>-dir (S bir yarı, total-S digər yarı).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    vector<bool> dp(total + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = total; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    int best = total;
+    for (int s = 0; s <= total / 2; s++)
+        if (dp[s]) best = min(best, total - 2 * s);
+    cout << best << "\\n";
+}`},
+  {
+    title: "5 massivini iki hissəyə bölərək minimum fərq (DP, tək element)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ alt çoxluğa bölün (hər element bir yerdə) ki, bu iki alt çoxluğun CƏMLƏRİ ARASINDAKI FƏRQ MİNİMUM olsun. Bu minimum fərqi DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N qeyri-mənfi tam ədəd (≤ 100).",
+    output: "Minimum mümkün fərq.",
+    example: {in:"1\n5", out:"5"},
+    approach: "Əvvəlcə ÜMUMİ CƏM (total) hesablanır. Sonra DP (subset-sum) ilə, 0-dan total/2-yə qədər HANSI CƏMLƏRİN alt çoxluqla əldə edilə biləcəyi müəyyənləşdirilir; ƏN YAXIN olan cəm S seçilir, cavab <b>total - 2×S</b>-dir (S bir yarı, total-S digər yarı).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    vector<bool> dp(total + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = total; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    int best = total;
+    for (int s = 0; s <= total / 2; s++)
+        if (dp[s]) best = min(best, total - 2 * s);
+    cout << best << "\\n";
+}`},
+  {
+    title: "3, 3 massivini iki hissəyə bölərək minimum fərq (DP)",
+    difficulty: "mid",
+    tags: ["dp", "partition"],
+    statement: "N ədəd verilib. Massivi İKİ alt çoxluğa bölün (hər element bir yerdə) ki, bu iki alt çoxluğun CƏMLƏRİ ARASINDAKI FƏRQ MİNİMUM olsun. Bu minimum fərqi DP ilə tapın.",
+    input: "Birinci sətirdə N (1 ≤ N ≤ 100), ikinci sətirdə N qeyri-mənfi tam ədəd (≤ 100).",
+    output: "Minimum mümkün fərq.",
+    example: {in:"2\n3 3", out:"0"},
+    approach: "Əvvəlcə ÜMUMİ CƏM (total) hesablanır. Sonra DP (subset-sum) ilə, 0-dan total/2-yə qədər HANSI CƏMLƏRİN alt çoxluqla əldə edilə biləcəyi müəyyənləşdirilir; ƏN YAXIN olan cəm S seçilir, cavab <b>total - 2×S</b>-dir (S bir yarı, total-S digər yarı).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n; cin >> n;
+    vector<int> a(n);
+    int total = 0;
+    for (int i = 0; i < n; i++) { cin >> a[i]; total += a[i]; }
+    vector<bool> dp(total + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int s = total; s >= x; s--)
+            if (dp[s-x]) dp[s] = true;
+    int best = total;
+    for (int s = 0; s <= total / 2; s++)
+        if (dp[s]) best = min(best, total - 2 * s);
+    cout << best << "\\n";
+}`},
+  {
+    title: "\"aabebcdd\" sözünün ən uzun təkrarlanan alt-ardıcıllığı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "Bir sətir verilib. Özü ilə ÖZÜNÜN (fərqli indekslərdən) ən uzun TƏKRARLANAN ALT-ARDICILLIĞININ uzunluğunu DP ilə tapın (eyni indeksdən ikinci dəfə istifadə OLUNMUR).",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun təkrarlanan alt-ardıcıllığın uzunluğu.",
+    example: {in:"aabebcdd", out:"3"},
+    approach: "Sətrin özü ilə ÖZÜNÜN LCS-i hesablanır, AMMA <b>i == j</b> (eyni indeks) olan uyğunluq QƏBUL EDİLMİR — <b>dp[i][j] = (s[i-1]==s[j-1] && i!=j) ? dp[i-1][j-1]+1 : max(dp[i-1][j], dp[i][j-1])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (s[i-1] == s[j-1] && i != j) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"abc\" sözünün ən uzun təkrarlanan alt-ardıcıllığı (DP, təkrar yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "Bir sətir verilib. Özü ilə ÖZÜNÜN (fərqli indekslərdən) ən uzun TƏKRARLANAN ALT-ARDICILLIĞININ uzunluğunu DP ilə tapın (eyni indeksdən ikinci dəfə istifadə OLUNMUR).",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun təkrarlanan alt-ardıcıllığın uzunluğu.",
+    example: {in:"abc", out:"0"},
+    approach: "Sətrin özü ilə ÖZÜNÜN LCS-i hesablanır, AMMA <b>i == j</b> (eyni indeks) olan uyğunluq QƏBUL EDİLMİR — <b>dp[i][j] = (s[i-1]==s[j-1] && i!=j) ? dp[i-1][j-1]+1 : max(dp[i-1][j], dp[i][j-1])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (s[i-1] == s[j-1] && i != j) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"aaaa\" sözünün ən uzun təkrarlanan alt-ardıcıllığı (DP, hamısı eyni)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "Bir sətir verilib. Özü ilə ÖZÜNÜN (fərqli indekslərdən) ən uzun TƏKRARLANAN ALT-ARDICILLIĞININ uzunluğunu DP ilə tapın (eyni indeksdən ikinci dəfə istifadə OLUNMUR).",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun təkrarlanan alt-ardıcıllığın uzunluğu.",
+    example: {in:"aaaa", out:"3"},
+    approach: "Sətrin özü ilə ÖZÜNÜN LCS-i hesablanır, AMMA <b>i == j</b> (eyni indeks) olan uyğunluq QƏBUL EDİLMİR — <b>dp[i][j] = (s[i-1]==s[j-1] && i!=j) ? dp[i-1][j-1]+1 : max(dp[i-1][j], dp[i][j-1])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (s[i-1] == s[j-1] && i != j) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"a\" sözünün ən uzun təkrarlanan alt-ardıcıllığı (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "Bir sətir verilib. Özü ilə ÖZÜNÜN (fərqli indekslərdən) ən uzun TƏKRARLANAN ALT-ARDICILLIĞININ uzunluğunu DP ilə tapın (eyni indeksdən ikinci dəfə istifadə OLUNMUR).",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun təkrarlanan alt-ardıcıllığın uzunluğu.",
+    example: {in:"a", out:"0"},
+    approach: "Sətrin özü ilə ÖZÜNÜN LCS-i hesablanır, AMMA <b>i == j</b> (eyni indeks) olan uyğunluq QƏBUL EDİLMİR — <b>dp[i][j] = (s[i-1]==s[j-1] && i!=j) ? dp[i-1][j-1]+1 : max(dp[i-1][j], dp[i][j-1])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (s[i-1] == s[j-1] && i != j) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "\"azercellcup\" sözünün ən uzun təkrarlanan alt-ardıcıllığı (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "Bir sətir verilib. Özü ilə ÖZÜNÜN (fərqli indekslərdən) ən uzun TƏKRARLANAN ALT-ARDICILLIĞININ uzunluğunu DP ilə tapın (eyni indeksdən ikinci dəfə istifadə OLUNMUR).",
+    input: "Bir sətir S (1 ≤ |S| ≤ 200).",
+    output: "Ən uzun təkrarlanan alt-ardıcıllığın uzunluğu.",
+    example: {in:"azercellcup", out:"2"},
+    approach: "Sətrin özü ilə ÖZÜNÜN LCS-i hesablanır, AMMA <b>i == j</b> (eyni indeks) olan uyğunluq QƏBUL EDİLMİR — <b>dp[i][j] = (s[i-1]==s[j-1] && i!=j) ? dp[i-1][j-1]+1 : max(dp[i-1][j], dp[i][j-1])</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string s; cin >> s;
+    int n = s.size();
+    vector<vector<int>> dp(n+1, vector<int>(n+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (s[i-1] == s[j-1] && i != j) dp[i][j] = dp[i-1][j-1] + 1;
+            else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+        }
+    cout << dp[n][n] << "\\n";
+}`},
+  {
+    title: "(1,1),(3,4),(4,5),(5,7) əşya növləri, tutum 8, sinirsiz çanta — maksimum dəyər (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib. Çanta tutumu W-dir, HƏR ƏŞYA NÖVÜNÜ İSTƏNİLƏN SAYDA dəfə götürmək olar (sinirsiz/unbounded çanta). Maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"4 8\n1 1\n3 4\n4 5\n5 7", out:"11"},
+    approach: "0/1 çantadan fərqli olaraq, hər tutum üçün çəkilər KİÇİKDƏN BÖYÜYƏ yenilənir: <b>dp[c] = max(dp[c], dp[c-weight]+value)</b> — bu sıra EYNİ əşyanın BİR NEÇƏ DƏFƏ istifadə olunmasına (sinirsiz) icazə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int c = 1; c <= w; c++)
+        for (int i = 0; i < n; i++)
+            if (wt[i] <= c) dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(2,3) əşya növü, tutum 7, sinirsiz çanta — maksimum dəyər (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib. Çanta tutumu W-dir, HƏR ƏŞYA NÖVÜNÜ İSTƏNİLƏN SAYDA dəfə götürmək olar (sinirsiz/unbounded çanta). Maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 7\n2 3", out:"9"},
+    approach: "0/1 çantadan fərqli olaraq, hər tutum üçün çəkilər KİÇİKDƏN BÖYÜYƏ yenilənir: <b>dp[c] = max(dp[c], dp[c-weight]+value)</b> — bu sıra EYNİ əşyanın BİR NEÇƏ DƏFƏ istifadə olunmasına (sinirsiz) icazə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int c = 1; c <= w; c++)
+        for (int i = 0; i < n; i++)
+            if (wt[i] <= c) dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(5,10) əşya növü, tutum 3, sinirsiz çanta — maksimum dəyər (DP, sığmır)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib. Çanta tutumu W-dir, HƏR ƏŞYA NÖVÜNÜ İSTƏNİLƏN SAYDA dəfə götürmək olar (sinirsiz/unbounded çanta). Maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 3\n5 10", out:"0"},
+    approach: "0/1 çantadan fərqli olaraq, hər tutum üçün çəkilər KİÇİKDƏN BÖYÜYƏ yenilənir: <b>dp[c] = max(dp[c], dp[c-weight]+value)</b> — bu sıra EYNİ əşyanın BİR NEÇƏ DƏFƏ istifadə olunmasına (sinirsiz) icazə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int c = 1; c <= w; c++)
+        for (int i = 0; i < n; i++)
+            if (wt[i] <= c) dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "Tutum 0, sinirsiz çanta — maksimum dəyər (DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib. Çanta tutumu W-dir, HƏR ƏŞYA NÖVÜNÜ İSTƏNİLƏN SAYDA dəfə götürmək olar (sinirsiz/unbounded çanta). Maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 0\n1 5", out:"0"},
+    approach: "0/1 çantadan fərqli olaraq, hər tutum üçün çəkilər KİÇİKDƏN BÖYÜYƏ yenilənir: <b>dp[c] = max(dp[c], dp[c-weight]+value)</b> — bu sıra EYNİ əşyanın BİR NEÇƏ DƏFƏ istifadə olunmasına (sinirsiz) icazə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int c = 1; c <= w; c++)
+        for (int i = 0; i < n; i++)
+            if (wt[i] <= c) dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(1,2) əşya növü, tutum 5, sinirsiz çanta — maksimum dəyər (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib. Çanta tutumu W-dir, HƏR ƏŞYA NÖVÜNÜ İSTƏNİLƏN SAYDA dəfə götürmək olar (sinirsiz/unbounded çanta). Maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 5\n1 2", out:"10"},
+    approach: "0/1 çantadan fərqli olaraq, hər tutum üçün çəkilər KİÇİKDƏN BÖYÜYƏ yenilənir: <b>dp[c] = max(dp[c], dp[c-weight]+value)</b> — bu sıra EYNİ əşyanın BİR NEÇƏ DƏFƏ istifadə olunmasına (sinirsiz) icazə verir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int c = 1; c <= w; c++)
+        for (int i = 0; i < n; i++)
+            if (wt[i] <= c) dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(1,1),(3,4),(4,5),(5,7) əşyaları, ən azı 10 dəyər — minimum çəki (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri verilib. ƏN AZI T dəyər toplamaq üçün lazım olan MİNİMUM ümumi çəkini DP ilə tapın (0/1 çanta, hər əşya bir dəfə). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Minimum çəki, ya da -1.",
+    example: {in:"4 10\n1 1\n3 4\n4 5\n5 7", out:"8"},
+    approach: "Bu, 0/1 çantanın \"TƏRS\" versiyasıdır: DP ölçüsü DƏYƏR üzərindən qurulur: <b>dp[v]</b> = dəyər v-ni əldə etmək üçün minimum çəki. <b>dp[v] = min(dp[v], dp[v-value]+weight)</b>; cavab <b>dp[T], dp[T+1], ...</b> arasında ən kiçiyidir (T-dən ARTIQ dəyər də qəbul edilir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> wt(n), val(n);
+    int maxV = 0;
+    for (int i = 0; i < n; i++) { cin >> wt[i] >> val[i]; maxV += val[i]; }
+    vector<long long> dp(maxV + 1, LLONG_MAX / 2);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int v = maxV; v >= val[i]; v--)
+            dp[v] = min(dp[v], dp[v - val[i]] + wt[i]);
+    long long best = LLONG_MAX / 2;
+    for (int v = t; v <= maxV; v++) best = min(best, dp[v]);
+    cout << (best >= LLONG_MAX / 2 ? -1 : best) << "\\n";
+}`},
+  {
+    title: "(10,5) əşyası, ən azı 100 dəyər — minimum çəki (DP, mümkün deyil)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri verilib. ƏN AZI T dəyər toplamaq üçün lazım olan MİNİMUM ümumi çəkini DP ilə tapın (0/1 çanta, hər əşya bir dəfə). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Minimum çəki, ya da -1.",
+    example: {in:"1 100\n10 5", out:"-1"},
+    approach: "Bu, 0/1 çantanın \"TƏRS\" versiyasıdır: DP ölçüsü DƏYƏR üzərindən qurulur: <b>dp[v]</b> = dəyər v-ni əldə etmək üçün minimum çəki. <b>dp[v] = min(dp[v], dp[v-value]+weight)</b>; cavab <b>dp[T], dp[T+1], ...</b> arasında ən kiçiyidir (T-dən ARTIQ dəyər də qəbul edilir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> wt(n), val(n);
+    int maxV = 0;
+    for (int i = 0; i < n; i++) { cin >> wt[i] >> val[i]; maxV += val[i]; }
+    vector<long long> dp(maxV + 1, LLONG_MAX / 2);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int v = maxV; v >= val[i]; v--)
+            dp[v] = min(dp[v], dp[v - val[i]] + wt[i]);
+    long long best = LLONG_MAX / 2;
+    for (int v = t; v <= maxV; v++) best = min(best, dp[v]);
+    cout << (best >= LLONG_MAX / 2 ? -1 : best) << "\\n";
+}`},
+  {
+    title: "(1,10) əşyası, ən azı 10 dəyər — minimum çəki (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri verilib. ƏN AZI T dəyər toplamaq üçün lazım olan MİNİMUM ümumi çəkini DP ilə tapın (0/1 çanta, hər əşya bir dəfə). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Minimum çəki, ya da -1.",
+    example: {in:"1 10\n1 10", out:"1"},
+    approach: "Bu, 0/1 çantanın \"TƏRS\" versiyasıdır: DP ölçüsü DƏYƏR üzərindən qurulur: <b>dp[v]</b> = dəyər v-ni əldə etmək üçün minimum çəki. <b>dp[v] = min(dp[v], dp[v-value]+weight)</b>; cavab <b>dp[T], dp[T+1], ...</b> arasında ən kiçiyidir (T-dən ARTIQ dəyər də qəbul edilir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> wt(n), val(n);
+    int maxV = 0;
+    for (int i = 0; i < n; i++) { cin >> wt[i] >> val[i]; maxV += val[i]; }
+    vector<long long> dp(maxV + 1, LLONG_MAX / 2);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int v = maxV; v >= val[i]; v--)
+            dp[v] = min(dp[v], dp[v - val[i]] + wt[i]);
+    long long best = LLONG_MAX / 2;
+    for (int v = t; v <= maxV; v++) best = min(best, dp[v]);
+    cout << (best >= LLONG_MAX / 2 ? -1 : best) << "\\n";
+}`},
+  {
+    title: "Ən azı 0 dəyər — minimum çəki (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri verilib. ƏN AZI T dəyər toplamaq üçün lazım olan MİNİMUM ümumi çəkini DP ilə tapın (0/1 çanta, hər əşya bir dəfə). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Minimum çəki, ya da -1.",
+    example: {in:"1 0\n5 5", out:"0"},
+    approach: "Bu, 0/1 çantanın \"TƏRS\" versiyasıdır: DP ölçüsü DƏYƏR üzərindən qurulur: <b>dp[v]</b> = dəyər v-ni əldə etmək üçün minimum çəki. <b>dp[v] = min(dp[v], dp[v-value]+weight)</b>; cavab <b>dp[T], dp[T+1], ...</b> arasında ən kiçiyidir (T-dən ARTIQ dəyər də qəbul edilir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> wt(n), val(n);
+    int maxV = 0;
+    for (int i = 0; i < n; i++) { cin >> wt[i] >> val[i]; maxV += val[i]; }
+    vector<long long> dp(maxV + 1, LLONG_MAX / 2);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int v = maxV; v >= val[i]; v--)
+            dp[v] = min(dp[v], dp[v - val[i]] + wt[i]);
+    long long best = LLONG_MAX / 2;
+    for (int v = t; v <= maxV; v++) best = min(best, dp[v]);
+    cout << (best >= LLONG_MAX / 2 ? -1 : best) << "\\n";
+}`},
+  {
+    title: "(2,3),(3,4),(4,5) əşyaları, ən azı 7 dəyər — minimum çəki (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi və dəyəri verilib. ƏN AZI T dəyər toplamaq üçün lazım olan MİNİMUM ümumi çəkini DP ilə tapın (0/1 çanta, hər əşya bir dəfə). Mümkün deyilsə -1 çap edin.",
+    input: "Birinci sətirdə N və T, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Minimum çəki, ya da -1.",
+    example: {in:"3 7\n2 3\n3 4\n4 5", out:"5"},
+    approach: "Bu, 0/1 çantanın \"TƏRS\" versiyasıdır: DP ölçüsü DƏYƏR üzərindən qurulur: <b>dp[v]</b> = dəyər v-ni əldə etmək üçün minimum çəki. <b>dp[v] = min(dp[v], dp[v-value]+weight)</b>; cavab <b>dp[T], dp[T+1], ...</b> arasında ən kiçiyidir (T-dən ARTIQ dəyər də qəbul edilir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, t; cin >> n >> t;
+    vector<int> wt(n), val(n);
+    int maxV = 0;
+    for (int i = 0; i < n; i++) { cin >> wt[i] >> val[i]; maxV += val[i]; }
+    vector<long long> dp(maxV + 1, LLONG_MAX / 2);
+    dp[0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int v = maxV; v >= val[i]; v--)
+            dp[v] = min(dp[v], dp[v - val[i]] + wt[i]);
+    long long best = LLONG_MAX / 2;
+    for (int v = t; v <= maxV; v++) best = min(best, dp[v]);
+    cout << (best >= LLONG_MAX / 2 ? -1 : best) << "\\n";
+}`},
+  {
+    title: "\"abac\" və \"cab\" sətirlərinin ən qısa ortaq super-ardıcıllıq uzunluğu (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. HƏR İKİSİNİ ALT-ARDICILLIQ KİMİ İÇİNDƏ saxlayan ƏN QISA sətrin UZUNLUĞUNU (shortest common supersequence) DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən qısa ortaq super-ardıcıllığın uzunluğu.",
+    example: {in:"abac\ncab", out:"5"},
+    approach: "Ən qısa ortaq super-ardıcıllıq ORTAQ hissəni (LCS) BİR DƏFƏ, qalan fərqli hissələri isə TAM saxlamalıdır — düstur: <b>|S1| + |S2| - LCS(S1,S2)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"geek\" və \"eke\" sətirlərinin ən qısa ortaq super-ardıcıllıq uzunluğu (DP)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. HƏR İKİSİNİ ALT-ARDICILLIQ KİMİ İÇİNDƏ saxlayan ƏN QISA sətrin UZUNLUĞUNU (shortest common supersequence) DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən qısa ortaq super-ardıcıllığın uzunluğu.",
+    example: {in:"geek\neke", out:"5"},
+    approach: "Ən qısa ortaq super-ardıcıllıq ORTAQ hissəni (LCS) BİR DƏFƏ, qalan fərqli hissələri isə TAM saxlamalıdır — düstur: <b>|S1| + |S2| - LCS(S1,S2)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"abc\" sətirlərinin ən qısa ortaq super-ardıcıllıq uzunluğu (DP, eynidir)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. HƏR İKİSİNİ ALT-ARDICILLIQ KİMİ İÇİNDƏ saxlayan ƏN QISA sətrin UZUNLUĞUNU (shortest common supersequence) DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən qısa ortaq super-ardıcıllığın uzunluğu.",
+    example: {in:"abc\nabc", out:"3"},
+    approach: "Ən qısa ortaq super-ardıcıllıq ORTAQ hissəni (LCS) BİR DƏFƏ, qalan fərqli hissələri isə TAM saxlamalıdır — düstur: <b>|S1| + |S2| - LCS(S1,S2)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"abc\" və \"def\" sətirlərinin ən qısa ortaq super-ardıcıllıq uzunluğu (DP, ortaq yoxdur)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. HƏR İKİSİNİ ALT-ARDICILLIQ KİMİ İÇİNDƏ saxlayan ƏN QISA sətrin UZUNLUĞUNU (shortest common supersequence) DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən qısa ortaq super-ardıcıllığın uzunluğu.",
+    example: {in:"abc\ndef", out:"6"},
+    approach: "Ən qısa ortaq super-ardıcıllıq ORTAQ hissəni (LCS) BİR DƏFƏ, qalan fərqli hissələri isə TAM saxlamalıdır — düstur: <b>|S1| + |S2| - LCS(S1,S2)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - dp[n][m]) << "\\n";
+}`},
+  {
+    title: "\"a\" və \"a\" sətirlərinin ən qısa ortaq super-ardıcıllıq uzunluğu (DP, tək hərf)",
+    difficulty: "mid",
+    tags: ["dp", "LCS"],
+    statement: "İki sətir verilib. HƏR İKİSİNİ ALT-ARDICILLIQ KİMİ İÇİNDƏ saxlayan ƏN QISA sətrin UZUNLUĞUNU (shortest common supersequence) DP (LCS) ilə tapın.",
+    input: "Birinci sətirdə S1, ikinci sətirdə S2.",
+    output: "Ən qısa ortaq super-ardıcıllığın uzunluğu.",
+    example: {in:"a\na", out:"1"},
+    approach: "Ən qısa ortaq super-ardıcıllıq ORTAQ hissəni (LCS) BİR DƏFƏ, qalan fərqli hissələri isə TAM saxlamalıdır — düstur: <b>|S1| + |S2| - LCS(S1,S2)</b>.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    string a, b; cin >> a >> b;
+    int n = a.size(), m = b.size();
+    vector<vector<int>> dp(n+1, vector<int>(m+1, 0));
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            dp[i][j] = (a[i-1] == b[j-1]) ? dp[i-1][j-1] + 1 : max(dp[i-1][j], dp[i][j-1]);
+    cout << (n + m - dp[n][m]) << "\\n";
+}`},
+  {
+    title: "(2,3) əşya növü, tutum 5, hər növdən ən çox 2 — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib, HƏR NÖVÜ ƏN ÇOX 2 DƏFƏ götürmək olar. Çanta tutumu W daxilində maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 5\n2 3", out:"6"},
+    approach: "Hər əşya növü SANKİ İKİ AYRI 0/1 əşya kimi (eyni çəki/dəyərlə) işlənir — hər \"nüsxə\" üçün BÖYÜKDƏN KİÇİYƏ 0/1 çanta yeniləməsi tətbiq olunur ki, hər növ ƏN ÇOX 2 dəfə seçilsin.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int copy = 0; copy < 2; copy++)
+            for (int c = w; c >= wt[i]; c--)
+                dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(3,4) əşya növü, tutum 10, hər növdən ən çox 2 — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib, HƏR NÖVÜ ƏN ÇOX 2 DƏFƏ götürmək olar. Çanta tutumu W daxilində maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 10\n3 4", out:"8"},
+    approach: "Hər əşya növü SANKİ İKİ AYRI 0/1 əşya kimi (eyni çəki/dəyərlə) işlənir — hər \"nüsxə\" üçün BÖYÜKDƏN KİÇİYƏ 0/1 çanta yeniləməsi tətbiq olunur ki, hər növ ƏN ÇOX 2 dəfə seçilsin.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int copy = 0; copy < 2; copy++)
+            for (int c = w; c >= wt[i]; c--)
+                dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(5,10) əşya növü, tutum 3, hər növdən ən çox 2 — maksimum dəyər (DP, sığmır)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib, HƏR NÖVÜ ƏN ÇOX 2 DƏFƏ götürmək olar. Çanta tutumu W daxilində maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 3\n5 10", out:"0"},
+    approach: "Hər əşya növü SANKİ İKİ AYRI 0/1 əşya kimi (eyni çəki/dəyərlə) işlənir — hər \"nüsxə\" üçün BÖYÜKDƏN KİÇİYƏ 0/1 çanta yeniləməsi tətbiq olunur ki, hər növ ƏN ÇOX 2 dəfə seçilsin.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int copy = 0; copy < 2; copy++)
+            for (int c = w; c >= wt[i]; c--)
+                dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "Tutum 0, hər növdən ən çox 2 — maksimum dəyər (DP, baza hal)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib, HƏR NÖVÜ ƏN ÇOX 2 DƏFƏ götürmək olar. Çanta tutumu W daxilində maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"1 0\n1 5", out:"0"},
+    approach: "Hər əşya növü SANKİ İKİ AYRI 0/1 əşya kimi (eyni çəki/dəyərlə) işlənir — hər \"nüsxə\" üçün BÖYÜKDƏN KİÇİYƏ 0/1 çanta yeniləməsi tətbiq olunur ki, hər növ ƏN ÇOX 2 dəfə seçilsin.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int copy = 0; copy < 2; copy++)
+            for (int c = w; c >= wt[i]; c--)
+                dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "(1,2),(2,3) əşya növləri, tutum 4, hər növdən ən çox 2 — maksimum dəyər (DP)",
+    difficulty: "mid",
+    tags: ["dp", "çanta"],
+    statement: "N əşya növünün çəkisi və dəyəri verilib, HƏR NÖVÜ ƏN ÇOX 2 DƏFƏ götürmək olar. Çanta tutumu W daxilində maksimum dəyəri DP ilə tapın.",
+    input: "Birinci sətirdə N və W, növbəti N sətirdə \"çəki dəyər\".",
+    output: "Maksimum əldə edilə bilən dəyər.",
+    example: {in:"2 4\n1 2\n2 3", out:"7"},
+    approach: "Hər əşya növü SANKİ İKİ AYRI 0/1 əşya kimi (eyni çəki/dəyərlə) işlənir — hər \"nüsxə\" üçün BÖYÜKDƏN KİÇİYƏ 0/1 çanta yeniləməsi tətbiq olunur ki, hər növ ƏN ÇOX 2 dəfə seçilsin.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> wt(n), val(n);
+    for (int i = 0; i < n; i++) cin >> wt[i] >> val[i];
+    vector<long long> dp(w + 1, 0);
+    for (int i = 0; i < n; i++)
+        for (int copy = 0; copy < 2; copy++)
+            for (int c = w; c >= wt[i]; c--)
+                dp[c] = max(dp[c], dp[c - wt[i]] + val[i]);
+    cout << dp[w] << "\\n";
+}`},
+  {
+    title: "3x3 grid-də (ortada maneə) maksimum yol cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib, hər xananın dəyəri var (maneəli xananın dəyəri -1 kimi işarələnib və KEÇİLƏ BİLMƏZ). Sol-yuxarıdan sağ-aşağıya yalnız sağa/aşağı gedərək toplana bilən MAKSİMUM dəyər cəmini DP ilə tapın (maneədən yol yoxdursa -1 çap edin).",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər (maneə -1 ilə işarələnib, keçilə bilən xanaların dəyəri ≥ 0).",
+    output: "Maksimum yol cəmi, ya da -1.",
+    example: {in:"3 3\n1 2 3\n4 -1 6\n7 8 9", out:"29"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaqla toplana bilən maksimum dəyər, YALNIZ maneə olmayan xanalardan keçərək. Maneəli xana üçün <b>dp[i][j]</b> \"əlçatmaz\" (-∞) kimi işarələnir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+const long long NEG = LLONG_MIN / 2;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<int>> g(m, vector<int>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n, NEG));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == -1) continue;
+            if (i == 0 && j == 0) { dp[i][j] = g[i][j]; continue; }
+            long long best = NEG;
+            if (i > 0 && dp[i-1][j] > NEG) best = max(best, dp[i-1][j]);
+            if (j > 0 && dp[i][j-1] > NEG) best = max(best, dp[i][j-1]);
+            if (best > NEG) dp[i][j] = best + g[i][j];
+        }
+    cout << (dp[m-1][n-1] <= NEG ? -1 : dp[m-1][n-1]) << "\\n";
+}`},
+  {
+    title: "2x2 grid-də (maneəsiz) maksimum yol cəmi (DP)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib, hər xananın dəyəri var (maneəli xananın dəyəri -1 kimi işarələnib və KEÇİLƏ BİLMƏZ). Sol-yuxarıdan sağ-aşağıya yalnız sağa/aşağı gedərək toplana bilən MAKSİMUM dəyər cəmini DP ilə tapın (maneədən yol yoxdursa -1 çap edin).",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər (maneə -1 ilə işarələnib, keçilə bilən xanaların dəyəri ≥ 0).",
+    output: "Maksimum yol cəmi, ya da -1.",
+    example: {in:"2 2\n1 2\n3 4", out:"8"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaqla toplana bilən maksimum dəyər, YALNIZ maneə olmayan xanalardan keçərək. Maneəli xana üçün <b>dp[i][j]</b> \"əlçatmaz\" (-∞) kimi işarələnir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+const long long NEG = LLONG_MIN / 2;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<int>> g(m, vector<int>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n, NEG));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == -1) continue;
+            if (i == 0 && j == 0) { dp[i][j] = g[i][j]; continue; }
+            long long best = NEG;
+            if (i > 0 && dp[i-1][j] > NEG) best = max(best, dp[i-1][j]);
+            if (j > 0 && dp[i][j-1] > NEG) best = max(best, dp[i][j-1]);
+            if (best > NEG) dp[i][j] = best + g[i][j];
+        }
+    cout << (dp[m-1][n-1] <= NEG ? -1 : dp[m-1][n-1]) << "\\n";
+}`},
+  {
+    title: "1x1 grid-də maksimum yol cəmi (DP, tək xana)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib, hər xananın dəyəri var (maneəli xananın dəyəri -1 kimi işarələnib və KEÇİLƏ BİLMƏZ). Sol-yuxarıdan sağ-aşağıya yalnız sağa/aşağı gedərək toplana bilən MAKSİMUM dəyər cəmini DP ilə tapın (maneədən yol yoxdursa -1 çap edin).",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər (maneə -1 ilə işarələnib, keçilə bilən xanaların dəyəri ≥ 0).",
+    output: "Maksimum yol cəmi, ya da -1.",
+    example: {in:"1 1\n5", out:"5"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaqla toplana bilən maksimum dəyər, YALNIZ maneə olmayan xanalardan keçərək. Maneəli xana üçün <b>dp[i][j]</b> \"əlçatmaz\" (-∞) kimi işarələnir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+const long long NEG = LLONG_MIN / 2;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<int>> g(m, vector<int>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n, NEG));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == -1) continue;
+            if (i == 0 && j == 0) { dp[i][j] = g[i][j]; continue; }
+            long long best = NEG;
+            if (i > 0 && dp[i-1][j] > NEG) best = max(best, dp[i-1][j]);
+            if (j > 0 && dp[i][j-1] > NEG) best = max(best, dp[i][j-1]);
+            if (best > NEG) dp[i][j] = best + g[i][j];
+        }
+    cout << (dp[m-1][n-1] <= NEG ? -1 : dp[m-1][n-1]) << "\\n";
+}`},
+  {
+    title: "1x3 grid-də (başlanğıc maneəli) maksimum yol cəmi (DP, -1)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib, hər xananın dəyəri var (maneəli xananın dəyəri -1 kimi işarələnib və KEÇİLƏ BİLMƏZ). Sol-yuxarıdan sağ-aşağıya yalnız sağa/aşağı gedərək toplana bilən MAKSİMUM dəyər cəmini DP ilə tapın (maneədən yol yoxdursa -1 çap edin).",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər (maneə -1 ilə işarələnib, keçilə bilən xanaların dəyəri ≥ 0).",
+    output: "Maksimum yol cəmi, ya da -1.",
+    example: {in:"1 3\n-1 2 3", out:"-1"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaqla toplana bilən maksimum dəyər, YALNIZ maneə olmayan xanalardan keçərək. Maneəli xana üçün <b>dp[i][j]</b> \"əlçatmaz\" (-∞) kimi işarələnir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+const long long NEG = LLONG_MIN / 2;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<int>> g(m, vector<int>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n, NEG));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == -1) continue;
+            if (i == 0 && j == 0) { dp[i][j] = g[i][j]; continue; }
+            long long best = NEG;
+            if (i > 0 && dp[i-1][j] > NEG) best = max(best, dp[i-1][j]);
+            if (j > 0 && dp[i][j-1] > NEG) best = max(best, dp[i][j-1]);
+            if (best > NEG) dp[i][j] = best + g[i][j];
+        }
+    cout << (dp[m-1][n-1] <= NEG ? -1 : dp[m-1][n-1]) << "\\n";
+}`},
+  {
+    title: "2x2 grid-də (son xana maneəli) maksimum yol cəmi (DP, -1)",
+    difficulty: "mid",
+    tags: ["dp", "grid"],
+    statement: "M×N grid verilib, hər xananın dəyəri var (maneəli xananın dəyəri -1 kimi işarələnib və KEÇİLƏ BİLMƏZ). Sol-yuxarıdan sağ-aşağıya yalnız sağa/aşağı gedərək toplana bilən MAKSİMUM dəyər cəmini DP ilə tapın (maneədən yol yoxdursa -1 çap edin).",
+    input: "Birinci sətirdə M və N, növbəti M sətirdə hər birində N dəyər (maneə -1 ilə işarələnib, keçilə bilən xanaların dəyəri ≥ 0).",
+    output: "Maksimum yol cəmi, ya da -1.",
+    example: {in:"2 2\n1 2\n3 -1", out:"-1"},
+    approach: "<b>dp[i][j]</b> = (i,j)-ə çatmaqla toplana bilən maksimum dəyər, YALNIZ maneə olmayan xanalardan keçərək. Maneəli xana üçün <b>dp[i][j]</b> \"əlçatmaz\" (-∞) kimi işarələnir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+const long long NEG = LLONG_MIN / 2;
+int main(){
+    int m, n; cin >> m >> n;
+    vector<vector<int>> g(m, vector<int>(n));
+    for (int i = 0; i < m; i++) for (int j = 0; j < n; j++) cin >> g[i][j];
+    vector<vector<long long>> dp(m, vector<long long>(n, NEG));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++) {
+            if (g[i][j] == -1) continue;
+            if (i == 0 && j == 0) { dp[i][j] = g[i][j]; continue; }
+            long long best = NEG;
+            if (i > 0 && dp[i-1][j] > NEG) best = max(best, dp[i-1][j]);
+            if (j > 0 && dp[i][j-1] > NEG) best = max(best, dp[i][j-1]);
+            if (best > NEG) dp[i][j] = best + g[i][j];
+        }
+    cout << (dp[m-1][n-1] <= NEG ? -1 : dp[m-1][n-1]) << "\\n";
+}`},
+  {
+    title: "1, 3, 4, 5 çəkiləri ilə tutum 7-ni aşmayan maksimum cəm (0/1 çanta DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni AŞMADAN əldə edilə bilən MAKSİMUM MÜMKÜN çəki cəmini DP ilə tapın (0/1 çanta).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu aşmayan maksimum mümkün cəm.",
+    example: {in:"4 7\n1 3 4 5", out:"7"},
+    approach: "<b>dp[c]</b> = cəmi c olan alt çoxluq mümkündürmü? DP cədvəli qurulduqdan sonra, 0-dan W-ya qədər ƏN BÖYÜK \"mümkün\" (<b>dp[c]==true</b>) olan c cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    int best = 0;
+    for (int c = 0; c <= w; c++) if (dp[c]) best = c;
+    cout << best << "\\n";
+}`},
+  {
+    title: "10, 20 çəkiləri ilə tutum 5-i aşmayan maksimum cəm (0/1 çanta DP, heç biri sığmır)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni AŞMADAN əldə edilə bilən MAKSİMUM MÜMKÜN çəki cəmini DP ilə tapın (0/1 çanta).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu aşmayan maksimum mümkün cəm.",
+    example: {in:"2 5\n10 20", out:"0"},
+    approach: "<b>dp[c]</b> = cəmi c olan alt çoxluq mümkündürmü? DP cədvəli qurulduqdan sonra, 0-dan W-ya qədər ƏN BÖYÜK \"mümkün\" (<b>dp[c]==true</b>) olan c cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    int best = 0;
+    for (int c = 0; c <= w; c++) if (dp[c]) best = c;
+    cout << best << "\\n";
+}`},
+  {
+    title: "Boş çəki siyahısı ilə tutum 10-u aşmayan maksimum cəm (0/1 çanta DP, baza hal)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni AŞMADAN əldə edilə bilən MAKSİMUM MÜMKÜN çəki cəmini DP ilə tapın (0/1 çanta).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu aşmayan maksimum mümkün cəm.",
+    example: {in:"0 10", out:"0"},
+    approach: "<b>dp[c]</b> = cəmi c olan alt çoxluq mümkündürmü? DP cədvəli qurulduqdan sonra, 0-dan W-ya qədər ƏN BÖYÜK \"mümkün\" (<b>dp[c]==true</b>) olan c cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    int best = 0;
+    for (int c = 0; c <= w; c++) if (dp[c]) best = c;
+    cout << best << "\\n";
+}`},
+  {
+    title: "5 çəkisi ilə tutum 5-i aşmayan maksimum cəm (0/1 çanta DP, tək əşya)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni AŞMADAN əldə edilə bilən MAKSİMUM MÜMKÜN çəki cəmini DP ilə tapın (0/1 çanta).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu aşmayan maksimum mümkün cəm.",
+    example: {in:"1 5\n5", out:"5"},
+    approach: "<b>dp[c]</b> = cəmi c olan alt çoxluq mümkündürmü? DP cədvəli qurulduqdan sonra, 0-dan W-ya qədər ƏN BÖYÜK \"mümkün\" (<b>dp[c]==true</b>) olan c cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    int best = 0;
+    for (int c = 0; c <= w; c++) if (dp[c]) best = c;
+    cout << best << "\\n";
+}`},
+  {
+    title: "2, 3, 5, 7 çəkiləri ilə tutum 11-i aşmayan maksimum cəm (0/1 çanta DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib (dəyərsiz). Çanta tutumu W-ni AŞMADAN əldə edilə bilən MAKSİMUM MÜMKÜN çəki cəmini DP ilə tapın (0/1 çanta).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Tutumu aşmayan maksimum mümkün cəm.",
+    example: {in:"4 11\n2 3 5 7", out:"10"},
+    approach: "<b>dp[c]</b> = cəmi c olan alt çoxluq mümkündürmü? DP cədvəli qurulduqdan sonra, 0-dan W-ya qədər ƏN BÖYÜK \"mümkün\" (<b>dp[c]==true</b>) olan c cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<bool> dp(w + 1, false);
+    dp[0] = true;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            if (dp[c-x]) dp[c] = true;
+    int best = 0;
+    for (int c = 0; c <= w; c++) if (dp[c]) best = c;
+    cout << best << "\\n";
+}`},
+  {
+    title: "1, 2, 3 çəkiləri ilə cəmi 3-dən az-bərabər alt çoxluq sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çəkiləri cəmi tutum W-dən AZ-BƏRABƏR olan NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (boş çoxluq daxil).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Cəmi W-dən az-bərabər olan alt çoxluqların sayı.",
+    example: {in:"3 3\n1 2 3", out:"5"},
+    approach: "<b>dp[c]</b> = cəmi DƏQİQ c olan alt çoxluqların sayı (əvvəlki \"say_yollari\" konsepti ilə eyni DP). Son cavab <b>dp[0]+dp[1]+...+dp[W]</b> cəmidir — bütün mümkün cəmlər (0-dan W-ya qədər) toplanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    long long total = 0;
+    for (int c = 0; c <= w; c++) total += dp[c];
+    cout << total << "\\n";
+}`},
+  {
+    title: "1, 1 çəkiləri ilə cəmi 1-dən az-bərabər alt çoxluq sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çəkiləri cəmi tutum W-dən AZ-BƏRABƏR olan NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (boş çoxluq daxil).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Cəmi W-dən az-bərabər olan alt çoxluqların sayı.",
+    example: {in:"2 1\n1 1", out:"3"},
+    approach: "<b>dp[c]</b> = cəmi DƏQİQ c olan alt çoxluqların sayı (əvvəlki \"say_yollari\" konsepti ilə eyni DP). Son cavab <b>dp[0]+dp[1]+...+dp[W]</b> cəmidir — bütün mümkün cəmlər (0-dan W-ya qədər) toplanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    long long total = 0;
+    for (int c = 0; c <= w; c++) total += dp[c];
+    cout << total << "\\n";
+}`},
+  {
+    title: "Boş çəki siyahısı ilə cəmi 5-dən az-bərabər alt çoxluq sayı (DP, baza hal, yalnız boş çoxluq)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çəkiləri cəmi tutum W-dən AZ-BƏRABƏR olan NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (boş çoxluq daxil).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Cəmi W-dən az-bərabər olan alt çoxluqların sayı.",
+    example: {in:"0 5", out:"1"},
+    approach: "<b>dp[c]</b> = cəmi DƏQİQ c olan alt çoxluqların sayı (əvvəlki \"say_yollari\" konsepti ilə eyni DP). Son cavab <b>dp[0]+dp[1]+...+dp[W]</b> cəmidir — bütün mümkün cəmlər (0-dan W-ya qədər) toplanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    long long total = 0;
+    for (int c = 0; c <= w; c++) total += dp[c];
+    cout << total << "\\n";
+}`},
+  {
+    title: "5 çəkisi ilə cəmi 4-dən az-bərabər alt çoxluq sayı (DP, yalnız boş çoxluq)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çəkiləri cəmi tutum W-dən AZ-BƏRABƏR olan NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (boş çoxluq daxil).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Cəmi W-dən az-bərabər olan alt çoxluqların sayı.",
+    example: {in:"1 4\n5", out:"1"},
+    approach: "<b>dp[c]</b> = cəmi DƏQİQ c olan alt çoxluqların sayı (əvvəlki \"say_yollari\" konsepti ilə eyni DP). Son cavab <b>dp[0]+dp[1]+...+dp[W]</b> cəmidir — bütün mümkün cəmlər (0-dan W-ya qədər) toplanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    long long total = 0;
+    for (int c = 0; c <= w; c++) total += dp[c];
+    cout << total << "\\n";
+}`},
+  {
+    title: "2, 2, 2 çəkiləri ilə cəmi 4-dən az-bərabər alt çoxluq sayı (DP)",
+    difficulty: "easy",
+    tags: ["dp", "çanta"],
+    statement: "N əşyanın çəkisi verilib. Çəkiləri cəmi tutum W-dən AZ-BƏRABƏR olan NEÇƏ FƏRQLİ alt çoxluq olduğunu DP ilə tapın (boş çoxluq daxil).",
+    input: "Birinci sətirdə N və W, ikinci sətirdə N çəki.",
+    output: "Cəmi W-dən az-bərabər olan alt çoxluqların sayı.",
+    example: {in:"3 4\n2 2 2", out:"7"},
+    approach: "<b>dp[c]</b> = cəmi DƏQİQ c olan alt çoxluqların sayı (əvvəlki \"say_yollari\" konsepti ilə eyni DP). Son cavab <b>dp[0]+dp[1]+...+dp[W]</b> cəmidir — bütün mümkün cəmlər (0-dan W-ya qədər) toplanır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int n, w; cin >> n >> w;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    vector<long long> dp(w + 1, 0);
+    dp[0] = 1;
+    for (int x : a)
+        for (int c = w; c >= x; c--)
+            dp[c] += dp[c-x];
+    long long total = 0;
+    for (int c = 0; c <= w; c++) total += dp[c];
+    cout << total << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/001_canta_0_1_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/002_canta_0_1_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/003_canta_0_1_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/004_canta_0_1_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/005_canta_0_1_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/006_canta_tam_doldurma_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/007_canta_tam_doldurma_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/008_canta_tam_doldurma_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/009_canta_tam_doldurma_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/010_canta_tam_doldurma_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/011_canta_say_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/012_canta_say_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/013_canta_say_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/014_canta_say_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/015_canta_say_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/016_en_uzun_ortaq_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/017_en_uzun_ortaq_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/018_en_uzun_ortaq_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/019_en_uzun_ortaq_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/020_en_uzun_ortaq_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/021_en_uzun_ortaq_altsetir.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/022_en_uzun_ortaq_altsetir.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/023_en_uzun_ortaq_altsetir.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/024_en_uzun_ortaq_altsetir.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/025_en_uzun_ortaq_altsetir.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/026_edit_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/027_edit_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/028_edit_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/029_edit_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/030_edit_distance.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/031_maksimum_kvadrat_olcu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/032_maksimum_kvadrat_olcu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/033_maksimum_kvadrat_olcu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/034_maksimum_kvadrat_olcu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/035_maksimum_kvadrat_olcu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/036_meneeli_grid_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/037_meneeli_grid_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/038_meneeli_grid_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/039_meneeli_grid_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/040_meneeli_grid_yollari.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/041_en_uzun_palindromik_altardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/042_en_uzun_palindromik_altardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/043_en_uzun_palindromik_altardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/044_en_uzun_palindromik_altardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/045_en_uzun_palindromik_altardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/046_minimum_silme_ile_beraberlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/047_minimum_silme_ile_beraberlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/048_minimum_silme_ile_beraberlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/049_minimum_silme_ile_beraberlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/050_minimum_silme_ile_beraberlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/051_canta_k_esya_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/052_canta_k_esya_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/053_canta_k_esya_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/054_canta_k_esya_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/055_canta_k_esya_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/056_minimum_altcoxluq_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/057_minimum_altcoxluq_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/058_minimum_altcoxluq_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/059_minimum_altcoxluq_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/060_minimum_altcoxluq_ferqi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/061_en_uzun_tekrarlanan_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/062_en_uzun_tekrarlanan_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/063_en_uzun_tekrarlanan_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/064_en_uzun_tekrarlanan_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/065_en_uzun_tekrarlanan_alt_ardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/066_sinirsiz_canta_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/067_sinirsiz_canta_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/068_sinirsiz_canta_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/069_sinirsiz_canta_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/070_sinirsiz_canta_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/071_canta_minimum_agirliq_target_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/072_canta_minimum_agirliq_target_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/073_canta_minimum_agirliq_target_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/074_canta_minimum_agirliq_target_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/075_canta_minimum_agirliq_target_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/076_en_qisa_ortaq_superardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/077_en_qisa_ortaq_superardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/078_en_qisa_ortaq_superardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/079_en_qisa_ortaq_superardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/080_en_qisa_ortaq_superardicillik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/081_canta_bounded_2_defe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/082_canta_bounded_2_defe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/083_canta_bounded_2_defe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/084_canta_bounded_2_defe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/085_canta_bounded_2_defe.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/086_maneeli_grid_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/087_maneeli_grid_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/088_maneeli_grid_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/089_maneeli_grid_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/090_maneeli_grid_maksimum_deyer.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/091_canta_maksimum_mumkun_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/092_canta_maksimum_mumkun_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/093_canta_maksimum_mumkun_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/094_canta_maksimum_mumkun_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/095_canta_maksimum_mumkun_cemi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/096_canta_say_az_beraber.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/097_canta_say_az_beraber.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/098_canta_say_az_beraber.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/099_canta_say_az_beraber.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu13/100_canta_say_az_beraber.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week13/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

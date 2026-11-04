@@ -1,0 +1,4115 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mövzu 15 — Test: Qraf əsasları II (DFS, bağlantı komponentləri, dövr yoxlaması)</title>
+<style>
+  :root{
+    /* DARK MODE: sabit (daimi) tünd tema. */
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --bronze-text:      #E2A64D;
+    --green:            #4ADFB9;
+    --green-text:       #4ADFB9;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  body{
+    background-image: none;
+    background-attachment: fixed;
+  }
+  .wrap{ max-width:840px; margin:0 auto; padding:36px 20px 100px; }
+
+  .titleblock{
+    border:2px solid var(--gold);
+    position:relative;
+    padding:26px 24px 20px;
+    margin-bottom:36px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.03), transparent 60%);
+  }
+  .titleblock::before{
+    content:"AZ-CUP / MÖVZU-01 TEST SHEET / REV. 2026";
+    position:absolute; top:-11px; left:20px;
+    background:var(--blueprint-deep);
+    padding:0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold-bright);
+  }
+  .titleblock h1{
+    font-family:var(--mono);
+    font-size:clamp(24px,4.5vw,36px);
+    line-height:1.2;
+    margin:8px 0 8px;
+    color:var(--ink);
+    letter-spacing:-0.5px;
+  }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:640px; margin:0 0 16px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs div{ padding:10px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; color:var(--ink); }
+
+  .section-label{
+    font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold-bright);
+    text-transform:uppercase; display:flex; align-items:center; gap:12px; margin:44px 0 16px;
+  }
+  .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
+
+  .problem{
+    background:var(--paper); color:var(--ink); border-radius:2px; margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2); overflow:hidden;
+  }
+  .problem-head{
+    display:flex; align-items:center; gap:14px; padding:16px 18px;
+    cursor:pointer; user-select:none; transition:background 0.15s ease;
+  }
+  .problem-head:hover{ background:rgba(18,19,26,0.03); }
+  .problem-num{
+    font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--bronze);
+    padding:5px 9px; border-radius:2px; flex-shrink:0; letter-spacing:1px;
+  }
+  .problem-main{ flex:1; min-width:0; display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; }
+  .problem-main h3{ margin:0; font-size:16px; }
+  .difficulty{ display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700; }
+  .difficulty.easy{ color:var(--green-text); }
+  .difficulty.mid{ color:var(--bronze-text); }
+  .problem-chevron{
+    font-family:var(--mono); font-size:13px; color:var(--ink-soft); flex-shrink:0;
+    transition:transform 0.2s ease, color 0.2s ease;
+  }
+  .problem.expanded .problem-chevron{ transform:rotate(180deg); color:var(--gold-bright); }
+  .problem-body{
+    padding:0 18px 16px; grid-template-columns:1fr 380px; gap:24px; align-items:start;
+    display:none;
+  }
+  .problem.expanded .problem-body{ display:grid; }
+  .problem-left{ min-width:0; }
+  .problem-right{ position:sticky; top:16px; }
+  @media (max-width: 900px){
+    .problem-body{ grid-template-columns:1fr; }
+    .problem-right{ position:static; }
+  }
+  .problem-body p{ font-size:14px; line-height:1.65; margin:0 0 10px; color:var(--ink); }
+  .io-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .io-box{ background:var(--paper-warm); border-radius:2px; padding:10px 12px; }
+  .io-box .lbl{ font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--bronze-text); margin-bottom:4px; }
+  .io-box pre{ margin:0; font-family:var(--mono); font-size:13px; color:var(--ink); white-space:pre-wrap; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0; }
+  .tag{ font-family:var(--mono); font-size:10.5px; background:rgba(15,34,51,0.08); color:var(--ink); padding:3px 8px; border-radius:20px; border:1px solid rgba(15,34,51,0.15); }
+
+  .reveal-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer; user-select:none;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1px; color:var(--bronze-text);
+    border:1px solid var(--bronze); border-radius:20px; padding:6px 12px; background:transparent;
+    text-decoration:none; transition:background 0.15s ease, color 0.15s ease;
+  }
+  .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
+  .reveal-btn .arrow{ display:inline-block; }
+
+  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
+     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+     bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
+     əlavə olunmur (CSS ilə gizlətmə deyil). */
+  .admin-tc-panel{
+    margin-top:14px; padding:12px 14px; background:rgba(255,122,0,0.05);
+    border:1px solid rgba(255,122,0,0.25); border-radius:4px;
+  }
+  .admin-tc-list{ margin-bottom:8px; }
+  .admin-tc-item{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:6px 0; border-bottom:1px solid var(--grid-line);
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+  }
+  .admin-tc-item:last-child{ border-bottom:none; }
+  .admin-tc-remove{
+    font-family:var(--mono); font-size:11px; color:#e08080; background:transparent;
+    border:1px solid rgba(200,80,80,0.4); border-radius:14px; padding:3px 9px;
+    cursor:pointer; flex-shrink:0;
+  }
+  .admin-tc-add{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .admin-tc-input{
+    width:100%; font-family:var(--mono); font-size:12px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:6px 8px; resize:vertical; box-sizing:border-box;
+  }
+  .admin-tc-btn{
+    align-self:flex-start; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    background:var(--bronze); color:var(--on-accent); border:none; border-radius:16px;
+    padding:6px 14px; cursor:pointer;
+  }
+
+  .solution-inner{
+    background:var(--well); border-left:3px solid var(--green); border-radius:3px;
+    padding:12px 14px; margin:10px 0;
+  }
+  /* Həll panelinin içindəki yanaşma izahı (approach) — mono deyil, adi mətn şrifti */
+  .solution-inner .approach{ font-family:var(--sans); font-size:13px; line-height:1.6; color:#dce8ee; margin:0; }
+  .solution-inner .approach b{ color:#f2c14e; }
+  .solution-inner .sub-label{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:#6fa0bd; margin:0 0 6px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+
+  .solved-badge{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px; margin-left:6px;
+    border-radius:20px; background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4);
+  }
+  .submit-panel{ margin:14px 0 0; }
+  .code-editor{ position:relative; }
+  .code-gutter{
+    position:absolute; top:0; left:0; bottom:0; width:34px;
+    background:rgba(18,19,26,0.02); border:1px solid var(--grid-line-strong); border-right:none;
+    border-radius:4px 0 0 4px; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    color:#4d7188; text-align:right; padding:10px 6px 10px 0; overflow:hidden;
+    white-space:pre; user-select:none; pointer-events:none; transition:border-color 0.15s ease;
+  }
+  .code-editor:focus-within .code-gutter{ border-color:var(--gold); }
+  .code-input{
+    width:100%; min-height:65vh; font-family:var(--mono); font-size:12.5px; line-height:1.5;
+    background:var(--paper); color:var(--ink); border:1px solid var(--grid-line-strong);
+    border-radius:4px; padding:10px 12px 10px 44px; resize:vertical; outline:none; box-sizing:border-box;
+    white-space:pre; overflow:auto;
+  }
+  .code-input:focus{ border-color:var(--gold); }
+  .submit-row{ display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .submit-btn{
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    background:var(--gold-bright); color:var(--on-accent); border:none; border-radius:20px;
+    padding:8px 16px; cursor:pointer; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .submit-btn:hover{ background:var(--gold); }
+  .submit-btn:disabled{ opacity:0.6; cursor:default; }
+  .submit-hint{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+  .verdict{ margin-top:10px; display:none; }
+  .verdict.show{ display:block; }
+  .verdict-badge{
+    display:inline-block; font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:0.5px;
+    padding:5px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  .verdict-badge.ACCEPTED{ background:rgba(63,143,95,0.18); color:var(--green-text); border:1px solid rgba(63,143,95,0.4); }
+  .verdict-badge.WRONG_ANSWER{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.COMPILE_ERROR{ background:rgba(255,161,22,0.16); color:var(--bronze-text); border:1px solid rgba(255,161,22,0.4); }
+  .verdict-badge.RUNTIME_ERROR{ background:rgba(200,80,80,0.16); color:#e08080; border:1px solid rgba(200,80,80,0.4); }
+  .verdict-badge.TIME_LIMIT_EXCEEDED{ background:rgba(150,110,220,0.16); color:#b79ce8; border:1px solid rgba(150,110,220,0.4); }
+  .history-btn{
+    font-family:var(--mono); font-size:11px; background:transparent; color:var(--ink-soft);
+    border:1px solid var(--grid-line-strong); border-radius:16px; padding:6px 12px; cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .history-btn:hover{ background:rgba(75,139,190,0.1); color:var(--ink); border-color:#6fb1e0; }
+  .history-list{ display:none; margin-top:10px; }
+  .history-list.show{ display:block; }
+  .history-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 10px; border-bottom:1px solid rgba(15,34,51,0.08); font-size:12px;
+  }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .verdict-badge{ font-size:10px; padding:3px 9px; margin:0; }
+  .history-time{ font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); white-space:nowrap; }
+  .history-empty{ font-size:12.5px; color:var(--ink-soft); margin:6px 0 0; }
+
+  .footer{ margin-top:56px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; color:var(--ink-soft); }
+
+  .author-card{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:28px; padding:16px; border-top:1px solid var(--grid-line-strong);
+  }
+  .author-card img{
+    width:52px; height:52px; border-radius:50%; object-fit:cover;
+    border:2px solid var(--gold-bright); flex-shrink:0;
+  }
+  .author-card .author-text{ text-align:left; }
+  .author-card .author-role{
+    font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gold-bright); margin:0 0 2px;
+  }
+  .author-card .author-name{ font-size:15px; font-weight:600; color:var(--ink); margin:0; }
+
+  /* ---------- HƏLL PANELİ DAXİLİNDƏKİ RƏNGLİ KOD BLOKU ---------- */
+  .code-block{
+    background:transparent; font-family:var(--mono); border-radius:3px;
+    overflow-x:auto; margin:0; padding:4px 0;
+  }
+  .solution-code{
+    background:var(--ink); border-radius:4px; padding:6px 10px;
+    border-left:3px solid var(--green);
+  }
+  .code-line{ display:flex; gap:8px; padding:1px 0; white-space:pre; }
+  .code-line .line-no{ flex-shrink:0; width:16px; text-align:right; font-size:11px; color:#4d7188; user-select:none; }
+  .code-line code{ font-family:var(--mono); font-size:12.5px; line-height:1.6; color:#cfe3ee; white-space:pre; }
+  .code-block .cmt{ color:#7fa6bd; font-style:italic; }
+  .code-block .kw{ color:#f2c14e; font-weight:600; }
+  .code-block .tp{ color:#8fd0a8; }
+  .code-block .str{ color:#e0b96b; }
+  .code-block .num{ color:#c9a0dc; }
+  .code-block .pp{ color:#e0708a; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+
+  @media (max-width: 480px){
+    .wrap{ padding:24px 12px 80px; }
+    .io-grid{ grid-template-columns:1fr; }
+    .specs{ grid-template-columns:1fr 1fr; }
+    .titleblock{ padding:22px 16px 16px; }
+    .problem-head{ padding:14px 12px; gap:10px; }
+  }
+
+  .reveal-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .confirm-overlay{
+    position:fixed; inset:0; z-index:200; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(13,36,56,0.72); backdrop-filter:blur(2px);
+  }
+  .confirm-overlay.show{ display:flex; }
+  .confirm-box{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    border-top:3px solid var(--gold); padding:22px 24px; width:min(360px, 88vw);
+    box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  }
+  .confirm-box h4{ margin:0 0 10px; font-size:15.5px; }
+  .confirm-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.55; color:var(--ink-soft); }
+  .confirm-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .confirm-btn{
+    font-family:var(--mono); font-size:12.5px; padding:9px 15px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--grid-line-strong);
+  }
+  .confirm-btn.cancel{ background:var(--paper-warm); color:var(--ink); }
+  .confirm-btn.ok{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="titleblock">
+    <h1>Mövzu <span>15</span> — Test Vərəqi</h1>
+    <p>Mövzu: DFS (dərinlik üzrə axtarış), bağlantı komponentlərinin tapılması, visited massivi, yönəlmiş/yönəlməmiş qrafda dövr yoxlaması, iki hissəli qraf. Aşağıdakı 100 məsələ yalnız Mövzu 15-in mövzularına əsaslanır. Təpələr 1-dən N-ə qədər nömrələnib.</p>
+    <div class="specs">
+      <div><div class="k">Məsələ sayı</div><div class="v">100</div></div>
+      <div><div class="k">Tövsiyə olunan vaxt</div><div class="v">420–480 dəqiqə</div></div>
+      <div><div class="k">Səviyyə</div><div class="v">Başlanğıc (CF ~800)</div></div>
+      <div><div class="k">Dil</div><div class="v">C++</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Məsələlər</div>
+  <div id="problems"></div>
+
+  <div class="author-card">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADwAPADASIAAhEBAxEB/8QAHQAAAgIDAQEBAAAAAAAAAAAAAAEDBQIEBgcICf/EAD0QAAEDAgQEBQEGBQMDBQAAAAEAAgMEEQUSITEGIkFRBxNhcYEyFCNCkbHBCBVSodFigvAzQ+EXNHKSov/EABoBAQEAAwEBAAAAAAAAAAAAAAABAgMEBQb/xAArEQACAgEEAAUEAQUAAAAAAAAAAQIRAwQSITETFDJBUQUiI2EzQnGxwfD/2gAMAwEAAhEDEQA/APqOyEIuFgYDCD3RdK+qAaRGqL90IAKN0ihACEIQB0Qo55o4InSSvaxo3LjYLy/xC8beGeGs9NQPbitc36mRH7tvu8fso2l2Em+j1TRRVNTT00RlqZ44YwLlz3BoHyV8q45/ETxLVxPgoY6OkJ2c2Ml3sCf1XB1PiHjeK1LosUxKaSbKXMDnlzR8FYPIvY2LG2fY1Rx3wpFOYG4zBNKBfJAHSO/JoK1meInDEkzom1cge2188Tmb+4XxrNj+IwTGRtXMw7kiQ3af8KxoOK8ca37R9tkL2jM5r7HMO/dTxGXwj7PouJ8CrIg+nxGF2trX1v7Kypaumqml1PPHKBvlcDZfHlF4hV0DRVNqW38sNeAwWkb6+vqrvDeOaqjq48RpayoY9x1c7m17EdQqsg8Jn1emvL+DuOP59SGSSpZHUQuayRrXaEE6Ef8AOi9HoJzNTB7zzglrvcLZaZraa7Nn2QNkrg7apqkAbppIQDPonqkjogGEBAshQAmkjogMEbJIQDvZFkroQDA1RokhAB3QhNAJUPGvFGH8LYUa2ue25B8thNsxCviV8vfxjcTluJYfg9JN5ckLC6fuA76VjJ0jKKt0ch4i+KeK8VYlIJ6ySmoRcRxxuytA9ev5rzjF6gUzcz3ufEbc7HXyjuqFsdfi1SKeme92fQ3j6+916Vwd4WYm+naa2aR8bh9FrgXXLOaXMmduHDLJxFHHywsnhilpprSB1yc2kg/YpYhQzzYjFJA0xutmGv4l7TReGEcEWRjb9LFun/hWMXh+Y42ERA5NBmFzbqtPmY+x2LRSs8ZxGkndTsDwcxaWvbfQqOOjqbFpY4NMdjrqCdF7VJwXc2fCBoRoL2W1QcCl1QWmEOu22Zw2HZVZ0PJNM8GFFW08Ac6GTMGFjTbT3t6IoK2rgeGuD8lwDfppqV9IngaHISY25suVul7eqrZ/DWjkj8p8THBw5jl3WPmop8leifseGYNxlUYfXRva94zdAbX1vZe7eHfjNikdG6Kqo4qymBzOe55a4E9L9VwnFfhJLBmqKNmYAEaHVvsvPM9dgGICGV4hANrkOJ/wt8MqfMTjzaeUPUj7g4P49wPiHLDFOKeqtrBKQHfHQj2XXA3Fwvh/CMc8qpp6g1RD73a7JY+3qvobwx8R2VApqDFqlkkMpyQ1IPMx39Eg6ejl0RyXwzkljpWj1sJhYtILQQQQeoWXVbDUMJboQqAR+6DdCAaCkg2UBgkhCAaEkIBoSQUADdNIIQGtitW2hw2qrX2y08L5Tc6coJX5/wDHuPVWO4nV43iAE9RUSlwJ2I6C3b9l9peOlc+g8LcaljZmc+EQ2vb6jZfGGG4N/MsSoqJ/NncHEA6Zb91oyvk34Y3wd74CcHuqKEY3icY5z9yy2gHde40sUcTbRx7bAKs4fpYaHC4KaNjWNY0ANAV1Tt10I9l5GR75Wz38MVCKRnG1zhzAA+gWwyMHcXUkUbdtz6rYbHZvusFGzpUkQCnYXC7BdbbICwbfkFlExuYEhWELmC4IA91vjAwlOiu8gkXykKF0etiFdPDXAm4stGeMZyQFjKBFOzQdTscw8oOnZeS+N3BLJ8JlxKhiyyM1dlGo9QvZcpA037LXxmjjrsOmpZAC2RhbZYwTi7RhOpJpnxtSR1DqYeZJKXMd/wBzXXuP8FdBwric9JitLNI8sdFI2Qg3AcARceqm4lwKahxOso3uu2Bxyg68pVbhvnMqY4HNJcTdhcb+o17r1ItNWeLOG1tH3Rg1RHVYXTVMQsyWJrwO1wttU3BUc8fCmGMqRaYUzMw9bK5uupHCMIQhACEk+tlQPZJG6CoCNCRTQAhCEAIKEigDoglBSQHl/wDFDWCl8Ja4ZhmkmjaAeut/2Xz34VUzqnFo6yRuZzWBjLjT4Xrv8ZE87eD8JpGMDop6t2e5I1Dbj91wPg7C1xaG6iNt7dtFyajpnbpV9yPVadrmhoOysoHOBAAHuqsSAytaNOpC2P5jSwus6RpIOwK81Qd8HtxdIu4y7cDZbEbjl2uVV0uJwS2DbAe6soKqnkPI8XPqtii0beKNqN1iCb2CkbJclQDV1riyjMoaTnIAG3qsjHbZvB7joonXBN/zWnJidLFqZWj3PVQMxuleQPMab7WIKri30YOkWGa79LWWTxnaW6LXhqIZxnhe19t7HZTRuGe3datrsxfJ434o4W2TFfPay5cC15HX3XmkbHQYtFKWEsdIBl6tsd17X4lxMhqi4i+YZgvJOII2wyh8AcHXvou3F6aPM1C5PsjBXtkwmjkbs6BhH/1C21U8GSCbhLCZRs+jiP8A+QrYldx5g0JXQgGE791infRANCV0we6oIkJ/CFACEJIAQboQUAkISu0C7nNaBuSbAIU8G/jAv/LMA5hYTzcpPXKNVyPg1Tuioql1gXaNGi9W8ceHcN4hx/A6LFalsNJBG+bSQAykm2UdgALkqoq5cPwzhhpocscbqjy2OgcCMoH+n41XNkjus6sMnBrg47i/iasinOF4JC+asJtI8A2YO1+64vEsF4/qI/NjsCTezSbj3Nl2s1WKNjp53NlLiCNLucTtv1WlW8ajDoiajFqWicf+00GST5DdLrni0nSO5tzVs82f/wColBUOZJJUOGwLXkldXwLxPjhlfDWSzmVkgHOdR6eoUNXxxNNNmo8Sp6gO5m54jESPcrf4fxplbVs+1gRhx5iWNJ+NNVk38oQnsVo9lw3F5JaITXFyL77LieLeJcUf5jKd2QgGxB2XR8HimLPJnacjZOfaxb2XP8bsgwmeatYyOaJxtHyjckm3wFqVJ9nXLPa4R5DiNVxfieJTCmdPyOs12Y5SFf8ADHCHiHVZPLmqXNJDriJxt7FMcTVz6kNppGU7QbmR4Aawei67hfjfCWRtZXcbzCRzsrMhAZ6jZbfE/RxZKXLN3D+GfEvCJWVDY5y4DUuiIuP3Xo3D9fVVdNauw+ooqtn1tfGQ13q0n9Fxv87xGpY2ppMUbi1MCS7I/naPa9irOlLMSoPtELnB7exsVrc4y4N0VOKtOzb8RsMFbhQqY2Xkh1OmuVeQ4xTh9QBKTbWx7XGy9bx/PHwpK6nfldJUQkxxvNyzKQ7S+191xlfTYJU4e+etkjo2xts6drxYG/UH1XRjxfDOLLm3do9v8LZRN4e4I4EnLStYb9wSF0hXLeFsuHRcBYc2Cvp5IWZoxKJNHnMb2G66pw13uutHDJNcgEJJhUgIQEIQEIQEBii6xQoBoJSKSAd0XSR0SwPdcz4mSVEXCNS6nylwc0uDtnAG5C6ULkfFep8vh6OkZrJUzBoHp/whac/8cjr0Mb1EP7nhviczEcU4So3AyCnY/wAxsLnXLbi1r9vRWvDGG/ZuFMNiIZmEVyCLgrd4wkMGHOo4m5nFojaAfglWtNCGU1PD+GONrbj2XBGT20ezlxp5Lrs4riXBamulAnZJBTfidAQ0qrp+FcKbSNgjrXeW15fzOGYk6Hm3/NesxUvmjnAcNhfYLXm4Zw+R+Z9KwknUnW61qUo9Dy8Zdo8qh4Zwqk8yKgzOL2GMi4k0JudxYLLAuC20s+cTSsjJvle7lAvrbsvVBg9FSghsbR2G1lrthjmqmx5GCNmth191Xlk+zOOmilSVFjwRRNgpjPM37yZxdZ2th0stbi3A4Zi7bLI8PEZboe9j31VthzmNltuG66dFZVEcNbAWk6jbTYoo8WjbLCttHgWM8KUdHjQqw6pEoOYNms5nwNlqO4KwWtnNRI4MkzOc3msGlx10svdpMNgqY/Jq2Qy26OGy128GYbI/QFgPTQrKOWS6NE8MJepHmeD8IwsfHWUuJVFJNGwMaKd1muA2uDv8rvOHqGppnZpmG7m8xzcp9bLpMN4ZoqH7yCFpcDqTrf4SrmOMmVoy9CANFg1J8syqKVI1pKVjqKUEDM5h2XleF8NHHaqoo2xkRMN5HHa5OnyvZYIc0FngCy53BmtweTHKyeIMghtIHAb2BK2J7eTU47mka9TBUcJ8IeRg8QaWWjkqXDM6MHrZen8HSGXhageXl58u2Ym5Oq41tbh+NcK1gpGvBnp3OLXjW+W66/gRgj4Pw9rXZuTc/C2aZ3mu+0ZfUYpaKmqal/ouU0uqd16R84CChCAEwkEKEIwhHylogGl0QhCgkgpEoQd/VcV4mFpqMMDhoJSQuxJN1yniTTulw6Cqa27oZP8An6LRqE3jZ3fTpKOoj/3seUz2qsYfJcuMUbj83C6SkGeONxOhaLqsjwuGOrfiLJnWlaQWHYXU+G1HlRllxmZe2nRedFUj29TJb00X0T2ACwtZSSzNjjDnE+3ZUDa67rXAA9dVV8TY0YqfyY5Od/KAqzZCSSN3FcbjfK6CHQA2c7db9OKeOM2cCSOi42mkjjpS1vMT9RPUqlxyPGJBE6mr5WBmzAdPzCsYPsSyKj1uhq6OFrM5uTuraKaB4JYbNcvEKLiTEY4Wtq6N80kZsHsflze4KxlfxPjrhP5k1NGDyMZI4Nb+RFz7qxTTI8qPYuLIo2Yc2oikeJGuAaWnUXVbw9xDO2byKmQSZevVUHD7cVhpRHitW6ot9NxboocYH2erbV0pPmM+tv8AUEfDsyjKLVM9XhxFkjWlrxqL2QGtnc1xIK4vBsTZU0rSDqRbRdBh9Z5Rtcn3RSTOfLSXBZ1BbDE8HTTstOnpW1WE1dPKGkVAc3m1GosLpYjOS5rWnQqaBl4WRSB2Qi5Le4UkzXiTckyq4aw2XC3y0s5jd5LHEmM3FrLu+E4/K4bpGWsMpIHbX/wqGoja8eXTxgebYEjd3outpIfs9HFBpyNA/wArfpIVJk+q5bxJPtv/AAZkppFHRd54A0JBF/RCDQkCmEIRphJCAEIQhaEViT0WRWBQGLtTdQV9LFW0clLMOSQWuOh6FTHZCjVqiptO0eYYvw1ilLVObHST1EYPI6Jt2u7bbKixHDK/CKhsNeAyd8WfI11wAb2F+/de13K4nxWoM9LSYmwc0Z8mQjsdW/3v+a456eMU5I9Ja+eVqMkebCRxmIJJIFrKrr6WSfFj5mVrY4swJ6HurRlmVLn8oa82yg9VuYxRwzU0cjdQ6zXW3cFxPhnbF/bRQRYjhFLEftlZALG2XMLqZuM4ZI2NsdOXhwuwkaOA6iwXPcQ+G1HLicXEGHAMq4nh0jHczXgEEXHwu54bxplHTUUdVgXmNhEl3QkHLf6coPfW+1lvik12bEprqNlKK/BpHiSfDmkkaPa4gFXVFxJg9LC2J9GyJgGgN7rrqPGeGZMKpYJcPliLHNd5T6YnIb33Gn5KbFsT4dmMwZhEtTI+nyhzYAA7X6bm1isnBV2Y+NJunjZzJx7h+tIH2pkT7fS9VVfUU/2oMZNE55HIWuCl4/4Zj4uz0+H0EdNnDW+e5tiwAW0A91Bgnh5hPDGF+VTOmqJB9c00hc5x+dh6BapPauB2uVRv8NU8gmqGbNFnDTTXcLoqS4lGn0t/UqCghjpqYhhBJGvopqV3O8kXBAHytK5ZhOXSLOKOaprGRtALnuDRfoV0sPDtZTXihro5ISb/AHgOZvfbdaPBlMJa2Sqc2/lCwJ7ldgF34MKlG5HFk1U8UqgaOHYZFRnPmMknciwHsFvEpEpErrjFRVI4smWWSW6T5ApIQsjWAQhCAAsgVimEIR9U0kIQYQlqgFCicVidQsisCoBFYlMlIkIBFauMUMWJYXUUEtsszCAf6T0PwVtE3SulWLo8Ar2TU1VLRVEYZJA4xu7ggqKWtkf92H8o202XW+MeHNix2DEG5WMniAlNvxNNgf0C4UF8Tg55Dri9rarzJ49sqPWx5LimdJQVN6UWsXAW0SNXReYdDC4a3AWjgsud4aSAD3NtVay4VFUOF3a3tp3WLW1ndim+0J2LUrCA6fMT2YCrOhxOjqCI3yl2uwFlTwcKxtmu6U/VpcWVzhGB0cDzISXuGlwdVlZtlOTLtk8TIxHEA0WVTxA/NCGMcbnrZbshjYxzibW2BCoa6o8x5EMmYu1N9bX2Wl8nM2Omq7RtBLnvPLqNFuRTiNgAZzE3IVVTD74ukddgdYkC1rKxwWI1FWZnfSDZgvcHXdEjW3Z6dwnT/ZsFiuOaS73fKtSVFRx+VSRRjZrAP7KRexBVFI8ect0mx9EJIWRgNMpBCgAI6oR0VAC100k+qhCP4QhHW6oGl8IScUAnHRRlyb3aKJzkA3OWDnrB77dVE56AlL0s+qgL0B6FOW8Tomz0tKHC4OZp/sV5VVwuF43tcejXHS4C9a8QCfsFNa31n9F53XMZLC5paXEC9uoXBmaWRnpYIt4kyjY8xRmRlxlIJNuiu6TFi0Dy3ZteWypqimkjYXRm9tSCN7fotaOraxwiljdFfoBdYtJm7HJwfJ2kWMtLhqPRpKnlx5jA1unU3C4r7bCG3u8EDlzMOi15aoSFpZ5p0ubDdYbToedM7aLFjPKNeVwNz3UMxdnuw2B1Nui57D6yUN8tjDrcEkD8lbwNkdH95qTp7+qjSNHMmbwHnubHFnA636rp8DhcxrW210uqPCox5lmtBPe66iiZlynY/wBlrvk2KNHfttlA9EdUmfSPYItovYPDZkhIJ+ypAQdUIUAHZCSaoH8oSTCEI0ISJQASFg82CZO6ikKAwe5QvenIdCtaR6Ayc9ROfvqo3vUZchSUv63QH2UYZI7UNKloYhPO5m7WfUVLLRz3G5z0cAP9Z/RcPKC03AuCbX2IXf8AH7Sz7JHlDYjmsQPxdvyXEVEJa7Pqbdl5uof5WevpI/iRXSU4Jc4OAzHToq+sw7zmc4FxoCRqrkMJFxe1uo6rJsdm2c3Mtafwb3Hk4ianmZMA1x5TYNt/fVTUdHVPlLnGwG2mq6WoomOdmYACVsR07I4wC309FlbRNqNHD6UNbdjRfuRZWMULQwNuQ6+ykia5oOVrTrq4aKenjvqQTfS97LXfBkkWGENLWBr2kdl0VMByk3KqKCF9ri5HdXlOLWv0WHuUv8MxaOSspcNfHKJZWkMfa7SQNj20Vw4Fri0ggjdavCeEETtxOdpBDS2EH13cujnp4phzNse43XrYNzhcjxc6gp1EpQE1sz0UjHclnD+613sezRzS33W40mJ2SCZQFAPohCCqB9EJJoYkROiikzE6GyzJJ6XKkjpZH6uIaEBruKhkJOwVoyjjB5gXe6l8lrRygBC0UT4Z5G3bG6x+Fruo6gauAAPcroXsOyhmizgBQpRtonOBLngD0CxaxgfljGvVxVrUsszKFpw0+t7dUKkYSMDITbQlSYRGGl3+rVYVWrstrKWF3lhjm90oyfRsV1FTVtO6mqoWyRu6OH9x2K5TEuCLgmgrSOobM29v9w1XatLXtuEGPsSFhPDGfaMseWeP0s8kxHhrHKM3dh7qht/qgdn/ALbqsnimgsKmnmg0/HGW/qva3MdbQhRSsDmlssYe07hwuFoekXszqjrZf1I8LmcSTkcOyzieMrWPde269dqMCwSoJ87CqQm97+Xb9FFFwvw4Hhwwimv21/ytflZfJuWth7o8wiaxwDQQQO52VthkBlLWRRve89GC5P5L1CjwnCogBFhlI2233IVzTRlgtHGyMf6WgJHRN9swlrlXEThcK4bxWoaL0/2Zh6zG39t11eFcNUVI5ss7nVMg1GYWaD7f5Vw1jjupWtsNV0w00Ifs5Z6mc+Oht202WR0SJACxJuug5zE8xWDwNiLj1Ug3WMuyhTWkomP5ozkPbotWSlmZ+G47tVpF9KbrBSiFJqDYoVu+OOQc7Gn4UElExw5CWn12SgaAQth9HKwXADh6KAgg2Oh9VCE9LFC9gfGPQ33CleAx4voDt6JFogqBKNGScr/Q9Cp5488ZHXcKlMA3lN0BtwiA54Gu9NVK0aBUELorrB8Vhe2q2SsTqVAVksJJ23WDYbA6K0cwWuozHodFKBRVEBzk/kiVhbC0gXVrJDrsopIM0fyqZGiC8R5mEhwCmhneW3c0f7T+yy8vIT2WDmZHZwNOoRAkE7Dvdv8A8hZZCRh/ED7FYsOYaahZimbJuxp+FbJQZGE6tP5KeGKO4tp/tWMdDH1bb2JC24qOEfhJ93FASxMY0d/hSh8Y6gfIWLYYW7Rt/JSANA0aB8IQA8H6Rf4T5j1shHVUBa2upPqmkmoDFYTGzSpCopfwju4IVEjeVo7pht9TumB3Q7ZUhi49AhgvqdkiCTYKTYKAR12UcsMcos8X9eqk2GpAA6rAF7jdtmN7kalAQyMD2lrhykWITpsxjLHm72aE9+xTBuAehSByztd0cMp/ZEDGmblpmj1P6qQBZxt+7CRCAxAvugDVZixRZARuCYaLJuWXRAQyMB6LBkfIp3BYxDlIQGq+C50UYp+hVgW63TDQULZVikyXAvY7KelFnljh7LdABFlDUNyESAfSdUoXZMGgJgIYQ5oKdlSAgd0LIbIBH2QgoQAmkE0AnbqN3/VjB6u/ZZuUUo++hPZ/7KA2Vi42Qw3v6FG7lQDBpc7rLQC5RsFiTfU7dEAWzG526BNY5r7AlZC/UIDVhla8lpGR3Ypz/wDTd3bqFlJG14v17pPaXwOG7rEBQE0JvCwjqLrF26VL/wC2jv8A0hEhtqqAYbi6aI/oCCoDFwWXRI72TKAVljHo4hZjZYj6kBkfRIJn2SFroAG+6JBdpHdM7hDtkBHSnkyHduilUMBu53QgqboqACaB3QgDVCE0AICElAOyjkFyz0cCpAsXfUFQEP0k93FZBDRZoCxc636IBvPRAHV35JAgauOqM5P0tJUBmhYjOewWQv6Kg//Z" alt="İsmayıl Qarayev">
+    <div class="author-text">
+      <p class="author-role">Tərtib edən</p>
+      <p class="author-name">İsmayıl Qarayev</p>
+    </div>
+  </div>
+  <div class="footer">AZ·CUP — MÖVZU 04 TEST VƏRƏQİ — MÜSTƏQİL HƏLL ÜÇÜN</div>
+</div>
+
+<script>
+/* ============================================================================
+   Bu massiv Mövzu 15 mövzularına uyğun 100 məsələni saxlayır. Hər element:
+     title      — məsələnin adı
+     difficulty — "easy" və ya "mid" (rəng/etiket üçün)
+     tags       — hansı mövzuya aid olduğunu göstərən kiçik etiketlər
+     statement  — məsələ mətni
+     input      — giriş formatının təsviri
+     output     — çıxış formatının təsviri
+     example    — {in, out} nümunə test
+     solution   — kliklə açılan həll kodu (C++) — müəllim/şagird üçün yoxlama məqsədilə
+   ============================================================================ */
+const problems = [
+  {
+    title: "1-5 təpəli qrafda 1-dən başlayan DFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. DFS (dərinlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "DFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"5 4\n1 2\n1 3\n2 4\n3 5\n1", out:"1 2 4 3 5"},
+    approach: "DFS rekursiv (və ya stack ilə) işləyir: cari təpə ziyarət edilmiş işarələnir, SONRA hər ziyarət olunmamış qonşu üçün REKURSİV OLARAQ DFS çağırılır — bu, \"mümkün qədər DƏRİNƏ get, sonra geri qayıt\" məntiqidir (BFS-dəki \"enlik üzrə\" əksinədir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+vector<int> order;
+void dfs(int u){
+    visited[u] = true;
+    order.push_back(u);
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    dfs(s);
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Üçbucaq qrafda 2-dən başlayan DFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. DFS (dərinlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "DFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n2", out:"2 1 3"},
+    approach: "DFS rekursiv (və ya stack ilə) işləyir: cari təpə ziyarət edilmiş işarələnir, SONRA hər ziyarət olunmamış qonşu üçün REKURSİV OLARAQ DFS çağırılır — bu, \"mümkün qədər DƏRİNƏ get, sonra geri qayıt\" məntiqidir (BFS-dəki \"enlik üzrə\" əksinədir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+vector<int> order;
+void dfs(int u){
+    visited[u] = true;
+    order.push_back(u);
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    dfs(s);
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Tək təpəli qrafda DFS gəzinti sırası (baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. DFS (dərinlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "DFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "DFS rekursiv (və ya stack ilə) işləyir: cari təpə ziyarət edilmiş işarələnir, SONRA hər ziyarət olunmamış qonşu üçün REKURSİV OLARAQ DFS çağırılır — bu, \"mümkün qədər DƏRİNƏ get, sonra geri qayıt\" məntiqidir (BFS-dəki \"enlik üzrə\" əksinədir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+vector<int> order;
+void dfs(int u){
+    visited[u] = true;
+    order.push_back(u);
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    dfs(s);
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) 1-dən başlayan DFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. DFS (dərinlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "DFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1", out:"1 2 3 4"},
+    approach: "DFS rekursiv (və ya stack ilə) işləyir: cari təpə ziyarət edilmiş işarələnir, SONRA hər ziyarət olunmamış qonşu üçün REKURSİV OLARAQ DFS çağırılır — bu, \"mümkün qədər DƏRİNƏ get, sonra geri qayıt\" məntiqidir (BFS-dəki \"enlik üzrə\" əksinədir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+vector<int> order;
+void dfs(int u){
+    visited[u] = true;
+    order.push_back(u);
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    dfs(s);
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Ulduz qrafda (1 mərkəz) 1-dən başlayan DFS gəzinti sırası",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və başlanğıc S verilib. DFS (dərinlik üzrə axtarış) ilə ziyarət sırasını çap edin.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları, son sətirdə S.",
+    output: "DFS ziyarət sırası, boşluqla ayrılmış.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"1 2 3 4 5"},
+    approach: "DFS rekursiv (və ya stack ilə) işləyir: cari təpə ziyarət edilmiş işarələnir, SONRA hər ziyarət olunmamış qonşu üçün REKURSİV OLARAQ DFS çağırılır — bu, \"mümkün qədər DƏRİNƏ get, sonra geri qayıt\" məntiqidir (BFS-dəki \"enlik üzrə\" əksinədir).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+vector<int> order;
+void dfs(int u){
+    visited[u] = true;
+    order.push_back(u);
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    dfs(s);
+    for (size_t i = 0; i < order.size(); i++) cout << order[i] << (i + 1 < order.size() ? " " : "\\n");
+}`},
+  {
+    title: "Zəncir qrafda 1-dən 4-ə yol varmı (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1 4", out:"VAR"},
+    approach: "DFS S-dən bütün çatıla bilən təpələri ziyarət edir; sonda <b>visited[T]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    visited.assign(n + 1, false);
+    dfs(s);
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda 1-dən 4-ə yol varmı (DFS, yoxdur)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"4 2\n1 2\n3 4\n1 4", out:"YOX"},
+    approach: "DFS S-dən bütün çatıla bilən təpələri ziyarət edir; sonda <b>visited[T]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    visited.assign(n + 1, false);
+    dfs(s);
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K3) 1-dən 3-ə yol varmı (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n1 3", out:"VAR"},
+    approach: "DFS S-dən bütün çatıla bilən təpələri ziyarət edir; sonda <b>visited[T]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    visited.assign(n + 1, false);
+    dfs(s);
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə yol varmı (DFS, həmişə var)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"3 1\n1 2\n2 2", out:"VAR"},
+    approach: "DFS S-dən bütün çatıla bilən təpələri ziyarət edir; sonda <b>visited[T]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    visited.assign(n + 1, false);
+    dfs(s);
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda yol varmı (DFS, baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib. S-dən T-yə yol varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "\"VAR\" və ya \"YOX\".",
+    example: {in:"1 0\n1 1", out:"VAR"},
+    approach: "DFS S-dən bütün çatıla bilən təpələri ziyarət edir; sonda <b>visited[T]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s, t; cin >> s >> t;
+    visited.assign(n + 1, false);
+    dfs(s);
+    cout << (visited[t] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda (iki ayrı üçbucaq) komponent sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. NEÇƏ FƏRQLİ bağlantı komponenti olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bağlantı komponentlərinin sayı.",
+    example: {in:"6 6\n1 2\n2 3\n1 3\n4 5\n5 6\n4 6", out:"2"},
+    approach: "Hər ZİYARƏT OLUNMAMIŞ təpədən YENİ bir DFS başladılır — bu, bir YENİ komponent kəşf etmək deməkdir. Bütün təpələr 1-dən N-ə gəzilərkən başladılan DFS sayı CAVABDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) { dfs(i); cnt++; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Kənarsız 5 təpəli qrafda komponent sayı (DFS, hər təpə öz komponenti)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. NEÇƏ FƏRQLİ bağlantı komponenti olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bağlantı komponentlərinin sayı.",
+    example: {in:"5 0", out:"5"},
+    approach: "Hər ZİYARƏT OLUNMAMIŞ təpədən YENİ bir DFS başladılır — bu, bir YENİ komponent kəşf etmək deməkdir. Bütün təpələr 1-dən N-ə gəzilərkən başladılan DFS sayı CAVABDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) { dfs(i); cnt++; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tam bağlı 4 təpəli qrafda komponent sayı (DFS, bir komponent)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. NEÇƏ FƏRQLİ bağlantı komponenti olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bağlantı komponentlərinin sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"1"},
+    approach: "Hər ZİYARƏT OLUNMAMIŞ təpədən YENİ bir DFS başladılır — bu, bir YENİ komponent kəşf etmək deməkdir. Bütün təpələr 1-dən N-ə gəzilərkən başladılan DFS sayı CAVABDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) { dfs(i); cnt++; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda komponent sayı (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. NEÇƏ FƏRQLİ bağlantı komponenti olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bağlantı komponentlərinin sayı.",
+    example: {in:"1 0", out:"1"},
+    approach: "Hər ZİYARƏT OLUNMAMIŞ təpədən YENİ bir DFS başladılır — bu, bir YENİ komponent kəşf etmək deməkdir. Bütün təpələr 1-dən N-ə gəzilərkən başladılan DFS sayı CAVABDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) { dfs(i); cnt++; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "5 təpəli qrafda (1 cüt + 3 tək) komponent sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. NEÇƏ FƏRQLİ bağlantı komponenti olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Bağlantı komponentlərinin sayı.",
+    example: {in:"5 1\n1 2", out:"4"},
+    approach: "Hər ZİYARƏT OLUNMAMIŞ təpədən YENİ bir DFS başladılır — bu, bir YENİ komponent kəşf etmək deməkdir. Bütün təpələr 1-dən N-ə gəzilərkən başladılan DFS sayı CAVABDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) { dfs(i); cnt++; }
+    }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda (üçbucaq + cüt) ən böyük komponent ölçüsü (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük komponentin təpə sayı.",
+    example: {in:"6 4\n1 2\n2 3\n1 3\n4 5", out:"3"},
+    approach: "Hər YENİ DFS başladıqda, həmin komponentdəki təpə sayı (DFS zamanı ziyarət olunanların sayı) hesablanır; bütün komponentlər arasında MAKSİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = max(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Kənarsız 5 təpəli qrafda ən böyük komponent ölçüsü (DFS, hamısı tək)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük komponentin təpə sayı.",
+    example: {in:"5 0", out:"1"},
+    approach: "Hər YENİ DFS başladıqda, həmin komponentdəki təpə sayı (DFS zamanı ziyarət olunanların sayı) hesablanır; bütün komponentlər arasında MAKSİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = max(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tam bağlı 4 təpəli qrafda ən böyük komponent ölçüsü (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük komponentin təpə sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"4"},
+    approach: "Hər YENİ DFS başladıqda, həmin komponentdəki təpə sayı (DFS zamanı ziyarət olunanların sayı) hesablanır; bütün komponentlər arasında MAKSİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = max(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ən böyük komponent ölçüsü (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük komponentin təpə sayı.",
+    example: {in:"1 0", out:"1"},
+    approach: "Hər YENİ DFS başladıqda, həmin komponentdəki təpə sayı (DFS zamanı ziyarət olunanların sayı) hesablanır; bütün komponentlər arasında MAKSİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = max(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "7 təpəli qrafda (4-lük + 3-lük) ən böyük komponent ölçüsü (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN BÖYÜK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən böyük komponentin təpə sayı.",
+    example: {in:"7 4\n1 2\n2 3\n3 4\n5 6", out:"4"},
+    approach: "Hər YENİ DFS başladıqda, həmin komponentdəki təpə sayı (DFS zamanı ziyarət olunanların sayı) hesablanır; bütün komponentlər arasında MAKSİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = 0;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = max(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda 1-in komponentindəki təpə sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. V-nin OLDUĞU bağlantı komponentindəki təpə sayını DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponentindəki təpə sayı.",
+    example: {in:"6 4\n1 2\n2 3\n1 3\n4 5\n1", out:"3"},
+    approach: "V-dən BAŞLAYARAQ DFS aparılır — DFS-in ziyarət etdiyi BÜTÜN təpələr V ilə EYNİ komponentdədir; ziyarət olunan təpə sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    visited.assign(n + 1, false);
+    cout << dfs(vtx) << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda 5-in komponentindəki təpə sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. V-nin OLDUĞU bağlantı komponentindəki təpə sayını DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponentindəki təpə sayı.",
+    example: {in:"6 4\n1 2\n2 3\n1 3\n4 5\n5", out:"2"},
+    approach: "V-dən BAŞLAYARAQ DFS aparılır — DFS-in ziyarət etdiyi BÜTÜN təpələr V ilə EYNİ komponentdədir; ziyarət olunan təpə sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    visited.assign(n + 1, false);
+    cout << dfs(vtx) << "\\n";
+}`},
+  {
+    title: "İzolə təpənin komponentindəki təpə sayı (DFS, baza hal, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. V-nin OLDUĞU bağlantı komponentindəki təpə sayını DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponentindəki təpə sayı.",
+    example: {in:"5 2\n1 2\n2 3\n5", out:"1"},
+    approach: "V-dən BAŞLAYARAQ DFS aparılır — DFS-in ziyarət etdiyi BÜTÜN təpələr V ilə EYNİ komponentdədir; ziyarət olunan təpə sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    visited.assign(n + 1, false);
+    cout << dfs(vtx) << "\\n";
+}`},
+  {
+    title: "Tam bağlı qrafda komponentindəki təpə sayı (DFS, hamısı)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. V-nin OLDUĞU bağlantı komponentindəki təpə sayını DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponentindəki təpə sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1", out:"4"},
+    approach: "V-dən BAŞLAYARAQ DFS aparılır — DFS-in ziyarət etdiyi BÜTÜN təpələr V ilə EYNİ komponentdədir; ziyarət olunan təpə sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    visited.assign(n + 1, false);
+    cout << dfs(vtx) << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda komponentindəki təpə sayı (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. V-nin OLDUĞU bağlantı komponentindəki təpə sayını DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponentindəki təpə sayı.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "V-dən BAŞLAYARAQ DFS aparılır — DFS-in ziyarət etdiyi BÜTÜN təpələr V ilə EYNİ komponentdədir; ziyarət olunan təpə sayı cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    visited.assign(n + 1, false);
+    cout << dfs(vtx) << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) tam bağlıdırmı (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. QRAF TAM BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (tam bağlıdır) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"VAR"},
+    approach: "1-ci təpədən DFS başladılır; DFS-dən sonra BÜTÜN N təpə ziyarət olunubsa (<b>visited</b> massivində heç bir false qalmayıbsa), qraf tam bağlıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz 2 komponentli qrafda tam bağlıdırmı (DFS, yoxdur)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. QRAF TAM BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (tam bağlıdır) və ya \"YOX\".",
+    example: {in:"4 1\n1 2", out:"YOX"},
+    approach: "1-ci təpədən DFS başladılır; DFS-dən sonra BÜTÜN N təpə ziyarət olunubsa (<b>visited</b> massivində heç bir false qalmayıbsa), qraf tam bağlıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda tam bağlıdırmı (DFS, baza hal, var)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. QRAF TAM BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (tam bağlıdır) və ya \"YOX\".",
+    example: {in:"1 0", out:"VAR"},
+    approach: "1-ci təpədən DFS başladılır; DFS-dən sonra BÜTÜN N təpə ziyarət olunubsa (<b>visited</b> massivində heç bir false qalmayıbsa), qraf tam bağlıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tam qrafda (K4) tam bağlıdırmı (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. QRAF TAM BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (tam bağlıdır) və ya \"YOX\".",
+    example: {in:"4 6\n1 2\n1 3\n1 4\n2 3\n2 4\n3 4", out:"VAR"},
+    approach: "1-ci təpədən DFS başladılır; DFS-dən sonra BÜTÜN N təpə ziyarət olunubsa (<b>visited</b> massivində heç bir false qalmayıbsa), qraf tam bağlıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "İzolə təpəli qrafda tam bağlıdırmı (DFS, yoxdur)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. QRAF TAM BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (tam bağlıdır) və ya \"YOX\".",
+    example: {in:"3 1\n1 2", out:"YOX"},
+    approach: "1-ci təpədən DFS başladılır; DFS-dən sonra BÜTÜN N təpə ziyarət olunubsa (<b>visited</b> massivində heç bir false qalmayıbsa), qraf tam bağlıdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Üçbucaq qrafda (1-2-3-1) dövr varmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qrafda DÖVR (eyni təpəyə qayıdan yol) varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (dövr var) və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n1 3", out:"VAR"},
+    approach: "DFS zamanı, cari təpədən GEDİLƏN valideyn İSTİSNA OLMAQLA, ARTIQ ZİYARƏT OLUNMUŞ bir qonşuya rast gəlinərsə, bu DÖVR deməkdir — valideyn kənarı təbii ki, \"geri\" sayılmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+bool hasCycle;
+void dfs(int u, int parent){
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v, u);
+        else if (v != parent) hasCycle = true;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (!visited[i]) dfs(i, -1);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) dövr varmı (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qrafda DÖVR (eyni təpəyə qayıdan yol) varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (dövr var) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"YOX"},
+    approach: "DFS zamanı, cari təpədən GEDİLƏN valideyn İSTİSNA OLMAQLA, ARTIQ ZİYARƏT OLUNMUŞ bir qonşuya rast gəlinərsə, bu DÖVR deməkdir — valideyn kənarı təbii ki, \"geri\" sayılmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+bool hasCycle;
+void dfs(int u, int parent){
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v, u);
+        else if (v != parent) hasCycle = true;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (!visited[i]) dfs(i, -1);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda dövr varmı (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qrafda DÖVR (eyni təpəyə qayıdan yol) varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (dövr var) və ya \"YOX\".",
+    example: {in:"3 0", out:"YOX"},
+    approach: "DFS zamanı, cari təpədən GEDİLƏN valideyn İSTİSNA OLMAQLA, ARTIQ ZİYARƏT OLUNMUŞ bir qonşuya rast gəlinərsə, bu DÖVR deməkdir — valideyn kənarı təbii ki, \"geri\" sayılmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+bool hasCycle;
+void dfs(int u, int parent){
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v, u);
+        else if (v != parent) hasCycle = true;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (!visited[i]) dfs(i, -1);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Dördbucaq dövründə (1-2-3-4-1) dövr varmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qrafda DÖVR (eyni təpəyə qayıdan yol) varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (dövr var) və ya \"YOX\".",
+    example: {in:"4 4\n1 2\n2 3\n3 4\n4 1", out:"VAR"},
+    approach: "DFS zamanı, cari təpədən GEDİLƏN valideyn İSTİSNA OLMAQLA, ARTIQ ZİYARƏT OLUNMUŞ bir qonşuya rast gəlinərsə, bu DÖVR deməkdir — valideyn kənarı təbii ki, \"geri\" sayılmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+bool hasCycle;
+void dfs(int u, int parent){
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v, u);
+        else if (v != parent) hasCycle = true;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (!visited[i]) dfs(i, -1);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda dövr varmı (DFS, yoxdur, ağacdır)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qrafda DÖVR (eyni təpəyə qayıdan yol) varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (dövr var) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n1 3\n1 4", out:"YOX"},
+    approach: "DFS zamanı, cari təpədən GEDİLƏN valideyn İSTİSNA OLMAQLA, ARTIQ ZİYARƏT OLUNMUŞ bir qonşuya rast gəlinərsə, bu DÖVR deməkdir — valideyn kənarı təbii ki, \"geri\" sayılmır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+bool hasCycle;
+void dfs(int u, int parent){
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v, u);
+        else if (v != parent) hasCycle = true;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (!visited[i]) dfs(i, -1);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) dövr varmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Qrafda YÖNLÜ DÖVR varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (yönlü dövr var) və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n3 1", out:"VAR"},
+    approach: "Hər təpə 3 vəziyyətdə ola bilər: ziyarət edilməyib, \"CARİ DFS YOLUNDA\" (inStack), tamamlanıb. Əgər DFS zamanı \"CARİ YOLDA\" olan bir təpəyə təkrar rast gəlinərsə, bu YÖNLÜ DÖVR deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> state; // 0=ziyarət edilməyib, 1=cari yolda, 2=tamamlanıb
+bool hasCycle;
+void dfs(int u){
+    state[u] = 1;
+    for (int v : adj[u]) {
+        if (state[v] == 1) hasCycle = true;
+        else if (state[v] == 0) dfs(v);
+    }
+    state[u] = 2;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    state.assign(n + 1, 0);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (state[i] == 0) dfs(i);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü zəncirdə (1→2→3) dövr varmı (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Qrafda YÖNLÜ DÖVR varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (yönlü dövr var) və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n2 3", out:"YOX"},
+    approach: "Hər təpə 3 vəziyyətdə ola bilər: ziyarət edilməyib, \"CARİ DFS YOLUNDA\" (inStack), tamamlanıb. Əgər DFS zamanı \"CARİ YOLDA\" olan bir təpəyə təkrar rast gəlinərsə, bu YÖNLÜ DÖVR deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> state; // 0=ziyarət edilməyib, 1=cari yolda, 2=tamamlanıb
+bool hasCycle;
+void dfs(int u){
+    state[u] = 1;
+    for (int v : adj[u]) {
+        if (state[v] == 1) hasCycle = true;
+        else if (state[v] == 0) dfs(v);
+    }
+    state[u] = 2;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    state.assign(n + 1, 0);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (state[i] == 0) dfs(i);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda eyni cütə iki fərqli yol (dövr yoxdur) (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Qrafda YÖNLÜ DÖVR varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (yönlü dövr var) və ya \"YOX\".",
+    example: {in:"4 4\n1 2\n1 3\n2 4\n3 4", out:"YOX"},
+    approach: "Hər təpə 3 vəziyyətdə ola bilər: ziyarət edilməyib, \"CARİ DFS YOLUNDA\" (inStack), tamamlanıb. Əgər DFS zamanı \"CARİ YOLDA\" olan bir təpəyə təkrar rast gəlinərsə, bu YÖNLÜ DÖVR deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> state; // 0=ziyarət edilməyib, 1=cari yolda, 2=tamamlanıb
+bool hasCycle;
+void dfs(int u){
+    state[u] = 1;
+    for (int v : adj[u]) {
+        if (state[v] == 1) hasCycle = true;
+        else if (state[v] == 0) dfs(v);
+    }
+    state[u] = 2;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    state.assign(n + 1, 0);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (state[i] == 0) dfs(i);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Kənarsız yönlü qrafda dövr varmı (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Qrafda YÖNLÜ DÖVR varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (yönlü dövr var) və ya \"YOX\".",
+    example: {in:"3 0", out:"YOX"},
+    approach: "Hər təpə 3 vəziyyətdə ola bilər: ziyarət edilməyib, \"CARİ DFS YOLUNDA\" (inStack), tamamlanıb. Əgər DFS zamanı \"CARİ YOLDA\" olan bir təpəyə təkrar rast gəlinərsə, bu YÖNLÜ DÖVR deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> state; // 0=ziyarət edilməyib, 1=cari yolda, 2=tamamlanıb
+bool hasCycle;
+void dfs(int u){
+    state[u] = 1;
+    for (int v : adj[u]) {
+        if (state[v] == 1) hasCycle = true;
+        else if (state[v] == 0) dfs(v);
+    }
+    state[u] = 2;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    state.assign(n + 1, 0);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (state[i] == 0) dfs(i);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Özünə dönən kənarlı yönlü qrafda dövr varmı (DFS, var)",
+    difficulty: "mid",
+    tags: ["qraf", "dövr", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Qrafda YÖNLÜ DÖVR varmı? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (yönlü dövr var) və ya \"YOX\".",
+    example: {in:"2 2\n1 2\n2 2", out:"VAR"},
+    approach: "Hər təpə 3 vəziyyətdə ola bilər: ziyarət edilməyib, \"CARİ DFS YOLUNDA\" (inStack), tamamlanıb. Əgər DFS zamanı \"CARİ YOLDA\" olan bir təpəyə təkrar rast gəlinərsə, bu YÖNLÜ DÖVR deməkdir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> state; // 0=ziyarət edilməyib, 1=cari yolda, 2=tamamlanıb
+bool hasCycle;
+void dfs(int u){
+    state[u] = 1;
+    for (int v : adj[u]) {
+        if (state[v] == 1) hasCycle = true;
+        else if (state[v] == 0) dfs(v);
+    }
+    state[u] = 2;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) { int u, v; cin >> u >> v; adj[u].push_back(v); }
+    state.assign(n + 1, 0);
+    hasCycle = false;
+    for (int i = 1; i <= n; i++) if (state[i] == 0) dfs(i);
+    cout << (hasCycle ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda 1 və 3 eyni komponentdədirmi (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, A və B verilib. A və B EYNİ bağlantı komponentindədirmi? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"A B\".",
+    output: "\"VAR\" (eyni komponentdədir) və ya \"YOX\".",
+    example: {in:"6 4\n1 2\n2 3\n4 5\n5 6\n1 3", out:"VAR"},
+    approach: "A-dan DFS başladılır, DFS-in ziyarət etdiyi təpələr A ilə EYNİ komponentdədir; <b>visited[B]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int a, b; cin >> a >> b;
+    visited.assign(n + 1, false);
+    dfs(a);
+    cout << (visited[b] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda 1 və 4 eyni komponentdədirmi (DFS, yoxdur)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, A və B verilib. A və B EYNİ bağlantı komponentindədirmi? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"A B\".",
+    output: "\"VAR\" (eyni komponentdədir) və ya \"YOX\".",
+    example: {in:"6 4\n1 2\n2 3\n4 5\n5 6\n1 4", out:"YOX"},
+    approach: "A-dan DFS başladılır, DFS-in ziyarət etdiyi təpələr A ilə EYNİ komponentdədir; <b>visited[B]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int a, b; cin >> a >> b;
+    visited.assign(n + 1, false);
+    dfs(a);
+    cout << (visited[b] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Eyni təpə özü ilə eyni komponentdədirmi (DFS, həmişə var)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, A və B verilib. A və B EYNİ bağlantı komponentindədirmi? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"A B\".",
+    output: "\"VAR\" (eyni komponentdədir) və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n2 3\n1 1", out:"VAR"},
+    approach: "A-dan DFS başladılır, DFS-in ziyarət etdiyi təpələr A ilə EYNİ komponentdədir; <b>visited[B]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int a, b; cin >> a >> b;
+    visited.assign(n + 1, false);
+    dfs(a);
+    cout << (visited[b] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tam bağlı qrafda 1 və 4 eyni komponentdədirmi (DFS)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, A və B verilib. A və B EYNİ bağlantı komponentindədirmi? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"A B\".",
+    output: "\"VAR\" (eyni komponentdədir) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1 4", out:"VAR"},
+    approach: "A-dan DFS başladılır, DFS-in ziyarət etdiyi təpələr A ilə EYNİ komponentdədir; <b>visited[B]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int a, b; cin >> a >> b;
+    visited.assign(n + 1, false);
+    dfs(a);
+    cout << (visited[b] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda eyni komponentdədirmi (DFS, baza hal)",
+    difficulty: "easy",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, A və B verilib. A və B EYNİ bağlantı komponentindədirmi? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"A B\".",
+    output: "\"VAR\" (eyni komponentdədir) və ya \"YOX\".",
+    example: {in:"1 0\n1 1", out:"VAR"},
+    approach: "A-dan DFS başladılır, DFS-in ziyarət etdiyi təpələr A ilə EYNİ komponentdədir; <b>visited[B]</b> yoxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int a, b; cin >> a >> b;
+    visited.assign(n + 1, false);
+    dfs(a);
+    cout << (visited[b] ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Dördbucaq dövründə (1-2-3-4-1) iki hissəlidirmi (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qraf İKİ HİSSƏLİDİRMİ (2 rənglə elə boyanabilir ki, hər kənarın uçları fərqli rəngdə olsun)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (iki hissəlidir) və ya \"YOX\".",
+    example: {in:"4 4\n1 2\n2 3\n3 4\n4 1", out:"VAR"},
+    approach: "DFS ilə hər təpəyə NÖVBƏLƏŞƏN rəng (0/1) verilir: qonşu HƏMİŞƏ cari təpədən FƏRQLİ rəngdə olmalıdır. Əgər artıq rənglənmiş bir qonşunun rəngi EYNİDİRSƏ, qraf iki hissəli DEYİL.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color; // -1 = rənglənməyib
+bool ok;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) {
+        if (color[v] == -1) dfs(v, 1 - c);
+        else if (color[v] == c) ok = false;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    ok = true;
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Üçbucaqda (1-2-3-1) iki hissəlidirmi (DFS, yoxdur, tək dövr)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qraf İKİ HİSSƏLİDİRMİ (2 rənglə elə boyanabilir ki, hər kənarın uçları fərqli rəngdə olsun)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (iki hissəlidir) və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n1 3", out:"YOX"},
+    approach: "DFS ilə hər təpəyə NÖVBƏLƏŞƏN rəng (0/1) verilir: qonşu HƏMİŞƏ cari təpədən FƏRQLİ rəngdə olmalıdır. Əgər artıq rənglənmiş bir qonşunun rəngi EYNİDİRSƏ, qraf iki hissəli DEYİL.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color; // -1 = rənglənməyib
+bool ok;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) {
+        if (color[v] == -1) dfs(v, 1 - c);
+        else if (color[v] == c) ok = false;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    ok = true;
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda iki hissəlidirmi (DFS, ağac həmişə iki hissəlidir)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qraf İKİ HİSSƏLİDİRMİ (2 rənglə elə boyanabilir ki, hər kənarın uçları fərqli rəngdə olsun)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (iki hissəlidir) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"VAR"},
+    approach: "DFS ilə hər təpəyə NÖVBƏLƏŞƏN rəng (0/1) verilir: qonşu HƏMİŞƏ cari təpədən FƏRQLİ rəngdə olmalıdır. Əgər artıq rənglənmiş bir qonşunun rəngi EYNİDİRSƏ, qraf iki hissəli DEYİL.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color; // -1 = rənglənməyib
+bool ok;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) {
+        if (color[v] == -1) dfs(v, 1 - c);
+        else if (color[v] == c) ok = false;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    ok = true;
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda iki hissəlidirmi (DFS, baza hal, var)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qraf İKİ HİSSƏLİDİRMİ (2 rənglə elə boyanabilir ki, hər kənarın uçları fərqli rəngdə olsun)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (iki hissəlidir) və ya \"YOX\".",
+    example: {in:"3 0", out:"VAR"},
+    approach: "DFS ilə hər təpəyə NÖVBƏLƏŞƏN rəng (0/1) verilir: qonşu HƏMİŞƏ cari təpədən FƏRQLİ rəngdə olmalıdır. Əgər artıq rənglənmiş bir qonşunun rəngi EYNİDİRSƏ, qraf iki hissəli DEYİL.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color; // -1 = rənglənməyib
+bool ok;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) {
+        if (color[v] == -1) dfs(v, 1 - c);
+        else if (color[v] == c) ok = false;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    ok = true;
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Beşbucaq dövründə (5 təpəli tək dövr) iki hissəlidirmi (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Qraf İKİ HİSSƏLİDİRMİ (2 rənglə elə boyanabilir ki, hər kənarın uçları fərqli rəngdə olsun)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (iki hissəlidir) və ya \"YOX\".",
+    example: {in:"5 5\n1 2\n2 3\n3 4\n4 5\n5 1", out:"YOX"},
+    approach: "DFS ilə hər təpəyə NÖVBƏLƏŞƏN rəng (0/1) verilir: qonşu HƏMİŞƏ cari təpədən FƏRQLİ rəngdə olmalıdır. Əgər artıq rənglənmiş bir qonşunun rəngi EYNİDİRSƏ, qraf iki hissəli DEYİL.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color; // -1 = rənglənməyib
+bool ok;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) {
+        if (color[v] == -1) dfs(v, 1 - c);
+        else if (color[v] == c) ok = false;
+    }
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    ok = true;
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    cout << (ok ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4) ağacdırmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "ağac"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Bu qraf bir AĞACDIRMI (tam bağlıdır VƏ dövrü yoxdur)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (ağacdır) və ya \"YOX\".",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"VAR"},
+    approach: "Ağacın İKİ şərti var: (1) DÖVRSÜZ olmalı, (2) TAM BAĞLI olmalı. Bu, sadə ədədi şərtlə də yoxlanıla bilər: N təpəli bağlı qrafın AĞAC olması üçün DƏQİQ <b>M == N-1</b> kənarı olmalıdır VƏ qraf tam bağlı olmalıdır (DFS ilə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    if (m != n - 1) { cout << "YOX" << "\\n"; return 0; }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Dördbucaq dövründə (1-2-3-4-1) ağacdırmı (DFS, dövr var)",
+    difficulty: "mid",
+    tags: ["qraf", "ağac"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Bu qraf bir AĞACDIRMI (tam bağlıdır VƏ dövrü yoxdur)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (ağacdır) və ya \"YOX\".",
+    example: {in:"4 4\n1 2\n2 3\n3 4\n4 1", out:"YOX"},
+    approach: "Ağacın İKİ şərti var: (1) DÖVRSÜZ olmalı, (2) TAM BAĞLI olmalı. Bu, sadə ədədi şərtlə də yoxlanıla bilər: N təpəli bağlı qrafın AĞAC olması üçün DƏQİQ <b>M == N-1</b> kənarı olmalıdır VƏ qraf tam bağlı olmalıdır (DFS ilə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    if (m != n - 1) { cout << "YOX" << "\\n"; return 0; }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz 2 komponentli qrafda ağacdırmı (DFS, tam bağlı deyil)",
+    difficulty: "mid",
+    tags: ["qraf", "ağac"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Bu qraf bir AĞACDIRMI (tam bağlıdır VƏ dövrü yoxdur)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (ağacdır) və ya \"YOX\".",
+    example: {in:"4 2\n1 2\n3 4", out:"YOX"},
+    approach: "Ağacın İKİ şərti var: (1) DÖVRSÜZ olmalı, (2) TAM BAĞLI olmalı. Bu, sadə ədədi şərtlə də yoxlanıla bilər: N təpəli bağlı qrafın AĞAC olması üçün DƏQİQ <b>M == N-1</b> kənarı olmalıdır VƏ qraf tam bağlı olmalıdır (DFS ilə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    if (m != n - 1) { cout << "YOX" << "\\n"; return 0; }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ağacdırmı (DFS, baza hal, var)",
+    difficulty: "mid",
+    tags: ["qraf", "ağac"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Bu qraf bir AĞACDIRMI (tam bağlıdır VƏ dövrü yoxdur)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (ağacdır) və ya \"YOX\".",
+    example: {in:"1 0", out:"VAR"},
+    approach: "Ağacın İKİ şərti var: (1) DÖVRSÜZ olmalı, (2) TAM BAĞLI olmalı. Bu, sadə ədədi şərtlə də yoxlanıla bilər: N təpəli bağlı qrafın AĞAC olması üçün DƏQİQ <b>M == N-1</b> kənarı olmalıdır VƏ qraf tam bağlı olmalıdır (DFS ilə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    if (m != n - 1) { cout << "YOX" << "\\n"; return 0; }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda ağacdırmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "ağac"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. Bu qraf bir AĞACDIRMI (tam bağlıdır VƏ dövrü yoxdur)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "\"VAR\" (ağacdır) və ya \"YOX\".",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5", out:"VAR"},
+    approach: "Ağacın İKİ şərti var: (1) DÖVRSÜZ olmalı, (2) TAM BAĞLI olmalı. Bu, sadə ədədi şərtlə də yoxlanıla bilər: N təpəli bağlı qrafın AĞAC olması üçün DƏQİQ <b>M == N-1</b> kənarı olmalıdır VƏ qraf tam bağlı olmalıdır (DFS ilə).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    if (m != n - 1) { cout << "YOX" << "\\n"; return 0; }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir ağacda (1-2-3-4-5) 1-dən maksimum dərinlik (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf (AĞAC) və kök təpə S verilib. DFS ilə ağacın MAKSİMUM DƏRİNLİYİNİ (S-dən ən uzaq yarpağa qədər kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M (M=N-1, ağac), növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Maksimum dərinlik.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1", out:"4"},
+    approach: "Rekursiv DFS hər təpə üçün \"öz alt-ağacının dərinliyini\" qaytarır: <b>depth(u) = 1 + max(depth(v))</b> bütün uşaq v-lər üçün (uşağı olmayan təpə üçün 0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int best = 0;
+    for (int v : adj[u]) if (!visited[v]) best = max(best, 1 + dfs(v));
+    return best;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    cout << dfs(s) << "\\n";
+}`},
+  {
+    title: "Ulduz ağacda 1-dən maksimum dərinlik (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf (AĞAC) və kök təpə S verilib. DFS ilə ağacın MAKSİMUM DƏRİNLİYİNİ (S-dən ən uzaq yarpağa qədər kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M (M=N-1, ağac), növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Maksimum dərinlik.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"1"},
+    approach: "Rekursiv DFS hər təpə üçün \"öz alt-ağacının dərinliyini\" qaytarır: <b>depth(u) = 1 + max(depth(v))</b> bütün uşaq v-lər üçün (uşağı olmayan təpə üçün 0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int best = 0;
+    for (int v : adj[u]) if (!visited[v]) best = max(best, 1 + dfs(v));
+    return best;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    cout << dfs(s) << "\\n";
+}`},
+  {
+    title: "Tək təpəli ağacda maksimum dərinlik (DFS, baza hal, 0)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf (AĞAC) və kök təpə S verilib. DFS ilə ağacın MAKSİMUM DƏRİNLİYİNİ (S-dən ən uzaq yarpağa qədər kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M (M=N-1, ağac), növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Maksimum dərinlik.",
+    example: {in:"1 0\n1", out:"0"},
+    approach: "Rekursiv DFS hər təpə üçün \"öz alt-ağacının dərinliyini\" qaytarır: <b>depth(u) = 1 + max(depth(v))</b> bütün uşaq v-lər üçün (uşağı olmayan təpə üçün 0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int best = 0;
+    for (int v : adj[u]) if (!visited[v]) best = max(best, 1 + dfs(v));
+    return best;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    cout << dfs(s) << "\\n";
+}`},
+  {
+    title: "Balanslaşdırılmış ağacda (1-2,1-3,2-4,2-5) 1-dən maksimum dərinlik (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf (AĞAC) və kök təpə S verilib. DFS ilə ağacın MAKSİMUM DƏRİNLİYİNİ (S-dən ən uzaq yarpağa qədər kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M (M=N-1, ağac), növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Maksimum dərinlik.",
+    example: {in:"5 4\n1 2\n1 3\n2 4\n2 5\n1", out:"2"},
+    approach: "Rekursiv DFS hər təpə üçün \"öz alt-ağacının dərinliyini\" qaytarır: <b>depth(u) = 1 + max(depth(v))</b> bütün uşaq v-lər üçün (uşağı olmayan təpə üçün 0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int best = 0;
+    for (int v : adj[u]) if (!visited[v]) best = max(best, 1 + dfs(v));
+    return best;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    cout << dfs(s) << "\\n";
+}`},
+  {
+    title: "Zəncir ağacda ortadan başlayan maksimum dərinlik (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf (AĞAC) və kök təpə S verilib. DFS ilə ağacın MAKSİMUM DƏRİNLİYİNİ (S-dən ən uzaq yarpağa qədər kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M (M=N-1, ağac), növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Maksimum dərinlik.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n3", out:"2"},
+    approach: "Rekursiv DFS hər təpə üçün \"öz alt-ağacının dərinliyini\" qaytarır: <b>depth(u) = 1 + max(depth(v))</b> bütün uşaq v-lər üçün (uşağı olmayan təpə üçün 0).",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int best = 0;
+    for (int v : adj[u]) if (!visited[v]) best = max(best, 1 + dfs(v));
+    return best;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    visited.assign(n + 1, false);
+    cout << dfs(s) << "\\n";
+}`},
+  {
+    title: "Ulduz ağacda 1-dən yarpaq sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M=N-1 kənarlı YÖNƏLMƏMİŞ ağac və kök S verilib. DFS ilə ağacın YARPAQ (S-dən başqa, dərəcəsi 1 olan) təpələrinin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Yarpaq təpələrin sayı.",
+    example: {in:"5 4\n1 2\n1 3\n1 4\n1 5\n1", out:"4"},
+    approach: "DFS-də hər təpənin \"uşaq sayı\" hesablanır (valideyn İSTİSNA olmaqla qonşu sayı); uşaq sayı 0 olan (və kök olmayan) təpələr YARPAQDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+int leafCount = 0;
+void dfs(int u, int parent){
+    int children = 0;
+    for (int v : adj[u]) if (v != parent) { children++; dfs(v, u); }
+    if (children == 0) leafCount++;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    dfs(s, -1);
+    cout << leafCount << "\\n";
+}`},
+  {
+    title: "Zəncir ağacda 1-dən yarpaq sayı (DFS, tək yarpaq)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M=N-1 kənarlı YÖNƏLMƏMİŞ ağac və kök S verilib. DFS ilə ağacın YARPAQ (S-dən başqa, dərəcəsi 1 olan) təpələrinin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Yarpaq təpələrin sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n1", out:"1"},
+    approach: "DFS-də hər təpənin \"uşaq sayı\" hesablanır (valideyn İSTİSNA olmaqla qonşu sayı); uşaq sayı 0 olan (və kök olmayan) təpələr YARPAQDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+int leafCount = 0;
+void dfs(int u, int parent){
+    int children = 0;
+    for (int v : adj[u]) if (v != parent) { children++; dfs(v, u); }
+    if (children == 0) leafCount++;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    dfs(s, -1);
+    cout << leafCount << "\\n";
+}`},
+  {
+    title: "Tək təpəli ağacda yarpaq sayı (DFS, baza hal, kök özü yarpaq sayılır)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M=N-1 kənarlı YÖNƏLMƏMİŞ ağac və kök S verilib. DFS ilə ağacın YARPAQ (S-dən başqa, dərəcəsi 1 olan) təpələrinin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Yarpaq təpələrin sayı.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "DFS-də hər təpənin \"uşaq sayı\" hesablanır (valideyn İSTİSNA olmaqla qonşu sayı); uşaq sayı 0 olan (və kök olmayan) təpələr YARPAQDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+int leafCount = 0;
+void dfs(int u, int parent){
+    int children = 0;
+    for (int v : adj[u]) if (v != parent) { children++; dfs(v, u); }
+    if (children == 0) leafCount++;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    dfs(s, -1);
+    cout << leafCount << "\\n";
+}`},
+  {
+    title: "Balanslaşdırılmış ağacda (1-2,1-3,2-4,2-5) 1-dən yarpaq sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M=N-1 kənarlı YÖNƏLMƏMİŞ ağac və kök S verilib. DFS ilə ağacın YARPAQ (S-dən başqa, dərəcəsi 1 olan) təpələrinin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Yarpaq təpələrin sayı.",
+    example: {in:"5 4\n1 2\n1 3\n2 4\n2 5\n1", out:"3"},
+    approach: "DFS-də hər təpənin \"uşaq sayı\" hesablanır (valideyn İSTİSNA olmaqla qonşu sayı); uşaq sayı 0 olan (və kök olmayan) təpələr YARPAQDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+int leafCount = 0;
+void dfs(int u, int parent){
+    int children = 0;
+    for (int v : adj[u]) if (v != parent) { children++; dfs(v, u); }
+    if (children == 0) leafCount++;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    dfs(s, -1);
+    cout << leafCount << "\\n";
+}`},
+  {
+    title: "Zəncir ağacda ortadan baxılan yarpaq sayı (DFS, 2 yarpaq)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M=N-1 kənarlı YÖNƏLMƏMİŞ ağac və kök S verilib. DFS ilə ağacın YARPAQ (S-dən başqa, dərəcəsi 1 olan) təpələrinin sayını tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə S.",
+    output: "Yarpaq təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n3", out:"2"},
+    approach: "DFS-də hər təpənin \"uşaq sayı\" hesablanır (valideyn İSTİSNA olmaqla qonşu sayı); uşaq sayı 0 olan (və kök olmayan) təpələr YARPAQDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+int leafCount = 0;
+void dfs(int u, int parent){
+    int children = 0;
+    for (int v : adj[u]) if (v != parent) { children++; dfs(v, u); }
+    if (children == 0) leafCount++;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int s; cin >> s;
+    dfs(s, -1);
+    cout << leafCount << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda (1→2, 2→3) zəif bağlı komponent sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ NƏZƏRƏ ALMADAN (yönəlməmiş kimi baxaraq) NEÇƏ ZƏİF BAĞLI komponent olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "Zəif bağlı komponentlərin sayı.",
+    example: {in:"3 2\n1 2\n2 3", out:"1"},
+    approach: "Qonşuluq siyahısı HƏR kənar üçün HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edərək (yönü İTİRƏRƏK) qurulur, sonra adi bağlantı komponenti sayma DFS-i tətbiq olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (!visited[i]) { dfs(i); cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Yönlü əlaqəsiz qrafda zəif bağlı komponent sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ NƏZƏRƏ ALMADAN (yönəlməmiş kimi baxaraq) NEÇƏ ZƏİF BAĞLI komponent olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "Zəif bağlı komponentlərin sayı.",
+    example: {in:"4 2\n1 2\n3 4", out:"2"},
+    approach: "Qonşuluq siyahısı HƏR kənar üçün HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edərək (yönü İTİRƏRƏK) qurulur, sonra adi bağlantı komponenti sayma DFS-i tətbiq olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (!visited[i]) { dfs(i); cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) zəif bağlı komponent sayı (DFS, bir komponent)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ NƏZƏRƏ ALMADAN (yönəlməmiş kimi baxaraq) NEÇƏ ZƏİF BAĞLI komponent olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "Zəif bağlı komponentlərin sayı.",
+    example: {in:"3 3\n1 2\n2 3\n3 1", out:"1"},
+    approach: "Qonşuluq siyahısı HƏR kənar üçün HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edərək (yönü İTİRƏRƏK) qurulur, sonra adi bağlantı komponenti sayma DFS-i tətbiq olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (!visited[i]) { dfs(i); cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Kənarsız yönlü qrafda zəif bağlı komponent sayı (DFS, hamısı ayrı)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ NƏZƏRƏ ALMADAN (yönəlməmiş kimi baxaraq) NEÇƏ ZƏİF BAĞLI komponent olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "Zəif bağlı komponentlərin sayı.",
+    example: {in:"3 0", out:"3"},
+    approach: "Qonşuluq siyahısı HƏR kənar üçün HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edərək (yönü İTİRƏRƏK) qurulur, sonra adi bağlantı komponenti sayma DFS-i tətbiq olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (!visited[i]) { dfs(i); cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda (əks istiqamətli kənarlar) zəif bağlı komponent sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ NƏZƏRƏ ALMADAN (yönəlməmiş kimi baxaraq) NEÇƏ ZƏİF BAĞLI komponent olduğunu DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "Zəif bağlı komponentlərin sayı.",
+    example: {in:"3 2\n1 2\n3 2", out:"1"},
+    approach: "Qonşuluq siyahısı HƏR kənar üçün HƏM <b>adj[u]</b>-ya v, HƏM <b>adj[v]</b>-yə u əlavə edərək (yönü İTİRƏRƏK) qurulur, sonra adi bağlantı komponenti sayma DFS-i tətbiq olunur.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (!visited[i]) { dfs(i); cnt++; }
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda (üçbucaq + cüt) ən kiçik komponent ölçüsü (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN KİÇİK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən kiçik komponentin təpə sayı.",
+    example: {in:"6 4\n1 2\n2 3\n1 3\n4 5", out:"1"},
+    approach: "Hər komponentin ölçüsü DFS ilə hesablanır; bütün komponentlər arasında MİNİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = INT_MAX;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = min(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Kənarsız 5 təpəli qrafda ən kiçik komponent ölçüsü (DFS, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN KİÇİK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən kiçik komponentin təpə sayı.",
+    example: {in:"5 0", out:"1"},
+    approach: "Hər komponentin ölçüsü DFS ilə hesablanır; bütün komponentlər arasında MİNİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = INT_MAX;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = min(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tam bağlı 4 təpəli qrafda ən kiçik komponent ölçüsü (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN KİÇİK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən kiçik komponentin təpə sayı.",
+    example: {in:"4 3\n1 2\n2 3\n3 4", out:"4"},
+    approach: "Hər komponentin ölçüsü DFS ilə hesablanır; bütün komponentlər arasında MİNİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = INT_MAX;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = min(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda ən kiçik komponent ölçüsü (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN KİÇİK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən kiçik komponentin təpə sayı.",
+    example: {in:"1 0", out:"1"},
+    approach: "Hər komponentin ölçüsü DFS ilə hesablanır; bütün komponentlər arasında MİNİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = INT_MAX;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = min(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "7 təpəli qrafda (4-lük + izolə) ən kiçik komponent ölçüsü (DFS, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib. ƏN KİÇİK bağlantı komponentinin (təpə sayı) ölçüsünü DFS ilə tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "Ən kiçik komponentin təpə sayı.",
+    example: {in:"7 3\n1 2\n2 3\n3 4", out:"1"},
+    approach: "Hər komponentin ölçüsü DFS ilə hesablanır; bütün komponentlər arasında MİNİMUM ölçü saxlanılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int dfs(int u){
+    visited[u] = true;
+    int size = 1;
+    for (int v : adj[u]) if (!visited[v]) size += dfs(v);
+    return size;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    int best = INT_MAX;
+    for (int i = 1; i <= n; i++)
+        if (!visited[i]) best = min(best, dfs(i));
+    cout << best << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən DFS-də 4-cü təpənin sırası",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. DFS gəzintisində T-nin NEÇƏNCİ (1-dən başlayaraq) ziyarət olunduğunu tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "T-nin DFS ziyarət sırasındakı nömrəsi (T əlçatmazdırsa -1).",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 4", out:"4"},
+    approach: "DFS zamanı hər ziyarət olunan təpəyə ARDICIL nömrə (1,2,3,...) verilir; T-nin nömrəsi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> order_idx;
+int counter_ = 0;
+void dfs(int u){
+    order_idx[u] = ++counter_;
+    for (int v : adj[u]) if (order_idx[v] == 0) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    order_idx.assign(n + 1, 0);
+    dfs(s);
+    cout << (order_idx[t] == 0 ? -1 : order_idx[t]) << "\\n";
+}`},
+  {
+    title: "Ulduz qrafda 1-dən DFS-də 3-cü təpənin sırası",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. DFS gəzintisində T-nin NEÇƏNCİ (1-dən başlayaraq) ziyarət olunduğunu tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "T-nin DFS ziyarət sırasındakı nömrəsi (T əlçatmazdırsa -1).",
+    example: {in:"4 3\n1 2\n1 3\n1 4\n1 3", out:"3"},
+    approach: "DFS zamanı hər ziyarət olunan təpəyə ARDICIL nömrə (1,2,3,...) verilir; T-nin nömrəsi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> order_idx;
+int counter_ = 0;
+void dfs(int u){
+    order_idx[u] = ++counter_;
+    for (int v : adj[u]) if (order_idx[v] == 0) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    order_idx.assign(n + 1, 0);
+    dfs(s);
+    cout << (order_idx[t] == 0 ? -1 : order_idx[t]) << "\\n";
+}`},
+  {
+    title: "Əlaqəsiz qrafda DFS-də əlçatmaz təpənin sırası (DFS, -1)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. DFS gəzintisində T-nin NEÇƏNCİ (1-dən başlayaraq) ziyarət olunduğunu tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "T-nin DFS ziyarət sırasındakı nömrəsi (T əlçatmazdırsa -1).",
+    example: {in:"4 1\n1 2\n1 4", out:"-1"},
+    approach: "DFS zamanı hər ziyarət olunan təpəyə ARDICIL nömrə (1,2,3,...) verilir; T-nin nömrəsi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> order_idx;
+int counter_ = 0;
+void dfs(int u){
+    order_idx[u] = ++counter_;
+    for (int v : adj[u]) if (order_idx[v] == 0) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    order_idx.assign(n + 1, 0);
+    dfs(s);
+    cout << (order_idx[t] == 0 ? -1 : order_idx[t]) << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda DFS-də özünün sırası (DFS, baza hal, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. DFS gəzintisində T-nin NEÇƏNCİ (1-dən başlayaraq) ziyarət olunduğunu tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "T-nin DFS ziyarət sırasındakı nömrəsi (T əlçatmazdırsa -1).",
+    example: {in:"1 0\n1 1", out:"1"},
+    approach: "DFS zamanı hər ziyarət olunan təpəyə ARDICIL nömrə (1,2,3,...) verilir; T-nin nömrəsi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> order_idx;
+int counter_ = 0;
+void dfs(int u){
+    order_idx[u] = ++counter_;
+    for (int v : adj[u]) if (order_idx[v] == 0) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    order_idx.assign(n + 1, 0);
+    dfs(s);
+    cout << (order_idx[t] == 0 ? -1 : order_idx[t]) << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 2-dən DFS-də 1-ci təpənin sırası",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, başlanğıc S və hədəf T verilib. DFS gəzintisində T-nin NEÇƏNCİ (1-dən başlayaraq) ziyarət olunduğunu tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "T-nin DFS ziyarət sırasındakı nömrəsi (T əlçatmazdırsa -1).",
+    example: {in:"3 3\n1 2\n2 3\n1 3\n2 1", out:"2"},
+    approach: "DFS zamanı hər ziyarət olunan təpəyə ARDICIL nömrə (1,2,3,...) verilir; T-nin nömrəsi cavabdır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> order_idx;
+int counter_ = 0;
+void dfs(int u){
+    order_idx[u] = ++counter_;
+    for (int v : adj[u]) if (order_idx[v] == 0) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    order_idx.assign(n + 1, 0);
+    dfs(s);
+    cout << (order_idx[t] == 0 ? -1 : order_idx[t]) << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda (iki üçbucaq) 5-in komponent nömrəsi (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. Komponentlər KƏŞF OLUNMA sırasına görə 1-dən başlayaraq nömrələnir (DFS 1-ci təpədən, sonra ziyarət edilməmiş ən kiçik nömrəli təpədən davam edir). V-nin komponent nömrəsini tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponent nömrəsi.",
+    example: {in:"6 6\n1 2\n2 3\n1 3\n4 5\n5 6\n4 6\n5", out:"2"},
+    approach: "1-dən N-ə qədər gəzilir; hər ZİYARƏT OLUNMAMIŞ təpə YENİ komponent nömrəsi alır və oradan DFS başladılaraq bütün komponentə HƏMİN nömrə verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> comp;
+void dfs(int u, int c){
+    comp[u] = c;
+    for (int v : adj[u]) if (comp[v] == 0) dfs(v, c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    comp.assign(n + 1, 0);
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (comp[i] == 0) { c++; dfs(i, c); }
+    cout << comp[vtx] << "\\n";
+}`},
+  {
+    title: "6 təpəli qrafda 1-in komponent nömrəsi (DFS, ilk komponent)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. Komponentlər KƏŞF OLUNMA sırasına görə 1-dən başlayaraq nömrələnir (DFS 1-ci təpədən, sonra ziyarət edilməmiş ən kiçik nömrəli təpədən davam edir). V-nin komponent nömrəsini tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponent nömrəsi.",
+    example: {in:"6 6\n1 2\n2 3\n1 3\n4 5\n5 6\n4 6\n1", out:"1"},
+    approach: "1-dən N-ə qədər gəzilir; hər ZİYARƏT OLUNMAMIŞ təpə YENİ komponent nömrəsi alır və oradan DFS başladılaraq bütün komponentə HƏMİN nömrə verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> comp;
+void dfs(int u, int c){
+    comp[u] = c;
+    for (int v : adj[u]) if (comp[v] == 0) dfs(v, c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    comp.assign(n + 1, 0);
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (comp[i] == 0) { c++; dfs(i, c); }
+    cout << comp[vtx] << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda 3-cü təpənin komponent nömrəsi (DFS, hər təpə öz komponenti)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. Komponentlər KƏŞF OLUNMA sırasına görə 1-dən başlayaraq nömrələnir (DFS 1-ci təpədən, sonra ziyarət edilməmiş ən kiçik nömrəli təpədən davam edir). V-nin komponent nömrəsini tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponent nömrəsi.",
+    example: {in:"5 0\n3", out:"3"},
+    approach: "1-dən N-ə qədər gəzilir; hər ZİYARƏT OLUNMAMIŞ təpə YENİ komponent nömrəsi alır və oradan DFS başladılaraq bütün komponentə HƏMİN nömrə verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> comp;
+void dfs(int u, int c){
+    comp[u] = c;
+    for (int v : adj[u]) if (comp[v] == 0) dfs(v, c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    comp.assign(n + 1, 0);
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (comp[i] == 0) { c++; dfs(i, c); }
+    cout << comp[vtx] << "\\n";
+}`},
+  {
+    title: "Tam bağlı qrafda 4-cü təpənin komponent nömrəsi (DFS, tək komponent)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. Komponentlər KƏŞF OLUNMA sırasına görə 1-dən başlayaraq nömrələnir (DFS 1-ci təpədən, sonra ziyarət edilməmiş ən kiçik nömrəli təpədən davam edir). V-nin komponent nömrəsini tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponent nömrəsi.",
+    example: {in:"4 3\n1 2\n2 3\n3 4\n4", out:"1"},
+    approach: "1-dən N-ə qədər gəzilir; hər ZİYARƏT OLUNMAMIŞ təpə YENİ komponent nömrəsi alır və oradan DFS başladılaraq bütün komponentə HƏMİN nömrə verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> comp;
+void dfs(int u, int c){
+    comp[u] = c;
+    for (int v : adj[u]) if (comp[v] == 0) dfs(v, c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    comp.assign(n + 1, 0);
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (comp[i] == 0) { c++; dfs(i, c); }
+    cout << comp[vtx] << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda komponent nömrəsi (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "komponent"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf və təpə V verilib. Komponentlər KƏŞF OLUNMA sırasına görə 1-dən başlayaraq nömrələnir (DFS 1-ci təpədən, sonra ziyarət edilməmiş ən kiçik nömrəli təpədən davam edir). V-nin komponent nömrəsini tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə V.",
+    output: "V-nin komponent nömrəsi.",
+    example: {in:"1 0\n1", out:"1"},
+    approach: "1-dən N-ə qədər gəzilir; hər ZİYARƏT OLUNMAMIŞ təpə YENİ komponent nömrəsi alır və oradan DFS başladılaraq bütün komponentə HƏMİN nömrə verilir.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> comp;
+void dfs(int u, int c){
+    comp[u] = c;
+    for (int v : adj[u]) if (comp[v] == 0) dfs(v, c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    int vtx; cin >> vtx;
+    comp.assign(n + 1, 0);
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (comp[i] == 0) { c++; dfs(i, c); }
+    cout << comp[vtx] << "\\n";
+}`},
+  {
+    title: "Yönlü zəncirdə (1→2→3) zəif bağlıdırmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ nəzərə almadan (yönəlməmiş kimi) qraf ZƏİF BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (zəif bağlıdır) və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n2 3", out:"VAR"},
+    approach: "Qonşuluq siyahısı HƏR iki istiqamətdə qurulur (yön itirilir), sonra 1-ci təpədən DFS başladılır; bütün N təpə ziyarət olunubsa, qraf ZƏİF BAĞLIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü əlaqəsiz qrafda zəif bağlıdırmı (DFS, yoxdur)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ nəzərə almadan (yönəlməmiş kimi) qraf ZƏİF BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (zəif bağlıdır) və ya \"YOX\".",
+    example: {in:"4 2\n1 2\n3 4", out:"YOX"},
+    approach: "Qonşuluq siyahısı HƏR iki istiqamətdə qurulur (yön itirilir), sonra 1-ci təpədən DFS başladılır; bütün N təpə ziyarət olunubsa, qraf ZƏİF BAĞLIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü dövrdə (1→2→3→1) zəif bağlıdırmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ nəzərə almadan (yönəlməmiş kimi) qraf ZƏİF BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (zəif bağlıdır) və ya \"YOX\".",
+    example: {in:"3 3\n1 2\n2 3\n3 1", out:"VAR"},
+    approach: "Qonşuluq siyahısı HƏR iki istiqamətdə qurulur (yön itirilir), sonra 1-ci təpədən DFS başladılır; bütün N təpə ziyarət olunubsa, qraf ZƏİF BAĞLIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Tək təpəli yönlü qrafda zəif bağlıdırmı (DFS, baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ nəzərə almadan (yönəlməmiş kimi) qraf ZƏİF BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (zəif bağlıdır) və ya \"YOX\".",
+    example: {in:"1 0", out:"VAR"},
+    approach: "Qonşuluq siyahısı HƏR iki istiqamətdə qurulur (yön itirilir), sonra 1-ci təpədən DFS başladılır; bütün N təpə ziyarət olunubsa, qraf ZƏİF BAĞLIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Yönlü qrafda (əks istiqamətli kənarlar) zəif bağlıdırmı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "yönlü"],
+    statement: "N təpəli, M kənarlı YÖNLÜ qraf verilib. Kənarların İSTİQAMƏTİNİ nəzərə almadan (yönəlməmiş kimi) qraf ZƏİF BAĞLIDIRMI (bir komponentdən ibarətdirmi)? DFS ilə \"VAR\"/\"YOX\" tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" (yönlü kənar).",
+    output: "\"VAR\" (zəif bağlıdır) və ya \"YOX\".",
+    example: {in:"3 2\n1 2\n3 2", out:"VAR"},
+    approach: "Qonşuluq siyahısı HƏR iki istiqamətdə qurulur (yön itirilir), sonra 1-ci təpədən DFS başladılır; bütün N təpə ziyarət olunubsa, qraf ZƏİF BAĞLIDIR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+void dfs(int u){
+    visited[u] = true;
+    for (int v : adj[u]) if (!visited[v]) dfs(v);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n + 1, false);
+    dfs(1);
+    bool all = true;
+    for (int i = 1; i <= n; i++) if (!visited[i]) all = false;
+    cout << (all ? "VAR" : "YOX") << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda 1-dən 5-ə DFS-in tapdığı yol uzunluğu",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib (T S-dən çatıla bilər). DFS-in (qonşuları HƏMIŞƏ ARTAN nömrə sırasında sınayaraq) S-dən T-yə TAPDIĞI yolun UZUNLUĞUNU (kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "DFS-in tapdığı yolun uzunluğu (kənar sayı).",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5\n1 5", out:"4"},
+    approach: "DFS qonşuları ARTAN nömrə sırasında sınayır; T tapılanda CARİ YOLUN (rekursiya zəncirinin) uzunluğu qaytarılır. DFS BFS kimi QISA yolu zəmanətli tapmır — \"ilk tapdığı\" yolu tapır, bu da ARTAN sırada sınamanın nəticəsi kimi DETERMİNİSTİKDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int target;
+int dfs(int u, int len){
+    if (u == target) return len;
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            int r = dfs(v, len + 1);
+            if (r != -1) return r;
+        }
+    }
+    return -1;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    target = t;
+    visited.assign(n + 1, false);
+    cout << dfs(s, 0) << "\\n";
+}`},
+  {
+    title: "Romb qrafda (1-2-4, 1-3-4) 1-dən 4-ə DFS-in tapdığı yol uzunluğu",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib (T S-dən çatıla bilər). DFS-in (qonşuları HƏMIŞƏ ARTAN nömrə sırasında sınayaraq) S-dən T-yə TAPDIĞI yolun UZUNLUĞUNU (kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "DFS-in tapdığı yolun uzunluğu (kənar sayı).",
+    example: {in:"4 4\n1 2\n1 3\n2 4\n3 4\n1 4", out:"2"},
+    approach: "DFS qonşuları ARTAN nömrə sırasında sınayır; T tapılanda CARİ YOLUN (rekursiya zəncirinin) uzunluğu qaytarılır. DFS BFS kimi QISA yolu zəmanətli tapmır — \"ilk tapdığı\" yolu tapır, bu da ARTAN sırada sınamanın nəticəsi kimi DETERMİNİSTİKDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int target;
+int dfs(int u, int len){
+    if (u == target) return len;
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            int r = dfs(v, len + 1);
+            if (r != -1) return r;
+        }
+    }
+    return -1;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    target = t;
+    visited.assign(n + 1, false);
+    cout << dfs(s, 0) << "\\n";
+}`},
+  {
+    title: "Eyni təpədən eyni təpəyə DFS-in tapdığı yol uzunluğu (0)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib (T S-dən çatıla bilər). DFS-in (qonşuları HƏMIŞƏ ARTAN nömrə sırasında sınayaraq) S-dən T-yə TAPDIĞI yolun UZUNLUĞUNU (kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "DFS-in tapdığı yolun uzunluğu (kənar sayı).",
+    example: {in:"3 2\n1 2\n2 3\n1 1", out:"0"},
+    approach: "DFS qonşuları ARTAN nömrə sırasında sınayır; T tapılanda CARİ YOLUN (rekursiya zəncirinin) uzunluğu qaytarılır. DFS BFS kimi QISA yolu zəmanətli tapmır — \"ilk tapdığı\" yolu tapır, bu da ARTAN sırada sınamanın nəticəsi kimi DETERMİNİSTİKDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int target;
+int dfs(int u, int len){
+    if (u == target) return len;
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            int r = dfs(v, len + 1);
+            if (r != -1) return r;
+        }
+    }
+    return -1;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    target = t;
+    visited.assign(n + 1, false);
+    cout << dfs(s, 0) << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda DFS-in tapdığı yol uzunluğu (baza hal)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib (T S-dən çatıla bilər). DFS-in (qonşuları HƏMIŞƏ ARTAN nömrə sırasında sınayaraq) S-dən T-yə TAPDIĞI yolun UZUNLUĞUNU (kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "DFS-in tapdığı yolun uzunluğu (kənar sayı).",
+    example: {in:"1 0\n1 1", out:"0"},
+    approach: "DFS qonşuları ARTAN nömrə sırasında sınayır; T tapılanda CARİ YOLUN (rekursiya zəncirinin) uzunluğu qaytarılır. DFS BFS kimi QISA yolu zəmanətli tapmır — \"ilk tapdığı\" yolu tapır, bu da ARTAN sırada sınamanın nəticəsi kimi DETERMİNİSTİKDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int target;
+int dfs(int u, int len){
+    if (u == target) return len;
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            int r = dfs(v, len + 1);
+            if (r != -1) return r;
+        }
+    }
+    return -1;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    target = t;
+    visited.assign(n + 1, false);
+    cout << dfs(s, 0) << "\\n";
+}`},
+  {
+    title: "Üçbucaqda 1-dən 3-ə DFS-in tapdığı yol uzunluğu (birbaşa kənar tapılır)",
+    difficulty: "mid",
+    tags: ["qraf", "dfs"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf, S və T verilib (T S-dən çatıla bilər). DFS-in (qonşuları HƏMIŞƏ ARTAN nömrə sırasında sınayaraq) S-dən T-yə TAPDIĞI yolun UZUNLUĞUNU (kənar sayı) tapın.",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\", son sətirdə \"S T\".",
+    output: "DFS-in tapdığı yolun uzunluğu (kənar sayı).",
+    example: {in:"3 3\n1 2\n1 3\n2 3\n1 3", out:"2"},
+    approach: "DFS qonşuları ARTAN nömrə sırasında sınayır; T tapılanda CARİ YOLUN (rekursiya zəncirinin) uzunluğu qaytarılır. DFS BFS kimi QISA yolu zəmanətli tapmır — \"ilk tapdığı\" yolu tapır, bu da ARTAN sırada sınamanın nəticəsi kimi DETERMİNİSTİKDİR.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<bool> visited;
+int target;
+int dfs(int u, int len){
+    if (u == target) return len;
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            int r = dfs(v, len + 1);
+            if (r != -1) return r;
+        }
+    }
+    return -1;
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    for (int i = 1; i <= n; i++) sort(adj[i].begin(), adj[i].end());
+    int s, t; cin >> s >> t;
+    target = t;
+    visited.assign(n + 1, false);
+    cout << dfs(s, 0) << "\\n";
+}`},
+  {
+    title: "Dördbucaq dövründə (1-2-3-4-1) 0-cı rəngli təpə sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib (iki hissəli olduğu təmin edilib). DFS ilə 2-rəngli boyama aparıb, 0-CI RƏNGDƏ olan təpələrin sayını tapın (DFS 1-ci təpədən başlayır və ona 0-cı rəng verilir).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "0-cı rəngdəki təpələrin sayı.",
+    example: {in:"4 4\n1 2\n2 3\n3 4\n4 1", out:"2"},
+    approach: "DFS ilə hər komponent NÖVBƏLƏŞƏN (0/1) rənglə boyanır (hər YENİ komponent 0-dan başlayır); sonda rəngi 0 olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) if (color[v] == -1) dfs(v, 1 - c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (color[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Zəncir qrafda (1-2-3-4-5) 0-cı rəngli təpə sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib (iki hissəli olduğu təmin edilib). DFS ilə 2-rəngli boyama aparıb, 0-CI RƏNGDƏ olan təpələrin sayını tapın (DFS 1-ci təpədən başlayır və ona 0-cı rəng verilir).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "0-cı rəngdəki təpələrin sayı.",
+    example: {in:"5 4\n1 2\n2 3\n3 4\n4 5", out:"3"},
+    approach: "DFS ilə hər komponent NÖVBƏLƏŞƏN (0/1) rənglə boyanır (hər YENİ komponent 0-dan başlayır); sonda rəngi 0 olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) if (color[v] == -1) dfs(v, 1 - c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (color[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Kənarsız qrafda 0-cı rəngli təpə sayı (DFS, hamısı 0)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib (iki hissəli olduğu təmin edilib). DFS ilə 2-rəngli boyama aparıb, 0-CI RƏNGDƏ olan təpələrin sayını tapın (DFS 1-ci təpədən başlayır və ona 0-cı rəng verilir).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "0-cı rəngdəki təpələrin sayı.",
+    example: {in:"4 0", out:"4"},
+    approach: "DFS ilə hər komponent NÖVBƏLƏŞƏN (0/1) rənglə boyanır (hər YENİ komponent 0-dan başlayır); sonda rəngi 0 olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) if (color[v] == -1) dfs(v, 1 - c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (color[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "Tək təpəli qrafda 0-cı rəngli təpə sayı (DFS, baza hal, 1)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib (iki hissəli olduğu təmin edilib). DFS ilə 2-rəngli boyama aparıb, 0-CI RƏNGDƏ olan təpələrin sayını tapın (DFS 1-ci təpədən başlayır və ona 0-cı rəng verilir).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "0-cı rəngdəki təpələrin sayı.",
+    example: {in:"1 0", out:"1"},
+    approach: "DFS ilə hər komponent NÖVBƏLƏŞƏN (0/1) rənglə boyanır (hər YENİ komponent 0-dan başlayır); sonda rəngi 0 olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) if (color[v] == -1) dfs(v, 1 - c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (color[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+  {
+    title: "İki ayrı zəncirdən ibarət qrafda 0-cı rəngli təpə sayı (DFS)",
+    difficulty: "mid",
+    tags: ["qraf", "bipartite"],
+    statement: "N təpəli, M kənarlı YÖNƏLMƏMİŞ qraf verilib (iki hissəli olduğu təmin edilib). DFS ilə 2-rəngli boyama aparıb, 0-CI RƏNGDƏ olan təpələrin sayını tapın (DFS 1-ci təpədən başlayır və ona 0-cı rəng verilir).",
+    input: "Birinci sətirdə N və M, növbəti M sətirdə \"u v\" kənarları.",
+    output: "0-cı rəngdəki təpələrin sayı.",
+    example: {in:"6 4\n1 2\n2 3\n4 5\n5 6", out:"4"},
+    approach: "DFS ilə hər komponent NÖVBƏLƏŞƏN (0/1) rənglə boyanır (hər YENİ komponent 0-dan başlayır); sonda rəngi 0 olan təpələr sayılır.",
+    solution:
+`#include <bits/stdc++.h>
+using namespace std;
+vector<vector<int>> adj;
+vector<int> color;
+void dfs(int u, int c){
+    color[u] = c;
+    for (int v : adj[u]) if (color[v] == -1) dfs(v, 1 - c);
+}
+int main(){
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    color.assign(n + 1, -1);
+    for (int i = 1; i <= n; i++) if (color[i] == -1) dfs(i, 0);
+    int cnt = 0;
+    for (int i = 1; i <= n; i++) if (color[i] == 0) cnt++;
+    cout << cnt << "\\n";
+}`},
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Kod sətirlərini rəngli <span>-larla vurğulamaq üçün sadə tokenləşdirmə —
+   əsas hazırlıq faylındakı highlightCppLine məntiqi ilə eynidir. */
+const CPP_TOKEN_PATTERNS = [
+  ['cmt', /\/\/.*$/],
+  ['str', /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/],
+  ['pp', /#\s*include\s*(?:&lt;[^&]*&gt;|"[^"]*")/],
+  ['num', /\b\d+(?:\.\d+)?\b/],
+  ['kw', /\b(?:for|while|if|else|return|break|continue|switch|case|default|struct|class|public|private|using|namespace|const|auto|static|void|do|new|delete|cin|cout|endl|true|false|nullptr)\b/],
+  ['tp', /\b(?:int|long|double|float|char|bool|string|vector|map|size_t|short|unsigned)\b/],
+];
+function highlightCppLine(rawLine){
+  const escaped = escapeHtml(rawLine);
+  const combined = new RegExp(CPP_TOKEN_PATTERNS.map(p => '(' + p[1].source + ')').join('|'), 'g');
+  let out = '', last = 0, m;
+  while ((m = combined.exec(escaped)) !== null){
+    out += escaped.slice(last, m.index);
+    for (let i = 0; i < CPP_TOKEN_PATTERNS.length; i++){
+      if (m[i + 1] !== undefined){
+        out += `<span class="${CPP_TOKEN_PATTERNS[i][0]}">${m[i + 1]}</span>`;
+        break;
+      }
+    }
+    last = combined.lastIndex;
+    if (m.index === combined.lastIndex) combined.lastIndex++;
+  }
+  out += escaped.slice(last);
+  return out || '&nbsp;';
+}
+function renderCodeBlock(code){
+  const lines = code.split('\n');
+  const rows = lines.map((line, idx) => `<div class="code-line"><span class="line-no">${idx+1}</span><code>${highlightCppLine(line)}</code></div>`).join('');
+  return `<div class="code-block">${rows}</div>`;
+}
+
+
+const solutionLinks = [
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/001_dfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/002_dfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/003_dfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/004_dfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/005_dfs_gezinti_sirasi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/006_dfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/007_dfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/008_dfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/009_dfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/010_dfs_var_yol.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/011_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/012_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/013_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/014_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/015_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/016_en_boyuk_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/017_en_boyuk_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/018_en_boyuk_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/019_en_boyuk_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/020_en_boyuk_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/021_komponentde_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/022_komponentde_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/023_komponentde_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/024_komponentde_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/025_komponentde_teepe_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/026_qraf_tam_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/027_qraf_tam_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/028_qraf_tam_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/029_qraf_tam_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/030_qraf_tam_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/031_dfs_dovr_var_yonlenmemis.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/032_dfs_dovr_var_yonlenmemis.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/033_dfs_dovr_var_yonlenmemis.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/034_dfs_dovr_var_yonlenmemis.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/035_dfs_dovr_var_yonlenmemis.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/036_dfs_dovr_var_yonlu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/037_dfs_dovr_var_yonlu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/038_dfs_dovr_var_yonlu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/039_dfs_dovr_var_yonlu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/040_dfs_dovr_var_yonlu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/041_iki_teepe_eyni_komponentde_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/042_iki_teepe_eyni_komponentde_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/043_iki_teepe_eyni_komponentde_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/044_iki_teepe_eyni_komponentde_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/045_iki_teepe_eyni_komponentde_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/046_qraf_iki_hisseli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/047_qraf_iki_hisseli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/048_qraf_iki_hisseli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/049_qraf_iki_hisseli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/050_qraf_iki_hisseli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/051_agac_qraf_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/052_agac_qraf_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/053_agac_qraf_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/054_agac_qraf_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/055_agac_qraf_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/056_dfs_derinlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/057_dfs_derinlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/058_dfs_derinlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/059_dfs_derinlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/060_dfs_derinlik.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/061_dfs_yarpaq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/062_dfs_yarpaq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/063_dfs_yarpaq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/064_dfs_yarpaq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/065_dfs_yarpaq_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/066_zeif_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/067_zeif_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/068_zeif_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/069_zeif_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/070_zeif_bagli_komponent_sayi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/071_en_kicik_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/072_en_kicik_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/073_en_kicik_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/074_en_kicik_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/075_en_kicik_komponent_olcusu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/076_dfs_ziyaret_sirasi_indeksi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/077_dfs_ziyaret_sirasi_indeksi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/078_dfs_ziyaret_sirasi_indeksi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/079_dfs_ziyaret_sirasi_indeksi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/080_dfs_ziyaret_sirasi_indeksi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/081_teepenin_komponent_nomresi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/082_teepenin_komponent_nomresi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/083_teepenin_komponent_nomresi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/084_teepenin_komponent_nomresi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/085_teepenin_komponent_nomresi.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/086_yonlu_zeif_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/087_yonlu_zeif_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/088_yonlu_zeif_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/089_yonlu_zeif_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/090_yonlu_zeif_bagli_var.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/091_dfs_ile_tapilan_yol_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/092_dfs_ile_tapilan_yol_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/093_dfs_ile_tapilan_yol_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/094_dfs_ile_tapilan_yol_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/095_dfs_ile_tapilan_yol_uzunlugu.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/096_iki_hisseli_balans.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/097_iki_hisseli_balans.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/098_iki_hisseli_balans.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/099_iki_hisseli_balans.cpp",
+  "https://github.com/ismayilqarayev/azercell-cup-platform/blob/main/solutions/movzu15/100_iki_hisseli_balans.cpp",
+];
+
+const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
+
+const container = document.getElementById('problems');
+const showAdminTc = isAdminOrTeacher();
+problems.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'problem';
+  el.id = 'problem-' + i;
+  const adminTcHtml = showAdminTc ? `
+        <div class="admin-tc-panel">
+          <p class="sub-label">🔒 Gizli test halları (admin/müəllim)</p>
+          <div class="admin-tc-list" id="adminTcList-${i}"><span style="font-size:11px;color:var(--ink-soft);">Açanda yüklənəcək...</span></div>
+          <div class="admin-tc-add">
+            <textarea class="admin-tc-input" id="newTcInput-${i}" placeholder="Giriş (stdin)" rows="2"></textarea>
+            <textarea class="admin-tc-input" id="newTcOutput-${i}" placeholder="Gözlənilən çıxış" rows="2"></textarea>
+            <button type="button" class="admin-tc-btn" onclick="addAdminTestCase(${i})">+ Gizli test əlavə et</button>
+          </div>
+        </div>` : '';
+  el.innerHTML = `
+    <div class="problem-head" onclick="toggleProblem(${i})">
+      <div class="problem-num">M${String(i+1).padStart(2,'0')}</div>
+      <div class="problem-main">
+        <h3>${p.title}</h3>
+        <span class="difficulty ${p.difficulty}">${p.difficulty === 'easy' ? 'ASAN' : 'ORTA'}</span>
+        <span class="solved-badge" id="solved-${i}" style="display:none;">✓ Həll edilib</span>
+      </div>
+      <span class="problem-chevron">▾</span>
+    </div>
+    <div class="problem-body">
+      <div class="problem-left">
+        <p>${p.statement}</p>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Giriş</div><pre>${escapeHtml(p.input)}</pre></div>
+          <div class="io-box"><div class="lbl">Çıxış</div><pre>${escapeHtml(p.output)}</pre></div>
+        </div>
+        <div class="io-grid">
+          <div class="io-box"><div class="lbl">Nümunə giriş</div><pre>${escapeHtml(p.example.in)}</pre></div>
+          <div class="io-box"><div class="lbl">Nümunə çıxış</div><pre>${escapeHtml(p.example.out)}</pre></div>
+        </div>
+        <div class="tag-row">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="solution-inner approach-block">
+          <p class="sub-label">Yanaşma</p>
+          <p class="approach">${p.approach}</p>
+        </div>
+        <button type="button" class="reveal-btn" data-url="${solutionLinks[i]}" onclick="requestReveal(this)">
+          <span class="arrow">↗</span><span class="reveal-label">Həlli göstər (GitHub)</span>
+        </button>${adminTcHtml}
+      </div>
+      <div class="problem-right">
+        <div class="submit-panel">
+          <p class="sub-label">Kodunu göndər</p>
+          <div class="code-editor">
+            <div class="code-gutter" id="gutter-${i}"></div>
+            <textarea class="code-input" id="code-${i}" spellcheck="false" wrap="off" oninput="syncGutter(${i})" onscroll="syncGutterScroll(${i})">${escapeHtml(STARTER_CPP)}</textarea>
+          </div>
+          <div class="submit-row">
+            <button type="button" class="submit-btn" id="submit-btn-${i}" onclick="submitCode(${i})">Kodu göndər</button>
+            <button type="button" class="history-btn" onclick="toggleHistory(${i})">Tarixçə</button>
+            <span class="submit-hint" id="hint-${i}"></span>
+          </div>
+          <div class="history-list" id="history-${i}"></div>
+          <div class="verdict" id="verdict-${i}">
+            <span class="verdict-badge" id="badge-${i}"></span>
+            <div class="io-grid">
+              <div class="io-box"><div class="lbl">STDOUT</div><pre id="stdout-${i}"></pre></div>
+              <div class="io-box"><div class="lbl">STDERR</div><pre id="stderr-${i}"></pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  syncGutter(i);
+});
+
+// Bir məsələ kartını aç/bağla (accordion) — bütün məsələlərin eyni anda
+// açıq olmaması üçün, default olaraq bağlıdır, klikləyəndə açılır.
+// Bir məsələ kartını aç/bağla (accordion). Admin/müəllim üçün, İLK dəfə
+// açılanda gizli test halları da yüklənir (bax: el.dataset.tcLoaded — hər
+// problem üçün YALNIZ BİR DƏFƏ sorğu getsin deyə).
+function toggleProblem(i){
+  const el = document.getElementById('problem-' + i);
+  if (!el) return;
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+    el.dataset.tcLoaded = '1';
+    loadAdminTestCases(i);
+  }
+}
+
+// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
+// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
+function isAdminOrTeacher(){
+  const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+}
+
+// Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.
+async function loadAdminTestCases(i){
+  const meta = problemIdByTitle[problems[i].title];
+  const listEl = document.getElementById('adminTcList-' + i);
+  if (!listEl) return;
+  if (!meta) {
+    listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Məsələ məlumatı hələ yüklənir...</span>';
+    return;
+  }
+  listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Yüklənir...</span>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    if (!res.ok) throw new Error('fetch failed');
+    const cases = await res.json();
+    if (!cases.length) {
+      listEl.innerHTML = '<span style="font-size:11px;color:var(--ink-soft);">Hələ əlavə gizli test yoxdur — bu problem yalnız yuxarıdakı nümunəyə qarşı yoxlanılır.</span>';
+      return;
+    }
+    listEl.innerHTML = cases.map(tc => {
+      const preview = tc.input.length > 24 ? tc.input.slice(0, 24) + '…' : tc.input;
+      return '<div class="admin-tc-item"><span>#' + tc.orderIndex + ' — giriş: ' + escapeHtml(preview || '(boş)') + '</span>'
+        + '<button type="button" class="admin-tc-remove" onclick="deleteAdminTestCase(' + i + ',' + tc.id + ')">Sil</button></div>';
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = '<span style="font-size:11px;color:#e08080;">Yükləmək mümkün olmadı.</span>';
+  }
+}
+
+// Cari problemə yeni gizli test halı əlavə edir.
+async function addAdminTestCase(i){
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) {
+    AzcupUI.alert('Məsələ məlumatı hələ yüklənir, bir az gözlə.');
+    return;
+  }
+  const input = document.getElementById('newTcInput-' + i).value;
+  const output = document.getElementById('newTcOutput-' + i).value.trim();
+  if (!output) {
+    AzcupUI.alert('Gözlənilən çıxışı daxil et.');
+    return;
+  }
+  try {
+    // Növbəti sıra nömrəsini mövcud siyahının uzunluğundan hesablayır ki,
+    // şagirdə göstəriləcək "N-ci testdə səhv" nömrələri kiçik, ardıcıl olsun.
+    const listRes = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases');
+    const existing = listRes.ok ? await listRes.json() : [];
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases', {
+      method: 'POST',
+      body: JSON.stringify({ orderIndex: existing.length + 1, input, expectedOutput: output }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      AzcupUI.toast(data.message || 'Əlavə etmək mümkün olmadı.', 'error');
+      return;
+    }
+    document.getElementById('newTcInput-' + i).value = '';
+    document.getElementById('newTcOutput-' + i).value = '';
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Əlavə etmək mümkün olmadı.');
+  }
+}
+
+// Bir gizli test halını silir.
+async function deleteAdminTestCase(i, testCaseId){
+  if (!(await AzcupUI.confirm('Bu gizli testi silmək istəyirsən?', { danger: true, okText: 'Sil' }))) return;
+  const meta = problemIdByTitle[problems[i].title];
+  if (!meta) return;
+  try {
+    const res = await window.parent.azcupApiFetch('/api/admin/problems/' + meta.id + '/test-cases/' + testCaseId, { method: 'DELETE' });
+    if (!res.ok) throw new Error('delete failed');
+    loadAdminTestCases(i);
+  } catch (e) {
+    AzcupUI.alert('Silmək mümkün olmadı.');
+  }
+}
+
+// Kod redaktorunun sol tərəfindəki sətir nömrələrini mətnin sətir sayına
+// uyğunlaşdırır (dəyişdikcə çağırılır — bax: textarea-nın oninput atributu).
+function syncGutter(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  const lineCount = ta.value.split('\n').length;
+  let out = '';
+  for (let n = 1; n <= lineCount; n++) out += n + '\n';
+  gutter.textContent = out;
+}
+
+// Kod redaktoru üfüqi/şaquli sürüşdürüləndə sətir nömrələri sütununu da
+// eyni sürüşmə mövqeyinə gətirir ki, nömrələr həmişə düzgün sətirlə üst-üstə düşsün.
+function syncGutterScroll(i){
+  const ta = document.getElementById('code-' + i);
+  const gutter = document.getElementById('gutter-' + i);
+  if (!ta || !gutter) return;
+  gutter.scrollTop = ta.scrollTop;
+}
+
+let pendingRevealUrl = null;
+
+/* ---------- Backend inteqrasiyası: məsələ ID-lərini tapmaq və kod göndərmək ---------- */
+let problemIdByTitle = {};
+async function loadProblemMeta(){
+  try {
+    const res = await window.parent.azcupApiFetch('/api/topics/week15/problems');
+    if (!res.ok) return;
+    const list = await res.json();
+    list.forEach(item => {
+      problemIdByTitle[item.title] = item;
+      if (item.solved) {
+        const idx = problems.findIndex(p => p.title === item.title);
+        if (idx !== -1) {
+          const badge = document.getElementById('solved-' + idx);
+          if (badge) badge.style.display = 'inline-block';
+        }
+      }
+    });
+  } catch (e) { /* backend əlçatan deyil — sadəcə sakitcə keç */ }
+}
+loadProblemMeta();
+
+const VERDICT_LABELS = {
+  ACCEPTED: '✓ QƏBUL EDİLDİ',
+  WRONG_ANSWER: '✗ SƏHV CAVAB',
+  COMPILE_ERROR: '⚠ KOMPİLYASİYA XƏTASI',
+  RUNTIME_ERROR: '⚠ İCRA XƏTASI',
+  TIME_LIMIT_EXCEEDED: '⏱ VAXT LİMİTİ AŞILDI',
+};
+
+async function submitCode(i){
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  const hint = document.getElementById('hint-' + i);
+  const btn = document.getElementById('submit-btn-' + i);
+  hint.textContent = '';
+  if (!window.parent.AzcupAuth || !window.parent.AzcupAuth.getUser()){
+    hint.textContent = 'Davam etmək üçün yenidən daxil ol.';
+    return;
+  }
+  if (!meta){
+    hint.textContent = 'Məsələ məlumatı hələ yüklənir, bir az gözlə...';
+    return;
+  }
+  const sourceCode = document.getElementById('code-' + i).value;
+  btn.disabled = true;
+  hint.textContent = 'Kompilyasiya edilir və yoxlanılır...';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions', {
+      method: 'POST',
+      body: JSON.stringify({ sourceCode }),
+    });
+    const data = await res.json();
+    if (!res.ok){
+      hint.textContent = data.message || 'Göndərmə uğursuz oldu.';
+      return;
+    }
+    hint.textContent = '';
+    const verdictEl = document.getElementById('verdict-' + i);
+    const badgeEl = document.getElementById('badge-' + i);
+    verdictEl.classList.add('show');
+    badgeEl.className = 'verdict-badge ' + data.status;
+    // Əlavə gizli test halı olan problemlərdə "N/M test" göstəricisi əlavə
+    // olunur (adi, tək-nümunəli problemlərdə bu, əlavə səs-küy olmasın deyə
+    // göstərilmir — bax: SubmissionResponse.totalTestCases).
+    let badgeText = VERDICT_LABELS[data.status] || data.status;
+    if (data.totalTestCases > 1) {
+      badgeText += ' · ' + data.passedTestCases + '/' + data.totalTestCases + ' test';
+      if (data.firstFailedTestCaseOrder !== null && data.firstFailedTestCaseOrder !== undefined) {
+        badgeText += ' (' + (data.firstFailedTestCaseOrder + 1) + '-ci testdə səhv)';
+      }
+    }
+    badgeEl.textContent = badgeText;
+    document.getElementById('stdout-' + i).textContent = data.stdout || '';
+    document.getElementById('stderr-' + i).textContent = data.stderr || '';
+    if (data.status === 'ACCEPTED'){
+      const badge = document.getElementById('solved-' + i);
+      if (badge) badge.style.display = 'inline-block';
+    }
+  } catch (e) {
+    hint.textContent = 'Serverə qoşulmaq mümkün olmadı.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function toggleHistory(i){
+  const el = document.getElementById('history-' + i);
+  if (el.classList.contains('show')){
+    el.classList.remove('show');
+    return;
+  }
+  const p = problems[i];
+  const meta = problemIdByTitle[p.title];
+  el.classList.add('show');
+  if (!meta){
+    el.innerHTML = '<p class="history-empty">Məsələ məlumatı hələ yüklənməyib.</p>';
+    return;
+  }
+  el.innerHTML = '<p class="history-empty">Yüklənir...</p>';
+  try {
+    const res = await window.parent.azcupApiFetch('/api/problems/' + meta.id + '/submissions');
+    const list = await res.json();
+    if (!list.length){
+      el.innerHTML = '<p class="history-empty">Hələ göndəriş yoxdur.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => {
+      const dateStr = new Date(s.submittedAt).toLocaleString('az-AZ', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      return '<div class="history-item"><span class="verdict-badge ' + s.status + '">' + (VERDICT_LABELS[s.status] || s.status) + '</span><span class="history-time">' + dateStr + '</span></div>';
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p class="history-empty">Yüklənə bilmədi.</p>';
+  }
+}
+
+function requestReveal(btn){
+  pendingRevealUrl = btn.dataset.url;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  if (pendingRevealUrl) window.open(pendingRevealUrl, '_blank', 'noopener,noreferrer');
+  pendingRevealUrl = null;
+}
+function cancelReveal(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  pendingRevealUrl = null;
+}
+</script>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4>Bir dəqiqə...</h4>
+    <p>Doğrudan bu məsələni özün həll etməyə çalışdın? Həlli görmədən əvvəl bir daha cəhd etməyin faydalı ola bilər.</p>
+    <div class="confirm-actions">
+      <button type="button" class="confirm-btn cancel" onclick="cancelReveal()">Xeyr, davam edirəm</button>
+      <button type="button" class="confirm-btn ok" onclick="confirmReveal()">Bəli, göstər</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
