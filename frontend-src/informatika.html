@@ -591,17 +591,54 @@
     var list = state.manageList || [];
     var jsonArea = h('textarea', { class: 'mono json', spellcheck: 'false', placeholder: 'JSON-u bura yapışdır', 'aria-label': 'Test JSON-u' });
     var importBtn = h('button', { type: 'button', class: 'btn primary', text: 'Testi yüklə' });
+    var publishNow = h('input', { type: 'checkbox' });
+    var fileInput = h('input', { type: 'file', accept: '.json,application/json', 'aria-label': 'JSON faylı seç',
+      onchange: function (ev) {
+        var f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function () { jsonArea.value = String(reader.result || ''); };
+        reader.onerror = function () { toast('Faylı oxumaq mümkün olmadı', 'error'); };
+        reader.readAsText(f, 'utf-8');
+      } });
     importBtn.addEventListener('click', function () {
       var data;
       try { data = JSON.parse(jsonArea.value); } catch (e) { toast('JSON oxunmadı: ' + e.message, 'error'); return; }
-      if (!data || typeof data !== 'object' || Array.isArray(data) || !data.title || !Array.isArray(data.questions)) {
-        toast('JSON obyekt olmalı və "title" ilə "questions" siyahısı daxil etməlidir', 'error'); return;
+      // Bir test (obyekt) və ya bir neçə test (massiv) qəbul olunur
+      var items = Array.isArray(data) ? data : [data];
+      var bad = items.filter(function (it) { return !it || typeof it !== 'object' || Array.isArray(it) || !it.title || !Array.isArray(it.questions); });
+      if (!items.length || bad.length) {
+        toast('Hər test obyekt olmalı və "title" ilə "questions" siyahısı daxil etməlidir', 'error'); return;
       }
       importBtn.disabled = true;
-      send('POST', '/api/teacher/quizzes', data).then(function (saved) {
-        toast('Test yaradıldı: ' + saved.title, 'success');
-        openEditor(saved.id);
-      }).catch(function (e) { fail(e); importBtn.disabled = false; });
+      var created = [];
+      // Testlər ardıcıl yaradılır: hər hansı biri rədd edilsə, əvvəlkilər qalır və xəta mesajında hansının səhv olduğu yazılır
+      function next(i) {
+        if (i >= items.length) return Promise.resolve();
+        var item = Object.assign({}, items[i]);
+        if (publishNow.checked) item.published = true;
+        return send('POST', '/api/teacher/quizzes', item).then(function (saved) {
+          created.push(saved);
+          return next(i + 1);
+        }).catch(function (e) {
+          var err = new Error('"' + items[i].title + '": ' + e.message + (created.length ? ' (əvvəlki ' + created.length + ' test yaradıldı)' : ''));
+          err.status = e.status;
+          throw err;
+        });
+      }
+      next(0).then(function () {
+        if (created.length === 1) {
+          toast('Test yaradıldı: ' + created[0].title, 'success');
+          openEditor(created[0].id);
+        } else {
+          toast(created.length + ' test yaradıldı' + (publishNow.checked ? ' və dərc olundu' : ' (qaralama)'), 'success');
+          showManage();
+        }
+      }).catch(function (e) {
+        fail(e);
+        importBtn.disabled = false;
+        if (created.length) showManage();
+      });
     });
 
     var root = h('div', null,
@@ -612,9 +649,11 @@
       h('details', { class: 'imp' },
         h('summary', { text: 'JSON ilə test yüklə' }),
         h('div', { class: 'body' },
-          h('p', null, 'Çoxlu sualı tez əlavə etmək üçün testi JSON kimi yapışdır. ', h('b', { text: 'correctIndex' }),
-            ' 0-dan başlayır (0 = A variantı). NUMERIC sualda bir neçə qəbul olunan cavab üçün ', h('b', { text: 'correctText' }), '-də "|" işlət (məs. "12|12.0"). Test əvvəlcə qaralama kimi yaranır.'),
+          h('p', null, 'Çoxlu sualı tez əlavə etmək üçün testi JSON kimi yapışdır və ya JSON faylı seç. Bir test (obyekt) və ya bir neçə test (massiv) ola bilər. ', h('b', { text: 'correctIndex' }),
+            ' 0-dan başlayır (0 = A variantı). NUMERIC sualda bir neçə qəbul olunan cavab üçün ', h('b', { text: 'correctText' }), '-də "|" işlət (məs. "12|12.0"). Testlər JSON-dakı "published" qiymətinə görə yaranır (nümunələrdə qaralama).'),
+          h('div', { class: 'toolbar' }, fileInput),
           jsonArea,
+          h('label', { class: 'check' }, publishNow, 'Yüklənən testləri dərhal dərc et (şagirdlər görsün)'),
           h('div', { class: 'toolbar' }, importBtn,
             h('button', { type: 'button', class: 'btn', text: 'Nümunəni doldur', onclick: function () { jsonArea.value = JSON_EXAMPLE; } })))),
       list.length ? list.map(manageRow) : h('div', { class: 'state', text: 'Hələ test yaratmamısan. "+ Yeni test" düyməsi ilə başla.' }));
