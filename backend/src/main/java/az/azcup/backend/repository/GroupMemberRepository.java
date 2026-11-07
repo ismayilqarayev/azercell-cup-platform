@@ -4,6 +4,8 @@ import az.azcup.backend.entity.Group;
 import az.azcup.backend.entity.GroupMember;
 import az.azcup.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +28,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
 
     // Qrup silinəndə ona aid bütün üzvlük sətirlərini təmizləmək üçün.
     void deleteByGroup(Group group);
+
+    // Müəllimin BÜTÜN qruplarındakı şagirdlərin ID-ləri (təkrarsız) — test nəticələrini yalnız müəllimin öz şagirdləri ilə məhdudlaşdırmaq üçün.
+    @Query("select distinct m.student.id from GroupMember m where m.group.teacher.id = :teacherId")
+    List<Long> findStudentIdsByTeacherId(@Param("teacherId") Long teacherId);
 }

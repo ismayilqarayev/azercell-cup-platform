@@ -74,8 +74,15 @@ The build also injects the shared design layer, so the page sources themselves s
 `tools/python-lessons.test.js` checks the lesson structure and runs every Python snippet through `ast.parse` (needs `python` on PATH, skipped otherwise).
 
 The third language-screen card, "İnformatika" (DİM admission exam), opens `informatika.html` in its own full-screen `#dimApp` window, the same pattern as the Python section.
-It is static: exam structure, the 2027 programme topics and a per-user checklist kept in `localStorage` (`azcup-dim-info:<email>`). Its logo is `backend/src/main/resources/static/assets/dim-logo.svg`.
-The page states that the platform is not affiliated with the State Examination Centre; keep that notice and re-check the figures against dim.gov.az when the rules change.
+The section holds only tests. Teachers and admins create them in the page's "Test idarəsi" tab (form editor or pasted JSON); students solve published tests and get an instant, server-graded result with explanations. Admins skip the language screen, so they get an "İnformatika testləri" button in their sidebar. Its logo is `backend/src/main/resources/static/assets/dim-logo.svg`; the page states that the platform is not affiliated with the State Examination Centre, keep that notice.
+
+Backend (`/api/quizzes`, `/api/quiz-attempts/**` for students, `/api/teacher/quizzes/**` for authors; tables `quiz`, `quiz_question`, `quiz_question_option`, `quiz_attempt`, `quiz_answer`, created by `ddl-auto=update`):
+- Question types: `CHOICE` (2–6 options, one correct) and `NUMERIC` (typed answer; `12|12.0` accepts several spellings; comma/dot, spacing, trailing zeros and the Azerbaijani i/İ/ı/I difference are ignored). Written tasks are not supported.
+- The answer key and explanations are never sent while a test is being solved, only in the result after submitting. Grading is done by `QuizGrader` on the server.
+- A test with submitted attempts is locked: questions cannot be deleted and their type, option count and correct answer cannot change (text/explanation fixes and new questions are allowed). Such a test cannot be deleted, only unpublished.
+- A time limit is enforced by the server clock: submitting more than 60 s after the deadline is accepted but marked late.
+- Results: a teacher sees only students from their own groups, an admin sees everyone.
+- Tests: `QuizGraderTest`, `QuizIntegrationTest`.
 
 Fonts (Inter and JetBrains Mono, SIL OFL 1.1) are self-hosted in `backend/src/main/resources/static/assets/fonts/`, with their licenses.
 `StaticAssetsConfig` gives that folder a 30-day cache; Spring Security would otherwise send `no-store` for every font request.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>İnformatika: DİM qəbul imtahanına hazırlıq</title>
+<title>İnformatika testləri</title>
 <style>
   :root{
     --blueprint-deep:   #0B0D12;
@@ -25,255 +25,857 @@
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
-  .wrap{ max-width:1100px; margin:0 auto; padding:36px 20px 100px; }
-  a{ color:var(--gold-bright); }
+  .wrap{ max-width:1000px; margin:0 auto; padding:30px 20px 100px; }
+  [hidden]{ display:none !important; }
 
-  /* ---------- Başlıq bloku ---------- */
-  .titleblock{ border:1px solid var(--gold); position:relative; padding:28px 26px 8px; margin-bottom:22px; background:linear-gradient(180deg, rgba(38,210,255,0.05), transparent 70%); }
-  .titleblock::before{
-    content:"İNFORMATİKA / QƏBUL İMTAHANI / REV. 2026"; position:absolute; top:-11px; left:20px; background:var(--blueprint-deep);
-    padding:0 10px; font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--gold-bright); max-width:calc(100% - 40px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .titleblock h1{ font-family:var(--mono); font-size:clamp(26px,4.6vw,40px); line-height:1.15; margin:6px 0 10px; letter-spacing:-0.5px; }
-  .titleblock h1 span{ color:var(--gold-bright); }
-  .titleblock p.sub{ color:var(--ink-soft); font-size:15px; line-height:1.65; max-width:700px; margin:0 0 20px; }
-  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); border-top:1px solid var(--grid-line-strong); }
-  .specs > div{ padding:12px 14px; border-right:1px solid var(--grid-line-strong); }
-  .specs > div:last-child{ border-right:none; }
-  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
-  .specs .v{ font-size:14px; font-weight:600; }
+  /* ---------- Üst zolaq ---------- */
+  .top{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid var(--grid-line-strong); }
+  .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gold-bright); margin-bottom:6px; }
+  .top h1{ font-family:var(--mono); font-size:clamp(24px,4.4vw,34px); line-height:1.15; margin:0; letter-spacing:-0.5px; }
+  .seg{ display:inline-flex; gap:4px; padding:4px; border:1px solid var(--grid-line-strong); border-radius:99px; background:var(--paper); }
+  .seg button{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); background:transparent; border:0; border-radius:99px; padding:8px 16px; cursor:pointer; transition:color .15s ease, background .15s ease; }
+  .seg button:hover{ color:var(--ink); }
+  .seg button[aria-pressed="true"]{ color:var(--on-accent); background:var(--gold-bright); font-weight:700; }
 
-  /* ---------- Xəbərdarlıq ---------- */
-  .notice{ display:flex; gap:12px; align-items:flex-start; margin:0 0 30px; padding:14px 16px; border:1px solid rgba(226,166,77,0.4); border-radius:10px; background:rgba(226,166,77,0.07); font-size:13px; line-height:1.6; color:var(--ink-soft); }
-  .notice b{ color:var(--bronze); }
-  .notice svg{ flex:0 0 auto; width:18px; height:18px; margin-top:2px; color:var(--bronze); }
+  /* ---------- Ümumi komponentlər ---------- */
+  .btn{ font-family:var(--mono); font-size:12px; letter-spacing:.2px; padding:9px 16px; border-radius:99px; border:1px solid var(--grid-line-strong); background:transparent; color:var(--ink); cursor:pointer; transition:border-color .15s ease, background .15s ease, opacity .15s ease; }
+  .btn:hover{ border-color:var(--gold-bright); }
+  .btn.primary{ background:var(--gold-bright); color:var(--on-accent); border-color:var(--gold-bright); font-weight:700; }
+  .btn.primary:hover{ background:#5fdcff; }
+  .btn.danger{ color:var(--alert); border-color:rgba(255,107,118,.4); }
+  .btn.danger:hover{ border-color:var(--alert); background:rgba(255,107,118,.08); }
+  .btn.small{ padding:6px 12px; font-size:11px; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .tag{ display:inline-block; font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:99px; border:1px solid var(--grid-line-strong); color:var(--ink-soft); white-space:nowrap; }
+  .tag.cyan{ color:var(--gold-bright); border-color:rgba(38,210,255,.4); background:rgba(38,210,255,.07); }
+  .tag.green{ color:var(--green); border-color:rgba(74,223,185,.4); background:rgba(74,223,185,.07); }
+  .tag.bronze{ color:var(--bronze); border-color:rgba(226,166,77,.45); background:rgba(226,166,77,.07); }
+  .tag.red{ color:var(--alert); border-color:rgba(255,107,118,.45); background:rgba(255,107,118,.07); }
+  .muted{ color:var(--ink-soft); }
+  .state{ padding:46px 20px; text-align:center; color:var(--ink-soft); border:1px dashed var(--grid-line-strong); border-radius:12px; line-height:1.7; }
+  .state .btn{ margin-top:14px; }
+  .toolbar{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:18px; }
+  .toolbar .grow{ flex:1; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); background:transparent; border:1px solid var(--grid-line-strong); border-radius:99px; padding:6px 13px; cursor:pointer; transition:all .15s ease; }
+  .chip:hover{ color:var(--ink); border-color:var(--gold-bright); }
+  .chip[aria-pressed="true"]{ color:var(--on-accent); background:var(--gold-bright); border-color:var(--gold-bright); font-weight:700; }
+  .back{ margin-bottom:16px; }
 
-  h2{ font-family:var(--mono); font-size:18px; letter-spacing:-0.2px; margin:0 0 6px; }
-  h2 small{ font-weight:400; font-size:12px; color:var(--ink-soft); margin-left:8px; letter-spacing:0; }
-  .lead{ color:var(--ink-soft); font-size:14px; line-height:1.6; margin:0 0 16px; max-width:720px; }
-  section{ margin-bottom:38px; }
+  /* ---------- Test siyahısı (şagird) ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px; }
+  .qcard{ display:flex; flex-direction:column; gap:10px; padding:18px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:14px; transition:border-color .15s ease, transform .15s ease; }
+  .qcard:hover{ border-color:rgba(38,210,255,.5); transform:translateY(-2px); }
+  .qcard h3{ margin:0; font-size:17px; line-height:1.3; }
+  .qcard .desc{ margin:0; font-size:13px; line-height:1.55; color:var(--ink-soft); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .qcard .meta{ display:flex; flex-wrap:wrap; gap:6px; }
+  .qcard .foot{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:6px; }
+  .qcard .best{ font-size:12px; color:var(--ink-soft); font-family:var(--mono); }
+  .qcard .best b{ color:var(--green); }
 
-  /* ---------- İmtahan quruluşu ---------- */
-  .cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:14px; }
-  .card{ background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:12px; padding:18px 18px 16px; }
-  .card .n{ font-family:var(--mono); font-size:34px; font-weight:800; line-height:1; color:var(--gold-bright); }
-  .card .n sup{ font-size:12px; font-weight:600; color:var(--ink-soft); margin-left:6px; vertical-align:middle; letter-spacing:1px; }
-  .card h3{ margin:10px 0 6px; font-size:16px; }
-  .card p{ margin:0; color:var(--ink-soft); font-size:13px; line-height:1.6; }
-  details.score{ margin-top:14px; border:1px solid var(--grid-line-strong); border-radius:10px; background:var(--paper); }
-  details.score summary{ cursor:pointer; padding:12px 16px; font-size:14px; font-weight:600; }
-  details.score .body{ padding:0 16px 14px; color:var(--ink-soft); font-size:13px; line-height:1.7; }
-  details.score code{ font-family:var(--mono); font-size:12px; background:var(--well); padding:2px 6px; border-radius:5px; color:var(--ink); }
+  /* ---------- Test həlli ---------- */
+  .takebar{ position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; margin:0 -20px 22px; padding:12px 20px; background:rgba(11,13,18,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--grid-line-strong); }
+  .takebar .ttl{ font-weight:700; font-size:15px; flex:1 1 200px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .takebar .stat{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+  .timer{ font-family:var(--mono); font-size:16px; font-weight:700; color:var(--gold-bright); min-width:62px; text-align:right; }
+  .timer.low{ color:var(--alert); }
+  .q{ margin:0 0 16px; padding:20px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:14px; }
+  .q.answered{ border-color:rgba(38,210,255,.35); }
+  .q-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .q-num{ display:grid; place-items:center; min-width:30px; height:30px; padding:0 8px; border-radius:99px; background:var(--well); font-family:var(--mono); font-size:13px; font-weight:700; color:var(--gold-bright); }
+  .q-prompt{ font-size:16px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .code{ margin:12px 0 0; padding:14px 16px; background:#0E1017; border:1px solid var(--grid-line-strong); border-radius:10px; overflow:auto; font-family:var(--mono); font-size:13px; line-height:1.6; tab-size:4; }
+  .code code{ font-family:inherit; white-space:pre; }
+  .opts{ display:grid; gap:8px; margin-top:14px; }
+  .opt{ display:flex; align-items:flex-start; gap:12px; padding:11px 14px; background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
+  .opt:hover{ border-color:rgba(38,210,255,.5); }
+  .opt input{ margin:3px 0 0; width:16px; height:16px; accent-color:var(--gold-bright); flex:0 0 auto; }
+  .opt .letter{ font-family:var(--mono); font-weight:700; color:var(--gold-bright); min-width:16px; }
+  .opt .opt-text{ flex:1; line-height:1.55; overflow-wrap:anywhere; white-space:pre-wrap; }
+  .opt:has(input:checked){ border-color:var(--gold-bright); background:rgba(38,210,255,.08); }
+  .num{ display:block; width:100%; max-width:360px; margin-top:14px; padding:11px 14px; font:inherit; font-family:var(--mono); color:var(--ink); background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px; outline:none; }
+  .num:focus{ border-color:var(--gold-bright); }
+  .submitrow{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-top:24px; }
 
-  /* ---------- Mövzu siyahısı ---------- */
-  .toolbar{ margin:0 0 20px; padding:14px 16px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:10px; }
-  .progress-row{ display:flex; align-items:center; gap:14px; }
-  .progress-text{ font-family:var(--mono); font-size:12px; color:var(--ink); white-space:nowrap; }
-  .progress-bar{ flex:1; height:6px; border-radius:99px; background:var(--grid-line); overflow:hidden; }
-  .progress-bar i{ display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg, var(--gold), var(--gold-bright)); transition:width .45s ease; }
-  .coverage{ margin:10px 0 0; font-size:12px; color:var(--ink-soft); line-height:1.5; }
-  .group{ margin:0 0 22px; }
-  .group > h3{ margin:0 0 10px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-soft); }
-  .topic{ display:grid; grid-template-columns:auto 1fr auto; gap:6px 14px; align-items:start; padding:13px 16px; margin-bottom:8px; background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
-  .topic:hover{ border-color:rgba(38,210,255,0.5); }
-  .topic.done{ background:rgba(74,223,185,0.06); border-color:rgba(74,223,185,0.35); }
-  .topic input{ width:18px; height:18px; margin:2px 0 0; accent-color:var(--green); cursor:pointer; }
-  .topic .tt{ font-size:15px; font-weight:600; }
-  .topic.done .tt{ color:var(--green); }
-  .topic .td{ display:block; margin-top:3px; font-size:13px; color:var(--ink-soft); line-height:1.55; font-weight:400; }
-  .tag{ font-family:var(--mono); font-size:11px; padding:4px 10px; border-radius:99px; border:1px solid var(--grid-line-strong); white-space:nowrap; color:var(--ink-soft); }
-  .tag.ok{ color:var(--green); border-color:rgba(74,223,185,0.4); background:rgba(74,223,185,0.07); }
-  .tag.part{ color:var(--bronze); border-color:rgba(226,166,77,0.45); background:rgba(226,166,77,0.07); }
+  /* ---------- Nəticə ---------- */
+  .score{ display:flex; flex-wrap:wrap; align-items:center; gap:24px; padding:22px; margin-bottom:22px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:14px; }
+  .ring{ --p:0; --c:var(--green); flex:0 0 auto; width:116px; height:116px; border-radius:50%; background:conic-gradient(var(--c) calc(var(--p) * 1%), var(--grid-line) 0); display:grid; place-items:center; }
+  .ring span{ display:grid; place-items:center; width:92px; height:92px; border-radius:50%; background:var(--paper-warm); font-family:var(--mono); font-size:24px; font-weight:800; }
+  .score h2{ margin:0 0 6px; font-family:var(--mono); font-size:22px; }
+  .score p{ margin:0 0 4px; color:var(--ink-soft); font-size:14px; line-height:1.6; }
+  .rv{ margin:0 0 14px; padding:18px 20px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-left-width:4px; border-radius:12px; }
+  .rv.ok{ border-left-color:var(--green); }
+  .rv.bad{ border-left-color:var(--alert); }
+  .rv .verdict{ margin-left:auto; }
+  .opt.is-correct{ border-color:var(--green); background:rgba(74,223,185,.09); cursor:default; }
+  .opt.is-wrong{ border-color:var(--alert); background:rgba(255,107,118,.09); cursor:default; }
+  .opt .badge{ margin-left:auto; font-family:var(--mono); font-size:11px; white-space:nowrap; }
+  .opt.is-correct .badge{ color:var(--green); }
+  .opt.is-wrong .badge{ color:var(--alert); }
+  .opt.static{ cursor:default; }
+  .opt.static:hover{ border-color:var(--grid-line-strong); }
+  .opt.is-correct:hover{ border-color:var(--green); }
+  .opt.is-wrong:hover{ border-color:var(--alert); }
+  .ans{ margin-top:14px; display:grid; gap:6px; font-size:14px; }
+  .ans b{ font-family:var(--mono); }
+  .ans .good{ color:var(--green); }
+  .ans .badc{ color:var(--alert); }
+  .why{ margin-top:14px; padding:12px 14px; border-left:3px solid var(--gold); background:var(--paper); border-radius:0 8px 8px 0; font-size:14px; line-height:1.65; color:var(--ink-soft); white-space:pre-wrap; }
+  .why b{ color:var(--gold-bright); font-family:var(--mono); font-size:12px; letter-spacing:1px; text-transform:uppercase; }
 
-  /* ---------- Tapşırıq tipləri, mənbələr ---------- */
-  .types{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; padding:0; list-style:none; }
-  .types li{ font-size:13px; padding:7px 13px; border:1px solid var(--grid-line-strong); border-radius:99px; background:var(--paper); }
-  .tip{ margin:0; padding:12px 16px; border-left:3px solid var(--gold); background:var(--paper-warm); border-radius:0 8px 8px 0; color:var(--ink-soft); font-size:13px; line-height:1.65; max-width:720px; }
-  .sources{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
-  .sources a{ display:flex; justify-content:space-between; gap:12px; padding:11px 16px; border:1px solid var(--grid-line-strong); border-radius:10px; background:var(--paper); color:var(--ink); text-decoration:none; font-size:14px; transition:border-color .15s ease; }
-  .sources a:hover{ border-color:var(--gold-bright); }
-  .sources a span{ color:var(--ink-soft); font-family:var(--mono); font-size:12px; white-space:nowrap; }
+  /* ---------- İdarəetmə ---------- */
+  .row{ display:grid; grid-template-columns:1fr auto; gap:12px 18px; align-items:center; padding:14px 18px; margin-bottom:10px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:12px; }
+  .row .nm{ font-weight:700; font-size:15px; margin-bottom:6px; overflow-wrap:anywhere; }
+  .row .sub{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .row .acts{ display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+  details.imp{ margin:0 0 22px; border:1px solid var(--grid-line-strong); border-radius:12px; background:var(--paper); }
+  details.imp summary{ cursor:pointer; padding:13px 18px; font-size:14px; font-weight:600; }
+  details.imp .body{ padding:0 18px 18px; display:grid; gap:12px; }
+  details.imp p{ margin:0; font-size:13px; color:var(--ink-soft); line-height:1.65; }
+  textarea, .field{ width:100%; font:inherit; font-size:14px; color:var(--ink); background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px; padding:10px 12px; outline:none; transition:border-color .15s ease; }
+  textarea{ min-height:90px; resize:vertical; line-height:1.55; }
+  textarea.mono, .field.mono{ font-family:var(--mono); font-size:13px; }
+  textarea:focus, .field:focus{ border-color:var(--gold-bright); }
+  .json{ min-height:200px; }
+  label.lbl{ display:block; font-family:var(--mono); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink-soft); margin:0 0 6px; }
+  .form{ display:grid; gap:16px; margin-bottom:26px; padding:20px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:14px; }
+  .form .two{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .check{ display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer; }
+  .check input{ width:17px; height:17px; accent-color:var(--gold-bright); }
+  .lockbar{ margin-bottom:18px; padding:12px 16px; border:1px solid rgba(226,166,77,.4); border-radius:10px; background:rgba(226,166,77,.07); font-size:13px; line-height:1.6; color:var(--ink-soft); }
+  .lockbar b{ color:var(--bronze); }
+  .qe{ margin-bottom:16px; padding:18px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:14px; display:grid; gap:14px; }
+  .qe-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .qe-head .grow{ flex:1; }
+  .qe select{ font:inherit; font-size:13px; color:var(--ink); background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:8px; padding:6px 10px; }
+  .oe{ display:grid; grid-template-columns:auto 26px 1fr auto; gap:8px; align-items:center; }
+  .oe input[type=radio]{ width:17px; height:17px; accent-color:var(--green); }
+  .oe .letter{ font-family:var(--mono); font-weight:700; color:var(--gold-bright); }
+  .hint{ font-size:12px; color:var(--ink-soft); line-height:1.55; }
+  .savebar{ position:sticky; bottom:0; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin:20px -20px 0; padding:12px 20px; background:rgba(11,13,18,.94); backdrop-filter:blur(8px); border-top:1px solid var(--grid-line-strong); }
+
+  /* ---------- Nəticə cədvəli (müəllim) ---------- */
+  table.tbl{ width:100%; border-collapse:collapse; font-size:14px; }
+  .tblwrap{ overflow-x:auto; margin-bottom:26px; border:1px solid var(--grid-line-strong); border-radius:12px; background:var(--paper-warm); }
+  .tbl th, .tbl td{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--grid-line); vertical-align:middle; }
+  .tbl th{ font-family:var(--mono); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink-soft); font-weight:500; white-space:nowrap; }
+  .tbl tr:last-child td{ border-bottom:none; }
+  .bar{ display:inline-block; vertical-align:middle; width:110px; height:6px; margin-right:8px; border-radius:99px; background:var(--grid-line); overflow:hidden; }
+  .bar i{ display:block; height:100%; border-radius:99px; background:var(--green); }
+  h2.sec{ font-family:var(--mono); font-size:16px; margin:0 0 12px; }
+  .notice{ margin:34px 0 0; padding-top:16px; border-top:1px solid var(--grid-line); font-size:12px; line-height:1.65; color:var(--ink-soft); }
 
   @media (max-width:640px){
-    .wrap{ padding:26px 16px 80px; }
-    .titleblock{ padding:24px 18px 6px; }
-    .topic{ grid-template-columns:auto 1fr; }
-    .topic .tag{ grid-column:2; justify-self:start; white-space:normal; }
-    .specs{ grid-template-columns:repeat(2, 1fr); }
-    .specs > div{ border-right:none; border-bottom:1px solid var(--grid-line-strong); }
-    .specs > div:last-child{ border-bottom:none; }
-    .sources a{ flex-direction:column; gap:2px; }
+    .wrap{ padding:22px 16px 80px; }
+    .takebar, .savebar{ margin-left:-16px; margin-right:-16px; padding-left:16px; padding-right:16px; }
+    .form .two{ grid-template-columns:1fr; }
+    .row{ grid-template-columns:1fr; }
+    .row .acts{ justify-content:flex-start; }
+    .oe{ grid-template-columns:auto 22px 1fr auto; }
+    .score{ gap:16px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <header class="titleblock">
-    <h1>İnformatika: <span>DİM qəbul imtahanı</span></h1>
-    <p class="sub">Bakalavr qəbulunun 2-ci mərhələsində Riyaziyyat–İnformatika (Rİ) altqrupu üçün informatika bloku. Burada imtahanın quruluşu, proqramdakı mövzular və hər mövzu üçün platformada hazırlaşa biləcəyin yer toplanıb.</p>
-    <div class="specs">
-      <div><div class="k">Tapşırıq</div><div class="v">30</div></div>
-      <div><div class="k">Qapalı</div><div class="v">22</div></div>
-      <div><div class="k">Kodlu</div><div class="v">5</div></div>
-      <div><div class="k">Yazılı</div><div class="v">3</div></div>
-      <div><div class="k">Dil</div><div class="v">Python</div></div>
+  <header class="top">
+    <div>
+      <div class="eyebrow">DİM qəbul imtahanı</div>
+      <h1>İnformatika testləri</h1>
     </div>
+    <nav class="seg" id="seg" aria-label="Bölmələr" hidden></nav>
   </header>
 
-  <p class="notice" role="note">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
-    <span><b>Bu platforma Dövlət İmtahan Mərkəzi ilə əlaqəli deyil.</b> Məlumat DİM-in açıq sənədlərindən (2027 qəbul proqramı, 2025 və 2026 izah kitabçaları) götürülüb və 2026-cı ilin noyabrında yoxlanıb. İmtahan qaydaları dəyişə bilər, ona görə qərar verməzdən əvvəl aşağıdakı rəsmi mənbələrə bax.</span>
-  </p>
+  <main id="app" aria-live="polite"></main>
 
-  <section aria-labelledby="h-structure">
-    <h2 id="h-structure">İmtahan quruluşu</h2>
-    <p class="lead">İnformatika bloku 30 tapşırıqdan ibarətdir. Üç fənnin (riyaziyyat, fizika, informatika) kağızı birlikdə 3 saat çəkir, informatika üçün ayrıca vaxt göstərilməyib.</p>
-    <div class="cards">
-      <div class="card"><div class="n">22<sup>QAPALI</sup></div><h3>Qapalı tapşırıqlar</h3><p>Beş variantdan bir doğru cavabı seçirsən.</p></div>
-      <div class="card"><div class="n">5<sup>KODLU</sup></div><h3>Kodlu tapşırıqlar</h3><p>Cavab ədəddir. Cavab kartında rəqəm-rəqəm işarələnir.</p></div>
-      <div class="card"><div class="n">3<sup>YAZILI</sup></div><h3>Yazılı tapşırıqlar</h3><p>Cavab ayrıca vərəqdə əllə yazılır. Son üç tapşırıq blok-sxem və iki Python proqramıdır (2025–2026 kitabçalarının nömrələnməsinə görə). Yoxlayan meyarlara görə 0, 1/3, 1/2, 2/3 və ya 1 bal verir.</p></div>
-    </div>
-    <details class="score">
-      <summary>Bal necə hesablanır (təxmini)</summary>
-      <div class="body">
-        Maksimum xam bal 33-dür: qapalı 22 + kodlu 5 + yazılı 3×2 (yazılı tapşırıqlar iki dəfə çəkilidir). Xam bal <code>×100/33</code> ilə 100 ballıq miqyasa çevrilir. Qapalı tapşırıqda səhv cavab üçün 1/4 bal çıxılır.
-        Bu qaydalar DİM-in 2024-cü il sənədindən götürülüb; 2026-cı il üçün yenilənmiş variantı tapılmayıb. Dəqiq qaydanı DİM-in cari sənədindən yoxla.
-      </div>
-    </details>
-  </section>
-
-  <section aria-labelledby="h-topics">
-    <h2 id="h-topics">Proqram mövzuları <small>2027 qəbul proqramına görə</small></h2>
-    <p class="lead">Mövzunu öyrəndikcə qutunu işarələ, gedişatın bu brauzerdə saxlanılır. Sağdakı nişan həmin mövzu üçün platformada hazır material olub-olmadığını göstərir.</p>
-    <div class="toolbar">
-      <div class="progress-row">
-        <span class="progress-text" id="progressText">0 / 0 mövzu öyrənilib</span>
-        <div class="progress-bar" role="progressbar" aria-label="Öyrənilən mövzular" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><i id="progressFill"></i></div>
-      </div>
-      <p class="coverage" id="coverage"></p>
-    </div>
-    <div id="topics"></div>
-  </section>
-
-  <section aria-labelledby="h-types">
-    <h2 id="h-types">Kitabçalarda rast gəlinən tapşırıq tipləri</h2>
-    <p class="lead">2025 və 2026-cı il I qrup izah kitabçalarına baxanda təkrarlanan tiplər bunlardır.</p>
-    <ul class="types">
-      <li>Python kodunun çıxışını tapmaq</li>
-      <li>Verilmiş çıxış üçün ən böyük və ya ən kiçik girişi tapmaq</li>
-      <li>Blok-sxemi izləmək</li>
-      <li>Cədvəl prosessorunda düstur</li>
-      <li>Verilənlər bazası</li>
-      <li>Məntiqi (Boolean) axtarış sorğusu</li>
-      <li>Qraf</li>
-    </ul>
-    <p class="tip">İmtahanda kompüter yoxdur, ona görə kodu kağızda izləməyi məşq et: hər dəyişən üçün sütun çək və dövrün hər addımında dəyərləri yaz. Python dərslərindəki nümunələri əvvəlcə kağızda "icra et", sonra işə sal və cavabı müqayisə et.</p>
-  </section>
-
-  <section aria-labelledby="h-sources">
-    <h2 id="h-sources">Rəsmi mənbələr</h2>
-    <ul class="sources">
-      <li><a href="https://dim.gov.az/CkImage/proqramlar_qebul_Az.2027_1789019491.pdf" target="_blank" rel="noopener noreferrer">2027 qəbul proqramı <span>PDF ↗</span></a></li>
-      <li><a href="https://dim.gov.az/CkImage/1_ci_qrup_1783846528.pdf" target="_blank" rel="noopener noreferrer">2026, I qrup izah kitabçası <span>PDF ↗</span></a></li>
-      <li><a href="https://dim.gov.az/CkImage/1_ci_qrup_1752476895.pdf" target="_blank" rel="noopener noreferrer">2025, I qrup izah kitabçası <span>PDF ↗</span></a></li>
-      <li><a href="https://dim.gov.az/az/fealiyyet/qebul-ve-imtahanlar/bakalavriat" target="_blank" rel="noopener noreferrer">Bakalavr qəbulu <span>dim.gov.az ↗</span></a></li>
-      <li><a href="https://dim.gov.az/az/fealiyyet/qebul-ve-imtahanlar/magistratura" target="_blank" rel="noopener noreferrer">Magistratura qəbulu <span>dim.gov.az ↗</span></a></li>
-    </ul>
-  </section>
-
+  <p class="notice">Bu platforma Dövlət İmtahan Mərkəzi ilə əlaqəli deyil. Testlər hazırlıq məqsədi daşıyır, nəticələr rəsmi imtahan balı deyil.</p>
 </div>
 
 <script>
 (function(){
   'use strict';
-  // s: ok = platformada hazır material var, part = qismən, none = hələlik yoxdur
-  var TOPICS = [
-    { g:'prog', id:'vars',  t:'Dəyişənlər, verilənlərin tipləri, giriş və çıxış', d:'int, float, str, bool; input() və print(); tip çevirmələri.', s:'ok', w:'Python kursu › Dilin əsasları' },
-    { g:'prog', id:'cond',  t:'Şərt operatorları', d:'if, elif, else; müqayisə və məntiqi əməliyyatlar (and, or, not).', s:'ok', w:'Python kursu › Dilin əsasları' },
-    { g:'prog', id:'loops', t:'Dövrlər', d:'for və while, break və continue, iç-içə dövrlər.', s:'ok', w:'Python kursu › Dilin əsasları' },
-    { g:'prog', id:'nums',  t:'Ədədlər və riyazi əməllər', d:'Tam bölmə //, qalıq %, qüvvət **; ədədin rəqəmləri ilə iş.', s:'ok', w:'Python kursu › Dilin əsasları' },
-    { g:'prog', id:'str',   t:'Sətirlər', d:'İndeks və dilim, sətir metodları, sətir üzərində dövr.', s:'ok', w:'Python kursu › Sətirlər' },
-    { g:'prog', id:'list',  t:'Siyahılar', d:'Yaratma, indeks və dilim, əlavə etmə və silmə, sıralama, siyahı üzərində dövr.', s:'ok', w:'Python kursu › Kolleksiyalar' },
-    { g:'prog', id:'func',  t:'Funksiyalar', d:'def, parametrlər, return, yerli və qlobal dəyişən.', s:'ok', w:'Python kursu › Funksiyalar' },
-    { g:'prog', id:'algo',  t:'Alqoritm növləri və blok-sxemlər', d:'Xətti, şaxələnən və dövri alqoritmlər; blok-sxemi addım-addım izləmək.', s:'part', w:'Qismən: C++ bölməsi › Alqoritm Simulyasiyası' },
-    { g:'other', id:'info',   t:'İnformasiyanın həcmi və kodlaşdırılması', d:'bit, bayt və onların ölçü vahidləri; mətn, şəkil və səsin həcminin hesablanması.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'numsys', t:'Say sistemləri', d:'İkilik, səkkizlik, onluq və on altılıq sistemlər arasında çevirmə.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'crypto', t:'Kriptoqrafiya', d:'Şifrələmənin əsas anlayışları və sadə şifrələr.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'model',  t:'Modelləşdirmə', d:'Real hadisənin modelə çevrilməsi, model növləri.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'sheet',  t:'Cədvəl prosessoru', d:'Xanalar, düsturlar, nisbi və mütləq ünvan, diaqramlar.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'db',     t:'Verilənlər bazası', d:'Cədvəl, sahə, qeyd, açar; sadə sorğu və süzgəc.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'net',    t:'Şəbəkələr və İnternet', d:'Şəbəkə növləri, IP ünvan, protokollar, məntiqi axtarış sorğuları.', s:'none', w:'Hələlik platformada yoxdur' },
-    { g:'other', id:'web',    t:'HTML və CSS', d:'Sənədin quruluşu, əsas teqlər, sadə üslub qaydaları.', s:'none', w:'Hələlik platformada yoxdur' }
-  ];
-  var GROUPS = [
-    { id:'prog',  title:'Python ilə proqramlaşdırma' },
-    { id:'other', title:'Proqramlaşdırmadan kənar mövzular' }
-  ];
 
-  function storageKey(){
-    try {
-      var u = window.parent && window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
-      return 'azcup-dim-info:' + ((u && u.email) || 'anon');
-    } catch (e) { return 'azcup-dim-info:anon'; }
-  }
-  var done = new Set();
-  try {
-    var raw = JSON.parse(localStorage.getItem(storageKey()) || '[]');
-    if (Array.isArray(raw)) raw.forEach(function(id){ if (TOPICS.some(function(t){ return t.id === id; })) done.add(id); });
-  } catch (e) { /* saxlama əlçatan deyil */ }
-  function save(){ try { localStorage.setItem(storageKey(), JSON.stringify(Array.from(done))); } catch (e) { /* məs. məxfi rejim */ } }
+  var LETTERS = 'ABCDEF';
+  var P = window.parent;
+  var app = document.getElementById('app');
+  var seg = document.getElementById('seg');
+  var state = { tab: 'list', filter: 'Hamısı', timer: null };
 
-  function el(tag, cls, text){
+  /* ---------- Köməkçilər ---------- */
+
+  // Kiçik DOM qurucusu: bütün mətn textContent kimi yazılır, ona görə istifadəçi məlumatı HTML kimi işlənmir.
+  function h(tag, props) {
     var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text !== undefined) n.textContent = text;
+    var p = props || {};
+    Object.keys(p).forEach(function (k) {
+      var v = p[k];
+      if (v == null || v === false) return;
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'selected') n[k] = v;
+      else if (k.indexOf('on') === 0) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? '' : String(v));
+    });
+    for (var i = 2; i < arguments.length; i++) append(n, arguments[i]);
     return n;
   }
-
-  var host = document.getElementById('topics');
-  var rows = {};
-  GROUPS.forEach(function(g){
-    var box = el('div', 'group');
-    box.appendChild(el('h3', '', g.title));
-    TOPICS.filter(function(t){ return t.g === g.id; }).forEach(function(t){
-      var label = el('label', 'topic');
-      var cb = el('input');
-      cb.type = 'checkbox';
-      cb.checked = done.has(t.id);
-      var mid = el('span');
-      mid.appendChild(el('span', 'tt', t.t));
-      mid.appendChild(el('span', 'td', t.d));
-      label.appendChild(cb);
-      label.appendChild(mid);
-      label.appendChild(el('span', 'tag ' + t.s, t.w));
-      cb.addEventListener('change', function(){
-        if (cb.checked) done.add(t.id); else done.delete(t.id);
-        label.classList.toggle('done', cb.checked);
-        save();
-        updateProgress();
-      });
-      label.classList.toggle('done', cb.checked);
-      rows[t.id] = label;
-      box.appendChild(label);
-    });
-    host.appendChild(box);
-  });
-
-  function updateProgress(){
-    var total = TOPICS.length, n = done.size;
-    var pct = total ? Math.round(n / total * 100) : 0;
-    document.getElementById('progressText').textContent = n + ' / ' + total + ' mövzu öyrənilib';
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressBar').setAttribute('aria-valuenow', String(pct));
+  function append(n, kid) {
+    if (kid == null || kid === false) return;
+    if (Array.isArray(kid)) { kid.forEach(function (k) { append(n, k); }); return; }
+    n.appendChild(kid.nodeType ? kid : document.createTextNode(String(kid)));
   }
-  (function coverage(){
-    var ok = TOPICS.filter(function(t){ return t.s === 'ok'; }).length;
-    var part = TOPICS.filter(function(t){ return t.s === 'part'; }).length;
-    var none = TOPICS.length - ok - part;
-    document.getElementById('coverage').textContent = 'Platformada ' + ok + ' mövzu üçün hazır dərs var, ' + part + ' mövzu üçün qismən, ' + none + ' mövzu üçün hələlik material yoxdur. Sonuncular üçün DİM-in kitabçalarından və dərsliklərdən istifadə et.';
-  })();
-  updateProgress();
+  function mount(node) {
+    var y = document.scrollingElement ? document.scrollingElement.scrollTop : 0;
+    app.textContent = '';
+    app.appendChild(node);
+    return y;
+  }
+  function toast(msg, type) {
+    if (window.AzcupUI) window.AzcupUI.toast(msg, type || 'info');
+  }
+  function confirmBox(msg, opts) {
+    return window.AzcupUI ? window.AzcupUI.confirm(msg, opts) : Promise.resolve(true);
+  }
+  function currentUser() {
+    try { return (P.AzcupAuth && P.AzcupAuth.getUser()) || null; } catch (e) { return null; }
+  }
+  function canManage() {
+    var u = currentUser();
+    return !!u && (u.role === 'TEACHER' || u.role === 'ADMIN');
+  }
+  function isAdmin() {
+    var u = currentUser();
+    return !!u && u.role === 'ADMIN';
+  }
+  function call(path, opts) {
+    return P.azcupApiFetch(path, opts).then(function (res) {
+      return res.json().catch(function () { return null; }).then(function (data) {
+        if (!res.ok) {
+          var err = new Error((data && data.message) || ('Sorğu uğursuz oldu (' + res.status + ')'));
+          err.status = res.status;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+  function send(method, path, body) {
+    return call(path, { method: method, body: body === undefined ? undefined : JSON.stringify(body) });
+  }
+  function fail(e) {
+    if (e && e.status === 401) return; // shell özü giriş ekranına qaytarır
+    toast((e && e.message) || 'Əməliyyat uğursuz oldu', 'error');
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    try { return d.toLocaleString('az', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return d.toLocaleString(); }
+  }
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function stopTimer() { if (state.timer) { clearInterval(state.timer); state.timer = null; } }
+  function loading(text) { return h('div', { class: 'state', text: text || 'Yüklənir…' }); }
+
+  /* ---------- Üst bölmə düymələri ---------- */
+
+  function renderSeg() {
+    seg.textContent = '';
+    if (!canManage()) { seg.hidden = true; return; }
+    seg.hidden = false;
+    [['list', 'Testlər'], ['manage', 'Test idarəsi']].forEach(function (t) {
+      seg.appendChild(h('button', {
+        type: 'button', 'aria-pressed': state.tab === t[0] ? 'true' : 'false',
+        text: t[1], onclick: function () { stopTimer(); go(t[0]); }
+      }));
+    });
+  }
+  function go(tab) {
+    state.tab = tab;
+    renderSeg();
+    if (tab === 'manage') showManage(); else showList();
+  }
+
+  /* ---------- Şagird: test siyahısı ---------- */
+
+  function showList() {
+    mount(loading());
+    call('/api/quizzes').then(function (quizzes) {
+      state.quizzes = quizzes;
+      renderList();
+    }).catch(function (e) { fail(e); mount(h('div', { class: 'state', text: 'Testləri yükləmək mümkün olmadı.' })); });
+  }
+
+  function renderList() {
+    var quizzes = state.quizzes || [];
+    var cats = ['Hamısı'];
+    quizzes.forEach(function (q) { if (q.category && cats.indexOf(q.category) < 0) cats.push(q.category); });
+    if (cats.indexOf(state.filter) < 0) state.filter = 'Hamısı';
+    var shown = quizzes.filter(function (q) { return state.filter === 'Hamısı' || q.category === state.filter; });
+
+    var root = h('div');
+    if (cats.length > 2) {
+      root.appendChild(h('div', { class: 'toolbar' }, h('div', { class: 'chips', role: 'group', 'aria-label': 'Mövzu' },
+        cats.map(function (c) {
+          return h('button', { type: 'button', class: 'chip', 'aria-pressed': state.filter === c ? 'true' : 'false', text: c,
+            onclick: function () { state.filter = c; renderList(); } });
+        }))));
+    }
+    if (!shown.length) {
+      var empty = h('div', { class: 'state' }, 'Hələlik dərc olunmuş test yoxdur.');
+      if (canManage()) {
+        empty.appendChild(h('br'));
+        empty.appendChild(h('button', { type: 'button', class: 'btn primary', text: 'Test idarəsinə keç', onclick: function () { go('manage'); } }));
+      }
+      root.appendChild(empty);
+    } else {
+      root.appendChild(h('div', { class: 'grid' }, shown.map(quizCard)));
+    }
+    var y = mount(root);
+    if (document.scrollingElement) document.scrollingElement.scrollTop = y;
+  }
+
+  function quizCard(q) {
+    var meta = [h('span', { class: 'tag', text: q.questionCount + ' sual' })];
+    meta.push(h('span', { class: 'tag', text: q.timeLimitMinutes ? q.timeLimitMinutes + ' dəq' : 'Vaxt məhdudiyyəti yoxdur' }));
+    if (q.category) meta.unshift(h('span', { class: 'tag cyan', text: q.category }));
+    var best = q.attemptCount > 0 && q.bestPercent != null
+      ? h('span', { class: 'best' }, 'Ən yaxşı: ', h('b', { text: q.bestPercent + '%' }), ' · ' + q.attemptCount + ' cəhd')
+      : h('span', { class: 'best', text: 'Hələ həll olunmayıb' });
+    if (q.inProgress) meta.push(h('span', { class: 'tag bronze', text: 'Davam edir' }));
+    var label = q.inProgress ? 'Davam et' : (q.attemptCount > 0 ? 'Yenidən həll et' : 'Başla');
+    return h('article', { class: 'qcard' },
+      h('h3', { text: q.title }),
+      q.description ? h('p', { class: 'desc', text: q.description }) : null,
+      h('div', { class: 'meta' }, meta),
+      h('div', { class: 'foot' }, best,
+        h('button', { type: 'button', class: 'btn primary small', text: label, onclick: function (ev) { beginQuiz(q.id, ev.currentTarget); } })));
+  }
+
+  function beginQuiz(quizId, btn) {
+    if (btn) btn.disabled = true;
+    call('/api/quizzes/' + quizId + '/attempts', { method: 'POST' })
+      .then(function (start) { showTake(start); })
+      .catch(function (e) { fail(e); if (btn) btn.disabled = false; });
+  }
+
+  /* ---------- Şagird: testi həll etmək ---------- */
+
+  function draftKey(attemptId) { return 'azcup-quiz-draft:' + attemptId; }
+  function loadDraft(attemptId) {
+    try { var raw = JSON.parse(sessionStorage.getItem(draftKey(attemptId)) || '{}'); return raw && typeof raw === 'object' ? raw : {}; }
+    catch (e) { return {}; }
+  }
+  function saveDraft(attemptId, answers) { try { sessionStorage.setItem(draftKey(attemptId), JSON.stringify(answers)); } catch (e) { /* məxfi rejim */ } }
+  function clearDraft(attemptId) { try { sessionStorage.removeItem(draftKey(attemptId)); } catch (e) { /* heç nə */ } }
+
+  function showTake(start) {
+    stopTimer();
+    state.tab = 'take';
+    renderSeg();
+    var answers = loadDraft(start.attemptId);
+    var submitting = false;
+    var total = start.questions.length;
+
+    var statEl = h('span', { class: 'stat' });
+    var timerEl = h('span', { class: 'timer', hidden: !start.deadlineAt });
+    var submitBtn = h('button', { type: 'button', class: 'btn primary', text: 'Testi təhvil ver' });
+    var cards = {};
+
+    function answeredCount() {
+      return start.questions.filter(function (q) { return answers[q.id] != null && String(answers[q.id]).trim() !== ''; }).length;
+    }
+    function refresh() {
+      var n = answeredCount();
+      statEl.textContent = n + ' / ' + total + ' cavablandı';
+      start.questions.forEach(function (q) {
+        var a = answers[q.id];
+        cards[q.id].classList.toggle('answered', a != null && String(a).trim() !== '');
+      });
+    }
+    function setAnswer(qid, value) { answers[qid] = value; saveDraft(start.attemptId, answers); refresh(); }
+
+    function questionCard(q, i) {
+      var control;
+      if (q.type === 'CHOICE') {
+        control = h('div', { class: 'opts', role: 'radiogroup' }, q.options.map(function (o, idx) {
+          return h('label', { class: 'opt' },
+            h('input', { type: 'radio', name: 'q' + q.id, value: String(idx), checked: answers[q.id] === String(idx),
+              onchange: function () { setAnswer(q.id, String(idx)); } }),
+            h('span', { class: 'letter', text: LETTERS[idx] }),
+            h('span', { class: 'opt-text', text: o }));
+        }));
+      } else {
+        control = h('input', { type: 'text', class: 'num', maxlength: '200', autocomplete: 'off', spellcheck: 'false',
+          placeholder: 'Cavabı yaz', 'aria-label': 'Cavab', value: answers[q.id] || '',
+          oninput: function (ev) { setAnswer(q.id, ev.target.value); } });
+      }
+      var card = h('section', { class: 'q' },
+        h('div', { class: 'q-head' },
+          h('span', { class: 'q-num', text: String(i + 1) }),
+          h('span', { class: 'tag', text: q.type === 'CHOICE' ? 'Qapalı' : 'Kodlu' })),
+        h('div', { class: 'q-prompt', text: q.prompt }),
+        q.code ? h('pre', { class: 'code' }, h('code', { text: q.code })) : null,
+        control);
+      cards[q.id] = card;
+      return card;
+    }
+
+    function doSubmit(auto) {
+      if (submitting) return Promise.resolve();
+      var items = start.questions
+        .filter(function (q) { return answers[q.id] != null && String(answers[q.id]).trim() !== ''; })
+        .map(function (q) { return { questionId: q.id, answer: String(answers[q.id]) }; });
+      var missing = total - items.length;
+      var ask = (!auto && missing > 0)
+        ? confirmBox(missing + ' sual cavabsızdır. Yenə də təhvil verilsin?', { title: 'Testi təhvil ver', okText: 'Təhvil ver', danger: false })
+        : Promise.resolve(true);
+      return ask.then(function (ok) {
+        if (!ok) return;
+        submitting = true;
+        submitBtn.disabled = true;
+        stopTimer();
+        return send('POST', '/api/quiz-attempts/' + start.attemptId + '/submit', { answers: items }).then(function (result) {
+          clearDraft(start.attemptId);
+          if (auto) toast('Vaxt bitdi, cavablarınız təhvil verildi', 'info');
+          showResult(result);
+        }).catch(function (e) {
+          submitting = false;
+          submitBtn.disabled = false;
+          fail(e);
+          if (e.status === 404 || e.status === 409) { go('list'); return; }
+          if (start.deadlineAt) startTimer();
+        });
+      });
+    }
+    submitBtn.addEventListener('click', function () { doSubmit(false); });
+
+    // Geri sayım serverin saatına görə hesablanır (brauzerin saatı səhv olsa da düz işləsin)
+    var offset = start.serverNow ? new Date(start.serverNow).getTime() - Date.now() : 0;
+    var deadline = start.deadlineAt ? new Date(start.deadlineAt).getTime() : null;
+    function startTimer() {
+      if (deadline == null) return;
+      function tick() {
+        var left = Math.max(0, Math.round((deadline - (Date.now() + offset)) / 1000));
+        timerEl.textContent = pad(Math.floor(left / 60)) + ':' + pad(left % 60);
+        timerEl.classList.toggle('low', left <= 60);
+        if (left <= 0) { stopTimer(); doSubmit(true); }
+      }
+      tick();
+      if (!submitting) state.timer = setInterval(tick, 1000);
+    }
+
+    var root = h('div', null,
+      h('div', { class: 'takebar' },
+        h('span', { class: 'ttl', text: start.title }), statEl, timerEl,
+        h('button', { type: 'button', class: 'btn small', text: 'Çıx', onclick: function () {
+          confirmBox('Testdən çıxsan, cavabların bu cəhd üçün saxlanmayacaq. Çıxılsın?', { title: 'Testdən çıx', okText: 'Çıx', danger: true })
+            .then(function (ok) { if (ok) { stopTimer(); go('list'); } });
+        } })),
+      start.questions.map(questionCard),
+      h('div', { class: 'submitrow' }, h('span', { class: 'muted', text: 'Təhvil verəndən sonra düzgün cavablar və izahlar göstərilir.' }), submitBtn));
+    mount(root);
+    window.scrollTo(0, 0);
+    refresh();
+    startTimer();
+  }
+
+  /* ---------- Şagird: nəticə ---------- */
+
+  function showResult(r) {
+    stopTimer();
+    state.tab = 'result';
+    renderSeg();
+    var onlyWrong = false;
+    var listEl = h('div');
+
+    function draw() {
+      listEl.textContent = '';
+      r.items.forEach(function (it, i) {
+        if (onlyWrong && it.correct) return;
+        listEl.appendChild(reviewCard(it, i));
+      });
+      if (!listEl.childNodes.length) listEl.appendChild(h('div', { class: 'state', text: 'Səhv cavab yoxdur. Əla!' }));
+    }
+
+    var color = r.percent >= 70 ? 'var(--green)' : (r.percent >= 40 ? 'var(--bronze)' : 'var(--alert)');
+    var ring = h('div', { class: 'ring', style: '--p:' + r.percent + ';--c:' + color }, h('span', { text: r.percent + '%' }));
+    var wrongChip = h('button', { type: 'button', class: 'chip', 'aria-pressed': 'false', text: 'Yalnız səhvlər',
+      onclick: function (ev) { onlyWrong = !onlyWrong; ev.currentTarget.setAttribute('aria-pressed', String(onlyWrong)); draw(); } });
+
+    var root = h('div', null,
+      h('div', { class: 'score' }, ring,
+        h('div', null,
+          h('h2', { text: r.title }),
+          h('p', null, h('b', { text: r.correctCount + ' / ' + r.totalCount }), ' sual düzgün cavablandırıldı.'),
+          r.late ? h('p', null, h('span', { class: 'tag bronze', text: 'Vaxt bitəndən sonra təhvil verilib' })) : null)),
+      h('div', { class: 'toolbar' },
+        h('button', { type: 'button', class: 'btn', text: '← Testlər', onclick: function () { go('list'); } }),
+        h('button', { type: 'button', class: 'btn primary', text: 'Yenidən həll et', onclick: function (ev) { beginQuiz(r.quizId, ev.currentTarget); } }),
+        h('span', { class: 'grow' }), wrongChip),
+      listEl);
+    mount(root);
+    window.scrollTo(0, 0);
+    draw();
+  }
+
+  function reviewCard(it, i) {
+    var body;
+    if (it.type === 'CHOICE') {
+      var mine = it.yourAnswer == null ? -1 : Number(it.yourAnswer);
+      body = h('div', { class: 'opts' }, it.options.map(function (o, idx) {
+        var cls = 'opt static';
+        var badge = null;
+        if (idx === it.correctIndex) { cls += ' is-correct'; badge = 'Düzgün cavab'; }
+        else if (idx === mine) { cls += ' is-wrong'; }
+        if (idx === mine) badge = idx === it.correctIndex ? 'Sənin cavabın · düzgün' : 'Sənin cavabın';
+        return h('div', { class: cls },
+          h('span', { class: 'letter', text: LETTERS[idx] }),
+          h('span', { class: 'opt-text', text: o }),
+          badge ? h('span', { class: 'badge', text: badge }) : null);
+      }));
+      if (mine < 0) body.appendChild(h('div', { class: 'hint', text: 'Cavab verilməyib.' }));
+    } else {
+      var accepted = String(it.correctText || '').split('|').map(function (s) { return s.trim(); }).filter(Boolean).join('  və ya  ');
+      body = h('div', { class: 'ans' },
+        h('div', null, 'Sənin cavabın: ', h('b', { class: it.correct ? 'good' : 'badc', text: it.yourAnswer == null ? 'cavab verilməyib' : it.yourAnswer })),
+        it.correct ? null : h('div', null, 'Düzgün cavab: ', h('b', { class: 'good', text: accepted })));
+    }
+    return h('section', { class: 'rv ' + (it.correct ? 'ok' : 'bad') },
+      h('div', { class: 'q-head' },
+        h('span', { class: 'q-num', text: String(i + 1) }),
+        h('span', { class: 'tag', text: it.type === 'CHOICE' ? 'Qapalı' : 'Kodlu' }),
+        h('span', { class: 'verdict tag ' + (it.correct ? 'green' : 'red'), text: it.correct ? 'Düzgün' : 'Səhv' })),
+      h('div', { class: 'q-prompt', text: it.prompt }),
+      it.code ? h('pre', { class: 'code' }, h('code', { text: it.code })) : null,
+      body,
+      it.explanation ? h('div', { class: 'why' }, h('b', { text: 'İzah' }), h('br'), it.explanation) : null);
+  }
+
+  /* ---------- Müəllim/admin: testlərin siyahısı ---------- */
+
+  var JSON_EXAMPLE = JSON.stringify({
+    title: 'Python: dövrlər (nümunə)',
+    category: 'Python',
+    description: 'Qısa məşq testi',
+    timeLimitMinutes: 20,
+    published: false,
+    questions: [
+      {
+        type: 'CHOICE',
+        prompt: 'Kodun çıxışı nədir?',
+        code: 's = 0\nfor i in range(1, 4):\n    s += i\nprint(s)',
+        options: ['3', '5', '6', '10', '0'],
+        correctIndex: 2,
+        explanation: '1 + 2 + 3 = 6'
+      },
+      {
+        type: 'NUMERIC',
+        prompt: 'x = 17 // 5 olarsa, x neçədir?',
+        correctText: '3',
+        explanation: '// tam bölmədir'
+      }
+    ]
+  }, null, 2);
+
+  function showManage() {
+    stopTimer();
+    mount(loading());
+    call('/api/teacher/quizzes').then(function (list) {
+      state.manageList = list;
+      renderManage();
+    }).catch(function (e) { fail(e); mount(h('div', { class: 'state', text: 'Testləri yükləmək mümkün olmadı.' })); });
+  }
+
+  function renderManage() {
+    var list = state.manageList || [];
+    var jsonArea = h('textarea', { class: 'mono json', spellcheck: 'false', placeholder: 'JSON-u bura yapışdır', 'aria-label': 'Test JSON-u' });
+    var importBtn = h('button', { type: 'button', class: 'btn primary', text: 'Testi yüklə' });
+    importBtn.addEventListener('click', function () {
+      var data;
+      try { data = JSON.parse(jsonArea.value); } catch (e) { toast('JSON oxunmadı: ' + e.message, 'error'); return; }
+      if (!data || typeof data !== 'object' || Array.isArray(data) || !data.title || !Array.isArray(data.questions)) {
+        toast('JSON obyekt olmalı və "title" ilə "questions" siyahısı daxil etməlidir', 'error'); return;
+      }
+      importBtn.disabled = true;
+      send('POST', '/api/teacher/quizzes', data).then(function (saved) {
+        toast('Test yaradıldı: ' + saved.title, 'success');
+        openEditor(saved.id);
+      }).catch(function (e) { fail(e); importBtn.disabled = false; });
+    });
+
+    var root = h('div', null,
+      h('div', { class: 'toolbar' },
+        h('button', { type: 'button', class: 'btn primary', text: '+ Yeni test', onclick: function () { showEditor(newDraft()); } }),
+        h('span', { class: 'grow' }),
+        h('span', { class: 'muted', text: list.length + ' test' })),
+      h('details', { class: 'imp' },
+        h('summary', { text: 'JSON ilə test yüklə' }),
+        h('div', { class: 'body' },
+          h('p', null, 'Çoxlu sualı tez əlavə etmək üçün testi JSON kimi yapışdır. ', h('b', { text: 'correctIndex' }),
+            ' 0-dan başlayır (0 = A variantı). NUMERIC sualda bir neçə qəbul olunan cavab üçün ', h('b', { text: 'correctText' }), '-də "|" işlət (məs. "12|12.0"). Test əvvəlcə qaralama kimi yaranır.'),
+          jsonArea,
+          h('div', { class: 'toolbar' }, importBtn,
+            h('button', { type: 'button', class: 'btn', text: 'Nümunəni doldur', onclick: function () { jsonArea.value = JSON_EXAMPLE; } })))),
+      list.length ? list.map(manageRow) : h('div', { class: 'state', text: 'Hələ test yaratmamısan. "+ Yeni test" düyməsi ilə başla.' }));
+    var y = mount(root);
+    if (document.scrollingElement) document.scrollingElement.scrollTop = y;
+  }
+
+  function manageRow(q) {
+    var sub = [
+      h('span', { class: 'tag ' + (q.published ? 'green' : 'bronze'), text: q.published ? 'Dərc olunub' : 'Qaralama' }),
+      h('span', { class: 'tag', text: q.questionCount + ' sual' }),
+      h('span', { class: 'tag', text: q.attemptCount + ' cəhd' })
+    ];
+    if (q.category) sub.unshift(h('span', { class: 'tag cyan', text: q.category }));
+    if (q.timeLimitMinutes) sub.push(h('span', { class: 'tag', text: q.timeLimitMinutes + ' dəq' }));
+    if (isAdmin() && q.authorName) sub.push(h('span', { class: 'muted', text: q.authorName }));
+    var acts = h('div', { class: 'acts' },
+      h('button', { type: 'button', class: 'btn small', text: 'Redaktə', onclick: function () { openEditor(q.id); } }),
+      h('button', { type: 'button', class: 'btn small', text: 'Nəticələr', onclick: function () { showResults(q.id); } }),
+      h('button', { type: 'button', class: 'btn small', text: 'Yoxla', title: 'Testi şagird kimi həll et (nəticə cədvəlinə düşmür)', onclick: function (ev) { beginQuiz(q.id, ev.currentTarget); } }),
+      h('button', { type: 'button', class: 'btn small', text: q.published ? 'Gizlət' : 'Dərc et', onclick: function (ev) { togglePublish(q, ev.currentTarget); } }),
+      h('button', { type: 'button', class: 'btn small danger', text: 'Sil', onclick: function () { removeQuiz(q); } }));
+    return h('div', { class: 'row' },
+      h('div', null, h('div', { class: 'nm', text: q.title }), h('div', { class: 'sub' }, sub)),
+      acts);
+  }
+
+  function togglePublish(q, btn) {
+    btn.disabled = true;
+    call('/api/teacher/quizzes/' + q.id).then(function (detail) {
+      var draft = fromDetail(detail);
+      draft.published = !q.published;
+      return send('PUT', '/api/teacher/quizzes/' + q.id, toRequest(draft));
+    }).then(function () {
+      toast(q.published ? 'Test gizlədildi' : 'Test dərc olundu', 'success');
+      showManage();
+    }).catch(function (e) { fail(e); btn.disabled = false; });
+  }
+
+  function removeQuiz(q) {
+    confirmBox('"' + q.title + '" testi silinsin? Bu geri qaytarıla bilməz.', { title: 'Testi sil', okText: 'Sil', danger: true }).then(function (ok) {
+      if (!ok) return;
+      send('DELETE', '/api/teacher/quizzes/' + q.id).then(function () {
+        toast('Test silindi', 'success');
+        showManage();
+      }).catch(fail);
+    });
+  }
+
+  /* ---------- Müəllim/admin: redaktor ---------- */
+
+  function blankQuestion(type) {
+    return {
+      id: null, type: type, prompt: '', code: '',
+      options: type === 'CHOICE' ? ['', '', '', '', ''] : [],
+      correctIndex: type === 'CHOICE' ? 0 : null, correctText: '', explanation: ''
+    };
+  }
+  function newDraft() {
+    return { id: null, title: '', description: '', category: '', timeLimitMinutes: '', published: false, locked: false, attemptCount: 0, questions: [blankQuestion('CHOICE')] };
+  }
+  function fromDetail(d) {
+    return {
+      id: d.id, title: d.title || '', description: d.description || '', category: d.category || '',
+      timeLimitMinutes: d.timeLimitMinutes == null ? '' : String(d.timeLimitMinutes),
+      published: !!d.published, locked: !!d.locked, attemptCount: d.attemptCount || 0,
+      questions: d.questions.map(function (q) {
+        return { id: q.id, type: q.type, prompt: q.prompt || '', code: q.code || '', options: (q.options || []).slice(),
+          correctIndex: q.correctIndex == null ? null : q.correctIndex, correctText: q.correctText || '', explanation: q.explanation || '' };
+      })
+    };
+  }
+  function toRequest(d) {
+    var limit = String(d.timeLimitMinutes).trim();
+    return {
+      title: d.title, description: d.description || null, category: d.category || null,
+      timeLimitMinutes: limit === '' ? null : Number(limit),
+      published: !!d.published,
+      questions: d.questions.map(function (q) {
+        return {
+          id: q.id, type: q.type, prompt: q.prompt, code: q.code || null,
+          options: q.type === 'CHOICE' ? q.options : [],
+          correctIndex: q.type === 'CHOICE' ? q.correctIndex : null,
+          correctText: q.type === 'NUMERIC' ? q.correctText : null,
+          explanation: q.explanation || null
+        };
+      })
+    };
+  }
+
+  function openEditor(id) {
+    mount(loading());
+    call('/api/teacher/quizzes/' + id).then(function (d) { showEditor(fromDetail(d)); })
+      .catch(function (e) { fail(e); go('manage'); });
+  }
+
+  function showEditor(draft) {
+    stopTimer();
+    state.tab = 'manage';
+    renderSeg();
+    var saving = false;
+
+    function rerender() {
+      var y = mount(build());
+      if (document.scrollingElement) document.scrollingElement.scrollTop = y;
+    }
+
+    function field(label, input) { return h('div', null, h('label', { class: 'lbl', text: label }), input); }
+
+    function optionRow(q, qi, oi) {
+      var lockedQ = draft.locked && q.id != null;
+      return h('div', { class: 'oe' },
+        h('input', { type: 'radio', name: 'correct-' + qi, checked: q.correctIndex === oi, title: 'Düzgün cavab', 'aria-label': 'Düzgün cavab: ' + LETTERS[oi],
+          onchange: function () { q.correctIndex = oi; }, disabled: lockedQ }),
+        h('span', { class: 'letter', text: LETTERS[oi] }),
+        h('input', { type: 'text', class: 'field', value: q.options[oi], maxlength: '500', placeholder: 'Variant ' + LETTERS[oi], 'aria-label': 'Variant ' + LETTERS[oi],
+          oninput: function (ev) { q.options[oi] = ev.target.value; } }),
+        h('button', { type: 'button', class: 'btn small danger', text: '×', title: 'Variantı sil', disabled: lockedQ || q.options.length <= 2,
+          onclick: function () {
+            q.options.splice(oi, 1);
+            if (q.correctIndex === oi) q.correctIndex = 0; else if (q.correctIndex > oi) q.correctIndex--;
+            rerender();
+          } }));
+    }
+
+    function questionEditor(q, qi) {
+      var lockedQ = draft.locked && q.id != null;
+      var typeSel = h('select', { 'aria-label': 'Sualın növü', disabled: lockedQ,
+        onchange: function (ev) {
+          var t = ev.target.value;
+          if (t === q.type) return;
+          q.type = t;
+          if (t === 'CHOICE') { q.options = ['', '', '', '', '']; q.correctIndex = 0; } else { q.options = []; q.correctIndex = null; }
+          rerender();
+        } },
+        h('option', { value: 'CHOICE', selected: q.type === 'CHOICE', text: 'Qapalı (variantlı)' }),
+        h('option', { value: 'NUMERIC', selected: q.type === 'NUMERIC', text: 'Kodlu (ədəd/mətn cavab)' }));
+
+      var answerPart;
+      if (q.type === 'CHOICE') {
+        answerPart = h('div', { style: 'display:grid;gap:8px' },
+          h('label', { class: 'lbl', text: 'Variantlar (düzgün olanı işarələ)' }),
+          q.options.map(function (_, oi) { return optionRow(q, qi, oi); }),
+          h('div', null, h('button', { type: 'button', class: 'btn small', text: '+ Variant əlavə et', disabled: lockedQ || q.options.length >= 6,
+            onclick: function () { q.options.push(''); rerender(); } })));
+      } else {
+        answerPart = field('Düzgün cavab',
+          h('input', { type: 'text', class: 'field mono', value: q.correctText, maxlength: '200', placeholder: 'məs. 12', disabled: lockedQ,
+            oninput: function (ev) { q.correctText = ev.target.value; } }));
+        answerPart.appendChild(h('div', { class: 'hint', text: 'Bir neçə qəbul olunan yazılış üçün "|" işlət (məs. 12|12.0). Boşluq, vergül/nöqtə və sondakı sıfırlar fərq salmır.' }));
+      }
+
+      return h('section', { class: 'qe' },
+        h('div', { class: 'qe-head' },
+          h('span', { class: 'q-num', text: String(qi + 1) }), typeSel, h('span', { class: 'grow' }),
+          h('button', { type: 'button', class: 'btn small', text: '↑', title: 'Yuxarı', disabled: qi === 0,
+            onclick: function () { swap(qi, qi - 1); } }),
+          h('button', { type: 'button', class: 'btn small', text: '↓', title: 'Aşağı', disabled: qi === draft.questions.length - 1,
+            onclick: function () { swap(qi, qi + 1); } }),
+          h('button', { type: 'button', class: 'btn small danger', text: 'Sil', disabled: lockedQ, onclick: function () {
+            confirmBox('Sual ' + (qi + 1) + ' silinsin?', { title: 'Sualı sil', okText: 'Sil', danger: true }).then(function (ok) {
+              if (ok) { draft.questions.splice(qi, 1); rerender(); }
+            });
+          } })),
+        field('Sualın mətni', h('textarea', { value: q.prompt, maxlength: '4000', oninput: function (ev) { q.prompt = ev.target.value; } })),
+        field('Kod və ya cədvəl (istəyə bağlı)', h('textarea', { class: 'mono', value: q.code, maxlength: '8000', spellcheck: 'false',
+          placeholder: 'Sualla birlikdə monoşrift blokunda göstərilir', oninput: function (ev) { q.code = ev.target.value; } })),
+        answerPart,
+        field('İzah (istəyə bağlı, təhvildən sonra göstərilir)', h('textarea', { value: q.explanation, maxlength: '4000', oninput: function (ev) { q.explanation = ev.target.value; } })));
+    }
+
+    function swap(a, b) {
+      var t = draft.questions[a]; draft.questions[a] = draft.questions[b]; draft.questions[b] = t;
+      rerender();
+    }
+
+    function save(btn) {
+      if (saving) return;
+      saving = true;
+      btn.disabled = true;
+      var req = toRequest(draft);
+      (draft.id ? send('PUT', '/api/teacher/quizzes/' + draft.id, req) : send('POST', '/api/teacher/quizzes', req))
+        .then(function (saved) {
+          draft = fromDetail(saved);
+          toast('Yadda saxlandı', 'success');
+          saving = false;
+          rerender();
+        }).catch(function (e) { saving = false; btn.disabled = false; fail(e); });
+    }
+
+    function build() {
+      var saveBtn = h('button', { type: 'button', class: 'btn primary', text: 'Yadda saxla' });
+      saveBtn.addEventListener('click', function () { save(saveBtn); });
+      var pub = h('input', { type: 'checkbox', checked: draft.published, onchange: function (ev) { draft.published = ev.target.checked; } });
+      return h('div', null,
+        h('div', { class: 'toolbar back' },
+          h('button', { type: 'button', class: 'btn', text: '← Test idarəsi', onclick: function () { go('manage'); } }),
+          h('span', { class: 'grow' }),
+          draft.id ? h('span', { class: 'muted', text: draft.attemptCount + ' cəhd' }) : null),
+        draft.locked ? h('div', { class: 'lockbar' }, h('b', { text: 'Bu testi artıq həll ediblər. ' }),
+          'Köhnə nəticələr pozulmasın deyə mövcud sualı silmək, növünü, variant sayını və düzgün cavabı dəyişmək olmaz. Mətn və izah düzəlişləri, yeni sual əlavə etmək, sıranı dəyişmək və dərcdən çıxarmaq mümkündür.') : null,
+        h('div', { class: 'form' },
+          field('Testin adı', h('input', { type: 'text', class: 'field', value: draft.title, maxlength: '200', placeholder: 'məs. Say sistemləri, test 1',
+            oninput: function (ev) { draft.title = ev.target.value; } })),
+          h('div', { class: 'two' },
+            field('Mövzu etiketi', h('input', { type: 'text', class: 'field', value: draft.category, maxlength: '80', placeholder: 'məs. Python',
+              oninput: function (ev) { draft.category = ev.target.value; } })),
+            field('Vaxt (dəqiqə, boş = məhdudiyyətsiz)', h('input', { type: 'number', class: 'field', min: '1', max: '300', value: draft.timeLimitMinutes,
+              oninput: function (ev) { draft.timeLimitMinutes = ev.target.value; } }))),
+          field('Qısa izah (istəyə bağlı)', h('textarea', { value: draft.description, maxlength: '4000', oninput: function (ev) { draft.description = ev.target.value; } })),
+          h('label', { class: 'check' }, pub, 'Dərc olunsun (şagirdlər görsün)')),
+        h('h2', { class: 'sec', text: 'Suallar (' + draft.questions.length + ')' }),
+        draft.questions.map(questionEditor),
+        h('div', { class: 'toolbar' },
+          h('button', { type: 'button', class: 'btn', text: '+ Qapalı sual', onclick: function () { draft.questions.push(blankQuestion('CHOICE')); rerender(); } }),
+          h('button', { type: 'button', class: 'btn', text: '+ Kodlu sual', onclick: function () { draft.questions.push(blankQuestion('NUMERIC')); rerender(); } })),
+        h('div', { class: 'savebar' }, h('span', { class: 'muted', text: draft.id ? 'Dəyişikliklər yadda saxlanana qədər şagirdlərə görünmür.' : 'Yeni test' }), saveBtn));
+    }
+
+    mount(build());
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Müəllim/admin: nəticələr ---------- */
+
+  function showResults(id) {
+    stopTimer();
+    mount(loading());
+    call('/api/teacher/quizzes/' + id + '/results').then(function (r) {
+      var back = h('div', { class: 'toolbar back' },
+        h('button', { type: 'button', class: 'btn', text: '← Test idarəsi', onclick: function () { go('manage'); } }));
+      var students = r.students.length
+        ? h('div', { class: 'tblwrap' }, h('table', { class: 'tbl' },
+            h('thead', null, h('tr', null, ['Şagird', 'E-poçt', 'Cəhd', 'Ən yaxşı nəticə', 'Sonuncu cəhd'].map(function (t) { return h('th', { text: t }); }))),
+            h('tbody', null, r.students.map(function (s) {
+              return h('tr', null,
+                h('td', { text: s.name }), h('td', { class: 'muted', text: s.email }), h('td', { text: String(s.attemptCount) }),
+                h('td', null, h('span', { class: 'bar' }, h('i', { style: 'width:' + s.bestPercent + '%' })), s.bestCorrect + ' / ' + s.bestTotal + ' (' + s.bestPercent + '%)'),
+                h('td', { class: 'muted', text: fmtDate(s.lastSubmittedAt) }));
+            }))))
+        : h('div', { class: 'state', text: 'Hələ təhvil verilmiş cəhd yoxdur.' });
+      var questions = h('div', { class: 'tblwrap' }, h('table', { class: 'tbl' },
+        h('thead', null, h('tr', null, ['№', 'Sual', 'Doğru cavab'].map(function (t) { return h('th', { text: t }); }))),
+        h('tbody', null, r.questions.map(function (q) {
+          return h('tr', null,
+            h('td', { text: String(q.position + 1) }), h('td', { text: q.prompt }),
+            h('td', null, h('span', { class: 'bar' }, h('i', { style: 'width:' + q.percent + '%' })), q.percent + '%'));
+        }))));
+      mount(h('div', null, back,
+        h('h2', { class: 'sec', text: r.title }),
+        h('p', { class: 'muted', text: r.scope === 'MY_GROUPS'
+          ? 'Yalnız sənin qruplarındakı şagirdlərin nəticələri göstərilir.'
+          : 'Bütün şagirdlərin nəticələri göstərilir.' }),
+        students,
+        h('h2', { class: 'sec', text: 'Suallar üzrə statistika' }), questions));
+    }).catch(function (e) { fail(e); go('manage'); });
+  }
+
+  /* ---------- Başlanğıc ---------- */
+
+  go('list');
 })();
 </script>
 </body>
