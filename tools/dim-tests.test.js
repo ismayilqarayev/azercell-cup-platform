@@ -1,4 +1,4 @@
-// dim-tests/python.json (DİM Python testləri) faylını yoxlayır: server qaydalarına (QuizAdminService) uyğunluq, təkrarsızlıq,
+// backend/src/main/resources/seed/dim-python-tests.json (DİM Python testləri; QuizSeedLoader onu bazaya yazır) faylını yoxlayır: server qaydalarına (QuizAdminService) uyğunluq, təkrarsızlıq,
 // düzgün variantın paylanması və (python varsa) generatorun --check rejimi: cavab açarları kodu YENİDƏN icra edərək təsdiqlənir.
 // İşə salmaq: node --test tools/*.test.js
 'use strict';
@@ -9,13 +9,14 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const ROOT = path.join(__dirname, '..');
-const FILE = path.join(ROOT, 'dim-tests', 'python.json');
+const FILE = path.join(ROOT, 'backend', 'src', 'main', 'resources', 'seed', 'dim-python-tests.json');
 const quizzes = JSON.parse(fs.readFileSync(FILE, 'utf8'));
 
 test('fayl massivdir: 10 mövzu testi + 1 qarışıq sınaq', () => {
   assert.ok(Array.isArray(quizzes));
   assert.equal(quizzes.length, 11);
   assert.equal(new Set(quizzes.map(q => q.title)).size, quizzes.length, 'testlərin adları təkrarsız olmalıdır');
+  assert.equal(new Set(quizzes.map(q => q.seedKey)).size, quizzes.length, 'seedKey-lər təkrarsız olmalıdır (dəyişsə, test bazada təkrar yaranar)');
 });
 
 test('hər test serverin qəbul edəcəyi formadadır (QuizUpsertRequest + QuizAdminService qaydaları)', () => {
@@ -25,7 +26,9 @@ test('hər test serverin qəbul edəcəyi formadadır (QuizUpsertRequest + QuizA
     assert.ok(z.description == null || z.description.length <= 4000, where + ': izah');
     assert.ok(z.category == null || z.category.length <= 80, where + ': kateqoriya');
     assert.ok(z.timeLimitMinutes === null || (Number.isInteger(z.timeLimitMinutes) && z.timeLimitMinutes >= 1 && z.timeLimitMinutes <= 300), where + ': vaxt');
-    assert.equal(z.published, false, where + ': yeni testlər qaralama kimi gəlir (müəllim yoxlayıb dərc edir)');
+    assert.equal(z.published, true, where + ': hazır testlər dərc olunmuş yaranır');
+    assert.match(z.seedKey, /^dim-python-[a-z0-9]+$/, where + ': seedKey');
+    assert.ok(z.seedKey.length <= 80, where + ': seedKey uzunluğu');
     assert.ok(Array.isArray(z.questions) && z.questions.length >= 8 && z.questions.length <= 200, where + ': sual sayı');
     z.questions.forEach((q, i) => {
       const at = where + ', sual ' + (i + 1);

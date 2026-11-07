@@ -9,6 +9,10 @@ spring:
       ddl-auto: create-drop
 
 app:
+  # Hazır testlər digər inteqrasiya testlərinin bazasına qarışmasın; onları yalnız QuizSeedLoaderTest özü açıq şəkildə yandırır.
+  seed:
+    quizzes:
+      enabled: false
   admin:
     email: admin-test@azcup.local
     password: test-admin-pw-123

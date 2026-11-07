@@ -49,6 +49,11 @@ public class Quiz {
     @Column(nullable = false)
     private boolean published;
 
+    // Layihə ilə birlikdə gələn hazır testlərin sabit açarı (bax: QuizSeedLoader); əl ilə yaradılan testlərdə null.
+    // Açar sayəsində yükləyici eyni testi iki dəfə yaratmır, hazır test isə silinə bilmir (yalnız dərcdən çıxarılır).
+    @Column(length = 80, unique = true)
+    private String seedKey;
+
     // Testi yaradan müəllim/admin — redaktə və silmə yalnız ona (və admin-ə) açıqdır.
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by_id", nullable = false)
@@ -118,6 +123,14 @@ public class Quiz {
 
     public void setPublished(boolean published) {
         this.published = published;
+    }
+
+    public String getSeedKey() {
+        return seedKey;
+    }
+
+    public void setSeedKey(String seedKey) {
+        this.seedKey = seedKey;
     }
 
     public User getCreatedBy() {

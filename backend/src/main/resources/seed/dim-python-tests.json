@@ -1,0 +1,1589 @@
+[
+  {
+    "seedKey": "dim-python-01",
+    "title": "Python 1. Dəyişənlər, tiplər və giriş-çıxış",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: dəyişənlər, verilənlərin tipləri, input və print.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 5\nb = 3\na = a + b\nb = a - b\nprint(a, b)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 5\nSətir 2: b = 3\nSətir 3: a = 8\nSətir 4: b = 5\n\nEkrana çıxan: 8 5",
+        "options": [
+          "8 3",
+          "8 -3",
+          "8 5",
+          "5 3",
+          "3 5"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı ifadələrdən hansının nəticəsi float tipindədir?",
+        "code": null,
+        "explanation": "Python-da / əməliyyatı bölünən tam ədədlər üçün də həmişə float qaytarır.\n\nHər variantın qiyməti:\n7 // 2  ->  3  (tip: int)\n3 * 4  ->  12  (tip: int)\n2 ** 3  ->  8  (tip: int)\n10 / 5  ->  2.0  (tip: float)\nabs(-3)  ->  3  (tip: int)",
+        "options": [
+          "10 / 5",
+          "7 // 2",
+          "3 * 4",
+          "2 ** 3",
+          "abs(-3)"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = \"5\"\ny = \"3\"\nprint(x + y)",
+        "explanation": "Dırnaq içindəki 5 və 3 sətirdir; sətirlərdə + birləşdirmə deməkdir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = '5'\nSətir 2: y = '3'\n\nEkrana çıxan: 53",
+        "options": [
+          "8",
+          "5 3",
+          "15",
+          "x + y",
+          "53"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "x = 7\ny = 2\nz = x // y + x % y * x\nprint(z)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 7\nSətir 2: y = 2\nSətir 3: z = 10\n\nEkrana çıxan: 10",
+        "correctText": "10"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq? Klaviaturadan ardıcıl olaraq 6 və 7 daxil edilir.",
+        "code": "a = int(input())\nb = int(input())\nc = a + b\nprint(c, a * b, sep=\";\")",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 6\nSətir 2: b = 7\nSətir 3: c = 13\n\nEkrana çıxan: 13;42",
+        "options": [
+          "13 42",
+          "13;42",
+          "42;13",
+          "67;42",
+          "1342"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq? Klaviaturadan 12 daxil edilir.",
+        "code": "n = input()\nprint(n * 2)\nprint(int(n) * 2)",
+        "explanation": "input() həmişə sətir qaytarır: sətri 2-yə vurmaq onu təkrarlayır, int-ə çevirəndən sonra isə ədəd vurulur.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = '12'\n\nEkrana çıxan: 1212 / 24",
+        "options": [
+          "24\n24",
+          "1212\n1212",
+          "12\n24",
+          "1212\n24",
+          "24\n1212"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakılardan hansı Python-da dəyişən adı ola BİLMƏZ?",
+        "code": null,
+        "explanation": "Dəyişən adı rəqəmlə başlaya bilməz; hərf, rəqəm və _ işlədilə bilər.\n\nHər variantın qiyməti:\n_sum  ->  keçərli ad\nad2  ->  keçərli ad\n2ad  ->  keçərsiz ad\nYaş  ->  keçərli ad\na_b  ->  keçərli ad",
+        "options": [
+          "_sum",
+          "ad2",
+          "2ad",
+          "Yaş",
+          "a_b"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 10\nx += 5\nx *= 2\nx -= 4\nprint(x)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 10\nSətir 2: x = 15\nSətir 3: x = 30\nSətir 4: x = 26\n\nEkrana çıxan: 26",
+        "options": [
+          "26",
+          "30",
+          "22",
+          "16",
+          "36"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "print(\"a\", \"b\", \"c\", sep=\"-\")\nprint(\"x\", end=\"\")\nprint(\"y\")",
+        "explanation": "sep ardıcıl çıxarılan qiymətlər arasına qoyulan ayırıcıdır, end isə çıxışın sonuna əlavə olunur (standart: sətir keçidi).\n\nEkrana çıxan: a-b-c / xy",
+        "options": [
+          "a-b-c\nx\ny",
+          "a b c\nxy",
+          "a-b-c\nx y",
+          "abc\nxy",
+          "a-b-c\nxy"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 3\nb = 4.0\nc = a + b\nprint(c)\nprint(type(c))",
+        "explanation": "int və float birlikdə hesablananda nəticə float olur.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 3\nSətir 2: b = 4.0\nSətir 3: c = 7.0\n\nEkrana çıxan: 7.0 / <class 'float'>",
+        "options": [
+          "7\n<class 'int'>",
+          "7.0\n<class 'float'>",
+          "7.0\n<class 'int'>",
+          "7\n<class 'float'>",
+          "7.0\n<class 'str'>"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-02",
+    "title": "Python 2. Ədədlər və riyazi əməllər",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: //, %, **, əməliyyat sırası, ədədin rəqəmləri.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "print(17 // 5, 17 % 5, 17 / 5)",
+        "explanation": "17 // 5 tam hissəni (3), 17 % 5 qalığı (2), 17 / 5 isə kəsr nəticəni (3.4) verir.\n\nEkrana çıxan: 3 2 3.4",
+        "options": [
+          "3 2 3",
+          "3 3 3.4",
+          "4 2 3.4",
+          "3 2 3.4",
+          "3 2 3.0"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 4729\nprint(n // 100 % 10)",
+        "explanation": "n // 100 ədədin son iki rəqəmini atır (47), % 10 isə qalan ədədin son rəqəmini verir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 4729\n\nEkrana çıxan: 7",
+        "correctText": "7"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "print(2 + 3 * 4 ** 2 // 8 - 1)",
+        "explanation": "Sıra: **, sonra * və // (soldan sağa), sonra + və -.\n\nEkrana çıxan: 7",
+        "correctText": "7"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı ifadələrdən hansının qiyməti 3-dür?",
+        "code": null,
+        "explanation": "Hər variantın qiyməti:\n10 // 3  ->  3  (tip: int)\n10 % 4  ->  2  (tip: int)\n10 / 4  ->  2.5  (tip: float)\n2 ** 2  ->  4  (tip: int)\n9 % 5  ->  4  (tip: int)",
+        "options": [
+          "10 % 4",
+          "10 / 4",
+          "10 // 3",
+          "2 ** 2",
+          "9 % 5"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = -7\nprint(a // 2, a % 2, abs(a))",
+        "explanation": "Mənfi ədədlərdə // aşağıya yuvarlaqlaşdırır: -7 // 2 = -4, qalıq isə həmişə bölənin işarəsini daşıyır: -7 % 2 = 1.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = -7\n\nEkrana çıxan: -4 1 7",
+        "options": [
+          "-4 1 7",
+          "-3 -1 7",
+          "-4 -1 7",
+          "-3 1 7",
+          "-4 1 -7"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 5832\ns = 0\nwhile n > 0:\n    s += n % 10\n    n //= 10\nprint(s)",
+        "explanation": "Dövr hər addımda ədədin son rəqəmini cəmə əlavə edir və onu atır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 5832\nSətir 2: s = 0\nSətir 4: s = 2\nSətir 5: n = 583\nSətir 4: s = 5\nSətir 5: n = 58\nSətir 4: s = 13\nSətir 5: n = 5\nSətir 4: s = 18\nSətir 5: n = 0\n\nEkrana çıxan: 18",
+        "correctText": "18"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan n ədədi daxil edilir (iki rəqəmli natural ədəd). Proqramın ekrana 13 çıxarması üçün n-in ala biləcəyi ən böyük qiymət hansıdır?",
+        "code": "n = int(input())\nprint(n // 10 + n % 10)",
+        "explanation": "n // 10 onlar rəqəmini, n % 10 isə təklər rəqəmini verir: proqram rəqəmlərin cəmini tapır.\n\nYoxlama: n = 94  ->  13; n = 95  ->  14\nƏn böyük uyğun qiymət: 94",
+        "options": [
+          "49",
+          "95",
+          "93",
+          "96",
+          "94"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 17\ny = 5\nprint(x / y, x // y, x % y, x ** 2 % y)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 17\nSətir 2: y = 5\n\nEkrana çıxan: 3.4 3 2 4",
+        "options": [
+          "3.4 3 2 2",
+          "3.4 3 2 4",
+          "3 3 2 4",
+          "3.4 3 2 5",
+          "3.4 3 3 4"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "print(round(3.7), int(3.7), int(-3.7), round(-3.2))",
+        "explanation": "int() kəsr hissəni atır (sıfıra doğru), round() isə ən yaxın tam ədədi verir.\n\nEkrana çıxan: 4 3 -3 -3",
+        "options": [
+          "4 3 -4 -3",
+          "3 3 -3 -3",
+          "4 4 -3 -3",
+          "4 3 -3 -3",
+          "4 3 -3 -4"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "print(abs(-5) + 10 % 4 * 3 - 2 ** 3)",
+        "explanation": "abs(-5) = 5; 10 % 4 * 3 = 2 * 3 = 6; 2 ** 3 = 8; deməli 5 + 6 - 8.\n\nEkrana çıxan: 3",
+        "correctText": "3"
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-03",
+    "title": "Python 3. Şərt operatorları",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: if, elif, else, məntiqi əməliyyatlar.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 8\nif x > 5:\n    print(\"A\")\nif x > 7:\n    print(\"B\")\nelif x > 2:\n    print(\"C\")\nelse:\n    print(\"D\")",
+        "explanation": "Hər ayrıca if müstəqil yoxlanır; elif/else isə yalnız öz if-indən sonra, onun şərti ödənməyəndə işləyir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 8\n\nEkrana çıxan: A / B",
+        "options": [
+          "A",
+          "A\nC",
+          "A\nB",
+          "B",
+          "A\nB\nC"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 4\nb = 9\nif a > 3 and b < 5:\n    print(1)\nelif a > 3 or b < 5:\n    print(2)\nelse:\n    print(3)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 4\nSətir 2: b = 9\n\nEkrana çıxan: 2",
+        "options": [
+          "2",
+          "1",
+          "3",
+          "1\n2",
+          "2\n3"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı ifadələrdən hansının qiyməti True-dur?",
+        "code": null,
+        "explanation": "Hər variantın qiyməti:\n5 > 3 and 2 > 4  ->  False  (tip: bool)\nnot (3 < 5)  ->  False  (tip: bool)\n10 // 3 == 3 and 10 % 3 == 1  ->  True  (tip: bool)\n5 != 5  ->  False  (tip: bool)\nnot True or False  ->  False  (tip: bool)",
+        "options": [
+          "5 > 3 and 2 > 4",
+          "not (3 < 5)",
+          "5 != 5",
+          "not True or False",
+          "10 // 3 == 3 and 10 % 3 == 1"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 27\nif n % 2 == 0:\n    r = n // 2\nelse:\n    r = 3 * n + 1\nprint(r)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 27\nSətir 5: r = 82\n\nEkrana çıxan: 82",
+        "correctText": "82"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan iki rəqəmli natural n ədədi daxil edilir. Proqramın ekrana B çıxarması üçün n-in ən kiçik qiyməti neçədir?",
+        "code": "n = int(input())\nif n % 3 == 0 and n % 5 == 0:\n    print(\"A\")\nelif n % 3 == 0:\n    print(\"B\")\nelse:\n    print(\"C\")",
+        "explanation": "Yoxlama: n = 12  ->  B; n = 11  ->  C\nƏn kiçik uyğun qiymət: 12",
+        "options": [
+          "99",
+          "12",
+          "13",
+          "11",
+          "14"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 9\nb = 4\nif a > b:\n    a, b = b, a\nif a + b > 12:\n    print(b - a)\nelse:\n    print(a * b)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 9\nSətir 2: b = 4\nSətir 4: a = 4; b = 9\n\nEkrana çıxan: 5",
+        "options": [
+          "36",
+          "13",
+          "4",
+          "5",
+          "9"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 12\ny = 5\nif x > y:\n    if x % y == 2:\n        print(\"A\")\n    else:\n        print(\"B\")\nelse:\n    print(\"C\")",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 12\nSətir 2: y = 5\n\nEkrana çıxan: A",
+        "options": [
+          "B",
+          "C",
+          "A",
+          "A\nB",
+          "2"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "year = 2100\nif year % 400 == 0 or (year % 4 == 0 and year % 100 != 0):\n    print(366)\nelse:\n    print(365)",
+        "explanation": "2100 ili 4-ə bölünür, lakin 100-ə də bölünür və 400-ə bölünmür: sıçrayış il deyil.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: year = 2100\n\nEkrana çıxan: 365",
+        "correctText": "365"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "print(7 > 3, 7 == 3, not 7 > 3, 7 > 3 and 3 > 7)",
+        "explanation": "7 > 3 True; 7 == 3 False; not 7 > 3 = not True = False; 7 > 3 and 3 > 7 = True and False = False.\n\nEkrana çıxan: True False False False",
+        "options": [
+          "True False False False",
+          "True False True False",
+          "True True False False",
+          "False False True False",
+          "True False False True"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = 74\nif s >= 90:\n    g = 5\nelif s >= 70:\n    g = 4\nelif s >= 50:\n    g = 3\nelse:\n    g = 2\nprint(g, s // 10)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 74\nSətir 5: g = 4\n\nEkrana çıxan: 4 7",
+        "options": [
+          "3 7",
+          "4 74",
+          "4 8",
+          "5 7",
+          "4 7"
+        ],
+        "correctIndex": 4
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-04",
+    "title": "Python 4. for dövrü və range",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: for, range(başla, bitir, addım), dövrdə cəm və hasil.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = 0\nfor i in range(1, 6):\n    s += i\nprint(s)",
+        "explanation": "range(1, 6) 1, 2, 3, 4, 5 ədədlərini verir (son ədəd daxil deyil).\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 3: s = 1\nSətir 2: i = 2\nSətir 3: s = 3\nSətir 2: i = 3\nSətir 3: s = 6\nSətir 2: i = 4\nSətir 3: s = 10\nSətir 2: i = 5\nSətir 3: s = 15\n\nEkrana çıxan: 15",
+        "correctText": "15"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(2, 11, 3):\n    print(i, end=\" \")",
+        "explanation": "range(2, 11, 3) 2-dən başlayır, hər dəfə 3 artır və 11-ə çatmamış dayanır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 2\nSətir 1: i = 5\nSətir 1: i = 8\n\nEkrana çıxan: 2 5 8",
+        "options": [
+          "2 5 8 11",
+          "2 5 8",
+          "3 6 9",
+          "2 4 6 8 10",
+          "2 3 4 5 6 7 8 9 10"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "p = 1\nfor i in range(1, 6):\n    p *= i\nprint(p)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: p = 1\nSətir 2: i = 1\nSətir 2: i = 2\nSətir 3: p = 2\nSətir 2: i = 3\nSətir 3: p = 6\nSətir 2: i = 4\nSətir 3: p = 24\nSətir 2: i = 5\nSətir 3: p = 120\n\nEkrana çıxan: 120",
+        "correctText": "120"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(5, 0, -2):\n    print(i)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 5\nSətir 1: i = 3\nSətir 1: i = 1\n\nEkrana çıxan: 5 / 3 / 1",
+        "options": [
+          "5\n3\n1\n-1",
+          "5\n4\n3\n2\n1",
+          "4\n2",
+          "5\n3\n1",
+          "5\n3"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "c = 0\nfor i in range(1, 31):\n    if i % 4 == 0:\n        c += 1\nprint(c)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: c = 0\nSətir 2: i = 1\nSətir 2: i = 2\nSətir 2: i = 3\nSətir 2: i = 4\nSətir 4: c = 1\nSətir 2: i = 5\nSətir 2: i = 6\nSətir 2: i = 7\nSətir 2: i = 8\n...\nSətir 4: c = 7\nSətir 2: i = 29\nSətir 2: i = 30\n\nEkrana çıxan: 7",
+        "correctText": "7"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = 0\nfor i in range(1, 8):\n    if i % 2 == 0:\n        s -= i\n    else:\n        s += i\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 6: s = 1\nSətir 2: i = 2\nSətir 4: s = -1\nSətir 2: i = 3\nSətir 6: s = 2\nSətir 2: i = 4\nSətir 4: s = -2\nSətir 2: i = 5\n...\nSətir 4: s = -3\nSətir 2: i = 7\nSətir 6: s = 4\n\nEkrana çıxan: 4",
+        "options": [
+          "28",
+          "-4",
+          "4",
+          "16",
+          "0"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan n ədədi daxil edilir (natural ədəd). Proqramın ekrana True çıxarması üçün n-in ala biləcəyi ən kiçik qiymət hansıdır?",
+        "code": "n = int(input())\ns = 0\nfor i in range(1, n + 1):\n    s += i * i\nprint(s > 100)",
+        "explanation": "n = 6 üçün kvadratlar cəmi 91, n = 7 üçün 140 olur: 100-ü ilk dəfə 7 keçir.\n\nYoxlama: n = 7  ->  True; n = 6  ->  False\nƏn kiçik uyğun qiymət: 7",
+        "options": [
+          "7",
+          "50",
+          "8",
+          "6",
+          "9"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"\"\nfor ch in \"python\":\n    s = ch + s\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = ''\nSətir 2: ch = 'p'\nSətir 3: s = 'p'\nSətir 2: ch = 'y'\nSətir 3: s = 'yp'\nSətir 2: ch = 't'\nSətir 3: s = 'typ'\nSətir 2: ch = 'h'\nSətir 3: s = 'htyp'\nSətir 2: ch = 'o'\nSətir 3: s = 'ohtyp'\nSətir 2: ch = 'n'\nSətir 3: s = 'nohtyp'\n\nEkrana çıxan: nohtyp",
+        "options": [
+          "python",
+          "pytho",
+          "nohty",
+          "p y t h o n",
+          "nohtyp"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(1, 4):\n    print(i * \"*\")",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 1\nSətir 1: i = 2\nSətir 1: i = 3\n\nEkrana çıxan: * / ** / ***",
+        "options": [
+          "*\n*\n*",
+          "*\n**\n***",
+          "***\n**\n*",
+          "*\n**",
+          "**\n***\n****"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "t = 0\nfor i in range(10, 0, -3):\n    t += i\nprint(t)",
+        "explanation": "range(10, 0, -3) 10, 7, 4, 1 ədədlərini verir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: t = 0\nSətir 2: i = 10\nSətir 3: t = 10\nSətir 2: i = 7\nSətir 3: t = 17\nSətir 2: i = 4\nSətir 3: t = 21\nSətir 2: i = 1\nSətir 3: t = 22\n\nEkrana çıxan: 22",
+        "correctText": "22"
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-05",
+    "title": "Python 5. while dövrü, break və continue",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: while, break, continue, ədədin rəqəmləri ilə işləmək.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 1\nwhile n < 100:\n    n *= 3\nprint(n)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 1\nSətir 3: n = 3\nSətir 3: n = 9\nSətir 3: n = 27\nSətir 3: n = 81\nSətir 3: n = 243\n\nEkrana çıxan: 243",
+        "correctText": "243"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "i = 0\ns = 0\nwhile i < 10:\n    i += 1\n    if i % 3 == 0:\n        continue\n    s += i\nprint(s)",
+        "explanation": "continue cari addımın qalan hissəsini atıb dövrün növbəti addımına keçir: 3, 6 və 9 cəmə əlavə olunmur.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 0\nSətir 2: s = 0\nSətir 4: i = 1\nSətir 7: s = 1\nSətir 4: i = 2\nSətir 7: s = 3\nSətir 4: i = 3\nSətir 4: i = 4\nSətir 7: s = 7\nSətir 4: i = 5\n...\nSətir 4: i = 9\nSətir 4: i = 10\nSətir 7: s = 37\n\nEkrana çıxan: 37",
+        "correctText": "37"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(1, 10):\n    if i * i > 30:\n        break\n    print(i, end=\" \")",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 1\nSətir 1: i = 2\nSətir 1: i = 3\nSətir 1: i = 4\nSətir 1: i = 5\nSətir 1: i = 6\n\nEkrana çıxan: 1 2 3 4 5",
+        "options": [
+          "1 2 3 4 5 6",
+          "1 2 3 4",
+          "1 4 9 16 25",
+          "1 2 3 4 5",
+          "6"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 7329\nc = 0\nwhile n > 0:\n    n //= 10\n    c += 1\nprint(c)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 7329\nSətir 2: c = 0\nSətir 4: n = 732\nSətir 5: c = 1\nSətir 4: n = 73\nSətir 5: c = 2\nSətir 4: n = 7\nSətir 5: c = 3\nSətir 4: n = 0\nSətir 5: c = 4\n\nEkrana çıxan: 4",
+        "correctText": "4"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a, b = 48, 18\nwhile b != 0:\n    a, b = b, a % b\nprint(a)",
+        "explanation": "Bu, Evklid alqoritmidir: iki ədədin ən böyük ortaq bölənini tapır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 48; b = 18\nSətir 3: a = 18; b = 12\nSətir 3: a = 12; b = 6\nSətir 3: a = 6; b = 0\n\nEkrana çıxan: 6",
+        "options": [
+          "18",
+          "12",
+          "6",
+          "3",
+          "0"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan n ədədi daxil edilir (natural ədəd). Proqramın ekrana 3 çıxarması üçün n-in ala biləcəyi ən böyük qiymət hansıdır?",
+        "code": "n = int(input())\nc = 0\nwhile n > 0:\n    n //= 10\n    c += 1\nprint(c)",
+        "explanation": "Proqram natural ədədin rəqəmlərinin sayını tapır.\n\nYoxlama: n = 999  ->  3; n = 1000  ->  4\nƏn böyük uyğun qiymət: 999",
+        "options": [
+          "999",
+          "100",
+          "1000",
+          "998",
+          "1001"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 100\nk = 0\nwhile x > 1:\n    x //= 2\n    k += 1\nprint(k, x)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 100\nSətir 2: k = 0\nSətir 4: x = 50\nSətir 5: k = 1\nSətir 4: x = 25\nSətir 5: k = 2\nSətir 4: x = 12\nSətir 5: k = 3\nSətir 4: x = 6\nSətir 5: k = 4\nSətir 4: x = 3\nSətir 5: k = 5\nSətir 4: x = 1\nSətir 5: k = 6\n\nEkrana çıxan: 6 1",
+        "options": [
+          "7 0",
+          "6 0",
+          "7 1",
+          "5 3",
+          "6 1"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = 0\ni = 1\nwhile True:\n    s += i\n    if s > 20:\n        break\n    i += 1\nprint(i, s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 4: s = 1\nSətir 7: i = 2\nSətir 4: s = 3\nSətir 7: i = 3\nSətir 4: s = 6\nSətir 7: i = 4\nSətir 4: s = 10\nSətir 7: i = 5\nSətir 4: s = 15\nSətir 7: i = 6\nSətir 4: s = 21\n\nEkrana çıxan: 6 21",
+        "options": [
+          "5 15",
+          "6 21",
+          "6 20",
+          "7 28",
+          "6 15"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 12345\nr = 0\nwhile n > 0:\n    r = r * 10 + n % 10\n    n //= 10\nprint(r)",
+        "explanation": "Dövr ədədin rəqəmlərini tərsinə yığır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 12345\nSətir 2: r = 0\nSətir 4: r = 5\nSətir 5: n = 1234\nSətir 4: r = 54\nSətir 5: n = 123\nSətir 4: r = 543\nSətir 5: n = 12\nSətir 4: r = 5432\nSətir 5: n = 1\nSətir 4: r = 54321\nSətir 5: n = 0\n\nEkrana çıxan: 54321",
+        "correctText": "54321"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "i = 10\nwhile i > 0:\n    i -= 3\n    if i == 4:\n        continue\n    print(i, end=\" \")",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 10\nSətir 3: i = 7\nSətir 3: i = 4\nSətir 3: i = 1\nSətir 3: i = -2\n\nEkrana çıxan: 7 1 -2",
+        "options": [
+          "7 4 1",
+          "7 1",
+          "7 4 1 -2",
+          "7 1 -2",
+          "10 7 1 -2"
+        ],
+        "correctIndex": 3
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-06",
+    "title": "Python 6. İç-içə dövrlər",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: iç-içə for dövrləri, naxışlar, cütlərin sayılması.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "c = 0\nfor i in range(3):\n    for j in range(4):\n        c += 1\nprint(c)",
+        "explanation": "Xarici dövr 3 dəfə, hər dəfə daxili dövr 4 dəfə işləyir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: c = 0\nSətir 2: i = 0\nSətir 3: j = 0\nSətir 4: c = 1\nSətir 3: j = 1\nSətir 4: c = 2\nSətir 3: j = 2\nSətir 4: c = 3\nSətir 3: j = 3\nSətir 4: c = 4\n...\nSətir 4: c = 11\nSətir 3: j = 3\nSətir 4: c = 12\n\nEkrana çıxan: 12",
+        "correctText": "12"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(1, 4):\n    for j in range(1, i + 1):\n        print(j, end=\"\")\n    print()",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 1\nSətir 2: j = 1\nSətir 1: i = 2\nSətir 2: j = 2\nSətir 1: i = 3\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 2: j = 3\n\nEkrana çıxan: 1 / 12 / 123",
+        "options": [
+          "1\n11\n111",
+          "123\n123\n123",
+          "1\n12\n123",
+          "1\n21\n321",
+          "1\n12\n123\n1234"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = 0\nfor i in range(1, 4):\n    for j in range(1, 4):\n        if i != j:\n            s += i * j\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 3: j = 1\nSətir 3: j = 2\nSətir 5: s = 2\nSətir 3: j = 3\nSətir 5: s = 5\nSətir 2: i = 2\nSətir 3: j = 1\nSətir 5: s = 7\n...\nSətir 3: j = 2\nSətir 5: s = 22\nSətir 3: j = 3\n\nEkrana çıxan: 22",
+        "correctText": "22"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(3):\n    for j in range(3):\n        if i == j:\n            print(\"1\", end=\"\")\n        else:\n            print(\"0\", end=\"\")\n    print()",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 0\nSətir 2: j = 0\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 1: i = 1\nSətir 2: j = 0\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 1: i = 2\nSətir 2: j = 0\nSətir 2: j = 1\nSətir 2: j = 2\n\nEkrana çıxan: 100 / 010 / 001",
+        "options": [
+          "100\n010\n001",
+          "111\n111\n111",
+          "011\n101\n110",
+          "100\n100\n100",
+          "001\n010\n100"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "c = 0\nfor a in range(1, 6):\n    for b in range(a, 6):\n        if a + b == 6:\n            c += 1\nprint(c)",
+        "explanation": "Uyğun cütlər: (1, 5), (2, 4), (3, 3). b dövrü a-dan başladığı üçün (5, 1) kimi təkrar cütlər yoxdur.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: c = 0\nSətir 2: a = 1\nSətir 3: b = 1\nSətir 3: b = 2\nSətir 3: b = 3\nSətir 3: b = 4\nSətir 3: b = 5\nSətir 5: c = 1\nSətir 2: a = 2\nSətir 3: b = 2\n...\nSətir 3: b = 4\nSətir 3: b = 5\nSətir 2: a = 5\n\nEkrana çıxan: 3",
+        "correctText": "3"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(1, 4):\n    for j in range(1, 4):\n        print(i * j, end=\" \")\n    print()",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 1\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 2: j = 3\nSətir 1: i = 2\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 2: j = 3\nSətir 1: i = 3\nSətir 2: j = 1\nSətir 2: j = 2\nSətir 2: j = 3\n\nEkrana çıxan: 1 2 3 / 2 4 6 / 3 6 9",
+        "options": [
+          "1 2 3\n1 2 3\n1 2 3",
+          "1 2 3\n4 5 6\n7 8 9",
+          "1 4 9\n2 8 18\n3 12 27",
+          "1 2 3\n2 4 6",
+          "1 2 3\n2 4 6\n3 6 9"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "c = 0\nfor i in range(1, 5):\n    for j in range(i, 5):\n        c += 1\nprint(c)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: c = 0\nSətir 2: i = 1\nSətir 3: j = 1\nSətir 4: c = 1\nSətir 3: j = 2\nSətir 4: c = 2\nSətir 3: j = 3\nSətir 4: c = 3\nSətir 3: j = 4\nSətir 4: c = 4\n...\nSətir 4: c = 9\nSətir 2: i = 4\nSətir 4: c = 10\n\nEkrana çıxan: 10",
+        "correctText": "10"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "n = 4\nfor i in range(n):\n    print(\" \" * (n - i - 1) + \"*\" * (2 * i + 1))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 4\nSətir 2: i = 0\nSətir 2: i = 1\nSətir 2: i = 2\nSətir 2: i = 3\n\nEkrana çıxan:    * /   *** /  ***** / *******",
+        "options": [
+          "*\n**\n***\n****",
+          "   *\n  ***\n *****\n*******",
+          "*\n***\n*****\n*******",
+          "   *\n  **\n ***\n****",
+          "****\n***\n**\n*"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-07",
+    "title": "Python 7. Sətirlər",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: indeks, dilim, sətir metodları, sətir üzərində dövr.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"informatika\"\nprint(s[0], s[-1], len(s))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'informatika'\n\nEkrana çıxan: i a 11",
+        "options": [
+          "i a 10",
+          "i k 11",
+          "n a 11",
+          "i a 11",
+          "i a 12"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"Python\"\nprint(s[1:4], s[:2], s[3:])",
+        "explanation": "Dilimdə başlanğıc indeks daxildir, son indeks daxil deyil: s[1:4] 1, 2, 3-cü simvolları verir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'Python'\n\nEkrana çıxan: yth Py hon",
+        "options": [
+          "yt Py hon",
+          "ytho Py on",
+          "yth Py hon",
+          "Pyt Py hon",
+          "yth P hon"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = \"abracadabra\"\nprint(s.count(\"a\"))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'abracadabra'\n\nEkrana çıxan: 5",
+        "correctText": "5"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"Salam dünya\"\nprint(s.upper(), s.lower().replace(\"a\", \"o\"))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'Salam dünya'\n\nEkrana çıxan: SALAM DÜNYA solom dünyo",
+        "options": [
+          "SALAM DÜNYA solom dünyo",
+          "SALAM DÜNYA salam dünya",
+          "Salam dünya SALAM DÜNYA",
+          "SALAM DÜNYA solom dunyo",
+          "salam dünya SALAM DÜNYA"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"a1b2c3\"\nt = \"\"\nfor ch in s:\n    if ch.isdigit():\n        t += ch\nprint(t)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'a1b2c3'\nSətir 2: t = ''\nSətir 3: ch = 'a'\nSətir 3: ch = '1'\nSətir 5: t = '1'\nSətir 3: ch = 'b'\nSətir 3: ch = '2'\nSətir 5: t = '12'\nSətir 3: ch = 'c'\nSətir 3: ch = '3'\nSətir 5: t = '123'\n\nEkrana çıxan: 123",
+        "options": [
+          "abc",
+          "a1b2c3",
+          "6",
+          "321",
+          "123"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "w = \"kitab\"\nprint(w * 2, w[::-1], w[1::2])",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: w = 'kitab'\n\nEkrana çıxan: kitabkitab batik ia",
+        "options": [
+          "kitabkitab batik kia",
+          "kitabkitab batik ia",
+          "kitab kitab batik ia",
+          "kitabkitab kitab ia",
+          "kitabkitab batik it"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = \"2 5 8 11\"\nt = 0\nfor x in s.split():\n    t += int(x)\nprint(t)",
+        "explanation": "split() sətri boşluqlara görə hissələrə ayırır, int() hər hissəni ədədə çevirir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = '2 5 8 11'\nSətir 2: t = 0\nSətir 3: x = '2'\nSətir 4: t = 2\nSətir 3: x = '5'\nSətir 4: t = 7\nSətir 3: x = '8'\nSətir 4: t = 15\nSətir 3: x = '11'\nSətir 4: t = 26\n\nEkrana çıxan: 26",
+        "correctText": "26"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"Informatika\"\nprint(s.find(\"m\"), s.find(\"z\"), s.index(\"a\"))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'Informatika'\n\nEkrana çıxan: 5 -1 6",
+        "options": [
+          "4 -1 5",
+          "5 0 6",
+          "5 -1 10",
+          "5 -1 6",
+          "6 -1 6"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "s = \"Informatika\" olarsa, hansı ifadə \"tik\" sətrini verir?",
+        "code": "s = \"Informatika\"",
+        "explanation": "Sətrin indeksləri 0-dan başlayır: I0 n1 f2 o3 r4 m5 a6 t7 i8 k9 a10. Dilimdə son indeks daxil olmur.\n\nHər variantın qiyməti:\ns[7:10]  ->  'tik'  (tip: str)\ns[7:9]  ->  'ti'  (tip: str)\ns[-3:]  ->  'ika'  (tip: str)\ns[6:9]  ->  'ati'  (tip: str)\ns[8:11]  ->  'ika'  (tip: str)",
+        "options": [
+          "s[7:9]",
+          "s[-3:]",
+          "s[7:10]",
+          "s[6:9]",
+          "s[8:11]"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = \"Salam\"\nc = 0\nfor ch in s:\n    if ch in \"aeiou\":\n        c += 1\nprint(c)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'Salam'\nSətir 2: c = 0\nSətir 3: ch = 'S'\nSətir 3: ch = 'a'\nSətir 5: c = 1\nSətir 3: ch = 'l'\nSətir 3: ch = 'a'\nSətir 5: c = 2\nSətir 3: ch = 'm'\n\nEkrana çıxan: 2",
+        "correctText": "2"
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-08",
+    "title": "Python 8. Siyahılar",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: indeks və dilim, append/pop/insert/sort, dövrlə siyahı emalı.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [4, 8, 15, 16]\na.append(23)\na.pop(0)\nprint(a, len(a))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [4, 8, 15, 16]\nSətir 2: a = [4, 8, 15, 16, 23]\nSətir 3: a = [8, 15, 16, 23]\n\nEkrana çıxan: [8, 15, 16, 23] 4",
+        "options": [
+          "[8, 15, 16, 23] 4",
+          "[4, 8, 15, 16, 23] 5",
+          "[8, 15, 16, 23] 5",
+          "[4, 8, 15, 16] 4",
+          "[8, 15, 16] 3"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [3, 1, 4, 1, 5, 9]\nprint(sum(a) - max(a) + min(a))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [3, 1, 4, 1, 5, 9]\n\nEkrana çıxan: 15",
+        "correctText": "15"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [5, 2, 7]\na.sort()\nb = a[::-1]\nprint(a, b)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [5, 2, 7]\nSətir 2: a = [2, 5, 7]\nSətir 3: b = [7, 5, 2]\n\nEkrana çıxan: [2, 5, 7] [7, 5, 2]",
+        "options": [
+          "[5, 2, 7] [7, 2, 5]",
+          "[2, 5, 7] [2, 5, 7]",
+          "[7, 5, 2] [2, 5, 7]",
+          "[2, 5, 7] [7, 2, 5]",
+          "[2, 5, 7] [7, 5, 2]"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [2, 4, 6, 8, 10]\ns = 0\nfor i in range(len(a)):\n    if i % 2 == 0:\n        s += a[i]\nprint(s)",
+        "explanation": "Şərt elementin yox, İNDEKSİN cüt olmasını yoxlayır: a[0], a[2], a[4] toplanır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [2, 4, 6, 8, 10]\nSətir 2: s = 0\nSətir 3: i = 0\nSətir 5: s = 2\nSətir 3: i = 1\nSətir 3: i = 2\nSətir 5: s = 8\nSətir 3: i = 3\nSətir 3: i = 4\nSətir 5: s = 18\n\nEkrana çıxan: 18",
+        "correctText": "18"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [1, 2, 3, 4, 5, 6]\nprint(a[1:4], a[-2:], a[::2])",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [1, 2, 3, 4, 5, 6]\n\nEkrana çıxan: [2, 3, 4] [5, 6] [1, 3, 5]",
+        "options": [
+          "[2, 3, 4, 5] [5, 6] [1, 3, 5]",
+          "[2, 3, 4] [5, 6] [1, 3, 5]",
+          "[2, 3, 4] [4, 5] [1, 3, 5]",
+          "[1, 2, 3] [5, 6] [2, 4, 6]",
+          "[2, 3, 4] [5, 6] [2, 4, 6]"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [1, 2, 3, 4, 5]\nfor i in range(len(a) - 1):\n    a[i] = a[i + 1]\nprint(a)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [1, 2, 3, 4, 5]\nSətir 2: i = 0\nSətir 3: a = [2, 2, 3, 4, 5]\nSətir 2: i = 1\nSətir 3: a = [2, 3, 3, 4, 5]\nSətir 2: i = 2\nSətir 3: a = [2, 3, 4, 4, 5]\nSətir 2: i = 3\nSətir 3: a = [2, 3, 4, 5, 5]\n\nEkrana çıxan: [2, 3, 4, 5, 5]",
+        "options": [
+          "[2, 3, 4, 5, 1]",
+          "[2, 3, 4, 5, 6]",
+          "[1, 1, 2, 3, 4]",
+          "[2, 3, 4, 5, 5]",
+          "[2, 2, 3, 4, 5]"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [7, 3, 9, 3, 7, 3]\nprint(a.count(3) * 10 + a.index(9))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [7, 3, 9, 3, 7, 3]\n\nEkrana çıxan: 32",
+        "correctText": "32"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = list(map(int, \"5 3 8\".split()))\nb = []\nfor x in a:\n    b.insert(0, x * 2)\nprint(b)",
+        "explanation": "insert(0, ...) hər yeni elementi siyahının əvvəlinə qoyur, ona görə sıra tərsinə dönür.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [5, 3, 8]\nSətir 2: b = []\nSətir 3: x = 5\nSətir 4: b = [10]\nSətir 3: x = 3\nSətir 4: b = [6, 10]\nSətir 3: x = 8\nSətir 4: b = [16, 6, 10]\n\nEkrana çıxan: [16, 6, 10]",
+        "options": [
+          "[10, 6, 16]",
+          "[5, 3, 8]",
+          "[16, 6, 10]",
+          "[16, 10, 6]",
+          "[8, 3, 5]"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [3, 8, 1, 9, 4]\nm = a[0]\nfor x in a:\n    if x > m:\n        m = x\nprint(m, a.index(m))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [3, 8, 1, 9, 4]\nSətir 2: m = 3\nSətir 3: x = 3\nSətir 3: x = 8\nSətir 5: m = 8\nSətir 3: x = 1\nSətir 3: x = 9\nSətir 5: m = 9\nSətir 3: x = 4\n\nEkrana çıxan: 9 3",
+        "options": [
+          "9 3",
+          "9 4",
+          "8 1",
+          "9 9",
+          "3 0"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [1, 2, 3]\nb = a\nb.append(4)\nc = a[:]\nc.append(5)\nprint(len(a) * 10 + len(c))",
+        "explanation": "b = a eyni siyahıya ikinci ad verir (kopya yaratmır), a[:] isə yeni siyahı yaradır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [1, 2, 3]\nSətir 2: b = [1, 2, 3]\nSətir 3: a = [1, 2, 3, 4]; b = [1, 2, 3, 4]\nSətir 4: c = [1, 2, 3, 4]\nSətir 5: c = [1, 2, 3, 4, 5]\n\nEkrana çıxan: 45",
+        "correctText": "45"
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-09",
+    "title": "Python 9. Funksiyalar",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: def, parametrlər, return, susmaya görə qiymət, lokal dəyişən, rekursiya.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "def f(x):\n    return x * x + 1\nprint(f(3) + f(2))",
+        "explanation": "f(3) = 3 * 3 + 1 = 10, f(2) = 2 * 2 + 1 = 5; cəmi 15.\n\nEkrana çıxan: 15",
+        "correctText": "15"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def g(a, b=2):\n    return a ** b\nprint(g(3), g(2, 5), g(b=3, a=2))",
+        "explanation": "g(3) = 3 ** 2 = 9 (b susmaya görə 2); g(2, 5) = 2 ** 5 = 32; g(b=3, a=2) = 2 ** 3 = 8.\n\nEkrana çıxan: 9 32 8",
+        "options": [
+          "9 32 6",
+          "6 10 6",
+          "9 25 9",
+          "9 32 9",
+          "9 32 8"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def swap_sum(a, b):\n    a, b = b, a + b\n    return a, b\nx, y = swap_sum(3, 4)\nprint(x, y)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 4: x = 4; y = 7\n\nEkrana çıxan: 4 7",
+        "options": [
+          "3 7",
+          "4 7",
+          "7 4",
+          "4 3",
+          "3 4"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "def cnt(n):\n    c = 0\n    while n > 0:\n        c += n % 2\n        n //= 2\n    return c\nprint(cnt(13))",
+        "explanation": "Funksiya ədədin ikilik yazılışındakı vahidlərin sayını tapır: 13 = 1101.\n\nEkrana çıxan: 3",
+        "correctText": "3"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def f(n):\n    if n <= 1:\n        return 1\n    return n * f(n - 1)\nprint(f(5), f(1))",
+        "explanation": "f(5) = 5 * f(4) = 5 * 4 * f(3) = ... = 5 * 4 * 3 * 2 * 1 = 120; f(1) şərtə görə 1 qaytarır.\n\nEkrana çıxan: 120 1",
+        "options": [
+          "24 1",
+          "120 0",
+          "15 1",
+          "120 1",
+          "120 120"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 10\ndef h():\n    x = 5\n    return x * 2\nprint(h(), x)",
+        "explanation": "Funksiyanın içindəki x lokal dəyişəndir, xaricdəki x-ə toxunmur.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 10\n\nEkrana çıxan: 10 10",
+        "options": [
+          "10 5",
+          "5 10",
+          "10 10",
+          "50 10",
+          "10 50"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "def mx(a, b):\n    if a > b:\n        return a\n    return b\nprint(mx(mx(3, 9), mx(7, 4)))",
+        "explanation": "mx(3, 9) = 9, mx(7, 4) = 7, sonra mx(9, 7) = 9.\n\nEkrana çıxan: 9",
+        "correctText": "9"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def add(lst, v):\n    lst.append(v)\n    return len(lst)\na = [1]\nprint(add(a, 5), add(a, 6), a)",
+        "explanation": "Siyahı funksiyaya istinad ilə ötürülür: funksiya içindəki dəyişiklik xaricdəki siyahıda da görünür.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 4: a = [1]\nSətir 5: a = [1, 5, 6]\n\nEkrana çıxan: 2 3 [1, 5, 6]",
+        "options": [
+          "2 3 [1, 5, 6]",
+          "2 3 [1]",
+          "1 2 [1, 5, 6]",
+          "2 3 [1, 5]",
+          "2 2 [1, 5, 6]"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "def s(n):\n    return n if n < 10 else n % 10 + s(n // 10)\nprint(s(9876))",
+        "explanation": "s(9876) = 6 + s(987) = 6 + 7 + s(98) = 6 + 7 + 8 + s(9) = 6 + 7 + 8 + 9. Funksiya rəqəmlərin cəmini tapır.\n\nEkrana çıxan: 30",
+        "correctText": "30"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def f(a):\n    a = a + 1\n    return a\nn = 5\nm = f(n)\nprint(n, m, f(f(n)))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 4: n = 5\nSətir 5: m = 6\n\nEkrana çıxan: 5 6 7",
+        "options": [
+          "6 6 7",
+          "5 6 6",
+          "6 7 8",
+          "5 5 5",
+          "5 6 7"
+        ],
+        "correctIndex": 4
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-10",
+    "title": "Python 10. Alqoritmlər",
+    "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: sayma, axtarış, ən böyük/kiçik, sıralama, sadə ədəd, say sistemləri.",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [4, 9, 2, 7, 5]\nm = sum(a) / len(a)\nc = 0\nfor x in a:\n    if x > m:\n        c += 1\nprint(c)",
+        "explanation": "Orta qiymət 5.4-dür; ondan böyük olanlar 9 və 7-dir.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [4, 9, 2, 7, 5]\nSətir 2: m = 5.4\nSətir 3: c = 0\nSətir 4: x = 4\nSətir 4: x = 9\nSətir 6: c = 1\nSətir 4: x = 2\nSətir 4: x = 7\nSətir 6: c = 2\nSətir 4: x = 5\n\nEkrana çıxan: 2",
+        "correctText": "2"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [5, 1, 4, 2]\nfor i in range(len(a) - 1):\n    if a[i] > a[i + 1]:\n        a[i], a[i + 1] = a[i + 1], a[i]\nprint(a)",
+        "explanation": "Bu, qabarcıq sıralamasının YALNIZ bir keçididir: ən böyük element sona çıxır, siyahı hələ tam sıralanmır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [5, 1, 4, 2]\nSətir 2: i = 0\nSətir 4: a = [1, 5, 4, 2]\nSətir 2: i = 1\nSətir 4: a = [1, 4, 5, 2]\nSətir 2: i = 2\nSətir 4: a = [1, 4, 2, 5]\n\nEkrana çıxan: [1, 4, 2, 5]",
+        "options": [
+          "[1, 2, 4, 5]",
+          "[1, 4, 2, 5]",
+          "[1, 5, 4, 2]",
+          "[1, 4, 5, 2]",
+          "[5, 1, 4, 2]"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "c = 0\nfor n in range(2, 21):\n    p = True\n    for d in range(2, n):\n        if n % d == 0:\n            p = False\n    if p:\n        c += 1\nprint(c)",
+        "explanation": "20-yə qədər sadə ədədlər: 2, 3, 5, 7, 11, 13, 17, 19.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: c = 0\nSətir 2: n = 2\nSətir 3: p = True\nSətir 8: c = 1\nSətir 2: n = 3\nSətir 4: d = 2\nSətir 8: c = 2\nSətir 2: n = 4\nSətir 6: p = False\nSətir 4: d = 3\n...\nSətir 4: d = 17\nSətir 4: d = 18\nSətir 4: d = 19\n\nEkrana çıxan: 8",
+        "correctText": "8"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [6, 2, 9, 4, 9]\nk = -1\nfor i in range(len(a)):\n    if a[i] == 9:\n        k = i\n        break\nprint(k)",
+        "explanation": "break dövrü ilk tapılan 9-da dayandırır (indeks 2); onsuz dövr sona qədər işləyib k-nı 4 edərdi.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [6, 2, 9, 4, 9]\nSətir 2: k = -1\nSətir 3: i = 0\nSətir 3: i = 1\nSətir 3: i = 2\nSətir 5: k = 2\n\nEkrana çıxan: 2",
+        "options": [
+          "-1",
+          "9",
+          "3",
+          "2",
+          "4"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a, b = 1, 1\nfor i in range(6):\n    a, b = b, a + b\nprint(a)",
+        "explanation": "Bu, Fibonaççi ardıcıllığıdır: 1, 1, 2, 3, 5, 8, 13, ...\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 1; b = 1\nSətir 2: i = 0\nSətir 3: b = 2\nSətir 2: i = 1\nSətir 3: a = 2; b = 3\nSətir 2: i = 2\nSətir 3: a = 3; b = 5\nSətir 2: i = 3\nSətir 3: a = 5; b = 8\nSətir 2: i = 4\nSətir 3: a = 8; b = 13\nSətir 2: i = 5\nSətir 3: a = 13; b = 21\n\nEkrana çıxan: 13",
+        "correctText": "13"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [8, 3, 5, 3, 9]\nm = 0\nfor i in range(1, len(a)):\n    if a[i] < a[m]:\n        m = i\nprint(m, a[m])",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [8, 3, 5, 3, 9]\nSətir 2: m = 0\nSətir 3: i = 1\nSətir 5: m = 1\nSətir 3: i = 2\nSətir 3: i = 3\nSətir 3: i = 4\n\nEkrana çıxan: 1 3",
+        "options": [
+          "3 3",
+          "1 8",
+          "1 3",
+          "0 8",
+          "4 9"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 37\ns = \"\"\nwhile n > 0:\n    s = str(n % 2) + s\n    n //= 2\nprint(s)",
+        "explanation": "Qalıqlar sondan əvvələ doğru yazılır: bu, 37-nin ikilik yazılışıdır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 37\nSətir 2: s = ''\nSətir 4: s = '1'\nSətir 5: n = 18\nSətir 4: s = '01'\nSətir 5: n = 9\nSətir 4: s = '101'\nSətir 5: n = 4\nSətir 4: s = '0101'\nSətir 5: n = 2\nSətir 4: s = '00101'\nSətir 5: n = 1\nSətir 4: s = '100101'\nSətir 5: n = 0\n\nEkrana çıxan: 100101",
+        "correctText": "100101"
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [2, 5, 1, 4]\nfor i in range(1, len(a)):\n    a[i] += a[i - 1]\nprint(a)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [2, 5, 1, 4]\nSətir 2: i = 1\nSətir 3: a = [2, 7, 1, 4]\nSətir 2: i = 2\nSətir 3: a = [2, 7, 8, 4]\nSətir 2: i = 3\nSətir 3: a = [2, 7, 8, 12]\n\nEkrana çıxan: [2, 7, 8, 12]",
+        "options": [
+          "[2, 7, 8, 12]",
+          "[2, 5, 1, 4]",
+          "[2, 7, 6, 5]",
+          "[2, 7, 8, 9]",
+          "[3, 6, 5, 8]"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan n ədədi daxil edilir (iki rəqəmli natural ədəd). Proqramın ekrana 2 çıxarması üçün n-in ala biləcəyi ən böyük qiymət hansıdır?",
+        "code": "n = int(input())\nc = 0\nfor d in range(1, n + 1):\n    if n % d == 0:\n        c += 1\nprint(c)",
+        "explanation": "Proqram n-in bölənlərinin sayını tapır; yalnız sadə ədədin iki böləni olur.\n\nYoxlama: n = 97  ->  2; n = 98  ->  6\nƏn böyük uyğun qiymət: 97",
+        "options": [
+          "11",
+          "98",
+          "96",
+          "99",
+          "97"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [1, 2, 3, 4, 5]\ni, j = 0, 3\nwhile i < j:\n    a[i], a[j] = a[j], a[i]\n    i += 1\n    j -= 1\nprint(a)",
+        "explanation": "j = 3 olduğu üçün yalnız ilk dörd element tərsinə çevrilir, sonuncu (5) yerində qalır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [1, 2, 3, 4, 5]\nSətir 2: i = 0; j = 3\nSətir 4: a = [4, 2, 3, 1, 5]\nSətir 5: i = 1\nSətir 6: j = 2\nSətir 4: a = [4, 3, 2, 1, 5]\nSətir 5: i = 2\nSətir 6: j = 1\n\nEkrana çıxan: [4, 3, 2, 1, 5]",
+        "options": [
+          "[5, 4, 3, 2, 1]",
+          "[4, 3, 2, 1, 5]",
+          "[1, 2, 3, 4, 5]",
+          "[4, 2, 3, 1, 5]",
+          "[2, 1, 3, 4, 5]"
+        ],
+        "correctIndex": 1
+      }
+    ]
+  },
+  {
+    "seedKey": "dim-python-mock",
+    "title": "Python: DİM formatında sınaq (22 qapalı + 5 kodlu)",
+    "description": "Qəbul imtahanının informatika blokunun quruluşuna uyğun orijinal sınaq: 22 qapalı və 5 kodlu tapşırıq, bütün Python mövzularını əhatə edir (rəsmi imtahan sualları deyil, yazılı tapşırıqlar daxil deyil).",
+    "category": "Python",
+    "timeLimitMinutes": null,
+    "published": true,
+    "questions": [
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 12\nb = 5\nprint(a // b * b + a % b == a)",
+        "explanation": "Bu, bölmənin əsas bərabərliyidir: bölünən = qismət * bölən + qalıq.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 12\nSətir 2: b = 5\n\nEkrana çıxan: True",
+        "options": [
+          "False",
+          "12",
+          "2",
+          "True",
+          "Xəta baş verəcək"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 3\ny = x\nx = x + 2\ny = y * x\nprint(x, y)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 3\nSətir 2: y = 3\nSətir 3: x = 5\nSətir 4: y = 15\n\nEkrana çıxan: 5 15",
+        "options": [
+          "5 6",
+          "5 5",
+          "5 15",
+          "3 15",
+          "3 9"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"2024\"\nprint(int(s) // 10 + len(s))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = '2024'\n\nEkrana çıxan: 206",
+        "options": [
+          "206",
+          "207",
+          "205",
+          "208",
+          "204"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı ifadələrdən hansının qiyməti 14-dür?",
+        "code": null,
+        "explanation": "Hər variantın qiyməti:\n(2 + 3) * 4  ->  20  (tip: int)\n2 ** 3 * 2  ->  16  (tip: int)\n50 % 7 * 3  ->  3  (tip: int)\n3 * 4 + 2 ** 2  ->  16  (tip: int)\n2 + 3 * 4  ->  14  (tip: int)",
+        "options": [
+          "(2 + 3) * 4",
+          "2 ** 3 * 2",
+          "50 % 7 * 3",
+          "3 * 4 + 2 ** 2",
+          "2 + 3 * 4"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "for i in range(4):\n    for j in range(i):\n        print(\"#\", end=\"\")\n    print(i)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: i = 0\nSətir 1: i = 1\nSətir 2: j = 0\nSətir 1: i = 2\nSətir 2: j = 1\nSətir 1: i = 3\nSətir 2: j = 0\nSətir 2: j = 1\nSətir 2: j = 2\n\nEkrana çıxan: 0 / #1 / ##2 / ###3",
+        "options": [
+          "0\n1\n2\n3",
+          "0\n#1\n##2\n###3",
+          "#\n##\n###\n####",
+          "#0\n##1\n###2",
+          "0\n#1\n##2\n###3\n####4"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "n = 10\ns = 0\nwhile n > 0:\n    s += n\n    n -= 3\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 10\nSətir 2: s = 0\nSətir 4: s = 10\nSətir 5: n = 7\nSətir 4: s = 17\nSətir 5: n = 4\nSətir 4: s = 21\nSətir 5: n = 1\nSətir 4: s = 22\nSətir 5: n = -2\n\nEkrana çıxan: 22",
+        "options": [
+          "23",
+          "21",
+          "24",
+          "22",
+          "20"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [3, 6, 9, 12]\nprint(a[len(a) // 2], a[-3], sum(a[1:3]))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [3, 6, 9, 12]\n\nEkrana çıxan: 9 6 15",
+        "options": [
+          "12 9 18",
+          "9 9 15",
+          "9 6 15",
+          "6 3 9",
+          "9 6 18"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def f(x, y):\n    return x - y\nprint(f(10, 3), f(y=10, x=3))",
+        "explanation": "Açar sözlü çağırışda f(y=10, x=3) ilə x = 3, y = 10 olur.\n\nEkrana çıxan: 7 -7",
+        "options": [
+          "7 -7",
+          "7 7",
+          "-7 7",
+          "7 13",
+          "13 -7"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"informatika\"\nprint(s[2:6].upper(), s.count(\"i\"))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'informatika'\n\nEkrana çıxan: FORM 2",
+        "options": [
+          "FORMA 2",
+          "FORM 1",
+          "NFOR 2",
+          "FORM 3",
+          "FORM 2"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı ifadələrdən hansının tipi sətirdir (str)?",
+        "code": null,
+        "explanation": "Hər variantın qiyməti:\nstr(5) + str(3)  ->  '53'  (tip: str)\n5 + 3  ->  8  (tip: int)\nlen(\"ab\")  ->  2  (tip: int)\n\"ab\" == \"ab\"  ->  True  (tip: bool)\nint(\"7\") * 2  ->  14  (tip: int)",
+        "options": [
+          "5 + 3",
+          "str(5) + str(3)",
+          "len(\"ab\")",
+          "\"ab\" == \"ab\"",
+          "int(\"7\") * 2"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = 7\nb = 2\nif a % b == 0:\n    print(\"cüt\")\nelse:\n    print(a // b)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 7\nSətir 2: b = 2\n\nEkrana çıxan: 3",
+        "options": [
+          "cüt",
+          "1",
+          "3.5",
+          "3",
+          "2"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = 5\nwhile x > 0:\n    x -= 2\n    print(x)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = 5\nSətir 3: x = 3\nSətir 3: x = 1\nSətir 3: x = -1\n\nEkrana çıxan: 3 / 1 / -1",
+        "options": [
+          "5\n3\n1",
+          "3\n1",
+          "3\n1\n-1",
+          "3\n1\n-1\n-3",
+          "4\n2\n0"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Klaviaturadan n ədədi daxil edilir (natural ədəd). Proqramın ekrana 6 çıxarması üçün n-in ala biləcəyi ən böyük qiymət hansıdır?",
+        "code": "n = int(input())\nprint(n % 7 + n // 7)",
+        "explanation": "n = 7q + r yazılışında proqram q + r cəmini çıxarır.\n\nYoxlama: n = 42  ->  6; n = 43  ->  7\nƏn böyük uyğun qiymət: 42",
+        "options": [
+          "42",
+          "6",
+          "43",
+          "41",
+          "44"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [2, 4, 6]\nb = []\nfor x in a:\n    b.append(x * x)\nprint(b[1], sum(b))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [2, 4, 6]\nSətir 2: b = []\nSətir 3: x = 2\nSətir 4: b = [4]\nSətir 3: x = 4\nSətir 4: b = [4, 16]\nSətir 3: x = 6\nSətir 4: b = [4, 16, 36]\n\nEkrana çıxan: 16 56",
+        "options": [
+          "4 56",
+          "16 12",
+          "16 36",
+          "4 12",
+          "16 56"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = 0\nfor i in range(1, 6):\n    if i % 2 == 1:\n        continue\n    s += i * i\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 2: i = 2\nSətir 5: s = 4\nSətir 2: i = 3\nSətir 2: i = 4\nSətir 5: s = 20\nSətir 2: i = 5\n\nEkrana çıxan: 20",
+        "options": [
+          "35",
+          "20",
+          "55",
+          "8",
+          "4"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "print(10 / 4, 10 // 4, 10 % 4, -10 // 4)",
+        "explanation": "10 / 4 = 2.5; 10 // 4 = 2; 10 % 4 = 2; -10 // 4 = -3, çünki // həmişə aşağıya yuvarlaqlaşdırır.\n\nEkrana çıxan: 2.5 2 2 -3",
+        "options": [
+          "2.5 2 2 -2",
+          "2.5 2 2 -2.5",
+          "2 2 2 -3",
+          "2.5 2 2 -3",
+          "2.5 2.0 2 -3"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a, b = 5, 9\nwhile a != b:\n    if a > b:\n        a -= b\n    else:\n        b -= a\nprint(a)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 5; b = 9\nSətir 6: b = 4\nSətir 4: a = 1\nSətir 6: b = 3\nSətir 6: b = 2\nSətir 6: b = 1\n\nEkrana çıxan: 1",
+        "options": [
+          "5",
+          "9",
+          "1",
+          "4",
+          "0"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "s = \"a-b-c\"\nprint(s.split(\"-\"), s.replace(\"-\", \"\"))",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 'a-b-c'\n\nEkrana çıxan: ['a', 'b', 'c'] abc",
+        "options": [
+          "['a', 'b', 'c'] abc",
+          "['a-b-c'] abc",
+          "['a', 'b', 'c'] a b c",
+          "['a', 'b', 'c'] a-b-c",
+          "['abc'] abc"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "x = \"3\"\ny = 4\nprint(x * y, int(x) * y)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: x = '3'\nSətir 2: y = 4\n\nEkrana çıxan: 3333 12",
+        "options": [
+          "12 12",
+          "3333 3333",
+          "34 12",
+          "3333 7",
+          "3333 12"
+        ],
+        "correctIndex": 4
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "def f(n):\n    s = 0\n    for i in range(1, n + 1):\n        if n % i == 0:\n            s += i\n    return s\nprint(f(6), f(7))",
+        "explanation": "f(n) n-in bütün bölənlərinin cəmini tapır: 6 üçün 1 + 2 + 3 + 6 = 12, 7 üçün 1 + 7 = 8.\n\nEkrana çıxan: 12 8",
+        "options": [
+          "6 7",
+          "12 8",
+          "12 7",
+          "9 8",
+          "12 14"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "a = [1, 2, 3, 4, 5]\nfor i in range(0, len(a), 2):\n    a[i] = 0\nprint(a)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [1, 2, 3, 4, 5]\nSətir 2: i = 0\nSətir 3: a = [0, 2, 3, 4, 5]\nSətir 2: i = 2\nSətir 3: a = [0, 2, 0, 4, 5]\nSətir 2: i = 4\nSətir 3: a = [0, 2, 0, 4, 0]\n\nEkrana çıxan: [0, 2, 0, 4, 0]",
+        "options": [
+          "[0, 0, 0, 0, 0]",
+          "[1, 0, 3, 0, 5]",
+          "[0, 2, 0, 4, 5]",
+          "[0, 2, 0, 4, 0]",
+          "[0, 2, 3, 4, 5]"
+        ],
+        "correctIndex": 3
+      },
+      {
+        "type": "CHOICE",
+        "prompt": "Aşağıdakı proqramın icrası nəticəsində ekrana nə çıxarılacaq?",
+        "code": "k = 0\nfor i in range(1, 4):\n    for j in range(i, 4):\n        k += j\nprint(k)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: k = 0\nSətir 2: i = 1\nSətir 3: j = 1\nSətir 4: k = 1\nSətir 3: j = 2\nSətir 4: k = 3\nSətir 3: j = 3\nSətir 4: k = 6\nSətir 2: i = 2\nSətir 3: j = 2\n...\nSətir 4: k = 11\nSətir 2: i = 3\nSətir 4: k = 14\n\nEkrana çıxan: 14",
+        "options": [
+          "15",
+          "13",
+          "14",
+          "16",
+          "12"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = 17\nb = 5\nc = a % b * 10 + a // b\nprint(c)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = 17\nSətir 2: b = 5\nSətir 3: c = 23\n\nEkrana çıxan: 23",
+        "correctText": "23"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "s = 0\nfor i in range(1, 11):\n    if i % 3 != 0:\n        s += i\nprint(s)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: s = 0\nSətir 2: i = 1\nSətir 4: s = 1\nSətir 2: i = 2\nSətir 4: s = 3\nSətir 2: i = 3\nSətir 2: i = 4\nSətir 4: s = 7\nSətir 2: i = 5\nSətir 4: s = 12\n...\nSətir 2: i = 9\nSətir 2: i = 10\nSətir 4: s = 37\n\nEkrana çıxan: 37",
+        "correctText": "37"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "a = [5, 3, 8, 1, 9, 2]\nm = 0\nfor x in a:\n    if x % 2 == 1 and x > m:\n        m = x\nprint(m)",
+        "explanation": "Yalnız tək ədədlər nəzərə alınır: 5, 3, 1, 9. Onların ən böyüyü tapılır.\n\nİcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: a = [5, 3, 8, 1, 9, 2]\nSətir 2: m = 0\nSətir 3: x = 5\nSətir 5: m = 5\nSətir 3: x = 3\nSətir 3: x = 8\nSətir 3: x = 1\nSətir 3: x = 9\nSətir 5: m = 9\nSətir 3: x = 2\n\nEkrana çıxan: 9",
+        "correctText": "9"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "def f(x):\n    if x < 10:\n        return x\n    return f(x // 10) + x % 10\nprint(f(7654))",
+        "explanation": "f(7654) = 4 + f(765) = 4 + 5 + f(76) = 4 + 5 + 6 + f(7) = 4 + 5 + 6 + 7: funksiya rəqəmlərin cəmini tapır.\n\nEkrana çıxan: 22",
+        "correctText": "22"
+      },
+      {
+        "type": "NUMERIC",
+        "prompt": "Aşağıdakı proqramın ekrana çıxardığı nəticəni yazın.",
+        "code": "n = 97\nk = 0\nwhile n >= 5:\n    n = n // 5 + n % 5\n    k += 1\nprint(k)",
+        "explanation": "İcra izi (hər sətirdən sonra dəyişən dəyərlər):\nSətir 1: n = 97\nSətir 2: k = 0\nSətir 4: n = 21\nSətir 5: k = 1\nSətir 4: n = 5\nSətir 5: k = 2\nSətir 4: n = 1\nSətir 5: k = 3\n\nEkrana çıxan: 3",
+        "correctText": "3"
+      }
+    ]
+  }
+]

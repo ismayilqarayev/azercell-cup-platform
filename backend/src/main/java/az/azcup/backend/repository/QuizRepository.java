@@ -15,4 +15,10 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     // Admin üçün bütün testlər.
     List<Quiz> findAllByOrderByUpdatedAtDesc();
+
+    // Hazır (layihə ilə gələn) test artıq yaradılıbmı — yükləyici təkrar yaratmasın.
+    boolean existsBySeedKey(String seedKey);
+
+    // Müəllimlər də hazır testlərin nəticələrinə (öz qruplarının) baxa bilsin deyə: dərc olunmuş hazır testlər.
+    List<Quiz> findBySeedKeyIsNotNullAndPublishedTrueOrderByTitleAsc();
 }
