@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İnformatika: DİM qəbul imtahanına hazırlıq</title>
+<style>
+  :root{
+    --blueprint-deep:   #0B0D12;
+    --grid-line:        rgba(255, 255, 255, 0.08);
+    --grid-line-strong: rgba(255, 255, 255, 0.16);
+    --paper:            #151822;
+    --paper-warm:       #1B1E27;
+    --well:             #1E2230;
+    --ink:              #F2F3F7;
+    --ink-soft:         #9AA3B2;
+    --gold:             #3FC4DE;
+    --gold-bright:      #26D2FF;
+    --on-accent:        #001529;
+    --bronze:           #E2A64D;
+    --green:            #4ADFB9;
+    --alert:            #FF6B76;
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--blueprint-deep); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:36px 20px 100px; }
+  a{ color:var(--gold-bright); }
+
+  /* ---------- Başlıq bloku ---------- */
+  .titleblock{ border:1px solid var(--gold); position:relative; padding:28px 26px 8px; margin-bottom:22px; background:linear-gradient(180deg, rgba(38,210,255,0.05), transparent 70%); }
+  .titleblock::before{
+    content:"İNFORMATİKA / QƏBUL İMTAHANI / REV. 2026"; position:absolute; top:-11px; left:20px; background:var(--blueprint-deep);
+    padding:0 10px; font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--gold-bright); max-width:calc(100% - 40px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .titleblock h1{ font-family:var(--mono); font-size:clamp(26px,4.6vw,40px); line-height:1.15; margin:6px 0 10px; letter-spacing:-0.5px; }
+  .titleblock h1 span{ color:var(--gold-bright); }
+  .titleblock p.sub{ color:var(--ink-soft); font-size:15px; line-height:1.65; max-width:700px; margin:0 0 20px; }
+  .specs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); border-top:1px solid var(--grid-line-strong); }
+  .specs > div{ padding:12px 14px; border-right:1px solid var(--grid-line-strong); }
+  .specs > div:last-child{ border-right:none; }
+  .specs .k{ font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--gold-bright); text-transform:uppercase; margin-bottom:3px; }
+  .specs .v{ font-size:14px; font-weight:600; }
+
+  /* ---------- Xəbərdarlıq ---------- */
+  .notice{ display:flex; gap:12px; align-items:flex-start; margin:0 0 30px; padding:14px 16px; border:1px solid rgba(226,166,77,0.4); border-radius:10px; background:rgba(226,166,77,0.07); font-size:13px; line-height:1.6; color:var(--ink-soft); }
+  .notice b{ color:var(--bronze); }
+  .notice svg{ flex:0 0 auto; width:18px; height:18px; margin-top:2px; color:var(--bronze); }
+
+  h2{ font-family:var(--mono); font-size:18px; letter-spacing:-0.2px; margin:0 0 6px; }
+  h2 small{ font-weight:400; font-size:12px; color:var(--ink-soft); margin-left:8px; letter-spacing:0; }
+  .lead{ color:var(--ink-soft); font-size:14px; line-height:1.6; margin:0 0 16px; max-width:720px; }
+  section{ margin-bottom:38px; }
+
+  /* ---------- İmtahan quruluşu ---------- */
+  .cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:14px; }
+  .card{ background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:12px; padding:18px 18px 16px; }
+  .card .n{ font-family:var(--mono); font-size:34px; font-weight:800; line-height:1; color:var(--gold-bright); }
+  .card .n sup{ font-size:12px; font-weight:600; color:var(--ink-soft); margin-left:6px; vertical-align:middle; letter-spacing:1px; }
+  .card h3{ margin:10px 0 6px; font-size:16px; }
+  .card p{ margin:0; color:var(--ink-soft); font-size:13px; line-height:1.6; }
+  details.score{ margin-top:14px; border:1px solid var(--grid-line-strong); border-radius:10px; background:var(--paper); }
+  details.score summary{ cursor:pointer; padding:12px 16px; font-size:14px; font-weight:600; }
+  details.score .body{ padding:0 16px 14px; color:var(--ink-soft); font-size:13px; line-height:1.7; }
+  details.score code{ font-family:var(--mono); font-size:12px; background:var(--well); padding:2px 6px; border-radius:5px; color:var(--ink); }
+
+  /* ---------- Mövzu siyahısı ---------- */
+  .toolbar{ margin:0 0 20px; padding:14px 16px; background:var(--paper-warm); border:1px solid var(--grid-line-strong); border-radius:10px; }
+  .progress-row{ display:flex; align-items:center; gap:14px; }
+  .progress-text{ font-family:var(--mono); font-size:12px; color:var(--ink); white-space:nowrap; }
+  .progress-bar{ flex:1; height:6px; border-radius:99px; background:var(--grid-line); overflow:hidden; }
+  .progress-bar i{ display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg, var(--gold), var(--gold-bright)); transition:width .45s ease; }
+  .coverage{ margin:10px 0 0; font-size:12px; color:var(--ink-soft); line-height:1.5; }
+  .group{ margin:0 0 22px; }
+  .group > h3{ margin:0 0 10px; font-family:var(--mono); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-soft); }
+  .topic{ display:grid; grid-template-columns:auto 1fr auto; gap:6px 14px; align-items:start; padding:13px 16px; margin-bottom:8px; background:var(--paper); border:1px solid var(--grid-line-strong); border-radius:10px; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
+  .topic:hover{ border-color:rgba(38,210,255,0.5); }
+  .topic.done{ background:rgba(74,223,185,0.06); border-color:rgba(74,223,185,0.35); }
+  .topic input{ width:18px; height:18px; margin:2px 0 0; accent-color:var(--green); cursor:pointer; }
+  .topic .tt{ font-size:15px; font-weight:600; }
+  .topic.done .tt{ color:var(--green); }
+  .topic .td{ display:block; margin-top:3px; font-size:13px; color:var(--ink-soft); line-height:1.55; font-weight:400; }
+  .tag{ font-family:var(--mono); font-size:11px; padding:4px 10px; border-radius:99px; border:1px solid var(--grid-line-strong); white-space:nowrap; color:var(--ink-soft); }
+  .tag.ok{ color:var(--green); border-color:rgba(74,223,185,0.4); background:rgba(74,223,185,0.07); }
+  .tag.part{ color:var(--bronze); border-color:rgba(226,166,77,0.45); background:rgba(226,166,77,0.07); }
+
+  /* ---------- Tapşırıq tipləri, mənbələr ---------- */
+  .types{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; padding:0; list-style:none; }
+  .types li{ font-size:13px; padding:7px 13px; border:1px solid var(--grid-line-strong); border-radius:99px; background:var(--paper); }
+  .tip{ margin:0; padding:12px 16px; border-left:3px solid var(--gold); background:var(--paper-warm); border-radius:0 8px 8px 0; color:var(--ink-soft); font-size:13px; line-height:1.65; max-width:720px; }
+  .sources{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+  .sources a{ display:flex; justify-content:space-between; gap:12px; padding:11px 16px; border:1px solid var(--grid-line-strong); border-radius:10px; background:var(--paper); color:var(--ink); text-decoration:none; font-size:14px; transition:border-color .15s ease; }
+  .sources a:hover{ border-color:var(--gold-bright); }
+  .sources a span{ color:var(--ink-soft); font-family:var(--mono); font-size:12px; white-space:nowrap; }
+
+  @media (max-width:640px){
+    .wrap{ padding:26px 16px 80px; }
+    .titleblock{ padding:24px 18px 6px; }
+    .topic{ grid-template-columns:auto 1fr; }
+    .topic .tag{ grid-column:2; justify-self:start; white-space:normal; }
+    .specs{ grid-template-columns:repeat(2, 1fr); }
+    .specs > div{ border-right:none; border-bottom:1px solid var(--grid-line-strong); }
+    .specs > div:last-child{ border-bottom:none; }
+    .sources a{ flex-direction:column; gap:2px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="titleblock">
+    <h1>İnformatika: <span>DİM qəbul imtahanı</span></h1>
+    <p class="sub">Bakalavr qəbulunun 2-ci mərhələsində Riyaziyyat–İnformatika (Rİ) altqrupu üçün informatika bloku. Burada imtahanın quruluşu, proqramdakı mövzular və hər mövzu üçün platformada hazırlaşa biləcəyin yer toplanıb.</p>
+    <div class="specs">
+      <div><div class="k">Tapşırıq</div><div class="v">30</div></div>
+      <div><div class="k">Qapalı</div><div class="v">22</div></div>
+      <div><div class="k">Kodlu</div><div class="v">5</div></div>
+      <div><div class="k">Yazılı</div><div class="v">3</div></div>
+      <div><div class="k">Dil</div><div class="v">Python</div></div>
+    </div>
+  </header>
+
+  <p class="notice" role="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+    <span><b>Bu platforma Dövlət İmtahan Mərkəzi ilə əlaqəli deyil.</b> Məlumat DİM-in açıq sənədlərindən (2027 qəbul proqramı, 2025 və 2026 izah kitabçaları) götürülüb və 2026-cı ilin noyabrında yoxlanıb. İmtahan qaydaları dəyişə bilər, ona görə qərar verməzdən əvvəl aşağıdakı rəsmi mənbələrə bax.</span>
+  </p>
+
+  <section aria-labelledby="h-structure">
+    <h2 id="h-structure">İmtahan quruluşu</h2>
+    <p class="lead">İnformatika bloku 30 tapşırıqdan ibarətdir. Üç fənnin (riyaziyyat, fizika, informatika) kağızı birlikdə 3 saat çəkir, informatika üçün ayrıca vaxt göstərilməyib.</p>
+    <div class="cards">
+      <div class="card"><div class="n">22<sup>QAPALI</sup></div><h3>Qapalı tapşırıqlar</h3><p>Beş variantdan bir doğru cavabı seçirsən.</p></div>
+      <div class="card"><div class="n">5<sup>KODLU</sup></div><h3>Kodlu tapşırıqlar</h3><p>Cavab ədəddir. Cavab kartında rəqəm-rəqəm işarələnir.</p></div>
+      <div class="card"><div class="n">3<sup>YAZILI</sup></div><h3>Yazılı tapşırıqlar</h3><p>Cavab ayrıca vərəqdə əllə yazılır. Son üç tapşırıq blok-sxem və iki Python proqramıdır (2025–2026 kitabçalarının nömrələnməsinə görə). Yoxlayan meyarlara görə 0, 1/3, 1/2, 2/3 və ya 1 bal verir.</p></div>
+    </div>
+    <details class="score">
+      <summary>Bal necə hesablanır (təxmini)</summary>
+      <div class="body">
+        Maksimum xam bal 33-dür: qapalı 22 + kodlu 5 + yazılı 3×2 (yazılı tapşırıqlar iki dəfə çəkilidir). Xam bal <code>×100/33</code> ilə 100 ballıq miqyasa çevrilir. Qapalı tapşırıqda səhv cavab üçün 1/4 bal çıxılır.
+        Bu qaydalar DİM-in 2024-cü il sənədindən götürülüb; 2026-cı il üçün yenilənmiş variantı tapılmayıb. Dəqiq qaydanı DİM-in cari sənədindən yoxla.
+      </div>
+    </details>
+  </section>
+
+  <section aria-labelledby="h-topics">
+    <h2 id="h-topics">Proqram mövzuları <small>2027 qəbul proqramına görə</small></h2>
+    <p class="lead">Mövzunu öyrəndikcə qutunu işarələ, gedişatın bu brauzerdə saxlanılır. Sağdakı nişan həmin mövzu üçün platformada hazır material olub-olmadığını göstərir.</p>
+    <div class="toolbar">
+      <div class="progress-row">
+        <span class="progress-text" id="progressText">0 / 0 mövzu öyrənilib</span>
+        <div class="progress-bar" role="progressbar" aria-label="Öyrənilən mövzular" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><i id="progressFill"></i></div>
+      </div>
+      <p class="coverage" id="coverage"></p>
+    </div>
+    <div id="topics"></div>
+  </section>
+
+  <section aria-labelledby="h-types">
+    <h2 id="h-types">Kitabçalarda rast gəlinən tapşırıq tipləri</h2>
+    <p class="lead">2025 və 2026-cı il I qrup izah kitabçalarına baxanda təkrarlanan tiplər bunlardır.</p>
+    <ul class="types">
+      <li>Python kodunun çıxışını tapmaq</li>
+      <li>Verilmiş çıxış üçün ən böyük və ya ən kiçik girişi tapmaq</li>
+      <li>Blok-sxemi izləmək</li>
+      <li>Cədvəl prosessorunda düstur</li>
+      <li>Verilənlər bazası</li>
+      <li>Məntiqi (Boolean) axtarış sorğusu</li>
+      <li>Qraf</li>
+    </ul>
+    <p class="tip">İmtahanda kompüter yoxdur, ona görə kodu kağızda izləməyi məşq et: hər dəyişən üçün sütun çək və dövrün hər addımında dəyərləri yaz. Python dərslərindəki nümunələri əvvəlcə kağızda "icra et", sonra işə sal və cavabı müqayisə et.</p>
+  </section>
+
+  <section aria-labelledby="h-sources">
+    <h2 id="h-sources">Rəsmi mənbələr</h2>
+    <ul class="sources">
+      <li><a href="https://dim.gov.az/CkImage/proqramlar_qebul_Az.2027_1789019491.pdf" target="_blank" rel="noopener noreferrer">2027 qəbul proqramı <span>PDF ↗</span></a></li>
+      <li><a href="https://dim.gov.az/CkImage/1_ci_qrup_1783846528.pdf" target="_blank" rel="noopener noreferrer">2026, I qrup izah kitabçası <span>PDF ↗</span></a></li>
+      <li><a href="https://dim.gov.az/CkImage/1_ci_qrup_1752476895.pdf" target="_blank" rel="noopener noreferrer">2025, I qrup izah kitabçası <span>PDF ↗</span></a></li>
+      <li><a href="https://dim.gov.az/az/fealiyyet/qebul-ve-imtahanlar/bakalavriat" target="_blank" rel="noopener noreferrer">Bakalavr qəbulu <span>dim.gov.az ↗</span></a></li>
+      <li><a href="https://dim.gov.az/az/fealiyyet/qebul-ve-imtahanlar/magistratura" target="_blank" rel="noopener noreferrer">Magistratura qəbulu <span>dim.gov.az ↗</span></a></li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  // s: ok = platformada hazır material var, part = qismən, none = hələlik yoxdur
+  var TOPICS = [
+    { g:'prog', id:'vars',  t:'Dəyişənlər, verilənlərin tipləri, giriş və çıxış', d:'int, float, str, bool; input() və print(); tip çevirmələri.', s:'ok', w:'Python kursu › Dilin əsasları' },
+    { g:'prog', id:'cond',  t:'Şərt operatorları', d:'if, elif, else; müqayisə və məntiqi əməliyyatlar (and, or, not).', s:'ok', w:'Python kursu › Dilin əsasları' },
+    { g:'prog', id:'loops', t:'Dövrlər', d:'for və while, break və continue, iç-içə dövrlər.', s:'ok', w:'Python kursu › Dilin əsasları' },
+    { g:'prog', id:'nums',  t:'Ədədlər və riyazi əməllər', d:'Tam bölmə //, qalıq %, qüvvət **; ədədin rəqəmləri ilə iş.', s:'ok', w:'Python kursu › Dilin əsasları' },
+    { g:'prog', id:'str',   t:'Sətirlər', d:'İndeks və dilim, sətir metodları, sətir üzərində dövr.', s:'ok', w:'Python kursu › Sətirlər' },
+    { g:'prog', id:'list',  t:'Siyahılar', d:'Yaratma, indeks və dilim, əlavə etmə və silmə, sıralama, siyahı üzərində dövr.', s:'ok', w:'Python kursu › Kolleksiyalar' },
+    { g:'prog', id:'func',  t:'Funksiyalar', d:'def, parametrlər, return, yerli və qlobal dəyişən.', s:'ok', w:'Python kursu › Funksiyalar' },
+    { g:'prog', id:'algo',  t:'Alqoritm növləri və blok-sxemlər', d:'Xətti, şaxələnən və dövri alqoritmlər; blok-sxemi addım-addım izləmək.', s:'part', w:'Qismən: C++ bölməsi › Alqoritm Simulyasiyası' },
+    { g:'other', id:'info',   t:'İnformasiyanın həcmi və kodlaşdırılması', d:'bit, bayt və onların ölçü vahidləri; mətn, şəkil və səsin həcminin hesablanması.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'numsys', t:'Say sistemləri', d:'İkilik, səkkizlik, onluq və on altılıq sistemlər arasında çevirmə.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'crypto', t:'Kriptoqrafiya', d:'Şifrələmənin əsas anlayışları və sadə şifrələr.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'model',  t:'Modelləşdirmə', d:'Real hadisənin modelə çevrilməsi, model növləri.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'sheet',  t:'Cədvəl prosessoru', d:'Xanalar, düsturlar, nisbi və mütləq ünvan, diaqramlar.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'db',     t:'Verilənlər bazası', d:'Cədvəl, sahə, qeyd, açar; sadə sorğu və süzgəc.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'net',    t:'Şəbəkələr və İnternet', d:'Şəbəkə növləri, IP ünvan, protokollar, məntiqi axtarış sorğuları.', s:'none', w:'Hələlik platformada yoxdur' },
+    { g:'other', id:'web',    t:'HTML və CSS', d:'Sənədin quruluşu, əsas teqlər, sadə üslub qaydaları.', s:'none', w:'Hələlik platformada yoxdur' }
+  ];
+  var GROUPS = [
+    { id:'prog',  title:'Python ilə proqramlaşdırma' },
+    { id:'other', title:'Proqramlaşdırmadan kənar mövzular' }
+  ];
+
+  function storageKey(){
+    try {
+      var u = window.parent && window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
+      return 'azcup-dim-info:' + ((u && u.email) || 'anon');
+    } catch (e) { return 'azcup-dim-info:anon'; }
+  }
+  var done = new Set();
+  try {
+    var raw = JSON.parse(localStorage.getItem(storageKey()) || '[]');
+    if (Array.isArray(raw)) raw.forEach(function(id){ if (TOPICS.some(function(t){ return t.id === id; })) done.add(id); });
+  } catch (e) { /* saxlama əlçatan deyil */ }
+  function save(){ try { localStorage.setItem(storageKey(), JSON.stringify(Array.from(done))); } catch (e) { /* məs. məxfi rejim */ } }
+
+  function el(tag, cls, text){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  var host = document.getElementById('topics');
+  var rows = {};
+  GROUPS.forEach(function(g){
+    var box = el('div', 'group');
+    box.appendChild(el('h3', '', g.title));
+    TOPICS.filter(function(t){ return t.g === g.id; }).forEach(function(t){
+      var label = el('label', 'topic');
+      var cb = el('input');
+      cb.type = 'checkbox';
+      cb.checked = done.has(t.id);
+      var mid = el('span');
+      mid.appendChild(el('span', 'tt', t.t));
+      mid.appendChild(el('span', 'td', t.d));
+      label.appendChild(cb);
+      label.appendChild(mid);
+      label.appendChild(el('span', 'tag ' + t.s, t.w));
+      cb.addEventListener('change', function(){
+        if (cb.checked) done.add(t.id); else done.delete(t.id);
+        label.classList.toggle('done', cb.checked);
+        save();
+        updateProgress();
+      });
+      label.classList.toggle('done', cb.checked);
+      rows[t.id] = label;
+      box.appendChild(label);
+    });
+    host.appendChild(box);
+  });
+
+  function updateProgress(){
+    var total = TOPICS.length, n = done.size;
+    var pct = total ? Math.round(n / total * 100) : 0;
+    document.getElementById('progressText').textContent = n + ' / ' + total + ' mövzu öyrənilib';
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressBar').setAttribute('aria-valuenow', String(pct));
+  }
+  (function coverage(){
+    var ok = TOPICS.filter(function(t){ return t.s === 'ok'; }).length;
+    var part = TOPICS.filter(function(t){ return t.s === 'part'; }).length;
+    var none = TOPICS.length - ok - part;
+    document.getElementById('coverage').textContent = 'Platformada ' + ok + ' mövzu üçün hazır dərs var, ' + part + ' mövzu üçün qismən, ' + none + ' mövzu üçün hələlik material yoxdur. Sonuncular üçün DİM-in kitabçalarından və dərsliklərdən istifadə et.';
+  })();
+  updateProgress();
+})();
+</script>
+</body>
+</html>
