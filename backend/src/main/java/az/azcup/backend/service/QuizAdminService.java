@@ -64,17 +64,27 @@ public class QuizAdminService {
         this.groupMemberRepository = groupMemberRepository;
     }
 
-    // Admin bütün testləri, müəllim yalnız öz testlərini görür.
+    // Admin bütün testləri görür. Müəllim öz testlərini və dərc olunmuş hazır testləri görür (hazırlarda yalnız nəticələrə baxır).
     @Transactional(readOnly = true)
     public List<QuizManageSummaryDto> list(User user) {
-        List<Quiz> quizzes = user.getRole() == Role.ADMIN
-            ? quizRepository.findAllByOrderByUpdatedAtDesc()
-            : quizRepository.findByCreatedByOrderByUpdatedAtDesc(user);
+        List<Quiz> quizzes;
+        if (user.getRole() == Role.ADMIN) {
+            quizzes = quizRepository.findAllByOrderByUpdatedAtDesc();
+        } else {
+            quizzes = new ArrayList<>(quizRepository.findByCreatedByOrderByUpdatedAtDesc(user));
+            Set<Long> own = quizzes.stream().map(Quiz::getId).collect(Collectors.toSet());
+            for (Quiz seeded : quizRepository.findBySeedKeyIsNotNullAndPublishedTrueOrderByTitleAsc()) {
+                if (!own.contains(seeded.getId())) {
+                    quizzes.add(seeded);
+                }
+            }
+        }
         List<QuizManageSummaryDto> result = new ArrayList<>();
         for (Quiz q : quizzes) {
             result.add(new QuizManageSummaryDto(
                 q.getId(), q.getTitle(), q.getCategory(), q.isPublished(), q.getTimeLimitMinutes(), q.getQuestions().size(),
-                attemptRepository.countByQuizAndSubmittedAtIsNotNull(q), q.getCreatedBy().getFullName(), q.getUpdatedAt()
+                attemptRepository.countByQuizAndSubmittedAtIsNotNull(q), q.getCreatedBy().getFullName(), q.getUpdatedAt(),
+                q.getSeedKey() != null, canEdit(q, user)
             ));
         }
         return result;
@@ -87,9 +97,20 @@ public class QuizAdminService {
 
     @Transactional
     public QuizManageDetailDto create(User user, QuizUpsertRequest request) {
+        return createInternal(user, request, null);
+    }
+
+    // Layihə ilə gələn hazır testi yaradır (bax: QuizSeedLoader): açar eyni tranzaksiyada yazılır ki, yarımçıq nəticə qalmasın.
+    @Transactional
+    public QuizManageDetailDto createSeeded(User owner, String seedKey, QuizUpsertRequest request) {
+        return createInternal(owner, request, seedKey);
+    }
+
+    private QuizManageDetailDto createInternal(User user, QuizUpsertRequest request, String seedKey) {
         List<Normalized> items = normalizeAll(request);
         Quiz quiz = new Quiz();
         quiz.setCreatedBy(user);
+        quiz.setSeedKey(seedKey);
         applyMeta(quiz, request, items.size());
         for (int i = 0; i < items.size(); i++) {
             QuizQuestion q = new QuizQuestion();
@@ -147,6 +168,10 @@ public class QuizAdminService {
     @Transactional
     public void delete(Long id, User user) {
         Quiz quiz = getOwned(id, user);
+        if (quiz.getSeedKey() != null) {
+            // Silinsə, yükləyici növbəti başlanğıcda onu yenidən yaradardı; ona görə hazır testlər yalnız gizlədilir.
+            throw new ConflictException("Bu hazır testdir, silmək olmaz. Şagirdlərdən gizlətmək üçün dərcdən çıxarın.");
+        }
         if (attemptRepository.countByQuizAndSubmittedAtIsNotNull(quiz) > 0) {
             throw new ConflictException("Bu testi artıq həll ediblər, ona görə silmək olmaz. Şagirdlərdən gizlətmək üçün dərcdən çıxarın.");
         }
@@ -154,10 +179,14 @@ public class QuizAdminService {
         quizRepository.delete(quiz);
     }
 
-    // Şagirdlər üzrə ən yaxşı nəticə və sual üzrə doğru cavab faizi. Müəllim yalnız öz qruplarındakı şagirdləri görür.
+    // Şagirdlər üzrə ən yaxşı nəticə və sual üzrə doğru cavab faizi. Müəllim yalnız öz qruplarındakı şagirdləri görür; buna görə
+    // nəticələrə sahibi olmadığı DƏRC OLUNMUŞ testdə də baxa bilər (şagirdləri istənilən dərc olunmuş testi həll edir), dərc olunmamışda yox.
     @Transactional(readOnly = true)
     public QuizResultsDto results(Long id, User user) {
-        Quiz quiz = getOwned(id, user);
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new NotFoundException("Test tapılmadı: " + id));
+        if (!quiz.isPublished() && !canEdit(quiz, user)) {
+            throw new ForbiddenException("Bu test sizə aid deyil");
+        }
         boolean all = user.getRole() == Role.ADMIN;
         Set<Long> scope = all ? null : new HashSet<>(groupMemberRepository.findStudentIdsByTeacherId(user.getId()));
         List<QuizAttempt> attempts = attemptRepository.findByQuizAndSubmittedAtIsNotNullOrderBySubmittedAtDesc(quiz).stream()
@@ -217,10 +246,15 @@ public class QuizAdminService {
 
     private Quiz getOwned(Long id, User user) {
         Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new NotFoundException("Test tapılmadı: " + id));
-        if (user.getRole() != Role.ADMIN && !quiz.getCreatedBy().getId().equals(user.getId())) {
+        if (!canEdit(quiz, user)) {
             throw new ForbiddenException("Bu test sizə aid deyil");
         }
         return quiz;
+    }
+
+    // Sahibi və admin testi redaktə edə bilər.
+    private static boolean canEdit(Quiz quiz, User user) {
+        return user.getRole() == Role.ADMIN || quiz.getCreatedBy().getId().equals(user.getId());
     }
 
     private void applyMeta(Quiz quiz, QuizUpsertRequest request, int questionCount) {

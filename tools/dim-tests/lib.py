@@ -290,11 +290,12 @@ def inp(code, target, lo, hi, which='max', q=None, domain=None, why=None, check_
 
 
 def quiz(title, description, questions, category='Python', time_limit=None):
+    # seedKey build.py-də verilir. published=True: bu fayl QuizSeedLoader-in bazaya yazdığı hazır testlərdir (cavab açarları icra ilə yoxlanıb).
     return {
         'title': title,
         'description': description,
         'category': category,
         'timeLimitMinutes': time_limit,
-        'published': False,
+        'published': True,
         'questions': questions,
     }

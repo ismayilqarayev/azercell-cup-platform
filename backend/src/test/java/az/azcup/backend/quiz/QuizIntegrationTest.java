@@ -265,7 +265,14 @@ class QuizIntegrationTest {
                 .content(objectMapper.writeValueAsString(quizBody("Oğurluq", true, null, threeQuestions()))))
             .andExpect(status().isForbidden());
         mockMvc.perform(delete("/api/teacher/quizzes/" + quizId).header("Authorization", auth(other))).andExpect(status().isForbidden());
-        mockMvc.perform(get("/api/teacher/quizzes/" + quizId + "/results").header("Authorization", auth(other))).andExpect(status().isForbidden());
+        // Dərc olunmuş testin nəticələrinə başqa müəllim də baxa bilər, amma yalnız ÖZ qruplarındakı şagirdlərinkinə (burada heç kim yoxdur)
+        mockMvc.perform(get("/api/teacher/quizzes/" + quizId + "/results").header("Authorization", auth(other)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.scope").value("MY_GROUPS"))
+            .andExpect(jsonPath("$.students.length()").value(0));
+        // Dərc olunmamış (qaralama) testin nəticələri isə yalnız sahibinə və admin-ə açıqdır
+        long draftId = createQuiz(owner, quizBody("Qaralama sahibliyi", false, null, threeQuestions())).get("id").asLong();
+        mockMvc.perform(get("/api/teacher/quizzes/" + draftId + "/results").header("Authorization", auth(other))).andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/teacher/quizzes/" + quizId).header("Authorization", auth(owner))).andExpect(status().isOk());
         mockMvc.perform(get("/api/teacher/quizzes/" + quizId).header("Authorization", auth(admin))).andExpect(status().isOk());

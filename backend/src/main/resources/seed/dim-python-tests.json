@@ -1,10 +1,11 @@
 [
   {
+    "seedKey": "dim-python-01",
     "title": "Python 1. Dəyişənlər, tiplər və giriş-çıxış",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: dəyişənlər, verilənlərin tipləri, input və print.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
@@ -142,11 +143,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-02",
     "title": "Python 2. Ədədlər və riyazi əməllər",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: //, %, **, əməliyyat sırası, ədədin rəqəmləri.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
@@ -263,11 +265,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-03",
     "title": "Python 3. Şərt operatorları",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: if, elif, else, məntiqi əməliyyatlar.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
@@ -398,11 +401,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-04",
     "title": "Python 4. for dövrü və range",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: for, range(başla, bitir, addım), dövrdə cəm və hasil.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "NUMERIC",
@@ -519,11 +523,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-05",
     "title": "Python 5. while dövrü, break və continue",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: while, break, continue, ədədin rəqəmləri ilə işləmək.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "NUMERIC",
@@ -640,11 +645,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-06",
     "title": "Python 6. İç-içə dövrlər",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: iç-içə for dövrləri, naxışlar, cütlərin sayılması.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "NUMERIC",
@@ -733,11 +739,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-07",
     "title": "Python 7. Sətirlər",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: indeks, dilim, sətir metodları, sətir üzərində dövr.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
@@ -861,11 +868,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-08",
     "title": "Python 8. Siyahılar",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: indeks və dilim, append/pop/insert/sort, dövrlə siyahı emalı.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
@@ -982,11 +990,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-09",
     "title": "Python 9. Funksiyalar",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: def, parametrlər, return, susmaya görə qiymət, lokal dəyişən, rekursiya.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "NUMERIC",
@@ -1103,11 +1112,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-10",
     "title": "Python 10. Alqoritmlər",
     "description": "DİM qəbul proqramındakı mövzuya uyğun orijinal tapşırıqlar (rəsmi imtahan sualları deyil). Cavabları kodu kağızda izləyərək tapın. Mövzu: sayma, axtarış, ən böyük/kiçik, sıralama, sadə ədəd, say sistemləri.",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "NUMERIC",
@@ -1224,11 +1234,12 @@
     ]
   },
   {
+    "seedKey": "dim-python-mock",
     "title": "Python: DİM formatında sınaq (22 qapalı + 5 kodlu)",
     "description": "Qəbul imtahanının informatika blokunun quruluşuna uyğun orijinal sınaq: 22 qapalı və 5 kodlu tapşırıq, bütün Python mövzularını əhatə edir (rəsmi imtahan sualları deyil, yazılı tapşırıqlar daxil deyil).",
     "category": "Python",
     "timeLimitMinutes": null,
-    "published": false,
+    "published": true,
     "questions": [
       {
         "type": "CHOICE",
