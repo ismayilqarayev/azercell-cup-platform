@@ -1734,6 +1734,7 @@ window.azcupApiFetch = azcupApiFetch;
 // buradaca, hər hansı funksiya onu istifadə etməzdən əvvəl elan olunur.
 let loadingTimer = null;
 let uiAuthRendered = false; // updateAuthUI ilk dəfə animasiyasız işləyir
+let uiLastUserKey; // son render olunan istifadəçi (undefined = hələ heç bir render olmayıb); dəyişəndə istifadəçiyə bağlı pəncərələr sıfırlanır
 
 // AŞAĞIDAKI BLOK (B64 konstantları + lazy-iframe infrastrukturu) QƏSDƏN
 // BURAYA, loadingTimer-in YANINA köçürülüb (əvvəllər faylın çox aşağısında,
@@ -3499,8 +3500,25 @@ document.getElementById('adminAuthForm').addEventListener('submit', async functi
   }
 });
 
+// İstifadəçiyə bağlı tam ekran pəncərələrin (İnformatika, Python) iframe-i bir dəfə yüklənib qalırdı (bax: ensureIframeLoaded): çıxışdan sonra
+// növbəti istifadəçi əvvəlkinin görünüşünü (məs. admin-in "Test idarəsi" tabını, köhnə nəticəni, oxunmuş dərsləri) görürdü, həll edilən testin
+// geri sayımı da arxa planda davam edirdi. İstifadəçi dəyişəndə (çıxış, sessiyanın bitməsi, başqa hesabla giriş) pəncərələr bağlanır,
+// iframe təmizlənir və növbəti açılışda təzədən yüklənir.
+function resetUserBoundOverlays(){
+  ['pythonApp', 'dimApp'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
+  ['frame-python', 'frame-dim'].forEach(id => {
+    const frame = document.getElementById(id);
+    if (!frame) return;
+    loadedIframes.delete(id);
+    if (frame.srcdoc) frame.srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>';
+  });
+}
+
 function updateAuthUI(){
   const user = AzcupAuth.getUser();
+  const userKey = user ? String(user.id != null ? user.id : user.email) : null;
+  if (uiLastUserKey !== undefined && userKey !== uiLastUserKey) resetUserBoundOverlays();
+  uiLastUserKey = userKey;
   const authGate = document.getElementById('authGate');
   const langGate = document.getElementById('langGate');
   const tabbarUserName = document.getElementById('tabbarUserName');
