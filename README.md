@@ -53,7 +53,7 @@ index.html         Legacy static landing page (carried over unchanged)
 
 ## Frontend build and the shared UI layer
 
-`index.html` is the app shell. The nine pages in `frontend-src/*.html` (prep, week1-5, algo, scheme, python) are embedded in it as
+`index.html` is the app shell. The ten pages in `frontend-src/*.html` (prep, week1-5, algo, scheme, python, informatika) are embedded in it as
 base64 `srcdoc` iframes. After editing anything under `frontend-src/` (or the shell), regenerate and copy it with:
 
 ```bash
@@ -72,6 +72,10 @@ The build also injects the shared design layer, so the page sources themselves s
 | `frontend-src/python-lessons/*.js` | The Python section's 85 lessons (original Azerbaijani text and code, each linking to the matching metanit.com lesson); merged into `python.html` at the `/* PY_LESSONS */` marker | `python.html` |
 
 `tools/python-lessons.test.js` checks the lesson structure and runs every Python snippet through `ast.parse` (needs `python` on PATH, skipped otherwise).
+
+The third language-screen card, "İnformatika" (DİM admission exam), opens `informatika.html` in its own full-screen `#dimApp` window, the same pattern as the Python section.
+It is static: exam structure, the 2027 programme topics and a per-user checklist kept in `localStorage` (`azcup-dim-info:<email>`). Its logo is `backend/src/main/resources/static/assets/dim-logo.svg`.
+The page states that the platform is not affiliated with the State Examination Centre; keep that notice and re-check the figures against dim.gov.az when the rules change.
 
 Fonts (Inter and JetBrains Mono, SIL OFL 1.1) are self-hosted in `backend/src/main/resources/static/assets/fonts/`, with their licenses.
 `StaticAssetsConfig` gives that folder a 30-day cache; Spring Security would otherwise send `no-store` for every font request.

@@ -21,6 +21,7 @@ const FILES = {
   ALGO: 'algo.html',
   SCHEME: 'scheme.html',
   PYTHON: 'python.html',
+  DIM: 'informatika.html',
 };
 
 function readSrc(name) {
