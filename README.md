@@ -53,7 +53,7 @@ index.html         Legacy static landing page (carried over unchanged)
 
 ## Frontend build and the shared UI layer
 
-`index.html` is the app shell. The ten pages in `frontend-src/*.html` (prep, week1-5, algo, scheme, python, informatika) are embedded in it as
+`index.html` is the app shell. The pages in `frontend-src/*.html` (prep, week1-5, week7-16, algo, scheme, python, informatika) are embedded in it as
 base64 `srcdoc` iframes. After editing anything under `frontend-src/` (or the shell), regenerate and copy it with:
 
 ```bash
