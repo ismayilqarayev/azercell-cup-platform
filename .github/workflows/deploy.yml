@@ -68,6 +68,15 @@ jobs:
       - name: Frontend-i yığ
         run: node tools/build-index.js
 
+      # Server arxivi köhnə qovluğun üstünə açır, ona görə repodan silinən fayl orada qalır və yığımı sındıra bilir.
+      # Bu siyahı arxivlə birlikdə gedir; deploy.sh siyahıda olmayan backend/src fayllarını yığımdan əvvəl silir.
+      # Son sətirdəki "#END <say>" bütövlük möhürüdür: siyahı yarımçıq çatsa server heç nə silmir (bax: deploy/prune-stale-sources.sh).
+      - name: Mənbə fayllarının siyahısı
+        run: |
+          (cd backend && find src -type f | LC_ALL=C sort) > deploy/backend-src.manifest
+          echo "#END $(wc -l < deploy/backend-src.manifest | tr -d ' ')" >> deploy/backend-src.manifest
+          tail -n 1 deploy/backend-src.manifest
+
       - name: SSH hazırla
         run: |
           install -m 700 -d ~/.ssh
