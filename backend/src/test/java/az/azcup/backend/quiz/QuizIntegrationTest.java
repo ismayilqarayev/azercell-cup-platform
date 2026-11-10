@@ -2,12 +2,15 @@ package az.azcup.backend.quiz;
 
 import az.azcup.backend.entity.Group;
 import az.azcup.backend.entity.GroupMember;
+import az.azcup.backend.entity.Quiz;
 import az.azcup.backend.entity.QuizAttempt;
 import az.azcup.backend.entity.Role;
 import az.azcup.backend.entity.User;
 import az.azcup.backend.repository.GroupMemberRepository;
 import az.azcup.backend.repository.GroupRepository;
 import az.azcup.backend.repository.QuizAttemptRepository;
+import az.azcup.backend.repository.QuizRepository;
+import az.azcup.backend.service.QuizAdminService;
 import az.azcup.backend.repository.UserRepository;
 import az.azcup.backend.security.JwtService;
 import org.junit.jupiter.api.Test;
@@ -61,6 +64,10 @@ class QuizIntegrationTest {
     private GroupMemberRepository groupMemberRepository;
     @Autowired
     private QuizAttemptRepository attemptRepository;
+    @Autowired
+    private QuizRepository quizRepository;
+    @Autowired
+    private QuizAdminService quizAdminService;
 
     // ---- yardımçılar ----
 
@@ -265,14 +272,7 @@ class QuizIntegrationTest {
                 .content(objectMapper.writeValueAsString(quizBody("Oğurluq", true, null, threeQuestions()))))
             .andExpect(status().isForbidden());
         mockMvc.perform(delete("/api/teacher/quizzes/" + quizId).header("Authorization", auth(other))).andExpect(status().isForbidden());
-        // Dərc olunmuş testin nəticələrinə başqa müəllim də baxa bilər, amma yalnız ÖZ qruplarındakı şagirdlərinkinə (burada heç kim yoxdur)
-        mockMvc.perform(get("/api/teacher/quizzes/" + quizId + "/results").header("Authorization", auth(other)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.scope").value("MY_GROUPS"))
-            .andExpect(jsonPath("$.students.length()").value(0));
-        // Dərc olunmamış (qaralama) testin nəticələri isə yalnız sahibinə və admin-ə açıqdır
-        long draftId = createQuiz(owner, quizBody("Qaralama sahibliyi", false, null, threeQuestions())).get("id").asLong();
-        mockMvc.perform(get("/api/teacher/quizzes/" + draftId + "/results").header("Authorization", auth(other))).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/teacher/quizzes/" + quizId + "/results").header("Authorization", auth(other))).andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/teacher/quizzes/" + quizId).header("Authorization", auth(owner))).andExpect(status().isOk());
         mockMvc.perform(get("/api/teacher/quizzes/" + quizId).header("Authorization", auth(admin))).andExpect(status().isOk());
@@ -461,6 +461,46 @@ class QuizIntegrationTest {
         JsonNode restarted = startAttempt(student, quizId);
         assertThat(restarted.get("attemptId").asLong()).isEqualTo(second);
         assertThat(Instant.parse(restarted.get("startedAt").asString())).isAfter(Instant.now().minus(1, ChronoUnit.MINUTES));
+    }
+
+    @Test
+    void cleanupRemovesOnlyTheOldReadyMadeQuizzesTogetherWithTheirAttempts() throws Exception {
+        User teacher = createUser(Role.TEACHER);
+        User student = createUser(Role.STUDENT);
+        long seededId = createQuiz(teacher, quizBody("Köhnə hazır test", true, null, threeQuestions())).get("id").asLong();
+        long handMadeId = createQuiz(teacher, quizBody("Əl ilə yaradılan test", true, null, threeQuestions())).get("id").asLong();
+
+        // Hər iki testi şagird həll edir (cəhd + cavab sətirləri yaranır), hazır testdə əlavə olaraq davam edən cəhd də qalır
+        long seededAttempt = startAttempt(student, seededId).get("attemptId").asLong();
+        submit(student, seededAttempt, Map.of()).andExpect(status().isOk());
+        startAttempt(student, seededId);
+        long handMadeAttempt = startAttempt(student, handMadeId).get("attemptId").asLong();
+        submit(student, handMadeAttempt, Map.of()).andExpect(status().isOk());
+
+        // Köhnə buraxılışın yükləyicisi kimi: testə seedKey veririk
+        Quiz seeded = quizRepository.findById(seededId).orElseThrow();
+        seeded.setSeedKey("dim-python-test-" + UUID.randomUUID());
+        quizRepository.save(seeded);
+
+        assertThat(quizAdminService.deleteSeededQuizzes()).isEqualTo(1);
+        // Təkrar çağırış heç nə etmir
+        assertThat(quizAdminService.deleteSeededQuizzes()).isZero();
+
+        // Hazır test, onun cəhdi və nəticəsi yoxdur
+        assertThat(quizRepository.existsById(seededId)).isFalse();
+        assertThat(attemptRepository.existsById(seededAttempt)).isFalse();
+        mockMvc.perform(get("/api/quiz-attempts/" + seededAttempt).header("Authorization", auth(student))).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/quizzes").header("Authorization", auth(student)))
+            .andExpect(jsonPath("$[?(@.id==" + seededId + ")]").isEmpty())
+            .andExpect(jsonPath("$[?(@.id==" + handMadeId + ")]").isNotEmpty());
+
+        // Əl ilə yaradılan test və onun nəticəsi yerindədir
+        mockMvc.perform(get("/api/teacher/quizzes/" + handMadeId).header("Authorization", auth(teacher)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.questions.length()").value(3));
+        mockMvc.perform(get("/api/quiz-attempts/" + handMadeAttempt).header("Authorization", auth(student)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalCount").value(3));
     }
 
     // ---- kiçik köməkçilər ----

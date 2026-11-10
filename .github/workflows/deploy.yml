@@ -1,4 +1,4 @@
-# main-ə hər push-dan sonra kodu Contabo VPS-ə yükləyir və AzCup konteynerlərini yenidən qurur.
+# main-ə hər push-dan sonra əvvəlcə testləri işlədir, yalnız onlar keçəndə kodu Contabo VPS-ə yükləyir və AzCup konteynerlərini yenidən qurur.
 # Lazım olan repo secret-ləri: VPS_SSH_KEY (azcup-github-actions şəxsi açarı), VPS_KNOWN_HOSTS (ssh-keyscan nəticəsi).
 # Serverdə həmin açar yalnız /opt/azcup/ci-deploy.sh-i işlədə bilir (bax: deploy/ci-deploy.sh).
 name: Deploy
@@ -13,7 +13,48 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Testlər deploy-dan ƏVVƏL işləyir: əvvəl onlar yalnız tərtibatçının kompüterində işlədilirdi (serverdəki Docker yığımı -DskipTests ilədir),
+  # yəni sınıq kod canlıya çıxa bilərdi. İndi hər hansı test uğursuz olsa deploy işi başlamır.
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      # BackendApplicationTests tətbiqi adi profillə (real Postgres ilə) qaldırır; qalan inteqrasiya testləri yaddaşdakı H2-dən istifadə edir.
+      # İstifadəçi/parol application.yml-dəki açıq default dəyərlərdir və yalnız bu müvəqqəti CI bazasına aiddir.
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: azcup
+          POSTGRES_PASSWORD: azcup
+          POSTGRES_DB: azcup
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U azcup"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Frontend testləri
+        run: node --test tools/*.test.js
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      # Hakim (judge) testləri real g++ ilə işləyir; o, ubuntu-latest-də quraşdırılıb.
+      - name: Backend testləri
+        working-directory: backend
+        run: bash ./mvnw -B -q test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

@@ -7,10 +7,16 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Şrift fayllarına (frontend UI qatı) uzunmüddətli keş verir. Spring Security bütün cavablara
- * "Cache-Control: no-store" yazır; bu, hər iframe səhifəsinin şriftləri hər açılışda yenidən endirməsinə səbəb olurdu.
- * Başlıq burada resurs idarəçisi tərəfindən əvvəlcədən təyin olunduğu üçün Spring Security onu üzərinə yazmır.
- * Yalnız /assets/fonts/** əhatə olunur: index.html və API cavabları əvvəlki kimi keşlənmir.
+ * Statik faylların keş qaydaları. Spring Security bütün cavablara "Cache-Control: no-store" yazır; başlıq burada resurs idarəçisi
+ * tərəfindən əvvəlcədən təyin olunduğu üçün Spring Security onu üzərinə yazmır.
+ *
+ * - /assets/fonts/**: 30 günlük keş (şriftlər dəyişmir; əvvəl hər iframe səhifəsi onları hər açılışda yenidən endirirdi).
+ * - /index.html (və "/" — o da index.html-ə yönləndirilir): "no-cache", yəni brauzer faylı saxlayır, amma HƏR açılışda serverdən
+ *   soruşur (If-Modified-Since). Dəyişməyibsə server gövdəsiz 304 qaytarır. index.html 5 MB-dan böyükdür (sıxılmış ~1,4 MB) və əvvəl
+ *   "no-store" üzündən hər açılışda və hər yenilənmədə tam endirilirdi. Yeni deploy faylın tarixini dəyişir, ona görə istifadəçilər
+ *   köhnə versiyada qalmır. Faylda istifadəçiyə aid heç bir məlumat yoxdur (statik qabıqdır), ona görə saxlanması təhlükəsizdir.
+ *
+ * API cavabları əvvəlki kimi keşlənmir.
  */
 @Configuration
 public class StaticAssetsConfig implements WebMvcConfigurer {
@@ -20,5 +26,8 @@ public class StaticAssetsConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/assets/fonts/**")
                 .addResourceLocations("classpath:/static/assets/fonts/")
                 .setCacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic());
+        registry.addResourceHandler("/index.html")
+                .addResourceLocations("classpath:/static/")
+                .setCacheControl(CacheControl.noCache());
     }
 }

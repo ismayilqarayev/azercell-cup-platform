@@ -6,6 +6,7 @@ import az.azcup.backend.entity.User;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -35,4 +36,9 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
 
     // Test silinəndə (yalnız həll olunmamış testlər silinə bilər) davam edən boş cəhdləri təmizləmək üçün.
     void deleteByQuiz(Quiz quiz);
+
+    // Bir testin BÜTÜN cəhdlərini bir sorğu ilə silir (əvvəlcə cavabları silinməlidir; hazır testlərin təmizlənməsi üçün).
+    @Modifying
+    @Query("delete from QuizAttempt t where t.quiz.id = :quizId")
+    void deleteAllByQuizId(@Param("quizId") Long quizId);
 }

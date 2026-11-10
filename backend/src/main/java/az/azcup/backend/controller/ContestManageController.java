@@ -7,10 +7,12 @@ import az.azcup.backend.dto.contest.ContestProblemUpsertRequest;
 import az.azcup.backend.dto.contest.ContestTestCaseDto;
 import az.azcup.backend.dto.contest.ContestTestCaseUpsertRequest;
 import az.azcup.backend.dto.contest.ContestUpsertRequest;
+import az.azcup.backend.security.UserPrincipal;
 import az.azcup.backend.service.ContestAdminService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,8 @@ import java.util.List;
 // "/api/teacher/**" -> hasAnyRole("TEACHER","ADMIN") qaydası bu bütün yolu
 // artıq əhatə edir, ƏLAVƏ konfiqurasiyaya EHTİYAC YOXDUR. Yarışın idarəetmə
 // (yaratma/redaktə/məsələ+test halı əlavə etmə) tərəfi — şagird tərəfi
-// ContestController-dədir.
+// ContestController-dədir. Sahiblik yoxlaması ContestAdminService-dədir:
+// müəllim yalnız öz yaratdığı (və sahibi qeyd olunmamış köhnə) yarışları, admin hamısını idarə edir.
 @RestController
 @RequestMapping("/api/teacher/contests")
 public class ContestManageController {
@@ -41,34 +44,41 @@ public class ContestManageController {
 
     // ---------- Yarış (Contest) CRUD ----------
 
-    // İdarəetmə panelində göstərmək üçün BÜTÜN yarışların siyahısı.
+    // İdarəetmə panelində göstərmək üçün sorğu edənin idarə edə bildiyi yarışların siyahısı.
     @GetMapping
-    public List<ContestDto> list() {
-        return contestAdminService.listForManagement();
+    public List<ContestDto> list(@AuthenticationPrincipal UserPrincipal principal) {
+        return contestAdminService.listForManagement(principal.getUser());
     }
 
     // Yeni yarış yaradır və 201 CREATED statusu ilə qaytarır.
     @PostMapping
-    public ResponseEntity<ContestManageDetailDto> create(@Valid @RequestBody ContestUpsertRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(contestAdminService.createContest(request));
+    public ResponseEntity<ContestManageDetailDto> create(
+        @Valid @RequestBody ContestUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(contestAdminService.createContest(request, principal.getUser()));
     }
 
     // Bir yarışın tam detalları (bütün məsələləri, bütün test halları ilə).
     @GetMapping("/{id}")
-    public ContestManageDetailDto get(@PathVariable Long id) {
-        return contestAdminService.getManageDetail(id);
+    public ContestManageDetailDto get(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal principal) {
+        return contestAdminService.getManageDetail(id, principal.getUser());
     }
 
     // Mövcud yarışı yeniləyir.
     @PutMapping("/{id}")
-    public ContestManageDetailDto update(@PathVariable Long id, @Valid @RequestBody ContestUpsertRequest request) {
-        return contestAdminService.updateContest(id, request);
+    public ContestManageDetailDto update(
+        @PathVariable Long id,
+        @Valid @RequestBody ContestUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return contestAdminService.updateContest(id, request, principal.getUser());
     }
 
     // Bir yarışı silir.
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        contestAdminService.deleteContest(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal principal) {
+        contestAdminService.deleteContest(id, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 
@@ -78,9 +88,11 @@ public class ContestManageController {
     @PostMapping("/{contestId}/problems")
     public ResponseEntity<ContestProblemAdminDto> addProblem(
         @PathVariable Long contestId,
-        @Valid @RequestBody ContestProblemUpsertRequest request
+        @Valid @RequestBody ContestProblemUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(contestAdminService.addProblem(contestId, request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(contestAdminService.addProblem(contestId, request, principal.getUser()));
     }
 
     // Mövcud yarış məsələsini yeniləyir.
@@ -88,15 +100,20 @@ public class ContestManageController {
     public ContestProblemAdminDto updateProblem(
         @PathVariable Long contestId,
         @PathVariable Long problemId,
-        @Valid @RequestBody ContestProblemUpsertRequest request
+        @Valid @RequestBody ContestProblemUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return contestAdminService.updateProblem(contestId, problemId, request);
+        return contestAdminService.updateProblem(contestId, problemId, request, principal.getUser());
     }
 
     // Bir yarış məsələsini (test halları ilə birlikdə) silir.
     @DeleteMapping("/{contestId}/problems/{problemId}")
-    public ResponseEntity<Void> deleteProblem(@PathVariable Long contestId, @PathVariable Long problemId) {
-        contestAdminService.deleteProblem(contestId, problemId);
+    public ResponseEntity<Void> deleteProblem(
+        @PathVariable Long contestId,
+        @PathVariable Long problemId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        contestAdminService.deleteProblem(contestId, problemId, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 
@@ -107,10 +124,11 @@ public class ContestManageController {
     public ResponseEntity<ContestTestCaseDto> addTestCase(
         @PathVariable Long contestId,
         @PathVariable Long problemId,
-        @Valid @RequestBody ContestTestCaseUpsertRequest request
+        @Valid @RequestBody ContestTestCaseUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(contestAdminService.addTestCase(contestId, problemId, request));
+            .body(contestAdminService.addTestCase(contestId, problemId, request, principal.getUser()));
     }
 
     // Mövcud test halını yeniləyir.
@@ -119,9 +137,10 @@ public class ContestManageController {
         @PathVariable Long contestId,
         @PathVariable Long problemId,
         @PathVariable Long testCaseId,
-        @Valid @RequestBody ContestTestCaseUpsertRequest request
+        @Valid @RequestBody ContestTestCaseUpsertRequest request,
+        @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return contestAdminService.updateTestCase(contestId, problemId, testCaseId, request);
+        return contestAdminService.updateTestCase(contestId, problemId, testCaseId, request, principal.getUser());
     }
 
     // Bir test halını silir.
@@ -129,9 +148,10 @@ public class ContestManageController {
     public ResponseEntity<Void> deleteTestCase(
         @PathVariable Long contestId,
         @PathVariable Long problemId,
-        @PathVariable Long testCaseId
+        @PathVariable Long testCaseId,
+        @AuthenticationPrincipal UserPrincipal principal
     ) {
-        contestAdminService.deleteTestCase(contestId, problemId, testCaseId);
+        contestAdminService.deleteTestCase(contestId, problemId, testCaseId, principal.getUser());
         return ResponseEntity.noContent().build();
     }
 }

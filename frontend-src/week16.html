@@ -123,8 +123,8 @@
   .reveal-btn:hover{ background:rgba(154,107,60,0.08); }
   .reveal-btn .arrow{ display:inline-block; }
 
-  /* ---------- Admin/müəllim üçün "Gizli test halları" paneli ----------
-     Yalnız TEACHER/ADMIN roluna görünür (bax: isAdminOrTeacher()) — şagird
+  /* ---------- Admin üçün "Gizli test halları" paneli ----------
+     Yalnız ADMIN roluna görünür (bax: canManageHiddenTests()) — şagird və müəllim
      bunu heç vaxt görmür, çünki panel HTML-i render zamanı ümumiyyətlə
      əlavə olunmur (CSS ilə gizlətmə deyil). */
   .admin-tc-panel{
@@ -2336,7 +2336,7 @@ const solutionLinks = [
 const STARTER_CPP = '#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    \n    return 0;\n}\n';
 
 const container = document.getElementById('problems');
-const showAdminTc = isAdminOrTeacher();
+const showAdminTc = canManageHiddenTests();
 problems.forEach((p, i) => {
   const el = document.createElement('div');
   el.className = 'problem';
@@ -2418,17 +2418,17 @@ function toggleProblem(i){
   const el = document.getElementById('problem-' + i);
   if (!el) return;
   el.classList.toggle('expanded');
-  if (el.classList.contains('expanded') && isAdminOrTeacher() && !el.dataset.tcLoaded) {
+  if (el.classList.contains('expanded') && canManageHiddenTests() && !el.dataset.tcLoaded) {
     el.dataset.tcLoaded = '1';
     loadAdminTestCases(i);
   }
 }
 
-// Hazırkı giriş etmiş istifadəçinin TEACHER və ya ADMIN olub-olmadığını
-// yoxlayır — "Gizli test halları" paneli yalnız bu halda göstərilir.
-function isAdminOrTeacher(){
+// "Gizli test halları" paneli yalnız ADMIN-ə göstərilir: onun endpoint-ləri (/api/admin/problems/{id}/test-cases)
+// serverdə yalnız ADMIN-ə açıqdır. Əvvəl panel müəllimə də göstərilirdi, amma hər sorğusu 403 ilə rədd olunurdu.
+function canManageHiddenTests(){
   const user = window.parent.AzcupAuth && window.parent.AzcupAuth.getUser();
-  return !!user && (user.role === 'TEACHER' || user.role === 'ADMIN');
+  return !!user && user.role === 'ADMIN';
 }
 
 // Bir problemin admin panelindəki gizli test halları siyahısını yükləyib göstərir.

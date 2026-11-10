@@ -3,6 +3,7 @@ package az.azcup.backend.repository;
 import az.azcup.backend.entity.Quiz;
 import az.azcup.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -16,9 +17,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     // Admin üçün bütün testlər.
     List<Quiz> findAllByOrderByUpdatedAtDesc();
 
-    // Hazır (layihə ilə gələn) test artıq yaradılıbmı — yükləyici təkrar yaratmasın.
-    boolean existsBySeedKey(String seedKey);
-
-    // Müəllimlər də hazır testlərin nəticələrinə (öz qruplarının) baxa bilsin deyə: dərc olunmuş hazır testlər.
-    List<Quiz> findBySeedKeyIsNotNullAndPublishedTrueOrderByTitleAsc();
+    // Əvvəlki buraxılışda avtomatik yaradılmış hazır testlərin ID-ləri (təmizləmə üçün, bax: QuizSeedCleanup).
+    @Query("select q.id from Quiz q where q.seedKey is not null")
+    List<Long> findSeededIds();
 }

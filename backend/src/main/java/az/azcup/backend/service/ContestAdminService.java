@@ -10,6 +10,9 @@ import az.azcup.backend.dto.contest.ContestUpsertRequest;
 import az.azcup.backend.entity.Contest;
 import az.azcup.backend.entity.ContestProblem;
 import az.azcup.backend.entity.ContestTestCase;
+import az.azcup.backend.entity.Role;
+import az.azcup.backend.entity.User;
+import az.azcup.backend.exception.ForbiddenException;
 import az.azcup.backend.exception.NotFoundException;
 import az.azcup.backend.repository.ContestProblemRepository;
 import az.azcup.backend.repository.ContestRepository;
@@ -20,8 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-// Yarış idarəetmə panelinin (Müəllim + Admin — hər ikisi eyni səlahiyyətə
-// malikdir) bütün biznes-məntiqi: yarış/məsələ/test halı CRUD-u. AdminService-in
+// Yarış idarəetmə panelinin (Müəllim + Admin) bütün biznes-məntiqi. Sahiblik: admin bütün yarışları,
+// müəllim yalnız ÖZ yaratdığı yarışları idarə edir (bax: requireManage); sahibi qeyd olunmamış köhnə
+// yarışlar əvvəlki kimi bütün müəllimlərə açıqdır. Məzmun: yarış/məsələ/test halı CRUD-u. AdminService-in
 // Topic/Problem CRUD-u ilə eyni struktura görə qurulub (bax: createTopic
 // və s.) — sadə "tap, sahələri təyin et, saxla" prinsipi.
 @Service
@@ -45,13 +49,17 @@ public class ContestAdminService {
         this.contestTestCaseRepository = contestTestCaseRepository;
     }
 
-    // İdarəetmə panelində göstərmək üçün BÜTÜN yarışların siyahısı (status
+    // İdarəetmə panelində göstərmək üçün sorğu edənin idarə edə bildiyi yarışların siyahısı (status
     // fərq etmir — UPCOMING/ACTIVE/ENDED, hamısı görünür).
     @Transactional(readOnly = true)
-    public List<ContestDto> listForManagement() {
+    public List<ContestDto> listForManagement(User requester) {
         List<Contest> contests = contestRepository.findAllByOrderByStartTimeDesc();
         List<ContestDto> result = new ArrayList<>();
         for (Contest c : contests) {
+            // Müəllim başqasının yarışını siyahıda da görmür (idarə edə bilmədiyi üçün).
+            if (!canManage(c, requester)) {
+                continue;
+            }
             long problemCount = contestProblemRepository.countByContest(c);
             result.add(new ContestDto(
                 c.getId(), c.getTitle(), c.getDescription(), c.getStartTime(), c.getEndTime(),
@@ -63,8 +71,9 @@ public class ContestAdminService {
 
     // Yeni yarış yaradır.
     @Transactional
-    public ContestManageDetailDto createContest(ContestUpsertRequest req) {
+    public ContestManageDetailDto createContest(ContestUpsertRequest req, User requester) {
         Contest contest = new Contest();
+        contest.setCreatedBy(requester);
         applyUpsert(contest, req);
         contestRepository.save(contest);
         return toManageDetailDto(contest);
@@ -72,8 +81,8 @@ public class ContestAdminService {
 
     // Mövcud yarışın başlıq/təsvir/vaxtlarını yeniləyir.
     @Transactional
-    public ContestManageDetailDto updateContest(Long contestId, ContestUpsertRequest req) {
-        Contest contest = getContestEntity(contestId);
+    public ContestManageDetailDto updateContest(Long contestId, ContestUpsertRequest req, User requester) {
+        Contest contest = getContestEntity(contestId, requester);
         applyUpsert(contest, req);
         contestRepository.save(contest);
         return toManageDetailDto(contest);
@@ -88,23 +97,23 @@ public class ContestAdminService {
     // constraint xətası ilə uğursuz olacaq, bu da YANLIŞLIQLA "canlı"
     // (artıq iştirakçısı/nəticəsi olan) yarışın silinməsinin qarşısını alır.
     @Transactional
-    public void deleteContest(Long contestId) {
-        Contest contest = getContestEntity(contestId);
+    public void deleteContest(Long contestId, User requester) {
+        Contest contest = getContestEntity(contestId, requester);
         contestRepository.delete(contest);
     }
 
     // İdarəetmə panelində bir yarışın tam detalları — BÜTÜN test halları
     // (gizli daxil) ilə birlikdə.
     @Transactional(readOnly = true)
-    public ContestManageDetailDto getManageDetail(Long contestId) {
-        Contest contest = getContestEntity(contestId);
+    public ContestManageDetailDto getManageDetail(Long contestId, User requester) {
+        Contest contest = getContestEntity(contestId, requester);
         return toManageDetailDto(contest);
     }
 
     // Yarışa yeni məsələ əlavə edir.
     @Transactional
-    public ContestProblemAdminDto addProblem(Long contestId, ContestProblemUpsertRequest req) {
-        Contest contest = getContestEntity(contestId);
+    public ContestProblemAdminDto addProblem(Long contestId, ContestProblemUpsertRequest req, User requester) {
+        Contest contest = getContestEntity(contestId, requester);
         ContestProblem problem = new ContestProblem();
         problem.setContest(contest);
         applyProblemUpsert(problem, req);
@@ -114,8 +123,8 @@ public class ContestAdminService {
 
     // Mövcud yarış məsələsini yeniləyir.
     @Transactional
-    public ContestProblemAdminDto updateProblem(Long contestId, Long problemId, ContestProblemUpsertRequest req) {
-        ContestProblem problem = getProblemEntity(contestId, problemId);
+    public ContestProblemAdminDto updateProblem(Long contestId, Long problemId, ContestProblemUpsertRequest req, User requester) {
+        ContestProblem problem = getProblemEntity(contestId, problemId, requester);
         applyProblemUpsert(problem, req);
         contestProblemRepository.save(problem);
         return toProblemAdminDto(problem);
@@ -123,8 +132,8 @@ public class ContestAdminService {
 
     // Bir yarış məsələsini (və onun test hallarını) silir.
     @Transactional
-    public void deleteProblem(Long contestId, Long problemId) {
-        ContestProblem problem = getProblemEntity(contestId, problemId);
+    public void deleteProblem(Long contestId, Long problemId, User requester) {
+        ContestProblem problem = getProblemEntity(contestId, problemId, requester);
         // Test halları əvvəlcə əl ilə silinir — FK ON DELETE CASCADE
         // təyin olunmadığı üçün, əks halda constraint xətası baş verərdi.
         List<ContestTestCase> testCases = contestTestCaseRepository.findByContestProblemOrderByOrderIndexAsc(problem);
@@ -134,8 +143,8 @@ public class ContestAdminService {
 
     // Bir məsələyə yeni test halı əlavə edir.
     @Transactional
-    public ContestTestCaseDto addTestCase(Long contestId, Long problemId, ContestTestCaseUpsertRequest req) {
-        ContestProblem problem = getProblemEntity(contestId, problemId);
+    public ContestTestCaseDto addTestCase(Long contestId, Long problemId, ContestTestCaseUpsertRequest req, User requester) {
+        ContestProblem problem = getProblemEntity(contestId, problemId, requester);
         ContestTestCase testCase = new ContestTestCase();
         testCase.setContestProblem(problem);
         applyTestCaseUpsert(testCase, req);
@@ -145,8 +154,8 @@ public class ContestAdminService {
 
     // Mövcud test halını yeniləyir.
     @Transactional
-    public ContestTestCaseDto updateTestCase(Long contestId, Long problemId, Long testCaseId, ContestTestCaseUpsertRequest req) {
-        ContestProblem problem = getProblemEntity(contestId, problemId);
+    public ContestTestCaseDto updateTestCase(Long contestId, Long problemId, Long testCaseId, ContestTestCaseUpsertRequest req, User requester) {
+        ContestProblem problem = getProblemEntity(contestId, problemId, requester);
         ContestTestCase testCase = contestTestCaseRepository.findById(testCaseId)
             .filter(tc -> tc.getContestProblem().getId().equals(problem.getId()))
             .orElseThrow(() -> new NotFoundException("Test halı tapılmadı: " + testCaseId));
@@ -157,30 +166,46 @@ public class ContestAdminService {
 
     // Bir test halını silir.
     @Transactional
-    public void deleteTestCase(Long contestId, Long problemId, Long testCaseId) {
-        ContestProblem problem = getProblemEntity(contestId, problemId);
+    public void deleteTestCase(Long contestId, Long problemId, Long testCaseId, User requester) {
+        ContestProblem problem = getProblemEntity(contestId, problemId, requester);
         ContestTestCase testCase = contestTestCaseRepository.findById(testCaseId)
             .filter(tc -> tc.getContestProblem().getId().equals(problem.getId()))
             .orElseThrow(() -> new NotFoundException("Test halı tapılmadı: " + testCaseId));
         contestTestCaseRepository.delete(testCase);
     }
 
-    // ID ilə xam Contest entity-sini tapır, tapılmazsa 404 atır.
-    private Contest getContestEntity(Long contestId) {
-        return contestRepository.findById(contestId)
+    // ID ilə xam Contest entity-sini tapır (tapılmazsa 404) və sorğu edənin onu idarə edə bildiyini yoxlayır (əks halda 403).
+    private Contest getContestEntity(Long contestId, User requester) {
+        Contest contest = contestRepository.findById(contestId)
             .orElseThrow(() -> new NotFoundException("Yarış tapılmadı: " + contestId));
+        requireManage(contest, requester);
+        return contest;
+    }
+
+    // Admin hər yarışı idarə edir; müəllim öz yaratdığını və sahibi qeyd olunmamış (bu qayda əlavə olunmazdan əvvəl yaradılmış) yarışı.
+    private static boolean canManage(Contest contest, User requester) {
+        return requester.getRole() == Role.ADMIN
+            || contest.getCreatedBy() == null
+            || contest.getCreatedBy().getId().equals(requester.getId());
+    }
+
+    private static void requireManage(Contest contest, User requester) {
+        if (!canManage(contest, requester)) {
+            throw new ForbiddenException("Bu yarış sizə aid deyil");
+        }
     }
 
     // ID ilə xam ContestProblem entity-sini tapır, HƏM DƏ onun DOĞRUDAN
     // bu yarışa aid olduğunu yoxlayır — əks halda başqa yarışın məsələ
     // ID-sini bu yarışın URL-inə yazaraq yanlış qovluqda redaktə etmək
     // mümkün olardı.
-    private ContestProblem getProblemEntity(Long contestId, Long problemId) {
+    private ContestProblem getProblemEntity(Long contestId, Long problemId, User requester) {
         ContestProblem problem = contestProblemRepository.findById(problemId)
             .orElseThrow(() -> new NotFoundException("Yarış məsələsi tapılmadı: " + problemId));
         if (!problem.getContest().getId().equals(contestId)) {
             throw new NotFoundException("Yarış məsələsi tapılmadı: " + problemId);
         }
+        requireManage(problem.getContest(), requester);
         return problem;
     }
 

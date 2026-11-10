@@ -1,7 +1,9 @@
 package az.azcup.backend.contest;
 
+import az.azcup.backend.entity.Contest;
 import az.azcup.backend.entity.Role;
 import az.azcup.backend.entity.User;
+import az.azcup.backend.repository.ContestRepository;
 import az.azcup.backend.repository.UserRepository;
 import az.azcup.backend.security.JwtService;
 import org.junit.jupiter.api.Test;
@@ -21,8 +23,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,6 +63,10 @@ class ContestIntegrationTest {
     // Test istifadəçiləri üçün birbaşa (login axınını keçmədən) JWT yaratmaq üçün.
     @Autowired
     private JwtService jwtService;
+
+    // Sahibi qeyd olunmamış (köhnə) yarışı birbaşa bazaya yazmaq üçün.
+    @Autowired
+    private ContestRepository contestRepository;
 
     // Verilmiş rolla, TƏSADÜFİ email-li, təsdiqlənmiş+aktiv bir istifadəçi
     // yaradıb bazaya yazır və onun üçün "Bearer <token>" header dəyərini qaytarır.
@@ -267,6 +275,80 @@ class ContestIntegrationTest {
         using namespace std;
         int main(){ long long a,b; cin>>a>>b; cout<<a+b<<"\\n"; }
         """;
+
+    // Yarışı yalnız onu yaradan müəllim və admin idarə edə bilər; sahibi qeyd olunmamış köhnə yarış isə əvvəlki kimi hər müəllimə açıqdır.
+    @Test
+    void onlyTheCreatorOrAdminManagesAContestAndLegacyContestsStayOpen() throws Exception {
+        String ownerAuth = createUserAndGetAuthHeader(Role.TEACHER);
+        String otherAuth = createUserAndGetAuthHeader(Role.TEACHER);
+        String adminAuth = createUserAndGetAuthHeader(Role.ADMIN);
+
+        Map<String, Object> contestBody = new HashMap<>();
+        contestBody.put("title", "Sahibli yarış");
+        contestBody.put("description", "Sahiblik testi");
+        contestBody.put("startTime", Instant.now().plus(1, ChronoUnit.HOURS).toString());
+        contestBody.put("endTime", Instant.now().plus(2, ChronoUnit.HOURS).toString());
+        String json = objectMapper.writeValueAsString(contestBody);
+        long contestId = objectMapper.readTree(mockMvc.perform(post("/api/teacher/contests")
+                .header("Authorization", ownerAuth).contentType(APPLICATION_JSON).content(json))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
+
+        Map<String, Object> problemBody = new HashMap<>();
+        problemBody.put("orderIndex", 0);
+        problemBody.put("title", "Məsələ");
+        problemBody.put("statement", "Şərt");
+        problemBody.put("inputSpec", "Giriş");
+        problemBody.put("outputSpec", "Çıxış");
+        problemBody.put("points", 100);
+        String problemJson = objectMapper.writeValueAsString(problemBody);
+        long problemId = objectMapper.readTree(mockMvc.perform(post("/api/teacher/contests/" + contestId + "/problems")
+                .header("Authorization", ownerAuth).contentType(APPLICATION_JSON).content(problemJson))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
+
+        // Başqa müəllim: siyahıda görmür, oxuya/dəyişə/silə bilmir, məsələ və test halı əlavə edə bilmir
+        mockMvc.perform(get("/api/teacher/contests").header("Authorization", otherAuth))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[?(@.id==" + contestId + ")]").isEmpty());
+        mockMvc.perform(get("/api/teacher/contests/" + contestId).header("Authorization", otherAuth)).andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/teacher/contests/" + contestId).header("Authorization", otherAuth).contentType(APPLICATION_JSON).content(json))
+            .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/teacher/contests/" + contestId).header("Authorization", otherAuth)).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/teacher/contests/" + contestId + "/problems")
+                .header("Authorization", otherAuth).contentType(APPLICATION_JSON).content(problemJson))
+            .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/teacher/contests/" + contestId + "/problems/" + problemId)
+                .header("Authorization", otherAuth).contentType(APPLICATION_JSON).content(problemJson))
+            .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/teacher/contests/" + contestId + "/problems/" + problemId).header("Authorization", otherAuth))
+            .andExpect(status().isForbidden());
+        Map<String, Object> testCaseBody = new HashMap<>();
+        testCaseBody.put("orderIndex", 0);
+        testCaseBody.put("input", "1");
+        testCaseBody.put("expectedOutput", "1");
+        testCaseBody.put("hidden", true);
+        mockMvc.perform(post("/api/teacher/contests/" + contestId + "/problems/" + problemId + "/test-cases")
+                .header("Authorization", otherAuth).contentType(APPLICATION_JSON).content(objectMapper.writeValueAsString(testCaseBody)))
+            .andExpect(status().isForbidden());
+
+        // Sahib və admin: görür və dəyişə bilir
+        mockMvc.perform(get("/api/teacher/contests").header("Authorization", ownerAuth))
+            .andExpect(jsonPath("$[?(@.id==" + contestId + ")]").isNotEmpty());
+        mockMvc.perform(get("/api/teacher/contests/" + contestId).header("Authorization", ownerAuth)).andExpect(status().isOk());
+        mockMvc.perform(get("/api/teacher/contests").header("Authorization", adminAuth))
+            .andExpect(jsonPath("$[?(@.id==" + contestId + ")]").isNotEmpty());
+        mockMvc.perform(put("/api/teacher/contests/" + contestId).header("Authorization", adminAuth).contentType(APPLICATION_JSON).content(json))
+            .andExpect(status().isOk());
+
+        // Köhnə (sahibi qeyd olunmamış) yarış: hər müəllim əvvəlki kimi idarə edə bilir
+        Contest legacy = new Contest();
+        legacy.setTitle("Köhnə yarış");
+        legacy.setStartTime(Instant.now().plus(1, ChronoUnit.HOURS));
+        legacy.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        long legacyId = contestRepository.save(legacy).getId();
+        mockMvc.perform(get("/api/teacher/contests/" + legacyId).header("Authorization", otherAuth)).andExpect(status().isOk());
+        mockMvc.perform(put("/api/teacher/contests/" + legacyId).header("Authorization", otherAuth).contentType(APPLICATION_JSON).content(json))
+            .andExpect(status().isOk());
+    }
 
     // Bilərəkdən yanlış (toplamaq əvəzinə həmişə 0 çap edən) həll.
     private static final String WRONG_SUM_SOLUTION = """

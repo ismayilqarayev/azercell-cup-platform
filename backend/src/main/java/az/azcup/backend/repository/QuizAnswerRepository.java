@@ -3,6 +3,9 @@ package az.azcup.backend.repository;
 import az.azcup.backend.entity.QuizAnswer;
 import az.azcup.backend.entity.QuizAttempt;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,4 +16,9 @@ public interface QuizAnswerRepository extends JpaRepository<QuizAnswer, Long> {
 
     // Müəllimin sual statistikası üçün: verilən cəhdlərin hamısının cavabları.
     List<QuizAnswer> findByAttemptIn(Collection<QuizAttempt> attempts);
+
+    // Bir testin bütün cəhdlərinin cavablarını bir sorğu ilə silir (hazır testlərin təmizlənməsi üçün).
+    @Modifying
+    @Query("delete from QuizAnswer a where a.attempt.id in (select t.id from QuizAttempt t where t.quiz.id = :quizId)")
+    void deleteByQuizId(@Param("quizId") Long quizId);
 }

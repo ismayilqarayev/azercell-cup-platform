@@ -2,9 +2,12 @@ package az.azcup.backend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -47,6 +50,12 @@ public class Contest {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    // Yarışı yaradan müəllim/admin: yarışı yalnız o (və admin) idarə edə bilər (bax: ContestAdminService.requireManage).
+    // Bu sahə əlavə olunmazdan əvvəl yaradılmış yarışlarda null-dur; onlar əvvəlki kimi bütün müəllimlərə açıq qalır.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
+
     // Bax: User.onCreate() — eyni məntiq, sətir bazaya yazılmazdan əvvəl
     // vaxt möhürünü avtomatik təyin edir.
     @PrePersist
@@ -54,6 +63,16 @@ public class Contest {
         if (createdAt == null) {
             createdAt = Instant.now();
         }
+    }
+
+    // createdBy sahəsinin dəyərini qaytarır (köhnə yarışlarda null).
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    // createdBy sahəsinə yeni dəyər təyin edir.
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
     // id sahəsinin dəyərini qaytarır.

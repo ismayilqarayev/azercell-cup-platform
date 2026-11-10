@@ -669,15 +669,13 @@
     ];
     if (q.category) sub.unshift(h('span', { class: 'tag cyan', text: q.category }));
     if (q.timeLimitMinutes) sub.push(h('span', { class: 'tag', text: q.timeLimitMinutes + ' dəq' }));
-    if (q.seeded) sub.unshift(h('span', { class: 'tag', title: 'Layihə ilə gələn hazır test: silinmir, yalnız gizlədilə bilər', text: 'Hazır test' }));
-    if (isAdmin() && q.authorName && !q.seeded) sub.push(h('span', { class: 'muted', text: q.authorName }));
-    // Başqasının (hazır) testində müəllim yalnız nəticələrə baxa və testi yoxlaya bilir; redaktə/dərc/silmə sahibinə və admin-ə məxsusdur
+    if (isAdmin() && q.authorName) sub.push(h('span', { class: 'muted', text: q.authorName }));
     var acts = h('div', { class: 'acts' },
-      q.canEdit ? h('button', { type: 'button', class: 'btn small', text: 'Redaktə', onclick: function () { openEditor(q.id); } }) : null,
+      h('button', { type: 'button', class: 'btn small', text: 'Redaktə', onclick: function () { openEditor(q.id); } }),
       h('button', { type: 'button', class: 'btn small', text: 'Nəticələr', onclick: function () { showResults(q.id); } }),
       h('button', { type: 'button', class: 'btn small', text: 'Yoxla', title: 'Testi şagird kimi həll et (nəticə cədvəlinə düşmür)', onclick: function (ev) { beginQuiz(q.id, ev.currentTarget); } }),
-      q.canEdit ? h('button', { type: 'button', class: 'btn small', text: q.published ? 'Gizlət' : 'Dərc et', onclick: function (ev) { togglePublish(q, ev.currentTarget); } }) : null,
-      q.canEdit ? h('button', { type: 'button', class: 'btn small danger', text: 'Sil', disabled: q.seeded, title: q.seeded ? 'Hazır testi silmək olmaz, "Gizlət" düyməsindən istifadə edin' : null, onclick: function () { removeQuiz(q); } }) : null);
+      h('button', { type: 'button', class: 'btn small', text: q.published ? 'Gizlət' : 'Dərc et', onclick: function (ev) { togglePublish(q, ev.currentTarget); } }),
+      h('button', { type: 'button', class: 'btn small danger', text: 'Sil', onclick: function () { removeQuiz(q); } }));
     return h('div', { class: 'row' },
       h('div', null, h('div', { class: 'nm', text: q.title }), h('div', { class: 'sub' }, sub)),
       acts);

@@ -49,8 +49,8 @@ public class Quiz {
     @Column(nullable = false)
     private boolean published;
 
-    // Layihə ilə birlikdə gələn hazır testlərin sabit açarı (bax: QuizSeedLoader); əl ilə yaradılan testlərdə null.
-    // Açar sayəsində yükləyici eyni testi iki dəfə yaratmır, hazır test isə silinə bilmir (yalnız dərcdən çıxarılır).
+    // KÖHNƏ SAHƏ: bir buraxılışda başlanğıcda avtomatik yaradılan hazır testlərin açarı idi. O testlər və yükləyici ləğv olunub;
+    // sahə yalnız QuizSeedCleanup-ın həmin testləri bazada tapıb silə bilməsi üçün qalır. Yeni testlərdə həmişə null-dur.
     @Column(length = 80, unique = true)
     private String seedKey;
 

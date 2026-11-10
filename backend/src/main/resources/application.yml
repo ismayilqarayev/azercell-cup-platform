@@ -29,10 +29,6 @@ app:
     # No real password here — set ADMIN_PASSWORD as an environment variable.
     password: ${ADMIN_PASSWORD:CHANGE-ME-set-ADMIN_PASSWORD-env-var}
     full-name: "Ismayil Garayev"
-  # Layihə ilə gələn hazır testlər (resources/seed/dim-python-tests.json) başlanğıcda bazaya yazılır (bax: QuizSeedLoader). Söndürmək: SEED_QUIZZES=false.
-  seed:
-    quizzes:
-      enabled: ${SEED_QUIZZES:true}
   # Sui-istifadəyə qarşı limitlər (bax: RateLimitFilter, LoginThrottle). Sinif eyni məktəb IP-sindən girir — IP limitləri səxavətlidir.
   rate-limit:
     enabled: ${RATE_LIMIT_ENABLED:true}
