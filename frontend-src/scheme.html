@@ -34,7 +34,7 @@
     background-image: none;
     background-attachment: fixed;
   }
-  .wrap{ max-width:960px; margin:0 auto; padding:36px 20px 100px; }
+  .wrap{ max-width:1360px; margin:0 auto; padding:36px 28px 100px; }
 
   .titleblock{
     border:2px solid var(--teal-bright); position:relative;
@@ -52,7 +52,7 @@
     margin:8px 0 8px; color:var(--ink); letter-spacing:-0.5px;
   }
   .titleblock h1 span{ color:var(--teal-text); }
-  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:660px; margin:0; }
+  .titleblock p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:920px; margin:0; }
 
   .section-label{
     font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--teal-text);
@@ -61,8 +61,10 @@
   .section-label::after{ content:""; flex:1; height:1px; background:var(--grid-line-strong); }
 
   /* ---------- Universal sxem: üfüqi axın (grid + oxlar) ---------- */
+  /* Hər sətir "kart → kart → kart → kart"dır (bax: renderUniversalFlow): 4 kart sütunu + aralarında 3 dar ox sütunu = 7 xana.
+     Əvvəl tor 4 bərabər sütun idi, oxlar da xana tutduğu üçün addımlar sətirlər arasında sürüşürdü. */
   .flow-grid{
-    display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+    display:grid; grid-template-columns:repeat(3, minmax(0,1fr) 28px) minmax(0,1fr); gap:10px;
   }
   .flow-card{
     position:relative; background:var(--paper); color:var(--ink); border-radius:6px;
@@ -78,7 +80,7 @@
     display:flex; align-items:center; justify-content:center;
     color:var(--teal-text); font-size:18px; font-family:var(--mono);
   }
-  @media (max-width:760px){
+  @media (max-width:900px){
     .flow-grid{ grid-template-columns:repeat(2, 1fr); }
     .flow-arrow{ display:none; }
   }
