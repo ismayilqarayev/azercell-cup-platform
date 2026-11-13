@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><g transform="translate(0,12)"><defs><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A9AEB4"/><stop offset="1" stop-color="#70767D"/></linearGradient>
+<mask id="mb"><path d="M172 112H340V196C340 250 304 288 256 288C208 288 172 250 172 196Z" fill="#fff"/>
+<g fill="#000"><rect x="160" y="166" width="192" height="9"/><rect x="160" y="226" width="192" height="9"/><rect x="209.5" y="100" width="9" height="200"/><rect x="251.5" y="100" width="9" height="200"/><rect x="293.5" y="100" width="9" height="200"/></g></mask></defs>
+<g mask="url(#mb)"><rect x="160" y="100" width="200" height="70" fill="#0098DA"/><rect x="160" y="170" width="200" height="60" fill="#E00F1A"/><rect x="160" y="230" width="200" height="70" fill="#22A85E"/></g>
+<path d="M235 297H277V320L296 342H216L235 320Z" fill="url(#gb)"/><rect x="184" y="351" width="144" height="26" rx="6" fill="url(#gb)"/>
+<g fill="none" stroke="url(#gb)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"><path d="M152 128C128 128 122 140 122 158V174C122 189 112 196 94 196C112 196 122 203 122 218V234C122 252 128 264 152 264"/><path d="M360 128C384 128 390 140 390 158V174C390 189 400 196 418 196C400 196 390 203 390 218V234C390 252 384 264 360 264"/></g></g></svg>
