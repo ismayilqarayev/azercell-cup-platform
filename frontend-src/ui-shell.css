@@ -160,13 +160,11 @@ svg.ico{ width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.2em; }
   box-shadow:0 18px 50px rgba(0,0,0,.5);
 }
 .loading-logo .loading-splash{ display:block; width:100%; margin:0; border-radius:0; box-shadow:none; animation:none; }
-/* Fincanın rəngləri: mavi-qırmızı-yaşıl zolaqlar fincanın içindən yuxarı axır (dövr = 200 vahid, ona görə kəsintisiz təkrarlanır) */
+/* Fincanın kiçik kubikləri (xanaları) növbə ilə böyüyüb kiçilir; gecikmə diaqonal dalğa yaradır */
 .loading-mark{ position:absolute; left:6.9%; top:17%; width:23.95%; height:auto; overflow:visible; }
-.mark-flow{ will-change:transform; }
-.loading-overlay.show .mark-flow{ animation:azMarkFlow 2.2s linear infinite; }
-.loading-overlay.show .mark-metal{ animation:azMarkMetal 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
-@keyframes azMarkFlow{ from{ transform:translateY(0); } to{ transform:translateY(-200px); } }
-@keyframes azMarkMetal{ 0%,100%{ opacity:.92; } 50%{ opacity:1; } }
+.mark-cell{ transform-box:fill-box; transform-origin:center; }
+.loading-overlay.show .mark-cell{ animation:azCell 1.4s ease-in-out infinite; }
+@keyframes azCell{ 0%,100%{ transform:scale(1); } 45%{ transform:scale(.4); } }
 .loading-logo::after{
   content:""; position:absolute; top:-10%; bottom:-10%; left:-55%; width:42%; opacity:0; pointer-events:none;
   background:linear-gradient(100deg, transparent, rgba(0,152,218,.22) 45%, rgba(255,255,255,.7) 50%, rgba(0,152,218,.22) 55%, transparent);
@@ -187,7 +185,7 @@ svg.ico{ width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.2em; }
   100%{ left:115%; opacity:0; }
 }
 @media (prefers-reduced-motion: reduce){
-  .loading-overlay.show .loading-logo, .loading-overlay.show .loading-logo::after, .loading-overlay.show .mark-flow, .loading-overlay.show .mark-metal{ animation:none; }
+  .loading-overlay.show .loading-logo, .loading-overlay.show .loading-logo::after, .loading-overlay.show .mark-cell{ animation:none; }
 }
 .loading-label{ font-weight:700; letter-spacing:.34em; text-indent:.34em; }
 .loading-bar{ height:5px; border-radius:99px; border:none; background:rgba(255,255,255,.08); }
