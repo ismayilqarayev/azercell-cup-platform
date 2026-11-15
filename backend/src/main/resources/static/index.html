@@ -1233,11 +1233,12 @@ svg.ico{ width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.2em; }
   box-shadow:0 18px 50px rgba(0,0,0,.5);
 }
 .loading-logo .loading-splash{ display:block; width:100%; margin:0; border-radius:0; box-shadow:none; animation:none; }
-/* Fincanın kiçik kubikləri (xanaları) növbə ilə böyüyüb kiçilir; gecikmə diaqonal dalğa yaradır */
+/* Fincanın kiçik kubikləri (xanaları) */
 .loading-mark{ position:absolute; left:6.9%; top:17%; width:23.95%; height:auto; overflow:visible; }
 .mark-cell{ transform-box:fill-box; transform-origin:center; }
-.loading-overlay.show .mark-cell{ animation:azCell 1.4s ease-in-out infinite; }
-@keyframes azCell{ 0%,100%{ transform:scale(1); } 45%{ transform:scale(.4); } }
+/* Kub ortadan böyüyərək gəlir (kiçik aşma ilə); "on" sinfini setLoaderMark verir */
+.mark-cell{ transform:scale(0); opacity:0; transition:transform .38s cubic-bezier(.34,1.56,.64,1), opacity .2s ease; }
+.mark-cell.on{ transform:scale(1); opacity:1; }
 .loading-logo::after{
   content:""; position:absolute; top:-10%; bottom:-10%; left:-55%; width:42%; opacity:0; pointer-events:none;
   background:linear-gradient(100deg, transparent, rgba(0,152,218,.22) 45%, rgba(255,255,255,.7) 50%, rgba(0,152,218,.22) 55%, transparent);
@@ -1258,7 +1259,7 @@ svg.ico{ width:1.15em; height:1.15em; flex:0 0 auto; vertical-align:-.2em; }
   100%{ left:115%; opacity:0; }
 }
 @media (prefers-reduced-motion: reduce){
-  .loading-overlay.show .loading-logo, .loading-overlay.show .loading-logo::after, .loading-overlay.show .mark-cell{ animation:none; }
+  .loading-overlay.show .loading-logo, .loading-overlay.show .loading-logo::after { animation:none; }
 }
 .loading-label{ font-weight:700; letter-spacing:.34em; text-indent:.34em; }
 .loading-bar{ height:5px; border-radius:99px; border:none; background:rgba(255,255,255,.08); }
@@ -3740,6 +3741,19 @@ function backToLangSelect(){
 // Hər səhifənin tam HTML məzmunu Base64 kodlanmış şəkildə saxlanılır ki,
 // iç-içə <script>/<style> teqləri və dırnaq işarələri heç bir konflikt yaratmasın.
 
+// Loqonun kubları yükləmə faizi artdıqca ortadan böyüyərək yerinə gəlir (diaqonal sıra ilə: yuxarı-soldan aşağı-sağa)
+let loaderCellOrder = null;
+function setLoaderMark(progress){
+  if (!loaderCellOrder){
+    const cells = Array.from(document.querySelectorAll('#loadingOverlay .mark-cell'));
+    loaderCellOrder = cells
+      .map((el, i) => ({ el, rank: (Math.floor(i / 4) + (i % 4)) * 10 + (i % 4) }))
+      .sort((x, y) => x.rank - y.rank)
+      .map(x => x.el);
+  }
+  const shown = Math.floor((progress / 100) * loaderCellOrder.length + 0.0001);
+  loaderCellOrder.forEach((el, i) => el.classList.toggle('on', i < shown));
+}
 function runLoadingThen(callback, fast){
   // setTimeout (not requestAnimationFrame) drives this: rAF fully pauses in
   // backgrounded tabs, which used to leave the overlay stuck at 0% forever
@@ -3753,7 +3767,7 @@ function runLoadingThen(callback, fast){
   overlay.classList.remove('quick');
   overlay.classList.add('show');
   fill.style.width = '0%';
-  pct.textContent = '0%';
+  pct.textContent = '0%'; setLoaderMark(0);
   // fast: dil/bölmə seçimində ~1 san. Tab keçidləri və giriş üçün bax: playEntryLoader.
   const duration = fast ? 850 + Math.random() * 350 : 1600 + Math.random() * 900;
   const start = performance.now();
@@ -3761,7 +3775,7 @@ function runLoadingThen(callback, fast){
     const elapsed = performance.now() - start;
     const progress = Math.min(100, Math.round((elapsed / duration) * 100));
     fill.style.width = progress + '%';
-    pct.textContent = progress + '%';
+    pct.textContent = progress + '%'; setLoaderMark(progress);
     if (progress < 100){
       loadingTimer = setTimeout(tick, 16);
     } else {
@@ -3791,7 +3805,7 @@ function playEntryLoader(frame){
   if (loadingTimer) clearTimeout(loadingTimer);
   overlay.classList.add('quick', 'show');
   fill.style.width = '0%';
-  pct.textContent = '0%';
+  pct.textContent = '0%'; setLoaderMark(0);
   const start = performance.now();
   function tick(){
     const elapsed = performance.now() - start;
@@ -3799,7 +3813,7 @@ function playEntryLoader(frame){
     let progress = Math.min(100, Math.round((elapsed / ENTRY_LOADER_MIN_MS) * 100));
     if (stillLoading) progress = Math.min(progress, 90);
     fill.style.width = progress + '%';
-    pct.textContent = progress + '%';
+    pct.textContent = progress + '%'; setLoaderMark(progress);
     if (progress < 100){
       loadingTimer = setTimeout(tick, 16);
     } else {
