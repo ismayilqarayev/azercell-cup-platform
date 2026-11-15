@@ -3769,7 +3769,7 @@ function runLoadingThen(callback, fast){
   fill.style.width = '0%';
   pct.textContent = '0%'; setLoaderMark(0);
   // fast: dil/bölmə seçimində ~1 san. Tab keçidləri və giriş üçün bax: playEntryLoader.
-  const duration = fast ? 850 + Math.random() * 350 : 1600 + Math.random() * 900;
+  const duration = fast ? 2600 + Math.random() * 400 : 3200 + Math.random() * 600;
   const start = performance.now();
   function tick(){
     const elapsed = performance.now() - start;
@@ -3795,7 +3795,7 @@ function runLoadingThen(callback, fast){
 // DİQQƏT: sabitlər funksiyanın İÇİNDƏDİR. Bu funksiya updateAuthUI -> showTab zənciri ilə skript hələ tam icra olunmamış da çağırıla
 // bilər; modul səviyyəsində "const" olsaydı TDZ ReferenceError skriptin qalanını dayandırardı (bax: loadingTimer yanındakı şərh).
 function playEntryLoader(frame){
-  const ENTRY_LOADER_MIN_MS = 800;
+  const ENTRY_LOADER_MIN_MS = 2200;
   const ENTRY_LOADER_MAX_MS = 6000;
   if (loaderHasCallback) return; // dil seçiminin yükləmə ekranı gedir: onun callback-i ləğv olunmamalıdır
   if (AzcupUI.reducedMotion()) return;
